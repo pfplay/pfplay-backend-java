@@ -24,6 +24,17 @@ pfplay backend api v1
 % git clone 'https://github.com/pfplay/pfplay-backend.git'
 ```
 
+## 3. Docker run
+```bash
+docker-compose up --build -d
+docker-compose down
+```
+
+### 3.1. M1 build
+> no matching manifest for linux/arm64/v8 in the manifest list entries
+1. docker-compose.yml -> `platform: linux/amd64` 추가하기
+![img.png](./api/asset/202305071207.png)
+
 ## Reference
 [docker-hub/mysql](https://hub.docker.com/_/mysql)
 
