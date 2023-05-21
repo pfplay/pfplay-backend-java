@@ -1,16 +1,19 @@
 package com.pfplaybackend.api.security;
 
+import com.pfplaybackend.api.security.service.PrincipalOAuth2UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final PrincipalOAuth2UserService principalOAuth2UserService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -26,6 +29,10 @@ public class SecurityConfig {
                 .formLogin().disable()
                 .httpBasic().disable()
                 .httpBasic();
+
+        http.oauth2Login()
+                .userInfoEndpoint()
+                .userService(principalOAuth2UserService);
 
         return http.build();
     }
