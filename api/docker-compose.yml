@@ -1,0 +1,42 @@
+version: "3.3"
+
+services:
+  db:
+    image: mysql/mysql-server:8.0
+    container_name: pfplay-db
+    restart: always
+    ports:
+      - "3306:3306"
+    env_file:
+      - ./db/.env
+    environment:
+        MYSQL_HOST: ${MYSQL_HOST}
+        MYSQL_DATABASE: ${MYSQL_DATABASE}
+        MYSQL_USER: ${MYSQL_USER}
+        MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/conf.d:/etc/mysql
+      - ./db/files:/var/lib/mysql-files
+    networks:
+      - backend
+
+  backend_app:
+    depends_on:
+    - db
+    container_name: pfplay-api
+    #platform: linux/amd64
+    #image: pfplay-api-v1:0.0.1
+    build:
+      context: .
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/pfplay?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&useUnicode=true&serverTimezone=Asia/Seoul
+    ports:
+      - "8080:8000"
+    restart: always
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
