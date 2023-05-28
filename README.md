@@ -24,6 +24,12 @@ pfplay backend api v1
 % git clone 'https://github.com/pfplay/pfplay-backend.git'
 ```
 
+## 3. Docker run
+```bash
+docker-compose up -d
+docker-compose down
+```
+
 ## Reference
 [docker-hub/mysql](https://hub.docker.com/_/mysql)
 
