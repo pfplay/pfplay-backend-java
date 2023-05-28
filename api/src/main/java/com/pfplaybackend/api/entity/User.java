@@ -26,4 +26,8 @@ public class User {
     private String refreshToken;
 
     public User() { }
+
+    public User(String email) {
+        this.email = email;
+    }
 }
