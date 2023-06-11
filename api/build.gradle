@@ -22,9 +22,10 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testCompileOnly 'org.assertj:assertj-core:3.23.1'
+	testCompileOnly 'org.assertj:assertj-core:3.24.2'
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.15.2'
 
 	// oauth2.0 jwt
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
