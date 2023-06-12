@@ -50,6 +50,7 @@ public class SecurityConfig {
                 .csrf(o -> o.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/error").permitAll()
+                        .requestMatchers("/health").permitAll()
                         .requestMatchers("/oauth2/authorization/google").permitAll()
                         .anyRequest().authenticated()
                 )
