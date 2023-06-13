@@ -32,3 +32,4 @@ db/
 api/src/main/resources/key/private_key.pem
 api/src/main/resources/key/public_key.pem
 api/src/main/resources/application.yml
+api/*.env

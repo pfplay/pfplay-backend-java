@@ -4,11 +4,11 @@ services:
   db:
     image: mysql/mysql-server:8.0
     container_name: pfplay-db
-    restart: "no"
+    restart: always
     ports:
       - "3306:3306"
     env_file:
-      - .env
+      - env
     environment:
         MYSQL_HOST: ${MYSQL_HOST}
         MYSQL_DATABASE: ${MYSQL_DATABASE}
