@@ -12,9 +12,15 @@
 #ENV JAR_NAME=pfplay-api-v1.jar
 #COPY --from=build ${JAR_FILE} ${JAR_NAME}
 #ENTRYPOINT ["sh", "-c", "java -jar ${JAR_NAME}"]
-
 FROM eclipse-temurin:17-jdk-alpine as build
+
+ARG SPRING_PROFILES_ACTIVE
+ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+RUN echo ${SPRING_PROFILES_ACTIVE}
+
 WORKDIR /opt/pfplay
 COPY . .
 RUN ./gradlew clean build -x test --refresh-dependencies
-ENTRYPOINT ["sh", "-c", "java -jar ./build/libs/*-SNAPSHOT.jar"]
+#ENTRYPOINT ["sh", "-c", "java -jar ./build/libs/*-SNAPSHOT.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar -Dspring.profiles.active=$SPRING_PROFILES_ACTIVE ./build/libs/*-SNAPSHOT.jar"]
+

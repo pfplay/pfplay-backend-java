@@ -7,6 +7,7 @@ import com.pfplaybackend.api.security.handle.CustomOAuth2AuthenticationSuccessHa
 import com.pfplaybackend.api.security.handle.JwtAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -33,8 +34,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final String AUTH_ENDPOINT_URL = "/oauth2/authorization";
-    private final String REDIRECT_URL = "/login/oauth2/code/google";
+    private final String AUTH_ENDPOINT_URL = "https://pfplay-api.com/oauth2/authorization";
+    private final String REDIRECT_URL = "https://pfplay-api.com/login/oauth2/code/google";
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -127,7 +128,7 @@ public class SecurityConfig {
             logoutHandler.setClearAuthentication(true);
             logoutHandler.setInvalidateHttpSession(true);
             logoutHandler.logout(request, response, authentication);
-            response.sendRedirect("/login");
+            response.sendRedirect( "/login");
         };
     }
 
