@@ -34,8 +34,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final String AUTH_ENDPOINT_URL = "https://pfplay-api.com/oauth2/authorization";
-    private final String REDIRECT_URL = "https://pfplay-api.com/login/oauth2/code/google";
+    private final String AUTH_ENDPOINT_URL = "/oauth2/authorization";
+    private final String REDIRECT_URL = "/login/oauth2/code/google";
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
