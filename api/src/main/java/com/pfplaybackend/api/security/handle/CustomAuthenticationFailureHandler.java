@@ -12,8 +12,10 @@ import java.io.IOException;
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
+    private final String DOMAIN = "https://pfplay-api.com";
+
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        response.sendRedirect("/login");
+        response.sendRedirect(DOMAIN + "/login");
     }
 }

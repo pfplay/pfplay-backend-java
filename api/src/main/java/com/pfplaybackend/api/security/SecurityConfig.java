@@ -34,6 +34,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final String DOMAIN = "https://pfplay-api.com";
     private final String AUTH_ENDPOINT_URL = "/oauth2/authorization";
     private final String REDIRECT_URL = "/login/oauth2/code/google";
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
@@ -75,9 +76,9 @@ public class SecurityConfig {
                         .successHandler(customOAuth2AuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
                         .authorizationEndpoint(auth -> auth
-                                .baseUri(AUTH_ENDPOINT_URL))
+                                .baseUri(DOMAIN + AUTH_ENDPOINT_URL))
                         .redirectionEndpoint(redirection -> redirection
-                                .baseUri(REDIRECT_URL)
+                                .baseUri(DOMAIN + REDIRECT_URL)
                         )
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
@@ -128,7 +129,7 @@ public class SecurityConfig {
             logoutHandler.setClearAuthentication(true);
             logoutHandler.setInvalidateHttpSession(true);
             logoutHandler.logout(request, response, authentication);
-            response.sendRedirect( "/login");
+            response.sendRedirect( DOMAIN + "/login");
         };
     }
 
