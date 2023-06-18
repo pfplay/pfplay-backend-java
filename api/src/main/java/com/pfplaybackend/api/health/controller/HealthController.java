@@ -13,9 +13,4 @@ public class HealthController {
         return ResponseEntity.ok("success");
     }
 
-    @GetMapping("/redirect")
-    public ResponseEntity<?> redirect(HttpServletRequest httpServletRequest) {
-
-        return ResponseEntity.ok("success");
-    }
 }
