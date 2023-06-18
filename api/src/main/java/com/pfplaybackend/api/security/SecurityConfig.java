@@ -35,8 +35,8 @@ import java.util.Set;
 public class SecurityConfig {
 
     private final String DOMAIN = "https://pfplay-api.com";
-    private final String AUTH_ENDPOINT_URL = "/oauth2/authorization";
-    private final String REDIRECT_URL = "/login/oauth2/code/google";
+//    private final String AUTH_ENDPOINT_URL = "/oauth2/authorization";
+//    private final String REDIRECT_URL = "/login/oauth2/code/google";
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/error").permitAll()
                         .requestMatchers("/health").permitAll()
-                        .requestMatchers("/oauth2/authorization/google").permitAll()
+//                        .requestMatchers("/oauth2/authorization/google").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(o -> o
@@ -75,11 +75,11 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2AuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
-                        .authorizationEndpoint(auth -> auth
-                                .baseUri(DOMAIN + AUTH_ENDPOINT_URL))
-                        .redirectionEndpoint(redirection -> redirection
-                                .baseUri(DOMAIN + REDIRECT_URL)
-                        )
+//                        .authorizationEndpoint(auth -> auth
+//                                .baseUri(DOMAIN + AUTH_ENDPOINT_URL))
+//                        .redirectionEndpoint(redirection -> redirection
+//                                .baseUri(DOMAIN + REDIRECT_URL)
+//                        )
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
                         )
