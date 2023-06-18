@@ -1,10 +1,7 @@
 package com.pfplaybackend.api.security;
 
-import com.pfplaybackend.api.security.handle.CustomAuthenticationEntryPoint;
+import com.pfplaybackend.api.security.handle.*;
 import com.pfplaybackend.api.enums.Authority;
-import com.pfplaybackend.api.security.handle.CustomAuthenticationFailureHandler;
-import com.pfplaybackend.api.security.handle.CustomOAuth2AuthenticationSuccessHandler;
-import com.pfplaybackend.api.security.handle.JwtAccessDeniedHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +38,7 @@ public class SecurityConfig {
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final CustomFilter customFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -60,11 +58,13 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                         .disable()
                 )
+                .requestCache(o -> o.disable())
                 .logout((logout) -> logout
                         .logoutUrl("/api/v1/logout").permitAll()
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler(logoutSuccessHandler())
                 )
+                .addFilterBefore(customFilter, CustomFilter.class)
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler)
