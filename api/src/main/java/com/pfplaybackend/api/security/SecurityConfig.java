@@ -15,7 +15,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -24,7 +31,11 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import static org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction.oauth2AuthorizedClient;
 
 @Slf4j
 @Configuration
@@ -33,14 +44,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final String DOMAIN = "https://pfplay-api.com";
-//    private final String AUTH_ENDPOINT_URL = "/oauth2/authorization";
-//    private final String REDIRECT_URL = "/login/oauth2/code/google";
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final CustomFilter customFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -76,26 +83,12 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2AuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
-//                        .authorizationEndpoint(auth -> auth
-//                                .baseUri(DOMAIN + AUTH_ENDPOINT_URL))
-//                        .redirectionEndpoint(redirection -> redirection
-//                                .baseUri(DOMAIN + REDIRECT_URL)
-//                        )
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
                         )
                 );
 
         return http.build();
-    }
-
-    @Bean
-    public FilterRegistrationBean<CustomFilter> loggingFilterRegistrationBean() {
-        FilterRegistrationBean<CustomFilter> registrationBean = new FilterRegistrationBean<>();
-        registrationBean.setFilter(new CustomFilter());
-        registrationBean.addUrlPatterns("/*"); // 적용할 URL 패턴 설정
-        registrationBean.setOrder(1); // 필터 실행 순서 설정
-        return registrationBean;
     }
 
     // Jwt 객체에 유저 권한 set
@@ -139,7 +132,7 @@ public class SecurityConfig {
             logoutHandler.setClearAuthentication(true);
             logoutHandler.setInvalidateHttpSession(true);
             logoutHandler.logout(request, response, authentication);
-            response.sendRedirect( DOMAIN + "/login");
+            response.sendRedirect( "/login");
         };
     }
 

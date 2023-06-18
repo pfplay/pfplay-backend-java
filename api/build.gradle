@@ -26,6 +26,7 @@ dependencies {
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.15.2'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// oauth2.0 jwt
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
