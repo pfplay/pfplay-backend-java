@@ -38,7 +38,6 @@ public class SecurityConfig {
     private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final CustomFilter customFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -64,7 +63,7 @@ public class SecurityConfig {
                         .deleteCookies("JSESSIONID")
                         .logoutSuccessHandler(logoutSuccessHandler())
                 )
-                .addFilterBefore(customFilter, CustomFilter.class)
+                .addFilterBefore(new CustomFilter(), CustomFilter.class)
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .authenticationEntryPoint(customAuthenticationEntryPoint)
                         .accessDeniedHandler(jwtAccessDeniedHandler)
