@@ -18,6 +18,6 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         log.info("response info={}", response);
         log.info("request info={}", request);
-        response.sendRedirect("/login");
+        response.sendRedirect("/error");
     }
 }
