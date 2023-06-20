@@ -19,9 +19,9 @@ public class HealthController {
         return ResponseEntity.ok("welcome");
     }
 
-    @RequestMapping("/error")
-    public ResponseEntity<?> error() {
-        return ResponseEntity.ok("error");
+    @GetMapping("/access")
+    public ResponseEntity<?> access() {
+        return ResponseEntity.ok("access");
     }
 
 }
