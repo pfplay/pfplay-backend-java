@@ -83,11 +83,13 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2AuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
+                        .loginPage("/api/v1/user/join")
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
                         )
                 );
 
+        http.requiresChannel().anyRequest().requiresSecure();
         return http.build();
     }
 
@@ -132,7 +134,7 @@ public class SecurityConfig {
             logoutHandler.setClearAuthentication(true);
             logoutHandler.setInvalidateHttpSession(true);
             logoutHandler.logout(request, response, authentication);
-            response.sendRedirect( "/login");
+            response.sendRedirect( "/");
         };
     }
 
