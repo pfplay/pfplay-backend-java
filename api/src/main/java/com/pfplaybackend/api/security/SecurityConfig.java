@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/error", "/health").permitAll()
                         .requestMatchers("/api/v1/user/login").permitAll()
+                        .requestMatchers("/api/v1/user/fail").permitAll()
                         .requestMatchers("/api/v1/user/join").permitAll()
                         .requestMatchers("/api/v1/logout").permitAll()
                         .anyRequest().authenticated()
@@ -70,7 +71,7 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2AuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
-                        .loginPage("/api/v1/user/join")
+                        .loginPage("/api/v1/user/login")
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
                         )

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
@@ -21,6 +22,7 @@ public class CustomOAuth2AuthenticationSuccessHandler implements AuthenticationS
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+        log.info("success request.getProtocol={}", request.getProtocol());
         response.sendRedirect( "/api/v1/user/join");
     }
 }
