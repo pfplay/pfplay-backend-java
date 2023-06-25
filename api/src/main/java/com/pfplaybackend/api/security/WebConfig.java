@@ -15,7 +15,6 @@ public class WebConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                log.info("config registry={}", registry);
                 registry.addMapping("/**")
 //                        .allowedOrigins("https:://pfplay.io") front : pfplay.io
                         .allowedOrigins("*")

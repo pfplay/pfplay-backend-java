@@ -45,10 +45,10 @@ public class SecurityConfig {
                 .csrf(o -> o.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/error", "/health").permitAll()
-                        .requestMatchers("/api/v1/user/login").permitAll()
-                        .requestMatchers("/api/v1/user/fail").permitAll()
-                        .requestMatchers("/api/v1/user/join").permitAll()
-                        .requestMatchers("/api/v1/logout").permitAll()
+//                        .requestMatchers("/api/v1/user/login").permitAll()
+//                        .requestMatchers("/api/v1/user/fail").permitAll()
+//                        .requestMatchers("/api/v1/user/join").permitAll()
+//                        .requestMatchers("/api/v1/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(o -> o
@@ -71,14 +71,12 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2AuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
-//                        .loginPage("/ https://pfplay-api.app/oauth2/authorization")
-//                        .loginPage("/api/v1/user/join")
+                        .loginPage("/api/v1/user/login")
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
                         )
                 );
 
-//        http.requiresChannel().requestMatchers("/api/v1/user/join").requiresSecure();
         return http.build();
     }
 
