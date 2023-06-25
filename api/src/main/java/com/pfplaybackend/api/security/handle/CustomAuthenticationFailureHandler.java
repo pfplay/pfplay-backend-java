@@ -16,10 +16,14 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        log.info("request info getProtocol={}", request.getProtocol());
-        log.info("request info getPathInfo={}", request.getPathInfo());
-        log.info("request info getRemoteHost={}", request.getRemoteHost());
-        log.info("request info getServerPort={}", request.getServerPort());
-        response.sendRedirect("/api/v1/user/fail");
+        log.info("fail request info getProtocol={}", request.getProtocol());
+        log.info("fail request info getPathInfo={}", request.getPathInfo());
+        log.info("fail request info getRemoteHost={}", request.getRemoteHost());
+        log.info("fail request info getServerPort={}", request.getServerPort());
+        log.info("fail request info getLocalPort={}", request.getLocalPort());
+        log.info("fail request info getRequestURI={}", request.getRequestURI());
+        log.info("fail request info getRemoteAddr={}", request.getRemoteAddr());
+
+        response.sendRedirect("/error");
     }
 }
