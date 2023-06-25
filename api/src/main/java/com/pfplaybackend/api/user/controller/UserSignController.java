@@ -34,20 +34,8 @@ public class UserSignController {
     private final TokenProvider tokenProvider;
     private final UserService userService;
 
-    @GetMapping("/login")
-    public ResponseEntity<?> join(HttpServletResponse response) {
-        return ResponseEntity.ok("login");
-    }
-
-    @GetMapping("/fail")
-    public ResponseEntity<?> fail(HttpServletResponse response) {
-        return ResponseEntity.ok(response);
-    }
-
-
     @GetMapping("/join")
     public ResponseEntity<?> join(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletResponse response) throws JsonProcessingException {
-        log.info("join");
         String email = oAuth2User.getAttributes().get("email").toString();
         Optional<User> findUser = Optional.ofNullable(userService.findByEmail(email));
 
