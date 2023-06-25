@@ -56,6 +56,8 @@ public class SecurityConfig {
                 .logout((logout) -> logout
                         .logoutUrl("/api/v1/logout").permitAll()
                         .deleteCookies("JSESSIONID")
+                        .clearAuthentication(true)
+                        .invalidateHttpSession(true)
                         .logoutSuccessHandler(logoutSuccessHandler())
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
