@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,15 @@ public class UserSignController {
 
     private final TokenProvider tokenProvider;
     private final UserService userService;
+
+    @GetMapping("/login")
+    public void join(HttpServletResponse response) throws IOException {
+        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        response.setHeader("Pragma", "no-cache");
+        response.setHeader("Expires", "0");
+        // 로그인 페이지로 리다이렉트
+        response.sendRedirect("/oauth2/authorization/google");
+    }
 
     @GetMapping("/join")
     public ResponseEntity<?> join(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletResponse response) throws JsonProcessingException {
