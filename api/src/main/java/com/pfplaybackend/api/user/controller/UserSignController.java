@@ -9,6 +9,7 @@ import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.enums.Header;
 import com.pfplaybackend.api.user.dto.UserSaveDto;
 import com.pfplaybackend.api.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,10 +37,12 @@ public class UserSignController {
     private final UserService userService;
 
     @GetMapping("/login")
-    public void join(HttpServletResponse response) throws IOException {
+    public void join(HttpServletResponse response, HttpServletRequest request) throws IOException {
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
         response.setHeader("Expires", "0");
+        log.info("login getRequestURI={}", request.getRequestURI());
+        log.info("login getRequestURL={}", request.getRequestURL());
         // 로그인 페이지로 리다이렉트
         response.sendRedirect("/oauth2/authorization/google");
     }
@@ -61,8 +64,10 @@ public class UserSignController {
 
             userService.save(userDto.toEntity());
             accessToken = tokenProvider.createAccessToken(userDto.getAuthority(), email, audience);
+            log.info("join accessToken={}", accessToken);
         } else {
             accessToken = tokenProvider.createAccessToken(findUser.orElseThrow().getAuthority(), email, audience);
+            log.info("join accessToken user={}", accessToken);
         }
 
         response.addHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + accessToken);
