@@ -45,7 +45,9 @@ public class SecurityConfig {
                 .csrf(o -> o.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/error", "/health").permitAll()
-//                        .requestMatchers("/oauth2/authorization/google").permitAll()
+                        .requestMatchers("/api/v1/user/login").permitAll()
+                        .requestMatchers("/api/v1/user/join").permitAll()
+                        .requestMatchers("/api/v1/logout").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(o -> o
@@ -74,7 +76,7 @@ public class SecurityConfig {
                         )
                 );
 
-//        http.requiresChannel().anyRequest().requiresSecure();
+        http.requiresChannel().requestMatchers("/api/v1/user/join").requiresSecure();
         return http.build();
     }
 
