@@ -72,6 +72,7 @@ public class SecurityConfig {
                         .successHandler(customOAuth2AuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
 //                        .loginPage("/ https://pfplay-api.app/oauth2/authorization")
+                        .loginPage("/api/v1/user/join")
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
                         )
