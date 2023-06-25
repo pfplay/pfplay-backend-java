@@ -71,13 +71,13 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(customOAuth2AuthenticationSuccessHandler)
                         .failureHandler(customAuthenticationFailureHandler)
-                        .loginPage("/api/v1/user/login")
+                        .loginPage("/")
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
                         )
                 );
 
-        http.requiresChannel().requestMatchers("/api/v1/user/join").requiresSecure();
+//        http.requiresChannel().requestMatchers("/api/v1/user/join").requiresSecure();
         return http.build();
     }
 
