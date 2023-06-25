@@ -39,6 +39,12 @@ public class UserSignController {
         return ResponseEntity.ok("login");
     }
 
+    @GetMapping("/fail")
+    public ResponseEntity<?> fail(HttpServletResponse response) {
+        return ResponseEntity.ok(response);
+    }
+
+
     @GetMapping("/join")
     public ResponseEntity<?> join(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletResponse response) throws JsonProcessingException {
         String email = oAuth2User.getAttributes().get("email").toString();

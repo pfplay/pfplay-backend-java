@@ -29,6 +29,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         String json = objectMapper.mapper().writeValueAsString(
                 ApiResponse.error(ResponseMessage.make(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.name()))
         );
+        log.info("entry={}", json);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }
