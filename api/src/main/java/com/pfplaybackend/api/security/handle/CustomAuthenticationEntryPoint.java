@@ -29,7 +29,13 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         String json = objectMapper.mapper().writeValueAsString(
                 ApiResponse.error(ResponseMessage.make(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.name()))
         );
-        log.info("entry={}", json);
+        log.info("entry point request info getProtocol={}", request.getProtocol());
+        log.info("entry point request info getPathInfo={}", request.getPathInfo());
+        log.info("entry point request info getRemoteHost={}", request.getRemoteHost());
+        log.info("entry point request info getServerPort={}", request.getServerPort());
+        log.info("entry point request info getLocalPort={}", request.getLocalPort());
+        log.info("entry point request info getRequestURI={}", request.getRequestURI());
+        log.info("entry point request info getRemoteAddr={}", request.getRemoteAddr());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }
