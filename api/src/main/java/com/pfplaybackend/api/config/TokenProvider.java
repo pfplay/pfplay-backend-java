@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
@@ -19,6 +20,7 @@ import org.springframework.security.oauth2.jwt.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -32,7 +34,7 @@ public class TokenProvider {
     private RSAPrivateKey privateKey;
 
     private final Instant now = Instant.now();
-    private final long expiry = 100L; // 3분
+    private final long expiry = 2600000L;   // 한달
 
     @Bean
     public JwtEncoder jwtEncoder() {
@@ -51,15 +53,15 @@ public class TokenProvider {
         return decoder;
     }
 
-    public String createAccessToken(Authority scope, String email, List<String> list) {
+    public String createAccessToken(Authority scope, String email) {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(email)
                 .issuedAt(now)
-                .audience(list)
                 .expiresAt(now.plusSeconds(expiry))
                 .claim("scope", scope)
                 .build();
 
+        log.info("jwt expiresAt ={}" , claims.getExpiresAt());
         return jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 

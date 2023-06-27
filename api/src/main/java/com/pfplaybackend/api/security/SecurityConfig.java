@@ -43,6 +43,7 @@ public class SecurityConfig {
                 .formLogin(o -> o.disable())
                 .httpBasic(o -> o.disable())
                 .csrf(o -> o.disable())
+                .rememberMe(o -> o.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/error", "/health").permitAll()
                         .requestMatchers("/api/v1/user/login").permitAll()
@@ -54,7 +55,7 @@ public class SecurityConfig {
                 )
                 .requestCache(o -> o.disable())
                 .logout((logout) -> logout
-                        .logoutUrl("/api/v1/logout").permitAll()
+                        .logoutUrl("/api/v1/user/logout").permitAll()
                         .deleteCookies("JSESSIONID")
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
