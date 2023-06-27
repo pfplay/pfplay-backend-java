@@ -23,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -38,11 +36,6 @@ public class UserSignController {
 
     @GetMapping("/login")
     public void join(HttpServletResponse response, HttpServletRequest request) throws IOException {
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Expires", "0");
-        log.info("login getRequestURI={}", request.getRequestURI());
-        log.info("login getRequestURL={}", request.getRequestURL());
         // 로그인 페이지로 리다이렉트
         response.sendRedirect("/oauth2/authorization/google");
     }
@@ -52,7 +45,6 @@ public class UserSignController {
         String email = oAuth2User.getAttributes().get("email").toString();
         Optional<User> findUser = Optional.ofNullable(userService.findByEmail(email));
 
-        List<String> audience = new ArrayList<>();
         String accessToken = "";
 
         if(findUser.isEmpty()) {
@@ -63,10 +55,10 @@ public class UserSignController {
                     .build();
 
             userService.save(userDto.toEntity());
-            accessToken = tokenProvider.createAccessToken(userDto.getAuthority(), email, audience);
+            accessToken = tokenProvider.createAccessToken(userDto.getAuthority(), email);
             log.info("join accessToken={}", accessToken);
         } else {
-            accessToken = tokenProvider.createAccessToken(findUser.orElseThrow().getAuthority(), email, audience);
+            accessToken = tokenProvider.createAccessToken(findUser.orElseThrow().getAuthority(), email);
             log.info("join accessToken user={}", accessToken);
         }
 
