@@ -16,8 +16,7 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-//                        .allowedOrigins("https:://pfplay.io") front : pfplay.io
-                        .allowedOrigins("*")
+                        .allowedOrigins("http://localhost:3000", "https://pfplay.io")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .maxAge(3600); // 프리플라이트 요청의 유효 기간
             }
