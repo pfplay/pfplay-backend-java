@@ -65,7 +65,7 @@ public class UserSignController {
     }
 
     @GetMapping("/join")
-    public ResponseEntity<?> join(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletResponse response) throws IOException {
+    public void join(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletResponse response) throws IOException {
         String email = oAuth2User.getAttributes().get("email").toString();
         Optional<User> findUser = Optional.ofNullable(userService.findByEmail(email));
 
@@ -96,11 +96,11 @@ public class UserSignController {
 //        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         response.addHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + accessToken);
 
-//        response.addHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + accessToken);
-//        response.setHeader("Location", REDIRECT_CLIENT_URL);
-//        response.setStatus(HttpServletResponse.SC_FOUND);
+        response.addHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + accessToken);
+        response.setHeader("Location", REDIRECT_CLIENT_URL);
+        response.setStatus(HttpServletResponse.SC_FOUND);
 
-        return ResponseEntity.ok().body(ApiResponse.success(ResponseMessage.make(HttpStatus.OK.value(), HttpStatus.OK.name())));
+//        return ResponseEntity.ok().body(ApiResponse.success(ResponseMessage.make(HttpStatus.OK.value(), HttpStatus.OK.name())));
     }
 
     @GetMapping("/dummy")
