@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -57,6 +58,7 @@ public class SecurityConfig {
                 .logout((logout) -> logout
                         .logoutUrl("/api/v1/user/logout").permitAll()
                         .deleteCookies("JSESSIONID")
+                        .deleteCookies("accessToken")
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
                         .logoutSuccessHandler(logoutSuccessHandler())
@@ -75,7 +77,9 @@ public class SecurityConfig {
                         .userInfoEndpoint((userInfo) -> userInfo
                                 .userAuthoritiesMapper(grantedAuthoritiesMapper())
                         )
-                );
+                )
+
+        ;
 
         return http.build();
     }

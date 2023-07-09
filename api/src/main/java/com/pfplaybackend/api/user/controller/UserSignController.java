@@ -13,7 +13,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,8 +23,14 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.ClientResponse;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Optional;
 
 @Slf4j
@@ -34,6 +42,8 @@ public class UserSignController {
     private final TokenProvider tokenProvider;
     private final UserService userService;
 
+    final String REDIRECT_CLIENT_URL = "https://pfplay.io";
+
     @GetMapping("/login")
     public void join(HttpServletResponse response, HttpServletRequest request) throws IOException {
         // 로그인 페이지로 리다이렉트
@@ -41,13 +51,13 @@ public class UserSignController {
     }
 
     @GetMapping("/join")
-    public ResponseEntity<?> join(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletResponse response) throws JsonProcessingException {
+    public void join(@AuthenticationPrincipal OAuth2User oAuth2User, HttpServletResponse response) throws IOException {
         String email = oAuth2User.getAttributes().get("email").toString();
         Optional<User> findUser = Optional.ofNullable(userService.findByEmail(email));
 
         String accessToken = "";
 
-        if(findUser.isEmpty()) {
+        if (findUser.isEmpty()) {
             // 회원가입
             UserSaveDto userDto = UserSaveDto.builder()
                     .email(email)
@@ -62,12 +72,23 @@ public class UserSignController {
             log.info("join accessToken user={}", accessToken);
         }
 
+//        ResponseCookie cookie = ResponseCookie.from("accessToken", accessToken)
+//                .httpOnly(true)
+//                .secure(true) // HTTPS를 사용하는 경우에만 secure로 설정
+//                .path("/") // 쿠키의 유효 범위 설정
+//                .build();
+//
+//        // 응답 헤더에 쿠키 추가
+//        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
         response.addHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + accessToken);
+        response.setHeader("Location", REDIRECT_CLIENT_URL);
+        response.setStatus(HttpServletResponse.SC_FOUND);
 
-        return ResponseEntity.ok().body(ApiResponse.success(ResponseMessage.make(HttpStatus.OK.value(), HttpStatus.OK.name())));
-    }
+//        return ResponseEntity.ok().body(ApiResponse.success(ResponseMessage.make(HttpStatus.OK.value(), HttpStatus.OK.name())));
+}
 
-    @GetMapping("/jwt")
+@GetMapping("/jwt")
     @PreAuthorize("hasRole('USER_ADMIN')")
     public ResponseEntity<?> jwt() {
         return ResponseEntity.ok().build();
