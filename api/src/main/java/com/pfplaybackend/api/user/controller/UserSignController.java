@@ -95,8 +95,6 @@ public class UserSignController {
 //        // 응답 헤더에 쿠키 추가
 //        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         response.addHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + accessToken);
-
-        response.addHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + accessToken);
         response.setHeader("Location", REDIRECT_CLIENT_URL);
         response.setStatus(HttpServletResponse.SC_FOUND);
 
