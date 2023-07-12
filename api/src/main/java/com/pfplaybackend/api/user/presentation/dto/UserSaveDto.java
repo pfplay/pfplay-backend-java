@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.user.dto;
+package com.pfplaybackend.api.user.presentation.dto;
 
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.enums.Authority;

@@ -30,8 +30,8 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
-    private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
+//    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+//    private final CustomOAuth2AuthenticationSuccessHandler customOAuth2AuthenticationSuccessHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
@@ -46,7 +46,7 @@ public class SecurityConfig {
                 .rememberMe(o -> o.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/", "/error", "/health").permitAll()
-                        .requestMatchers("/api/v1/user/login").permitAll()
+                        .requestMatchers("/api/v1/user/info").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(o -> o
@@ -57,7 +57,6 @@ public class SecurityConfig {
                 .logout((logout) -> logout
                         .logoutUrl("/api/v1/user/logout").permitAll()
                         .deleteCookies("JSESSIONID")
-                        .deleteCookies("accessToken")
                         .clearAuthentication(true)
                         .invalidateHttpSession(true)
                         .logoutSuccessHandler(logoutSuccessHandler())
@@ -69,14 +68,13 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter())
                         )
                 )
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(customOAuth2AuthenticationSuccessHandler)
-                        .failureHandler(customAuthenticationFailureHandler)
-                        .loginPage("/api/v1/user/login")
-                        .userInfoEndpoint((userInfo) -> userInfo
-                                .userAuthoritiesMapper(grantedAuthoritiesMapper())
-                        )
-                )
+//                .oauth2Login(oauth2 -> oauth2
+//                        .successHandler(customOAuth2AuthenticationSuccessHandler)
+//                        .failureHandler(customAuthenticationFailureHandler)
+//                        .userInfoEndpoint((userInfo) -> userInfo
+//                                .userAuthoritiesMapper(grantedAuthoritiesMapper())
+//                        )
+//                )
 
         ;
 
