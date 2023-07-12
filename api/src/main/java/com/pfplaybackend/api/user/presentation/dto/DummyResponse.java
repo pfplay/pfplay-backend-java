@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.user.dto;
+package com.pfplaybackend.api.user.presentation.dto;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

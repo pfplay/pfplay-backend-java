@@ -19,9 +19,4 @@ public class HealthController {
         return ResponseEntity.ok("welcome");
     }
 
-    @GetMapping("/access")
-    public ResponseEntity<?> access() {
-        return ResponseEntity.ok("access");
-    }
-
 }
