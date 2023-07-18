@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -26,20 +27,24 @@ public class UserService {
     }
 
     @Transactional
-    public String makeJwt(String email) {
-        Optional<User> findUser = Optional.ofNullable(userRepository.findByEmail(email));
-        if (findUser.isEmpty()) {
-            // 회원가입
-            UserSaveDto userDto = UserSaveDto.builder()
-                    .email(email)
-                    .authority(Authority.USER)
-                    .build();
+    public String notRegisteredUserReturnJwt(String email) {
+        // 회원가입
+        UserSaveDto userDto = UserSaveDto.builder()
+                .email(email)
+                .authority(Authority.USER)
+                .build();
 
-            userRepository.save(userDto.toEntity());
-            return tokenProvider.createAccessToken(userDto.getAuthority(), email);
-        } else {
-            return tokenProvider.createAccessToken(findUser.orElseThrow().getAuthority(), email);
-        }
+        userRepository.save(userDto.toEntity());
+        return tokenProvider.createAccessToken(userDto.getAuthority(), email);
+    }
+
+    public String registeredUserReturnJwt(User user, String email) {
+        return tokenProvider.createAccessToken(user.getAuthority(), email);
+    }
+
+    @Transactional(readOnly = true)
+    public User findByUser(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public <T> T request(String uri, Class<T> responseType) {

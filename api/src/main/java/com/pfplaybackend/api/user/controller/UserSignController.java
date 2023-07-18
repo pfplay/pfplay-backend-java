@@ -1,11 +1,13 @@
 package com.pfplaybackend.api.user.controller;
 
 import com.pfplaybackend.api.common.ApiResponse;
-import com.pfplaybackend.api.common.ResponseMessage;
+import com.pfplaybackend.api.entity.User;
+import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.enums.Header;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
 import com.pfplaybackend.api.user.presentation.request.TokenRequest;
 import com.pfplaybackend.api.user.presentation.response.UserInfoResponse;
+import com.pfplaybackend.api.user.presentation.response.UserLoginSuccessResponse;
 import com.pfplaybackend.api.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+import java.util.Optional;
+
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
@@ -25,7 +30,9 @@ public class UserSignController {
     private final UserService userService;
 
     @PostMapping("/info")
-    public ResponseEntity<?> userInfo(@RequestBody TokenRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> userInfo(
+            @RequestBody TokenRequest request, HttpServletResponse response
+    ) {
 
         final String uri = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + request.getAccessToken();
 
@@ -34,12 +41,31 @@ public class UserSignController {
         try {
             userInfoResponse = userService.request(uri, UserInfoResponse.class);
         } catch (Exception e) {
-            return ResponseEntity.ok().body(ApiResponse.error(ResponseMessage.make(HttpStatus.BAD_REQUEST.value(), e.getMessage())));
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
 
-        String accessToken = userService.makeJwt(userInfoResponse.getEmail());
-        response.setHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + accessToken);
-        return ResponseEntity.ok().body(ApiResponse.success(ResponseMessage.make(HttpStatus.OK.value(), HttpStatus.OK.name())));
+        String email = userInfoResponse.getEmail();
+        if(Objects.isNull(email) || email.isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("email scope empty"));
+        }
+
+        Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
+
+        String token;
+        boolean registered = false;
+        UserLoginSuccessResponse userLoginSuccessResponse;
+
+        if(findUser.isEmpty()) {
+            token = userService.notRegisteredUserReturnJwt(email);
+            registered = true;
+            userLoginSuccessResponse = new UserLoginSuccessResponse(registered, Authority.USER.getRole());
+        } else {
+            token = userService.registeredUserReturnJwt(findUser.orElseThrow(), email);
+            userLoginSuccessResponse = new UserLoginSuccessResponse(registered, findUser.get().getAuthority().getRole());
+        }
+
+        response.setHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + token);
+        return ResponseEntity.ok().body(ApiResponse.success(userLoginSuccessResponse));
     }
 
     @GetMapping("/dummy")
