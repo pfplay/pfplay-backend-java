@@ -24,4 +24,6 @@ public class Avatar {
 
     @Column(name = "point", nullable = false)
     private Integer point;
+
+    public Avatar() { }
 }
