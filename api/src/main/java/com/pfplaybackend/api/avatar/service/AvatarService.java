@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.avatar.service;
 
+import com.pfplaybackend.api.avatar.presentation.dto.AvatarBodyDto;
 import com.pfplaybackend.api.avatar.repository.AvatarRepository;
 import com.pfplaybackend.api.entity.Avatar;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,11 +10,13 @@ import java.util.List;
 
 @Service
 public class AvatarService {
-    @Autowired
-    AvatarRepository avatarRepository;
+    private AvatarRepository avatarRepository;
 
+    public AvatarService(AvatarRepository avatarRepository) {
+        this.avatarRepository = avatarRepository;
+    }
 
-    public List<Avatar> getAllAvatars() {
-        return avatarRepository.findAll();
+    public  List<AvatarBodyDto> getAvatarBodys() {
+        return avatarRepository.findBy(AvatarBodyDto.class);
     }
 }
