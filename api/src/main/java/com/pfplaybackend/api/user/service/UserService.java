@@ -4,6 +4,7 @@ import com.pfplaybackend.api.config.TokenProvider;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.user.presentation.dto.UserSaveDto;
+import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import com.pfplaybackend.api.user.repository.UserRepository;
 import com.pfplaybackend.api.config.WebClientConfig;
 import org.springframework.http.MediaType;
@@ -57,4 +58,13 @@ public class UserService {
                 .block();
     }
 
+    @Transactional
+    public void updateProfile(User user, ProfileUpdateRequest request) {
+        user.setIntroduction(request.getIntroduction());
+        user.setNickname(request.getNickname());
+        user.setFaceUrl(request.getFaceUrl());
+        user.setBodyId(request.getBodyId());
+        user.setWalletAddress(request.getWalletAddress());
+        userRepository.save(user);
+    }
 }

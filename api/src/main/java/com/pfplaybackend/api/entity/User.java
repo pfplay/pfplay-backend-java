@@ -4,11 +4,8 @@ import com.pfplaybackend.api.enums.Authority;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -28,13 +25,33 @@ public class User {
 
     private String nickname;
 
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
     private String introduction;
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
     private String walletAddress;
+    public void setWalletAddress(String walletAddress) {
+        this.walletAddress = walletAddress;
+    }
+
+    private String faceUrl;
+    public void setFaceUrl(String faceUrl) {
+        this.faceUrl = faceUrl;
+    }
+
+    private Integer bodyId;
+    public void setBodyId(Integer bodyId) {
+        this.bodyId = bodyId;
+    }
 
     @Column(columnDefinition = "integer default 0")
     private Integer djScore;
