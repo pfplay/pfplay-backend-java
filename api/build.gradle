@@ -27,10 +27,16 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.15.2'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	// oauth2.0 jwt
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+
+	// swagger
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'
+
+
 }
 
 tasks.named('test') {
