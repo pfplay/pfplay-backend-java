@@ -45,7 +45,12 @@ public class SecurityConfig {
                 .csrf(o -> o.disable())
                 .rememberMe(o -> o.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/error", "/health").permitAll()
+                        .requestMatchers(
+                                "/", "/error", "/health",
+                                "/v3/api-docs/**",
+                                "/spec/swagger-ui/**",
+                                "/swagger-ui/**"
+                        ).permitAll()
                         .requestMatchers("/api/v1/user/info").permitAll()
                         .anyRequest().authenticated()
                 )

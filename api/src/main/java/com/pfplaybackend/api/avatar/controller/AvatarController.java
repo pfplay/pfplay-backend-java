@@ -2,7 +2,7 @@ package com.pfplaybackend.api.avatar.controller;
 
 import com.pfplaybackend.api.avatar.presentation.response.AvatarBodyResponse;
 import com.pfplaybackend.api.avatar.service.AvatarService;
-import com.pfplaybackend.api.common.ApiResponse;
+import com.pfplaybackend.api.common.ApiCommonResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,6 +65,6 @@ public class AvatarController { // 아바타를 전체적으로 관리할거니�
     @GetMapping("/body-list")
     public ResponseEntity<?> getAllAvatarBodys() {
         AvatarBodyResponse avatarBodyResponse = new AvatarBodyResponse(this.avatarService.getAvatarBodys());
-        return ResponseEntity.ok(ApiResponse.success(avatarBodyResponse));
+        return ResponseEntity.ok(ApiCommonResponse.success(avatarBodyResponse));
     }
 }
