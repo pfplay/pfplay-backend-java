@@ -1,18 +1,24 @@
 package com.pfplaybackend.api.user.controller;
 
-import com.pfplaybackend.api.common.ApiResponse;
+import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.entity.User;
+import com.pfplaybackend.api.enums.ApiHeader;
 import com.pfplaybackend.api.enums.Authority;
-import com.pfplaybackend.api.enums.Header;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
 import com.pfplaybackend.api.user.presentation.request.TokenRequest;
 import com.pfplaybackend.api.user.presentation.response.UserInfoResponse;
 import com.pfplaybackend.api.user.presentation.response.UserLoginSuccessResponse;
 import com.pfplaybackend.api.user.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
@@ -21,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Objects;
 import java.util.Optional;
 
+
+@Tag(name = "user", description = "the user API")
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
@@ -29,6 +37,13 @@ public class UserSignController {
 
     private final UserService userService;
 
+    @Operation(summary = "유저 회원가입 및 로그인")
+    @ApiResponses(value = {
+        @ApiResponse(description = "유저 회원가입 및 로그인",
+                content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = UserLoginSuccessResponse.class))
+        )
+    })
     @PostMapping("/info")
     public ResponseEntity<?> userInfo(
             @RequestBody TokenRequest request, HttpServletResponse response
@@ -41,12 +56,12 @@ public class UserSignController {
         try {
             userInfoResponse = userService.request(uri, UserInfoResponse.class);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+            return ResponseEntity.badRequest().body(ApiCommonResponse.error(e.getMessage()));
         }
 
         String email = userInfoResponse.getEmail();
         if(Objects.isNull(email) || email.isEmpty()) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("email scope empty"));
+            return ResponseEntity.badRequest().body(ApiCommonResponse.error("email scope empty"));
         }
 
         Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
@@ -64,8 +79,8 @@ public class UserSignController {
             userLoginSuccessResponse = new UserLoginSuccessResponse(registered, findUser.get().getAuthority().getRole());
         }
 
-        response.setHeader(Header.AUTHORIZATION.getValue(), Header.BEARER.getValue() + token);
-        return ResponseEntity.ok().body(ApiResponse.success(userLoginSuccessResponse));
+        response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
+        return ResponseEntity.ok().body(ApiCommonResponse.success(userLoginSuccessResponse));
     }
 
     @GetMapping("/dummy")

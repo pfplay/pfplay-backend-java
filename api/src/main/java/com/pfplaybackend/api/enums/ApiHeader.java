@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum Header {
+public enum ApiHeader {
     AUTHORIZATION("Authorization"),
     BEARER("Bearer ");
 
