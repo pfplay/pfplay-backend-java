@@ -4,23 +4,20 @@ import com.pfplaybackend.api.enums.Authority;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
 @Getter
 @DynamicInsert
-@Table(schema = "USER")
+@Table(name = "USER")
 @Entity
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "integer UNSIGNED")
+    @Column(columnDefinition = "bigint UNSIGNED")
     private Long id;
 
     @Column(nullable = false, unique = true)
