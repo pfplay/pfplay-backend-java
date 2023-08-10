@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
@@ -20,8 +19,6 @@ import org.springframework.security.oauth2.jwt.*;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.List;
 
 @Slf4j
 @Configuration
@@ -62,6 +59,17 @@ public class TokenProvider {
                 .build();
 
         log.info("jwt expiresAt ={}" , claims.getExpiresAt());
+        return jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    public String createGuestAccessToken(Authority scope, Long id) {
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer(String.valueOf(id))
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(expiry))
+                .claim("scope", scope)
+                .build();
+
         return jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
 

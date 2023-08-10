@@ -1,17 +1,14 @@
 package com.pfplaybackend.api.user.service;
 
 import com.pfplaybackend.api.config.TokenProvider;
+import com.pfplaybackend.api.config.WebClientConfig;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.user.presentation.dto.UserSaveDto;
 import com.pfplaybackend.api.user.repository.UserRepository;
-import com.pfplaybackend.api.config.WebClientConfig;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class UserService {
@@ -27,15 +24,14 @@ public class UserService {
     }
 
     @Transactional
-    public String notRegisteredUserReturnJwt(String email) {
+    public User save(String email) {
         // 회원가입
         UserSaveDto userDto = UserSaveDto.builder()
                 .email(email)
                 .authority(Authority.USER)
                 .build();
 
-        userRepository.save(userDto.toEntity());
-        return tokenProvider.createAccessToken(userDto.getAuthority(), email);
+        return userRepository.save(userDto.toEntity());
     }
 
     public String registeredUserReturnJwt(User user, String email) {
