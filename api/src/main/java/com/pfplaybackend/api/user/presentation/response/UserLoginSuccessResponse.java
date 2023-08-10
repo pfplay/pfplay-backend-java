@@ -8,4 +8,6 @@ import lombok.RequiredArgsConstructor;
 public class UserLoginSuccessResponse {
     private final boolean registered;
     private final String authority;
+    private final Long id;
+    private final String name;
 }
