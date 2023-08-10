@@ -17,7 +17,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "bigint UNSIGNED")
+    @Column(columnDefinition = "integer UNSIGNED")
     private Long id;
 
     @Column(nullable = false, unique = true)
