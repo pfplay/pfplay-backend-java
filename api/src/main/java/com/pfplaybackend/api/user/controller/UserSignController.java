@@ -3,7 +3,6 @@ package com.pfplaybackend.api.user.controller;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.enums.ApiHeader;
-import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
 import com.pfplaybackend.api.user.presentation.request.TokenRequest;
 import com.pfplaybackend.api.user.presentation.response.UserInfoResponse;
@@ -39,10 +38,10 @@ public class UserSignController {
 
     @Operation(summary = "유저 회원가입 및 로그인")
     @ApiResponses(value = {
-        @ApiResponse(description = "유저 회원가입 및 로그인",
-                content = @Content(mediaType = "application/json",
-                schema = @Schema(implementation = UserLoginSuccessResponse.class))
-        )
+            @ApiResponse(description = "유저 회원가입 및 로그인",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = UserLoginSuccessResponse.class))
+            )
     })
     @PostMapping("/info")
     public ResponseEntity<?> userInfo(
@@ -60,7 +59,7 @@ public class UserSignController {
         }
 
         String email = userInfoResponse.getEmail();
-        if(Objects.isNull(email) || email.isEmpty()) {
+        if (Objects.isNull(email) || email.isEmpty()) {
             return ResponseEntity.badRequest().body(ApiCommonResponse.error("email scope empty"));
         }
 
@@ -70,13 +69,24 @@ public class UserSignController {
         boolean registered = false;
         UserLoginSuccessResponse userLoginSuccessResponse;
 
-        if(findUser.isEmpty()) {
-            token = userService.notRegisteredUserReturnJwt(email);
+        if (findUser.isEmpty()) {
+            User user = userService.save(email);
+            token = userService.registeredUserReturnJwt(user, user.getEmail());
             registered = true;
-            userLoginSuccessResponse = new UserLoginSuccessResponse(registered, Authority.USER.getRole());
+            userLoginSuccessResponse = new UserLoginSuccessResponse(
+                    registered,
+                    user.getAuthority().getRole(),
+                    user.getId(),
+                    null
+            );
         } else {
             token = userService.registeredUserReturnJwt(findUser.orElseThrow(), email);
-            userLoginSuccessResponse = new UserLoginSuccessResponse(registered, findUser.get().getAuthority().getRole());
+            userLoginSuccessResponse = new UserLoginSuccessResponse(
+                    registered,
+                    findUser.get().getAuthority().getRole(),
+                    findUser.get().getId(),
+                    findUser.get().getNickname()
+            );
         }
 
         response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
