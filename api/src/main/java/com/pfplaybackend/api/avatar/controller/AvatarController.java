@@ -1,12 +1,15 @@
 package com.pfplaybackend.api.avatar.controller;
 
-import com.pfplaybackend.api.avatar.presentation.response.AvatarBodyResponse;
+import com.pfplaybackend.api.avatar.presentation.dto.AvatarBodyDto;
 import com.pfplaybackend.api.avatar.service.AvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RequestMapping("/api/v1/avatar")
 @RestController
@@ -63,8 +66,8 @@ public class AvatarController { // 아바타를 전체적으로 관리할거니�
      *
      */
     @GetMapping("/body-list")
-    public ResponseEntity<?> getAllAvatarBodys() {
-        AvatarBodyResponse avatarBodyResponse = new AvatarBodyResponse(this.avatarService.getAvatarBodys());
+    public ResponseEntity<?> getAllAvatarBodies() {
+        List<AvatarBodyDto> avatarBodyResponse = new ArrayList<AvatarBodyDto>(this.avatarService.getAvatarBodies());
         return ResponseEntity.ok(ApiCommonResponse.success(avatarBodyResponse));
     }
 }

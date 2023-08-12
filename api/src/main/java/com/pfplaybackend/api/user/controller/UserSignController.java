@@ -4,6 +4,7 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.enums.ApiHeader;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
+import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import com.pfplaybackend.api.user.presentation.request.TokenRequest;
 import com.pfplaybackend.api.user.presentation.response.UserInfoResponse;
 import com.pfplaybackend.api.user.presentation.response.UserLoginSuccessResponse;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -108,5 +110,25 @@ public class UserSignController {
     public ResponseEntity<?> dummy() {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(new DummyResponse(jwtAuthenticationToken));
+    }
+
+    @PatchMapping("/profile")
+    public ResponseEntity<?> userProfile(
+            @RequestBody ProfileUpdateRequest request
+    ) {
+        try {
+            JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            String email = jwtAuthenticationToken.getToken().getClaims().get("iss").toString();
+
+            Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
+            if (findUser.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
+            } else {
+                userService.updateProfile(findUser.orElseThrow(), request);
+                return ResponseEntity.ok().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
     }
 }
