@@ -16,7 +16,7 @@ public class AvatarService {
         this.avatarRepository = avatarRepository;
     }
 
-    public  List<AvatarBodyDto> getAvatarBodys() {
+    public  List<AvatarBodyDto> getAvatarBodies() {
         return avatarRepository.findBy(AvatarBodyDto.class);
     }
 }
