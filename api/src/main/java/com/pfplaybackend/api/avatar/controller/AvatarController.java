@@ -63,8 +63,8 @@ public class AvatarController { // 아바타를 전체적으로 관리할거니�
      *
      */
     @GetMapping("/body-list")
-    public ResponseEntity<?> getAllAvatarBodys() {
-        AvatarBodyResponse avatarBodyResponse = new AvatarBodyResponse(this.avatarService.getAvatarBodys());
+    public ResponseEntity<?> getAllAvatarBodies() {
+        AvatarBodyResponse avatarBodyResponse = new AvatarBodyResponse(this.avatarService.getAvatarBodies());
         return ResponseEntity.ok(ApiCommonResponse.success(avatarBodyResponse));
     }
 }
