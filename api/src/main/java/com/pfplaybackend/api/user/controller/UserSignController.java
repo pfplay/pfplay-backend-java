@@ -4,6 +4,7 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.enums.ApiHeader;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
+import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import com.pfplaybackend.api.user.presentation.request.TokenRequest;
 import com.pfplaybackend.api.user.presentation.response.UserInfoResponse;
 import com.pfplaybackend.api.user.presentation.response.UserLoginSuccessResponse;
@@ -106,4 +107,23 @@ public class UserSignController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("/profile")
+    public ResponseEntity<?> userProfile(
+            @RequestBody ProfileUpdateRequest request
+    ) {
+        try {
+            JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            String email = jwtAuthenticationToken.getToken().getClaims().get("iss").toString();
+
+            Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
+            if (findUser.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
+            } else {
+                userService.updateProfile(findUser.orElseThrow(), request);
+                return ResponseEntity.ok().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
