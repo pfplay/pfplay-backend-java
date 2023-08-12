@@ -28,7 +28,7 @@ public class UserService {
         // 회원가입
         UserSaveDto userDto = UserSaveDto.builder()
                 .email(email)
-                .authority(Authority.USER)
+                .authority(Authority.ROLE_USER)
                 .build();
 
         return userRepository.save(userDto.toEntity());
