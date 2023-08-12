@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum Authority {
 
-    USER("ROLE_USER"),
-    GUEST("ROLE_GUEST"),
-    WALLET_USER("ROLE_WALLET_USER");
+    ROLE_USER("ROLE_USER"),
+    ROLE_GUEST("ROLE_GUEST"),
+    ROLE_WALLET_USER("ROLE_WALLET_USER");
 
     private final String role;
 }
