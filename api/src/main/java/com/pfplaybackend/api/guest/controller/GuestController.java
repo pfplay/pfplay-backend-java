@@ -45,9 +45,9 @@ public class GuestController {
 
         Guest guest = guestService.createGuest(request.getUserAgent());
         GuestCreateResponse guestCreateResponse =
-                new GuestCreateResponse(guest.getId(), guest.getName(), false, Authority.GUEST.getRole());
+                new GuestCreateResponse(guest.getId(), guest.getName(), false, Authority.ROLE_GUEST);
 
-        String token = tokenProvider.createGuestAccessToken(Authority.GUEST, guest.getId());
+        String token = tokenProvider.createGuestAccessToken(Authority.ROLE_GUEST, guest.getId());
         response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
 
         return ResponseEntity.ok().body(ApiCommonResponse.success(guestCreateResponse));

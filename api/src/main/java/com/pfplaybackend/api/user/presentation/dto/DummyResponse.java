@@ -9,7 +9,6 @@ import java.util.Collection;
 public class DummyResponse {
 
     private final String email;
-    private final String testSnakeCase = null;
     private final Collection<GrantedAuthority> authorities;
 
     public DummyResponse(JwtAuthenticationToken token) {

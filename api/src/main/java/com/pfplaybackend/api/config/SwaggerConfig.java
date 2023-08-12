@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.config;
 
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -15,6 +16,7 @@ import java.util.Arrays;
     name = "Bearer Authentication",
     type = SecuritySchemeType.HTTP,
     bearerFormat = "JWT",
+    in = SecuritySchemeIn.HEADER,
     scheme = "bearer"
 )
 @Configuration
@@ -33,7 +35,7 @@ public class SwaggerConfig {
                 .description("pfplay backend");
 
         Server localServer = new Server();
-        localServer.setDescription("local");
+        localServer.setDescription("backend local");
         localServer.setUrl(LOCAL_URL);
 
         Server prodServer = new Server();
@@ -41,7 +43,7 @@ public class SwaggerConfig {
         prodServer.setUrl(PROD_URL);
 
         return new OpenAPI()
-                .servers(Arrays.asList(localServer, prodServer))
+                .servers(Arrays.asList(prodServer, localServer))
                 .info(info);
     }
 }

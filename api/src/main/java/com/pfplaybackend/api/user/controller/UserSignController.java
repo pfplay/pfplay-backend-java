@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 
+@SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "user", description = "the user API")
 @Slf4j
 @RequiredArgsConstructor
@@ -41,8 +43,9 @@ public class UserSignController {
     @Operation(summary = "유저 회원가입 및 로그인")
     @ApiResponses(value = {
             @ApiResponse(description = "유저 회원가입 및 로그인",
-                    content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = UserLoginSuccessResponse.class))
+                    content = @Content(
+                        schema = @Schema(implementation = UserLoginSuccessResponse.class)
+                    )
             )
     })
     @PostMapping("/info")
@@ -76,18 +79,18 @@ public class UserSignController {
             token = userService.registeredUserReturnJwt(user, user.getEmail());
             registered = true;
             userLoginSuccessResponse = new UserLoginSuccessResponse(
-                    registered,
-                    user.getAuthority().getRole(),
                     user.getId(),
-                    null
+                    null,
+                    registered,
+                    user.getAuthority()
             );
         } else {
             token = userService.registeredUserReturnJwt(findUser.orElseThrow(), email);
             userLoginSuccessResponse = new UserLoginSuccessResponse(
-                    registered,
-                    findUser.get().getAuthority().getRole(),
                     findUser.get().getId(),
-                    findUser.get().getNickname()
+                    findUser.get().getNickname(),
+                    registered,
+                    findUser.get().getAuthority()
             );
         }
 
@@ -95,17 +98,18 @@ public class UserSignController {
         return ResponseEntity.ok().body(ApiCommonResponse.success(userLoginSuccessResponse));
     }
 
-    @GetMapping("/dummy")
+    @ApiResponses(value = {
+            @ApiResponse(description = "jwt 유저 인증 테스트. 게스트 jwt 접근 불가능",
+                    content = @Content(
+                        schema = @Schema(implementation = UserLoginSuccessResponse.class)
+                    )
+            )
+    })
+    @GetMapping("/jwt-auth-dummy")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> dummy() {
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(new DummyResponse(jwtAuthenticationToken));
-    }
-
-    @GetMapping("/jwt")
-    @PreAuthorize("hasRole('USER_ADMIN')")
-    public ResponseEntity<?> jwt() {
-        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/profile")

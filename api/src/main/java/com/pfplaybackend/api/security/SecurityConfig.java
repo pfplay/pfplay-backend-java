@@ -107,11 +107,11 @@ public class SecurityConfig {
                 if (authority instanceof OidcUserAuthority) {
                     OidcUserAuthority userAuthority = (OidcUserAuthority) authority;
                     mappedAuthority = new OidcUserAuthority(
-                            Authority.USER.getRole(), userAuthority.getIdToken(), userAuthority.getUserInfo());
+                            Authority.ROLE_USER.getRole(), userAuthority.getIdToken(), userAuthority.getUserInfo());
                 } else if (authority instanceof OAuth2UserAuthority) {
                     OAuth2UserAuthority userAuthority = (OAuth2UserAuthority) authority;
                     mappedAuthority = new OAuth2UserAuthority(
-                            Authority.USER.getRole(), userAuthority.getAttributes());
+                            Authority.ROLE_USER.getRole(), userAuthority.getAttributes());
                 } else {
                     mappedAuthority = authority;
                 }
