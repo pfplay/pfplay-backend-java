@@ -23,35 +23,20 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(length = 100)
     private String nickname;
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
     private String introduction;
-    public void setIntroduction(String introduction) {
-        this.introduction = introduction;
-    }
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Authority authority;
 
     private String walletAddress;
-    public void setWalletAddress(String walletAddress) {
-        this.walletAddress = walletAddress;
-    }
 
-    private String faceUrl;
-    public void setFaceUrl(String faceUrl) {
-        this.faceUrl = faceUrl;
-    }
-
-    private Integer bodyId;
-    public void setBodyId(Integer bodyId) {
-        this.bodyId = bodyId;
-    }
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDateTime createTime;
 
     @Column(columnDefinition = "integer default 0")
     private Integer djScore;
@@ -59,9 +44,11 @@ public class User {
     @Column(columnDefinition = "integer default 0")
     private Integer taskScore;
 
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime createTime;
+    @Column(columnDefinition = "integer UNSIGNED default 1")
+    private Integer bodyId;
+
+    @Column(length = 500)
+    private String faceUrl;
 
     protected User() { }
 
@@ -69,5 +56,21 @@ public class User {
     public User(String email, Authority authority) {
         this.email = email;
         this.authority = authority;
+    }
+
+    public void setFaceUrl(String faceUrl) {
+        this.faceUrl = faceUrl;
+    }
+
+    public void setWalletAddress(String walletAddress) {
+        this.walletAddress = walletAddress;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 }
