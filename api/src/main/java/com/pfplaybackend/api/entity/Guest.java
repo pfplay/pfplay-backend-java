@@ -29,10 +29,8 @@ public class Guest {
     @Column(nullable = false, columnDefinition = "varchar(2) default 0")
     private String ban;
 
-    @Column(length = 255)
     private String agent;
 
-    @Column(length = 255)
     private String reason;
 
     @Column(nullable = false, columnDefinition = "datetime default current_timestamp")
