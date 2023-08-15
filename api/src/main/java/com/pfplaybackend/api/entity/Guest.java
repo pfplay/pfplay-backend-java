@@ -17,7 +17,7 @@ public class Guest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "integer UNSIGNED")
+    @Column(columnDefinition = "integer unsigned")
     private Long id;
 
     @Column(nullable = false, length = 50)
@@ -35,7 +35,7 @@ public class Guest {
     @Column(length = 255)
     private String reason;
 
-    @Column(nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(nullable = false, columnDefinition = "datetime default current_timestamp")
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
