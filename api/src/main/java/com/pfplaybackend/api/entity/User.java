@@ -17,7 +17,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "integer UNSIGNED")
+    @Column(columnDefinition = "integer unsigned")
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -44,7 +44,7 @@ public class User {
     @Column(columnDefinition = "integer default 0")
     private Integer taskScore;
 
-    @Column(columnDefinition = "integer UNSIGNED default 1")
+    @Column(columnDefinition = "integer unsigned default 1")
     private Integer bodyId;
 
     @Column(length = 500)
