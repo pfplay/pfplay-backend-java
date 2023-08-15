@@ -76,7 +76,7 @@ public class UserSignController {
 
         if (findUser.isEmpty()) {
             User user = userService.save(email);
-            token = userService.registeredUserReturnJwt(user, user.getEmail());
+            token = userService.registeredUserReturnJwt(user, user.getEmail(), user.getId());
             registered = true;
             userLoginSuccessResponse = new UserLoginSuccessResponse(
                     user.getId(),
@@ -85,7 +85,7 @@ public class UserSignController {
                     user.getAuthority()
             );
         } else {
-            token = userService.registeredUserReturnJwt(findUser.orElseThrow(), email);
+            token = userService.registeredUserReturnJwt(findUser.orElseThrow(), email, findUser.get().getId());
             userLoginSuccessResponse = new UserLoginSuccessResponse(
                     findUser.get().getId(),
                     findUser.get().getNickname(),

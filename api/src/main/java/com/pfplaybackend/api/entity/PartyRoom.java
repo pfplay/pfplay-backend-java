@@ -36,7 +36,6 @@ public class PartyRoom {
 
     private String domain;
 
-
     @Comment("디제잉 시간")
     @Column(length = 50)
     private Integer djingLimit;
@@ -56,16 +55,19 @@ public class PartyRoom {
     @Enumerated(EnumType.STRING)
     private PartyRoomStatus status;
 
-    public PartyRoom() { }
+    protected PartyRoom() { }
 
     @Builder
-    public PartyRoom(String name, User user, String introduce, String domain, Integer djingLimit, PartyRoomType type, PartyRoomStatus status) {
+    public PartyRoom(String name, User user, String introduce,
+                     String domain, Integer djingLimit, PartyRoomType type,
+                     LocalDateTime updatedAt, PartyRoomStatus status) {
         this.name = name;
         this.user = user;
         this.introduce = introduce;
         this.domain = domain;
         this.djingLimit = djingLimit;
         this.type = type;
+        this.updatedAt = updatedAt;
         this.status = status;
     }
 }

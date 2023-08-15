@@ -35,8 +35,8 @@ public class UserService {
         return userRepository.save(userDto.toEntity());
     }
 
-    public String registeredUserReturnJwt(User user, String email) {
-        return tokenProvider.createAccessToken(user.getAuthority(), email);
+    public String registeredUserReturnJwt(User user, String email, Long userId) {
+        return tokenProvider.createAccessToken(user.getAuthority(), email, userId);
     }
 
     @Transactional(readOnly = true)
