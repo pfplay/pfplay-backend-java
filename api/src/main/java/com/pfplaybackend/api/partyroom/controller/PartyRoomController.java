@@ -2,7 +2,6 @@ package com.pfplaybackend.api.partyroom.controller;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
-import com.pfplaybackend.api.entity.PartyRoom;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
@@ -57,11 +56,14 @@ public class PartyRoomController {
                 .introduce(request.getIntroduce())
                 .domain(request.getDomain())
                 .limit(request.getLimit())
-                .type(PartyRoomType.PRIVATE)
+                .type(PartyRoomType.PARTY)
                 .status(PartyRoomStatus.ACTIVE)
                 .build();
 
-        PartyRoom partyRoom = partyRoomService.createPartyRoom(dto);
-        return ResponseEntity.ok().body(ApiCommonResponse.success(PartyRoomCreateResponse.toResponse(partyRoom)));
+        return ResponseEntity
+                .ok()
+                .body(ApiCommonResponse.success(
+                    PartyRoomCreateResponse.toResponse(partyRoomService.createPartyRoom(dto), user))
+                );
     }
 }

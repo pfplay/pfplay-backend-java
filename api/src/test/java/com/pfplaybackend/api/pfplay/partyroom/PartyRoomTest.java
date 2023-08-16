@@ -69,7 +69,7 @@ class PartyRoomTest {
                 .status(PartyRoomStatus.ACTIVE)
                 .djingLimit(3)
                 .introduce("뉴진스~~~")
-                .type(PartyRoomType.PRIVATE)
+                .type(PartyRoomType.PARTY)
                 .user(user)
                 .updatedAt(null)
                 .build();
@@ -99,9 +99,10 @@ class PartyRoomTest {
 
         String accessToken = tokenProvider.createAccessToken(save.getAuthority(), save.getEmail(), save.getId());
         String content = om.mapper().writeValueAsString(new PartyRoomCreateRequest(
-                "뉴진스", "뉴진스 소개", "https://pfplay.io", 3
+                "뉴진스", "뉴진스 소개", "domain", 3
         ));
 
+        System.out.println(accessToken);
         mockMvc.perform(post("/api/v1/party-room/create")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization", "Bearer " + accessToken)
