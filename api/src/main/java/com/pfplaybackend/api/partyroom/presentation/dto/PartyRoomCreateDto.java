@@ -19,12 +19,15 @@ public class PartyRoomCreateDto {
     private final PartyRoomType type;
     private final PartyRoomStatus status;
 
+    // @TODO 아래 domain 저장 확인 필요
+    private final String domainUrl = "https://pfplay.io/";
+
     public PartyRoom toEntity() {
         return PartyRoom.builder()
                 .name(name)
                 .user(user)
                 .introduce(introduce)
-                .domain(domain)
+                .domain(domainUrl + domain)
                 .djingLimit(limit)
                 .type(type)
                 .updatedAt(null)
