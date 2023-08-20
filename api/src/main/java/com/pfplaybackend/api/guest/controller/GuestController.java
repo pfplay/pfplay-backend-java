@@ -3,7 +3,6 @@ package com.pfplaybackend.api.guest.controller;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.config.TokenProvider;
 import com.pfplaybackend.api.entity.Guest;
-import com.pfplaybackend.api.enums.ApiHeader;
 import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.guest.presentation.request.GuestCreateRequest;
 import com.pfplaybackend.api.guest.presentation.response.GuestCreateResponse;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,16 +37,23 @@ public class GuestController {
     })
     @PostMapping("/create")
     public ResponseEntity<?> createGuest(
-            @RequestBody GuestCreateRequest request,
-            HttpServletResponse response
+            @RequestBody GuestCreateRequest request
+//            HttpServletResponse response
     ) {
 
         Guest guest = guestService.createGuest(request.getUserAgent());
-        GuestCreateResponse guestCreateResponse =
-                new GuestCreateResponse(guest.getId(), guest.getName(), false, Authority.ROLE_GUEST);
-
         String token = tokenProvider.createGuestAccessToken(Authority.ROLE_GUEST, guest.getId());
-        response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
+
+        GuestCreateResponse guestCreateResponse =
+                new GuestCreateResponse(
+                        guest.getId(),
+                        guest.getName(),
+                        false,
+                        Authority.ROLE_GUEST,
+                        token
+                );
+
+//        response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
 
         return ResponseEntity.ok().body(ApiCommonResponse.success(guestCreateResponse));
     }
