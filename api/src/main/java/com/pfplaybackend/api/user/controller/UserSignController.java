@@ -2,7 +2,6 @@ package com.pfplaybackend.api.user.controller;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.enums.ApiHeader;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
 import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import com.pfplaybackend.api.user.presentation.request.TokenRequest;
@@ -16,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -50,7 +48,8 @@ public class UserSignController {
     })
     @PostMapping("/info")
     public ResponseEntity<?> userInfo(
-            @RequestBody TokenRequest request, HttpServletResponse response
+            @RequestBody TokenRequest request
+//            , HttpServletResponse response
     ) {
 
         final String uri = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + request.getAccessToken();
@@ -82,7 +81,8 @@ public class UserSignController {
                     user.getId(),
                     null,
                     registered,
-                    user.getAuthority()
+                    user.getAuthority(),
+                    token
             );
         } else {
             token = userService.registeredUserReturnJwt(findUser.orElseThrow(), email);
@@ -90,11 +90,12 @@ public class UserSignController {
                     findUser.get().getId(),
                     findUser.get().getNickname(),
                     registered,
-                    findUser.get().getAuthority()
+                    findUser.get().getAuthority(),
+                    token
             );
         }
 
-        response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
+//        response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
         return ResponseEntity.ok().body(ApiCommonResponse.success(userLoginSuccessResponse));
     }
 
