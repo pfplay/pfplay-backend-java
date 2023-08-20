@@ -11,4 +11,5 @@ public class GuestCreateResponse {
     private final boolean registered;
     @Schema(implementation = Authority.class)
     private final Authority authority;
+    private final String accessToken;
 }

@@ -13,5 +13,5 @@ public class UserLoginSuccessResponse {
     private final boolean registered;
     @Schema(implementation = Authority.class)
     private final Authority authority;
-
+    private final String accessToken;
 }
