@@ -23,8 +23,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -82,10 +80,10 @@ class PartyRoomTest {
     @Transactional
     public void getPartyRoomInfo() {
         Long userId = userRepository.findById(1L).orElseThrow().getId();
-        List<PartyRoom> partyRooms = partyRoomRepository.findByUserId(userId).stream().toList();
+        PartyRoom partyRooms = partyRoomRepository.findByUserId(userId);
 
-        Assertions.assertEquals(partyRooms.get(0).getId(), 1);
-        Assertions.assertEquals(partyRooms.get(0).getUser().getId(), 1);
+        Assertions.assertEquals(partyRooms.getId(), 1);
+        Assertions.assertEquals(partyRooms.getUser().getId(), 1);
     }
 
     @Test
