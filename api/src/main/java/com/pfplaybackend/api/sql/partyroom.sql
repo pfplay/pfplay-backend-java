@@ -21,3 +21,7 @@ alter table party_room
     foreign key (user_id)
     references user (id)
 ;
+
+alter table party_room
+    add constraint unique_party_room_domain unique (domain)
+;

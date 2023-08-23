@@ -27,9 +27,9 @@ public class GuestController {
     private final GuestService guestService;
     private final TokenProvider tokenProvider;
 
-    @Operation(summary = "게스트")
+    @Operation(summary = "게스트 생성")
     @ApiResponses(value = {
-            @ApiResponse(description = "게스트",
+            @ApiResponse(description = "게스트 생성",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = GuestCreateResponse.class)
                     )

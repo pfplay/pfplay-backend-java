@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+@Tag(name = "party", description = "party api")
 @SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequiredArgsConstructor
@@ -48,7 +50,7 @@ public class PartyRoomController {
     public ResponseEntity<?> create(@RequestBody @Valid PartyRoomCreateRequest request) {
         JwtTokenInfo jwtTokenInfo = new JwtTokenInfo(SecurityContextHolder.getContext().getAuthentication());
         User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
-                            .orElseThrow(()-> new NoSuchElementException("user not found email : " + jwtTokenInfo.getEmail()));
+                            .orElseThrow(NoSuchElementException::new);
 
         PartyRoomCreateDto dto = PartyRoomCreateDto.builder()
                 .name(request.getName())
