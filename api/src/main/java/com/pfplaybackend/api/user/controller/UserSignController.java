@@ -120,7 +120,6 @@ public class UserSignController {
         try {
             JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
             String email = jwtAuthenticationToken.getToken().getClaims().get("iss").toString();
-
             Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
             if (findUser.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
