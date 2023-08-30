@@ -56,11 +56,6 @@ public class UserService {
 
     @Transactional
     public void updateProfile(User user, ProfileUpdateRequest request) {
-        user.setIntroduction(request.getIntroduction());
-        user.setNickname(request.getNickname());
-        user.setFaceUrl(request.getFaceUrl());
-        user.setBodyId(request.getBodyId());
-        user.setWalletAddress(request.getWalletAddress());
-        userRepository.save(user);
+        user.updateProfile(request);
     }
 }
