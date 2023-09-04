@@ -23,7 +23,6 @@ public class PartyRoomService {
 
     @Transactional
     public PartyRoom createPartyRoom(PartyRoomCreateDto dto) {
-
         if(partyRoomRepository.findByDomain(dto.domainUrl()).size() > 0) {
             throw new DuplicateKeyException("domain exists");
         }
