@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -39,6 +40,20 @@ public class GlobalExceptionHandler {
                                 ExceptionResult.builder()
                                         .code(ExceptionEnum.DUPLICATE_KEY.getHttpStatusCode())
                                         .message(ExceptionEnum.DUPLICATE_KEY.getMessage())
+                                        .stackTrace(e.getMessage())
+                                        .build()
+                        )
+                );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> AccessDeniedException(AccessDeniedException e) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiCommonResponse.error(
+                                ExceptionResult.builder()
+                                        .code(ExceptionEnum.ACCESS_DENIED_EXCEPTION.getHttpStatusCode())
+                                        .message(ExceptionEnum.ACCESS_DENIED_EXCEPTION.getMessage())
                                         .stackTrace(e.getMessage())
                                         .build()
                         )
