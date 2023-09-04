@@ -20,7 +20,6 @@ public class PartyRoomCreateDto {
     private final PartyRoomType type;
     private final PartyRoomStatus status;
 
-
     public PartyRoom toEntity() {
         return PartyRoom.builder()
                 .name(name)
