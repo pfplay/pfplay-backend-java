@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 @DynamicUpdate
 @Table( name = "PARTY_ROOM",
         uniqueConstraints = {
-            @UniqueConstraint(name = "unique_party_room_name", columnNames = { "name"}),
-            @UniqueConstraint(name = "unique_party_room_domain", columnNames = { "domain"})
+            @UniqueConstraint(name = "unique_party_room_name", columnNames = {"name"}),
+            @UniqueConstraint(name = "unique_party_room_domain", columnNames = {"domain"})
         })
 @Entity
 public class PartyRoom {
