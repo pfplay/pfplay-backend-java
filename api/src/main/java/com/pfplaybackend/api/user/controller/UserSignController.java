@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.user.controller;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
 import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
@@ -24,7 +25,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.web.bind.annotation.*;
 
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 
 
@@ -37,6 +37,7 @@ import java.util.Optional;
 public class UserSignController {
 
     private final UserService userService;
+    private final ObjectMapperConfig om;
 
     @Operation(summary = "유저 회원가입 및 로그인")
     @ApiResponses(value = {
@@ -49,51 +50,10 @@ public class UserSignController {
     @PostMapping("/info")
     public ResponseEntity<?> userInfo(
             @RequestBody TokenRequest request
-//            , HttpServletResponse response
     ) {
-
         final String uri = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + request.getAccessToken();
-
-        UserInfoResponse userInfoResponse;
-
-        userInfoResponse = userService.request(uri, UserInfoResponse.class);
-
-        String email = userInfoResponse.getEmail();
-        if (Objects.isNull(email) || email.isEmpty()) {
-            throw new NoSuchElementException();
-        }
-
-        Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
-
-        String token;
-        boolean registered = false;
-        UserLoginSuccessResponse userLoginSuccessResponse;
-
-        if (findUser.isEmpty()) {
-            User user = userService.save(email);
-            token = userService.registeredUserReturnJwt(user, user.getEmail(), user.getId());
-            registered = true;
-            userLoginSuccessResponse = new UserLoginSuccessResponse(
-                    user.getId(),
-                    null,
-                    registered,
-                    user.getAuthority(),
-                    token
-            );
-
-            return ResponseEntity.ok().body(ApiCommonResponse.success(userLoginSuccessResponse));
-        }
-
-        token = userService.registeredUserReturnJwt(findUser.orElseThrow(), email, findUser.get().getId());
-        userLoginSuccessResponse = new UserLoginSuccessResponse(
-                findUser.get().getId(),
-                findUser.get().getNickname(),
-                registered,
-                findUser.get().getAuthority(),
-                token
-        );
-
-//        response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
+        UserInfoResponse googleToken = userService.request(uri, UserInfoResponse.class);
+        UserLoginSuccessResponse userLoginSuccessResponse = userService.register(googleToken);
         return ResponseEntity.ok().body(ApiCommonResponse.success(userLoginSuccessResponse));
     }
 
