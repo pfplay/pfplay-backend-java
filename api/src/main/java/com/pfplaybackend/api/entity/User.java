@@ -12,7 +12,10 @@ import java.time.LocalDateTime;
 
 @Getter
 @DynamicInsert
-@Table(name = "USER")
+@Table( name = "USER",
+        uniqueConstraints = {
+            @UniqueConstraint(name = "unique_user_email", columnNames = {"email"})
+        })
 @Entity
 public class User {
 
@@ -21,7 +24,7 @@ public class User {
     @Column(columnDefinition = "integer unsigned")
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String email;
 
     @Column(length = 100)

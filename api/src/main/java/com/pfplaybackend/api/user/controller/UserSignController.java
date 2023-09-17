@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.user.controller;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
 import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
@@ -17,19 +18,18 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 
 @SecurityRequirement(name = "Bearer Authentication")
-@Tag(name = "user", description = "the user API")
+@Tag(name = "user", description = "user api")
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
@@ -37,6 +37,7 @@ import java.util.Optional;
 public class UserSignController {
 
     private final UserService userService;
+    private final ObjectMapperConfig om;
 
     @Operation(summary = "유저 회원가입 및 로그인")
     @ApiResponses(value = {
@@ -49,53 +50,10 @@ public class UserSignController {
     @PostMapping("/info")
     public ResponseEntity<?> userInfo(
             @RequestBody TokenRequest request
-//            , HttpServletResponse response
     ) {
-
         final String uri = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=" + request.getAccessToken();
-
-        UserInfoResponse userInfoResponse;
-
-        try {
-            userInfoResponse = userService.request(uri, UserInfoResponse.class);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiCommonResponse.error(e.getMessage()));
-        }
-
-        String email = userInfoResponse.getEmail();
-        if (Objects.isNull(email) || email.isEmpty()) {
-            return ResponseEntity.badRequest().body(ApiCommonResponse.error("email scope empty"));
-        }
-
-        Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
-
-        String token;
-        boolean registered = false;
-        UserLoginSuccessResponse userLoginSuccessResponse;
-
-        if (findUser.isEmpty()) {
-            User user = userService.save(email);
-            token = userService.registeredUserReturnJwt(user, user.getEmail());
-            registered = true;
-            userLoginSuccessResponse = new UserLoginSuccessResponse(
-                    user.getId(),
-                    null,
-                    registered,
-                    user.getAuthority(),
-                    token
-            );
-        } else {
-            token = userService.registeredUserReturnJwt(findUser.orElseThrow(), email);
-            userLoginSuccessResponse = new UserLoginSuccessResponse(
-                    findUser.get().getId(),
-                    findUser.get().getNickname(),
-                    registered,
-                    findUser.get().getAuthority(),
-                    token
-            );
-        }
-
-//        response.setHeader(ApiHeader.AUTHORIZATION.getValue(), ApiHeader.BEARER.getValue() + token);
+        UserInfoResponse googleToken = userService.request(uri, UserInfoResponse.class);
+        UserLoginSuccessResponse userLoginSuccessResponse = userService.register(googleToken);
         return ResponseEntity.ok().body(ApiCommonResponse.success(userLoginSuccessResponse));
     }
 
@@ -122,7 +80,7 @@ public class UserSignController {
             String email = jwtAuthenticationToken.getToken().getClaims().get("iss").toString();
             Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
             if (findUser.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user not found");
+                throw new NoSuchElementException();
             } else {
                 userService.updateProfile(findUser.orElseThrow(), request);
                 return ResponseEntity.ok().build();
@@ -130,5 +88,8 @@ public class UserSignController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
+
+        userService.updateProfile(findUser.orElseThrow(), request);
+        return ResponseEntity.ok().build();
     }
 }
