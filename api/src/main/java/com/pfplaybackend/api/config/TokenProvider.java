@@ -50,12 +50,13 @@ public class TokenProvider {
         return decoder;
     }
 
-    public String createAccessToken(Authority scope, String email) {
+    public String createAccessToken(Authority scope, String email, Long userId) {
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(email)
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiry))
                 .claim("scope", scope)
+                .claim("userId", userId)
                 .build();
 
         log.info("jwt expiresAt ={}" , claims.getExpiresAt());
@@ -68,6 +69,7 @@ public class TokenProvider {
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiry))
                 .claim("scope", scope)
+                .claim("userId", id)
                 .build();
 
         return jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
