@@ -75,12 +75,18 @@ public class UserSignController {
     public ResponseEntity<?> userProfile(
             @RequestBody ProfileUpdateRequest request
     ) {
-        JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        String email = jwtAuthenticationToken.getToken().getClaims().get("iss").toString();
-
-        Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
-        if (findUser.isEmpty()) {
-            throw new NoSuchElementException();
+        try {
+            JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+            String email = jwtAuthenticationToken.getToken().getClaims().get("iss").toString();
+            Optional<User> findUser = Optional.ofNullable(userService.findByUser(email));
+            if (findUser.isEmpty()) {
+                throw new NoSuchElementException();
+            } else {
+                userService.updateProfile(findUser.orElseThrow(), request);
+                return ResponseEntity.ok().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
 
         userService.updateProfile(findUser.orElseThrow(), request);
