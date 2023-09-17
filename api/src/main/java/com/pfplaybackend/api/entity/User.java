@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.entity;
 
 import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -61,23 +62,11 @@ public class User {
         this.authority = authority;
     }
 
-    public void setFaceUrl(String faceUrl) {
-        this.faceUrl = faceUrl;
-    }
-
-    public void setWalletAddress(String walletAddress) {
-        this.walletAddress = walletAddress;
-    }
-
-    public void setIntroduction(String introduction) {
-        this.introduction = introduction;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void setBodyId(Integer bodyId) {
-        this.bodyId = bodyId;
+    public void updateProfile(ProfileUpdateRequest dto) {
+        this.introduction = dto.getIntroduction();
+        this.nickname = dto.getNickname();
+        this.faceUrl = dto.getFaceUrl();
+        this.bodyId = dto.getBodyId();
+        this.walletAddress = dto.getWalletAddress();
     }
 }
