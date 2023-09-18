@@ -18,5 +18,5 @@ create table party_permission (
 ) comment='파티 권한' engine=InnoDB
 ;
 
-create index party_permission_authority on party_permission (authority)
+create index idx_permission_authority on party_permission (authority)
 ;

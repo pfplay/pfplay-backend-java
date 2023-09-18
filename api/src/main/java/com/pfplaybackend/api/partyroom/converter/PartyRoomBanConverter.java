@@ -2,7 +2,7 @@ package com.pfplaybackend.api.partyroom.converter;
 
 import jakarta.persistence.AttributeConverter;
 
-public class ParyPermissionConverter implements AttributeConverter<Boolean, Integer> {
+public class PartyRoomBanConverter implements AttributeConverter<Boolean, Integer> {
     @Override
     public Integer convertToDatabaseColumn(Boolean attribute) {
         return (attribute != null && attribute) ? 1 : 0;

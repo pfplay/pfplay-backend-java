@@ -1,9 +1,8 @@
-package com.pfplaybackend.api.user.conveter;
+package com.pfplaybackend.api.partyroom.converter;
 
 import jakarta.persistence.AttributeConverter;
 
-public class UserPermissionConverter implements AttributeConverter<Boolean, Integer> {
-
+public class PartyPermissionConverter implements AttributeConverter<Boolean, Integer> {
     @Override
     public Integer convertToDatabaseColumn(Boolean attribute) {
         return (attribute != null && attribute) ? 1 : 0;
@@ -13,4 +12,5 @@ public class UserPermissionConverter implements AttributeConverter<Boolean, Inte
     public Boolean convertToEntityAttribute(Integer dbData) {
         return dbData != null && dbData == 1;
     }
+
 }
