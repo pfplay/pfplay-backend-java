@@ -4,7 +4,7 @@ import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.UserPermission;
 import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.user.presentation.dto.UserPermissionDto;
-import com.pfplaybackend.api.user.repository.PermissionRepository;
+import com.pfplaybackend.api.user.repository.UserPermissionRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 class UserPermissionTest {
 
     @Autowired
-    PermissionRepository permissionRepository;
+    UserPermissionRepository userPermissionRepository;
 
     @Autowired
     ObjectMapperConfig om;
@@ -78,14 +78,14 @@ class UserPermissionTest {
                 .listener(true)
                 .build();
 
-        permissionRepository.save(guest);
-        permissionRepository.save(google);
-        permissionRepository.save(wallet);
+        userPermissionRepository.save(guest);
+        userPermissionRepository.save(google);
+        userPermissionRepository.save(wallet);
     }
 
     @Test
     void findAllByAuthority() {
-        UserPermission entity = permissionRepository.findAllByAuthority(Authority.ROLE_USER);
+        UserPermission entity = userPermissionRepository.findAllByAuthority(Authority.ROLE_USER);
         UserPermissionDto userPermissionDto = om.mapper().convertValue(entity, UserPermissionDto.class);
 
         Assertions.assertTrue(userPermissionDto.getChat());

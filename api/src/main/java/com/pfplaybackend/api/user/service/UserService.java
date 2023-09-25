@@ -11,7 +11,7 @@ import com.pfplaybackend.api.user.presentation.dto.UserSaveDto;
 import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import com.pfplaybackend.api.user.presentation.response.UserInfoResponse;
 import com.pfplaybackend.api.user.presentation.response.UserLoginSuccessResponse;
-import com.pfplaybackend.api.user.repository.PermissionRepository;
+import com.pfplaybackend.api.user.repository.UserPermissionRepository;
 import com.pfplaybackend.api.user.repository.UserRepository;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -27,30 +27,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final WebClientConfig web;
     private final TokenProvider tokenProvider;
-    private final PermissionRepository permissionRepository;
+    private final UserPermissionRepository userPermissionRepository;
     private final ObjectMapperConfig om;
 
     public UserService(UserRepository userRepository,
                        WebClientConfig web,
                        TokenProvider tokenProvider,
-                       PermissionRepository permissionRepository,
+                       UserPermissionRepository userPermissionRepository,
                        ObjectMapperConfig om) {
         this.userRepository = userRepository;
         this.web = web;
         this.tokenProvider = tokenProvider;
-        this.permissionRepository = permissionRepository;
+        this.userPermissionRepository = userPermissionRepository;
         this.om = om;
-    }
-
-    @Transactional
-    public User save(String email) {
-        // 회원가입
-        UserSaveDto userDto = UserSaveDto.builder()
-                .email(email)
-                .authority(Authority.ROLE_USER)
-                .build();
-
-        return userRepository.save(userDto.toEntity());
     }
 
     public String registeredUserReturnJwt(User user, String email, Long userId) {
@@ -77,11 +66,11 @@ public class UserService {
         user.updateProfile(request);
     }
 
-    @Transactional(readOnly = true)
     public UserPermission getUserPermission(Authority authority) {
-        return permissionRepository.findAllByAuthority(authority);
+        return userPermissionRepository.findAllByAuthority(authority);
     }
 
+    @Transactional
     public UserLoginSuccessResponse register(UserInfoResponse token) {
 
         String email = token.getEmail();
@@ -92,7 +81,13 @@ public class UserService {
         Optional<User> findUser = Optional.ofNullable(userRepository.findByEmail(email));
 
         if (findUser.isEmpty()) {
-            User user = save(email);
+            UserSaveDto userDto = UserSaveDto.builder()
+                    .email(email)
+                    .authority(Authority.ROLE_USER)
+                    .build();
+
+            User user = userRepository.save(userDto.toEntity());
+
             UserPermissionDto userPermissionDto = om.mapper().convertValue(getUserPermission(Authority.ROLE_USER), UserPermissionDto.class);
             return new UserLoginSuccessResponse(
                     user.getId(),

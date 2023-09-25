@@ -17,5 +17,5 @@ create table user_permission (
      primary key (id)
 ) comment='기능 접근 권한' engine=InnoDB;
 
-create index user_permission_authority on user_permission (authority)
+create index idx_user_permission_authority on user_permission (authority)
 ;
