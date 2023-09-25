@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.entity;
 
 import com.pfplaybackend.api.enums.Authority;
-import com.pfplaybackend.api.user.conveter.UserPermissionConverter;
+import com.pfplaybackend.api.user.converter.UserPermissionConverter;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,10 +10,10 @@ import org.hibernate.annotations.Comment;
 @Getter
 @Entity
 @Comment("기능 접근 권한")
-@Table(name = "USER_PERMISSION",
-        indexes = @Index(
-            name = "user_permission_authority",
-            columnList = "authority"))
+@Table( name = "USER_PERMISSION",
+        indexes = {
+            @Index(name = "idx_user_permission_authority", columnList = "authority")
+        })
 public class UserPermission {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -79,7 +79,11 @@ public class UserPermission {
 
 
     @Builder
-    public UserPermission(Authority authority, Boolean settingProfile, Boolean showPartyListDisplay, Boolean enterMainStage, Boolean chat, Boolean createPlayList, Boolean createWaitDj, Boolean enterPartyRoom, Boolean createPartyRoom, Boolean admin, Boolean communityManager, Boolean moderator, Boolean clubber, Boolean listener) {
+    public UserPermission(Authority authority, Boolean settingProfile, Boolean showPartyListDisplay,
+                          Boolean enterMainStage, Boolean chat, Boolean createPlayList,
+                          Boolean createWaitDj, Boolean enterPartyRoom, Boolean createPartyRoom,
+                          Boolean admin, Boolean communityManager, Boolean moderator,
+                          Boolean clubber, Boolean listener) {
         this.authority = authority;
         this.settingProfile = settingProfile;
         this.showPartyListDisplay = showPartyListDisplay;

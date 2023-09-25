@@ -69,7 +69,6 @@ class PartyRoomTest {
                 .introduce("뉴진스~~~")
                 .type(PartyRoomType.PARTY)
                 .user(user)
-                .updatedAt(null)
                 .build();
 
         partyRoomRepository.save(partyRoom);

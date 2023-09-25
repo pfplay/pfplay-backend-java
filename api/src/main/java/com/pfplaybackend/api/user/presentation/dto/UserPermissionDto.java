@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.user.presentation.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +8,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown=true)
 public class UserPermissionDto {
     @Schema(description = "프로필 설정")
     private Boolean settingProfile;

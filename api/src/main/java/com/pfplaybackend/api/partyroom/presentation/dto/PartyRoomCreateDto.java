@@ -28,7 +28,6 @@ public class PartyRoomCreateDto {
                 .domain(Domain.CLIENT.getUrl() + domain)
                 .djingLimit(limit)
                 .type(type)
-                .updatedAt(null)
                 .status(status)
                 .build();
     }
