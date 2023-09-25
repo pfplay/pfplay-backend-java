@@ -3,11 +3,10 @@ package com.pfplaybackend.api.entity;
 import com.pfplaybackend.api.partyroom.converter.PartyPermissionConverter;
 import com.pfplaybackend.api.partyroom.enums.PartyPermissionRole;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Comment;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Comment("파티 권한")

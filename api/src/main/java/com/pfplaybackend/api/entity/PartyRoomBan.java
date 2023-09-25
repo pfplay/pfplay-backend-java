@@ -29,7 +29,7 @@ public class PartyRoomBan {
     @Column(columnDefinition = "bigint unsigned")
     private Long id;
 
-    @Column(columnDefinition = "bigint unsigned")
+    @Column(columnDefinition = "bigint unsigned", name = "user_id")
     // role에 따라 guest pk가 들어갈 수 있음
     private Long userId;
 

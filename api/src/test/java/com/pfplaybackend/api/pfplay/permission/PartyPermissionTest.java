@@ -1,7 +1,9 @@
 package com.pfplaybackend.api.pfplay.permission;
 
+import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.PartyPermission;
 import com.pfplaybackend.api.partyroom.enums.PartyPermissionRole;
+import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomPermissionDefaultDto;
 import com.pfplaybackend.api.partyroom.repository.PartyPermissionRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,9 @@ public class PartyPermissionTest {
 
     @Autowired
     PartyPermissionRepository partyPermissionRepository;
+
+    @Autowired
+    ObjectMapperConfig om;
 
     @Test
     @Transactional
@@ -119,6 +124,16 @@ public class PartyPermissionTest {
         partyPermissionRepository.save(listener);
 
         Assertions.assertEquals(partyPermissionRepository.count(), 5);
+    }
+
+    @Test
+    @Transactional
+    void partyPermissionFindByAuthorityAndSetDto() {
+        PartyPermission partyPermission = partyPermissionRepository.findByAuthority(PartyPermissionRole.ADMIN);
+        PartyRoomPermissionDefaultDto partyRoomPermissionDefaultDto = om.mapper().convertValue(partyPermission, PartyRoomPermissionDefaultDto.class);
+
+        Assertions.assertEquals(partyPermission.getAuthority(), partyRoomPermissionDefaultDto.getAuthority());
+        Assertions.assertEquals(partyPermission.getPartyInfoFetch(), partyRoomPermissionDefaultDto.getPartyInfoFetch());
     }
 
 }

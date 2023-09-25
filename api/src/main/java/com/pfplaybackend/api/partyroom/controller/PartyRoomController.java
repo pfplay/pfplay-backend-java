@@ -64,8 +64,6 @@ public class PartyRoomController {
 
         return ResponseEntity
                 .ok()
-                .body(ApiCommonResponse.success(
-                    PartyRoomCreateResponse.toResponse(partyRoomService.createPartyRoom(dto), user))
-                );
+                .body(ApiCommonResponse.success(partyRoomService.createPartyRoom(dto)));
     }
 }
