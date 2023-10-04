@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.pfplay.guest;
 
+import com.pfplaybackend.api.common.util.CustomStringUtils;
 import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.Guest;
 import com.pfplaybackend.api.guest.presentation.request.GuestCreateRequest;
@@ -16,8 +17,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -47,7 +46,7 @@ class GuestTest {
     public void createGuest() {
 
         final String agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.46";
-        final String uuid = UUID.randomUUID().toString().replace("-", "").substring(0, 6);
+        final String uuid = CustomStringUtils.getRandomUuidWithoutHyphen().substring(0, 6);
         final String GUEST_NAME_PREFIX = "Guest_";
 
         Guest guest = Guest.builder()

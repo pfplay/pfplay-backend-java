@@ -23,6 +23,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -92,11 +94,14 @@ class PartyRoomTest {
                 .authority(Authority.ROLE_USER)
                 .build();
 
-        User save = userRepository.save(user);
+        User persistUser = userRepository.findByEmail(user.getEmail());
+        if(Objects.isNull(persistUser)) {
+            persistUser = userRepository.save(user);
+        }
 
-        String accessToken = tokenProvider.createAccessToken(save.getAuthority(), save.getEmail(), save.getId());
+        String accessToken = tokenProvider.createAccessToken(persistUser.getAuthority(), persistUser.getEmail(), persistUser.getId());
         String content = om.mapper().writeValueAsString(new PartyRoomCreateRequest(
-                "뉴진스", "뉴진스 소개", "domain", 3
+                "뉴진스", "뉴진스 소개", "domain", true, 3
         ));
 
         System.out.println(accessToken);

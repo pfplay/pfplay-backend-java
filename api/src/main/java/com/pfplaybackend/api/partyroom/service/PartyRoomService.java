@@ -10,12 +10,14 @@ import com.pfplaybackend.api.partyroom.presentation.response.PartyRoomCreateResp
 import com.pfplaybackend.api.partyroom.repository.PartyPermissionRepository;
 import com.pfplaybackend.api.partyroom.repository.PartyRoomRepository;
 import com.pfplaybackend.api.user.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
+@Slf4j
 @Service
 public class PartyRoomService {
 
@@ -36,7 +38,8 @@ public class PartyRoomService {
 
     @Transactional
     public PartyRoomCreateResponse createPartyRoom(PartyRoomCreateDto dto) {
-        if(partyRoomRepository.findByDomain(dto.domainUrl()).size() > 0) {
+
+        if(partyRoomRepository.findByDomain(dto.getDomain()).size() > 0) {
             throw new DuplicateKeyException("domain exists");
         }
 

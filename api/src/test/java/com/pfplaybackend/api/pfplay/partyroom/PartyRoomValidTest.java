@@ -30,7 +30,7 @@ class PartyRoomValidTest {
     @Test
     public void partyRoomRequestValidation() {
         PartyRoomCreateRequest partyRoomCreateRequest = new PartyRoomCreateRequest(
-                "뉴진스!!", "", "https://pfplay.io", 3
+                "뉴진스!!", "", "https://pfplay.io", false, 3
         );
 
         Set<ConstraintViolation<PartyRoomCreateRequest>> violations = validator.validate(partyRoomCreateRequest);
