@@ -19,6 +19,7 @@ public class PartyRoomCreateDto {
     private final User user;
     private final PartyRoomType type;
     private final PartyRoomStatus status;
+    private final boolean domainOption;
 
     public PartyRoom toEntity() {
         return PartyRoom.builder()

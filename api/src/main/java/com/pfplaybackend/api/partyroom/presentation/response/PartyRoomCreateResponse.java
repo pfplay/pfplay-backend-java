@@ -22,22 +22,4 @@ public class PartyRoomCreateResponse {
     private PartyRoomCreateAdminInfo admin;
     private PartyRoomPermissionDefaultDto defaultPartyPermission;
 
-//    public static PartyRoomCreateResponse toResponse(PartyRoom partyRoom, User user) {
-//        return PartyRoomCreateResponse
-//                .builder()
-//                .id(partyRoom.getId())
-//                .name(partyRoom.getName())
-//                .introduce(partyRoom.getIntroduce())
-//                .domain(partyRoom.getDomain())
-//                .djingLimit(partyRoom.getDjingLimit())
-//                .type(partyRoom.getType())
-//                .status(partyRoom.getStatus())
-//                .admin(PartyRoomCreateAdminInfo
-//                        .builder()
-//                        .profile(user.getFaceUrl())
-//                        .userName(user.getNickname())
-//                        .build())
-//                .defaultPartyPermission()
-//                .build();
-//    }
 }

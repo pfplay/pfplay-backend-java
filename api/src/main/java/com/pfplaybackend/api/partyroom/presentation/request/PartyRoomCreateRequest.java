@@ -1,10 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,9 +22,14 @@ public class PartyRoomCreateRequest {
     @Schema(description = "도메인")
     private String domain;
 
+    @NotNull
+    @Schema(description = "도메인 선택 여부")
+    private boolean domainOption;
+
     @Max(100)
     @Min(value = 3, message = "디제잉 1회 당 제한 시간은 3분 이상부터 가능해요")
     @Schema(description = "디제잉 제한 시간")
     private int limit;
+
 
 }
