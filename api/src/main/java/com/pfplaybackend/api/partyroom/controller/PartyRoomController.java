@@ -2,6 +2,7 @@ package com.pfplaybackend.api.partyroom.controller;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
+import com.pfplaybackend.api.common.util.CustomStringUtils;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
@@ -52,14 +53,20 @@ public class PartyRoomController {
         User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
                             .orElseThrow(NoSuchElementException::new);
 
+        String domain = request.getDomain();
+        if(request.isDomainOption()) {
+            domain = CustomStringUtils.base64Encoder(CustomStringUtils.getRandomUuidWithoutHyphen().substring(0, 10));
+        }
+
         PartyRoomCreateDto dto = PartyRoomCreateDto.builder()
                 .name(request.getName())
                 .user(user)
                 .introduce(request.getIntroduce())
-                .domain(request.getDomain())
+                .domain(domain)
                 .limit(request.getLimit())
                 .type(PartyRoomType.PARTY)
                 .status(PartyRoomStatus.ACTIVE)
+                .domainOption(request.isDomainOption())
                 .build();
 
         return ResponseEntity
