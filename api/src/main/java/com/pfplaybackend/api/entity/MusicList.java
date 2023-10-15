@@ -20,7 +20,7 @@ public class MusicList {
     @Column(columnDefinition = "integer unsigned")
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "play_list_id", foreignKey = @ForeignKey(name = "fk_music_list_play_list_id"))
     private PlayList playList;
 

@@ -32,7 +32,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/play-list")
 public class PlayListController {
-
     private final UserService userService;
     private final PartyRoomService partyRoomService;
 
@@ -58,7 +57,7 @@ public class PlayListController {
 //                .type(PartyRoomType.PARTY)
 //                .status(PartyRoomStatus.ACTIVE)
 //                .build();
-//
+
 //        return ResponseEntity
 //                .ok()
 //                .body(ApiCommonResponse.success(

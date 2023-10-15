@@ -22,8 +22,8 @@ public class PlayList {
     @Column(columnDefinition = "integer unsigned")
     private Long id;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_play_list_user_id"))
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_play_list_user_id"))
     private User user;
 
     @Comment("플레이리스트 순서")
