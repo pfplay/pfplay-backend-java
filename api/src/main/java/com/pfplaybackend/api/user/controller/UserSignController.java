@@ -94,7 +94,7 @@ public class UserSignController {
                 throw new NoSuchElementException();
             } else {
                 userService.updateProfile(findUser.orElseThrow(), request);
-                return ResponseEntity.ok().build();
+                return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
