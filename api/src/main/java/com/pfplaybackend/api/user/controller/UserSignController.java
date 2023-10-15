@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -72,9 +73,18 @@ public class UserSignController {
         return ResponseEntity.ok(new DummyResponse(jwtAuthenticationToken));
     }
 
+    @Operation(summary = "유저 마이 프로필 설정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "프로필 설정 성공"
+            ),
+            @ApiResponse(responseCode = "500",
+                    description = "프로필 설정 실패"
+            )
+    })
     @PatchMapping("/profile")
     public ResponseEntity<?> userProfile(
-            @RequestBody ProfileUpdateRequest request
+            @Valid @RequestBody ProfileUpdateRequest request
     ) {
         try {
             JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
@@ -84,7 +94,7 @@ public class UserSignController {
                 throw new NoSuchElementException();
             } else {
                 userService.updateProfile(findUser.orElseThrow(), request);
-                return ResponseEntity.ok().build();
+                return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
