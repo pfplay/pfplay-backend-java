@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.entity;
 
+import com.pfplaybackend.api.entity.audit.BaseTime;
 import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.partyroom.converter.PartyRoomBanConverter;
 import jakarta.persistence.*;
@@ -22,7 +23,7 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_party_room_ban_01", columnList = "user_id, party_room_id, authority"),
         }
 )
-public class PartyRoomBan {
+public class PartyRoomBan extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,12 +57,6 @@ public class PartyRoomBan {
     @Comment("유저 롤 타입")
     @Enumerated(value = EnumType.STRING)
     private Authority authority;
-
-    @Column(nullable = false, columnDefinition = "datetime default current_timestamp")
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false, columnDefinition = "datetime default current_timestamp on update current_timestamp")
-    private LocalDateTime updatedAt;
 
     @Builder
     public PartyRoomBan(Long userId, PartyRoom partyRoom, Boolean ban,

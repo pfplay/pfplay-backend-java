@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.entity;
 
+import com.pfplaybackend.api.entity.audit.BaseTime;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
 import jakarta.persistence.*;
@@ -13,8 +14,6 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 @Getter
-@DynamicInsert
-@DynamicUpdate
 @Table( name = "PARTY_ROOM",
         uniqueConstraints = {
             @UniqueConstraint(name = "unique_party_room_name", columnNames = {"name"}),
@@ -25,7 +24,7 @@ import java.util.Collection;
         }
         )
 @Entity
-public class PartyRoom {
+public class PartyRoom extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,12 +47,6 @@ public class PartyRoom {
     @Column(length = 50)
     @Enumerated(EnumType.STRING)
     private PartyRoomType type;
-
-    @Column(nullable = false, columnDefinition = "datetime default current_timestamp")
-    private LocalDateTime createdAt;
-
-    @Column(nullable = false, columnDefinition = "datetime default current_timestamp on update current_timestamp")
-    private LocalDateTime updatedAt;
 
     @Comment("파티룸 활성화 여부")
     @Column(length = 50)
