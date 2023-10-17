@@ -65,7 +65,7 @@ public class PartyPermissionTest {
 
         PartyPermission mod = PartyPermission
                 .builder()
-                .authority(PartyPermissionRole.COMMUNITY_MANAGER)
+                .authority(PartyPermissionRole.MODERATOR)
                 .partyInfoFetch(false)
                 .partyClose(false)
                 .notice(false)
