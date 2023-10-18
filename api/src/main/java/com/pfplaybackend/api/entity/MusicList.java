@@ -26,7 +26,7 @@ public class MusicList {
 
     @Comment("플레이리스트의 곡 순서")
     @Column(columnDefinition = "integer unsigned")
-    private Long order;
+    private Long orderNumber;
 
     @Comment("곡 이름")
     private String name;
@@ -46,9 +46,9 @@ public class MusicList {
     }
 
     @Builder
-    public MusicList(PlayList playList, Long order, String name, String duration, String url, LocalDateTime updatedAt) {
+    public MusicList(PlayList playList, Long orderNumber, String name, String duration, String url, LocalDateTime updatedAt) {
         this.playList = playList;
-        this.order = order;
+        this.orderNumber = orderNumber;
         this.name = name;
         this.duration = duration;
         this.url = url;

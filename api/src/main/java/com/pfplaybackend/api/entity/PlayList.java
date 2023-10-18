@@ -23,12 +23,12 @@ public class PlayList {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_play_list_user_id"))
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_play_list_user_id"))
     private User user;
 
     @Comment("플레이리스트 순서")
     @Column(columnDefinition = "integer unsigned")
-    private Long order;
+    private Long orderNumber;
 
     @Comment("플레이리스트 이름")
     private String name;
@@ -47,9 +47,9 @@ public class PlayList {
     }
 
     @Builder
-    public PlayList(User user, Long order, String name, PlayListType type, LocalDateTime updatedAt) {
+    public PlayList(User user, Long orderNumber, String name, PlayListType type, LocalDateTime updatedAt) {
         this.user = user;
-        this.order = order;
+        this.orderNumber = orderNumber;
         this.name = name;
         this.type = type;
         this.updatedAt = updatedAt;

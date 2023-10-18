@@ -1,37 +1,46 @@
 package com.pfplaybackend.api.playlist.service;
 
-import com.pfplaybackend.api.entity.PartyRoom;
-import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomCreateDto;
-import com.pfplaybackend.api.partyroom.repository.PartyRoomRepository;
-import com.pfplaybackend.api.user.repository.UserRepository;
-import org.springframework.dao.DuplicateKeyException;
+import com.pfplaybackend.api.entity.PlayList;
+import com.pfplaybackend.api.entity.User;
+import com.pfplaybackend.api.playlist.enums.PlayListType;
+import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
+import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
+import com.pfplaybackend.api.playlist.repository.PlayListRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class PlayListService {
-    private PartyRoomRepository partyRoomRepository;
-    private UserRepository userRepository;
+    private PlayListRepository playListRepository;
 
-    public PlayListService(PartyRoomRepository partyRoomRepository, UserRepository userRepository) {
-        this.partyRoomRepository = partyRoomRepository;
-        this.userRepository = userRepository;
+    public PlayListService(PlayListRepository playListRepository) {
+        this.playListRepository = playListRepository;
     }
 
     @Transactional
-    public PartyRoom createPartyRoom(PartyRoomCreateDto dto) {
-        if(partyRoomRepository.findByDomain(dto.domainUrl()).size() > 0) {
-            throw new DuplicateKeyException("domain exists");
+    public PlayList createPlayList(PlayListCreateRequest request, User user) {
+        PlayListCreateDto dto;
+        Optional<PlayList> result = playListRepository.findTopByUserIdOrderByOrderNumberDesc(user.getId());
+
+        if (result.isPresent()) {
+            PlayList playList = result.get();
+            dto = PlayListCreateDto.builder()
+                    .orderNumber(playList.getOrderNumber() + 1)
+                    .user(user)
+                    .name(request.getName())
+                    .type(PlayListType.valueOf(request.getType()))
+                    .build();
+        } else {
+            dto = PlayListCreateDto.builder()
+                    .orderNumber(1L)
+                    .user(user)
+                    .name(request.getName())
+                    .type(PlayListType.PLAYLIST)
+                    .build();
         }
 
-        PartyRoom partyRoom = partyRoomRepository.findByUserId(dto.getUser().getId());
-        if(Objects.nonNull(partyRoom)) {
-            return partyRoomRepository.findByUserId(partyRoom.getUser().getId());
-        }
-
-        return partyRoomRepository.save(dto.toEntity());
+        return playListRepository.save(dto.toEntity());
     }
-
 }
