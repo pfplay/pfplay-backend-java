@@ -4,11 +4,13 @@ import com.pfplaybackend.api.entity.PlayList;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
+import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
 import com.pfplaybackend.api.playlist.repository.PlayListRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,7 +21,6 @@ public class PlayListService {
         this.playListRepository = playListRepository;
     }
 
-    @Transactional
     public PlayList createPlayList(PlayListCreateRequest request, User user) {
         PlayListCreateDto dto;
         Optional<PlayList> result = playListRepository.findTopByUserIdOrderByOrderNumberDesc(user.getId());
@@ -42,5 +43,19 @@ public class PlayListService {
         }
 
         return playListRepository.save(dto.toEntity());
+    }
+
+    public List<PlayListDto> getPlayList(User user) {
+        List<PlayList> result = playListRepository.findByUserId(user.getId());
+        List<PlayListDto> dtoList = new ArrayList<>();
+        for (PlayList playList : result) {
+            PlayListDto dto = PlayListDto.builder()
+                    .id(playList.getId())
+                    .name(playList.getName())
+                    .orderNumber(playList.getOrderNumber())
+                    .type(playList.getType()).build();
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 }
