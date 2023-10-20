@@ -2,7 +2,6 @@ package com.pfplaybackend.api.playlist.service;
 
 import com.pfplaybackend.api.entity.PlayList;
 import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.playlist.enums.PlayListOrder;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
@@ -10,9 +9,7 @@ import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest
 import com.pfplaybackend.api.playlist.repository.PlayListRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PlayListService {
@@ -23,13 +20,18 @@ public class PlayListService {
     }
 
     public PlayList createPlayList(PlayListCreateRequest request, User user) {
-        PlayListCreateDto dto;
-        Optional<PlayList> result = playListRepository.findTopByUserIdOrderByOrderNumberDesc(user.getId());
+        List<PlayList> result = playListRepository.findByUserIdAndTypeOrderByOrderNumberDesc(user.getId(), PlayListType.PLAYLIST);
+        if (result.size() > 0 && user.getWalletAddress() == null) {
+            throw new RuntimeException("생성 개수 제한 초과 (지갑 미연동)");
+        }
+        if (result.size() > 9 && user.getWalletAddress() != null) {
+            throw new RuntimeException("생성 개수 제한 초과");
+        }
 
-        if (result.isPresent()) {
-            PlayList playList = result.get();
+        PlayListCreateDto dto;
+        if (!result.isEmpty()) {
             dto = PlayListCreateDto.builder()
-                    .orderNumber(playList.getOrderNumber() + 1)
+                    .orderNumber(result.get(0).getOrderNumber() + 1)
                     .user(user)
                     .name(request.getName())
                     .type(PlayListType.PLAYLIST)
