@@ -32,7 +32,7 @@ public class PlayListService {
                     .orderNumber(playList.getOrderNumber() + 1)
                     .user(user)
                     .name(request.getName())
-                    .type(PlayListType.valueOf(request.getType()))
+                    .type(PlayListType.PLAYLIST)
                     .build();
         } else {
             dto = PlayListCreateDto.builder()
@@ -46,13 +46,8 @@ public class PlayListService {
         return playListRepository.save(dto.toEntity());
     }
 
-    public List<PlayListDto> getPlayList(User user, PlayListType type, PlayListOrder order) {
-        PlayListType playListType = type != null ? type : PlayListType.valueOf("PLAYLIST");
-        PlayListOrder playListOrder = order != null ? order : PlayListOrder.valueOf("DESC");
-        List<PlayList> result = playListOrder == PlayListOrder.DESC
-                ? playListRepository.findByUserIdAndTypeOrderByOrderNumberDesc(user.getId(), playListType)
-                : playListRepository.findByUserIdAndTypeOrderByOrderNumberAsc(user.getId(), playListType);
-
+    public List<PlayListDto> getPlayList(User user) {
+        List<PlayList> result = playListRepository.findByUserIdOrderByTypeDescOrderNumberAsc(user.getId());
         List<PlayListDto> dtoList = new ArrayList<>();
         for (PlayList playList : result) {
             PlayListDto dto = PlayListDto.builder()

@@ -63,16 +63,13 @@ public class PlayListController {
             )
     })
     @GetMapping()
-    public ResponseEntity<?> getPlayList(
-            @RequestParam(required = false) PlayListType type,
-            @RequestParam(required = false) PlayListOrder order
-    ) {
+    public ResponseEntity<?> getPlayList() {
         JwtTokenInfo jwtTokenInfo = new JwtTokenInfo(SecurityContextHolder.getContext().getAuthentication());
         User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
                 .orElseThrow(NoSuchElementException::new);
 
         return ResponseEntity
                 .ok()
-                .body(ApiCommonResponse.success(playListService.getPlayList(user, type, order)));
+                .body(ApiCommonResponse.success(playListService.getPlayList(user)));
     }
 }
