@@ -3,6 +3,8 @@ package com.pfplaybackend.api.playlist.controller;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.entity.User;
+import com.pfplaybackend.api.playlist.enums.PlayListOrder;
+import com.pfplaybackend.api.playlist.enums.PlayListType;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListCreateResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
@@ -53,21 +55,24 @@ public class PlayListController {
                 );
     }
 
-    @Operation(summary = "플레이리스트 조회")
+    @Operation(summary = "플레이리스트 / 그랩 리스트 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "플레이리스트 조회 성공",
+            @ApiResponse(responseCode = "200", description = "플레이리스트 / 그랩 리스트 조회 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = PlayListResponse.class))
             )
     })
     @GetMapping()
-    public ResponseEntity<?> getPlayList() {
+    public ResponseEntity<?> getPlayList(
+            @RequestParam(required = false) PlayListType type,
+            @RequestParam(required = false) PlayListOrder order
+    ) {
         JwtTokenInfo jwtTokenInfo = new JwtTokenInfo(SecurityContextHolder.getContext().getAuthentication());
         User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
                 .orElseThrow(NoSuchElementException::new);
 
         return ResponseEntity
                 .ok()
-                .body(ApiCommonResponse.success(playListService.getPlayList(user)));
+                .body(ApiCommonResponse.success(playListService.getPlayList(user, type, order)));
     }
 }
