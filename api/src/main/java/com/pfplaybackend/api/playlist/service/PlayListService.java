@@ -2,6 +2,7 @@ package com.pfplaybackend.api.playlist.service;
 
 import com.pfplaybackend.api.entity.PlayList;
 import com.pfplaybackend.api.entity.User;
+import com.pfplaybackend.api.playlist.enums.PlayListOrder;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
@@ -45,8 +46,13 @@ public class PlayListService {
         return playListRepository.save(dto.toEntity());
     }
 
-    public List<PlayListDto> getPlayList(User user) {
-        List<PlayList> result = playListRepository.findByUserId(user.getId());
+    public List<PlayListDto> getPlayList(User user, PlayListType type, PlayListOrder order) {
+        PlayListType playListType = type != null ? type : PlayListType.valueOf("PLAYLIST");
+        PlayListOrder playListOrder = order != null ? order : PlayListOrder.valueOf("DESC");
+        List<PlayList> result = playListOrder == PlayListOrder.DESC
+                ? playListRepository.findByUserIdAndTypeOrderByOrderNumberDesc(user.getId(), playListType)
+                : playListRepository.findByUserIdAndTypeOrderByOrderNumberAsc(user.getId(), playListType);
+
         List<PlayListDto> dtoList = new ArrayList<>();
         for (PlayList playList : result) {
             PlayListDto dto = PlayListDto.builder()
