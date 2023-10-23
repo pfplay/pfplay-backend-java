@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface AvatarRepository extends JpaRepository<Avatar, Long> {
 
-    <R> List<R> findBy(Class<R> R);
+    List<Avatar> findAll();
 }
