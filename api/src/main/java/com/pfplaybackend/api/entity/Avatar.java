@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.entity;
 
+import com.pfplaybackend.api.avatar.enums.AvatarType;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -14,7 +15,8 @@ public class Avatar {
     private Long id;
 
     @Column(nullable = false)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private AvatarType type;
 
     @Column(nullable = false)
     private String name;

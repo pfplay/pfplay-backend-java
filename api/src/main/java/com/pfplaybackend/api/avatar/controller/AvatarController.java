@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @SecurityRequirement(name = "Bearer Authentication")
@@ -38,14 +37,11 @@ public class AvatarController {
                     content = @Content(
                             schema = @Schema(implementation = AvatarBodyResponse.class)
                     )
-            ),
-            @ApiResponse(responseCode = "500",
-                    description = "조회 실패"
             )
     })
     @GetMapping("/body-list")
     public ResponseEntity<?> getAllAvatarBodies() {
-        List<AvatarBodyDto> avatarBodyResponse = new ArrayList<AvatarBodyDto>(this.avatarService.getAvatarBodies());
-        return ResponseEntity.ok().body(ApiCommonResponse.success(avatarBodyResponse));
+        List<AvatarBodyDto> response = this.avatarService.getAvatarBodies();
+        return ResponseEntity.ok().body(ApiCommonResponse.success(response));
     }
 }
