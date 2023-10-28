@@ -25,7 +25,7 @@ public class Avatar {
     private String image;
 
     @Column(nullable = false)
-    private Integer point;
+    private Long point;
 
     public Avatar() { }
 }
