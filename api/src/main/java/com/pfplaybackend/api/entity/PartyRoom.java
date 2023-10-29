@@ -7,11 +7,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.Comment;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
-import java.time.LocalDateTime;
-import java.util.Collection;
 
 @Getter
 @Table( name = "PARTY_ROOM",
@@ -52,9 +47,6 @@ public class PartyRoom extends BaseTime {
     @Column(length = 50)
     @Enumerated(EnumType.STRING)
     private PartyRoomStatus status;
-
-    @OneToMany(mappedBy = "partyRoom")
-    private Collection<PartyRoomBan> partyRoomBans;
 
     protected PartyRoom() { }
 
