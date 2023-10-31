@@ -19,3 +19,10 @@ create table user_permission (
 
 create index idx_user_permission_authority on user_permission (authority)
 ;
+
+insert into user_permission (admin, authority, chat, clubber, community_manager, create_party_room, create_play_list,
+                             create_wait_dj, enter_main_stage, enter_party_room, listener, moderator, setting_profile,
+                             show_party_list_display)
+values (0, 'ROLE_GUEST', 1, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0),
+       (0, 'ROLE_USER', 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1),
+       (1, 'ROLE_WALLET_USER', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1);

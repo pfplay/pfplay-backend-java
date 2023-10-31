@@ -16,5 +16,4 @@ public class ExceptionResult {
     private HttpStatus status;
     private int code;
     private String message;
-    private String stackTrace;
 }

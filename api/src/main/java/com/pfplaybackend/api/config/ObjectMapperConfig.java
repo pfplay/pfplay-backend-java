@@ -3,6 +3,7 @@ package com.pfplaybackend.api.config;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.swagger.v3.core.converter.ModelConverters;
 import io.swagger.v3.core.jackson.ModelResolver;
@@ -20,6 +21,7 @@ public class ObjectMapperConfig {
         objectMapper.setPropertyNamingStrategy(LOWER_CAMEL_CASE);
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
 
         //swagger
         ModelConverters.getInstance().addConverter(new ModelResolver(objectMapper));

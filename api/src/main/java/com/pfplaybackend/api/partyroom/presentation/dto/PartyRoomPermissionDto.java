@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Schema(description = "파티룸 생성시 default 권한")
-public class PartyRoomPermissionDefaultDto {
+public class PartyRoomPermissionDto {
 
     @Schema(description = "파티룸 권한")
     private PartyPermissionRole authority;

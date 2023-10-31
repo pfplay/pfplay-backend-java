@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.enums;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -7,8 +8,11 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public enum Authority {
 
+    @Schema(description = "유저")
     ROLE_USER("ROLE_USER"),
+    @Schema(description = "게스트")
     ROLE_GUEST("ROLE_GUEST"),
+    @Schema(description = "지갑연동")
     ROLE_WALLET_USER("ROLE_WALLET_USER");
 
     private final String role;
