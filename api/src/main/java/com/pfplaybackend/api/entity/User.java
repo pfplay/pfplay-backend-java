@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.entity;
 
+import com.pfplaybackend.api.entity.audit.BaseTime;
 import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
             @UniqueConstraint(name = "unique_user_email", columnNames = {"email"})
         })
 @Entity
-public class User {
+public class User extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,10 +38,6 @@ public class User {
     private Authority authority;
 
     private String walletAddress;
-
-    @CreationTimestamp
-    @Column(updatable = false)
-    private LocalDateTime createTime;
 
     @Column(columnDefinition = "integer default 0")
     private Integer djScore;

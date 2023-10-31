@@ -40,7 +40,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                             .status(HttpStatus.UNAUTHORIZED)
                             .code(ExceptionEnum.UNAUTHORIZED.getHttpStatusCode())
                             .message(ExceptionEnum.UNAUTHORIZED.getMessage())
-                            .stackTrace(authException.getMessage())
                             .build()
                     )
                 );
