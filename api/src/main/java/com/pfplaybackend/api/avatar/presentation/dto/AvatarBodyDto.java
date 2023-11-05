@@ -34,5 +34,5 @@ public class AvatarBodyDto {
     private final Long myPoint;
 
     @Schema(description = "사용 가능 여부", example = "true", requiredMode = REQUIRED, type = "boolean")
-    private final Boolean isAvailable;
+    private final boolean isAvailable;
 }

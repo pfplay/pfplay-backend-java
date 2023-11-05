@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.pointhistory.service;
 
-import com.pfplaybackend.api.avatar.enums.AvatarType;
+import com.pfplaybackend.api.pointhistory.enums.PointType;
 import com.pfplaybackend.api.pointhistory.presentation.dto.PointHistoryGroupByDto;
 import com.pfplaybackend.api.pointhistory.repository.PointHistoryRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class PointHistoryService {
         List<PointHistoryGroupByDto> dtoList = new ArrayList<>();
         for (List<Object> list : result) {
             PointHistoryGroupByDto dto = PointHistoryGroupByDto.builder()
-                    .type(AvatarType.valueOf((String) list.get(0)))
+                    .type(PointType.valueOf((String) list.get(0)))
                     .point((Long) list.get(1))
                     .build();
             dtoList.add(dto);
