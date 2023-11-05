@@ -9,6 +9,5 @@ CREATE TABLE `point_history` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `fk_point_history_user_id` (`user_id`),
-  CONSTRAINT `fk_point_history_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+  KEY `point_history_user_id_IDX` (`user_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

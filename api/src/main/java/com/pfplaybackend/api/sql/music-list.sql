@@ -10,6 +10,5 @@ CREATE TABLE `music_list` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `fk_music_list_play_list_id` (`play_list_id`),
-  CONSTRAINT `fk_music_list_play_list_id` FOREIGN KEY (`play_list_id`) REFERENCES `play_list` (`id`)
+  KEY `music_list_play_list_id_IDX` (`play_list_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

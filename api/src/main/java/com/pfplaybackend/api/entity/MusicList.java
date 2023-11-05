@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @DynamicUpdate
 @Table(name = "MUSIC_LIST",
         indexes = {
-                @Index(name = "idx_music_list", columnList = "play_list_id")
+                @Index(name = "music_list_play_list_id_IDX", columnList = "play_list_id")
         })
 @Entity
 public class MusicList {

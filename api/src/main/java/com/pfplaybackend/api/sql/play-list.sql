@@ -9,6 +9,5 @@ CREATE TABLE `play_list` (
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `fk_play_list_user_id` (`user_id`),
-  CONSTRAINT `fk_play_list_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+  KEY `play_list_user_id_IDX` (`user_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
