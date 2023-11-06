@@ -10,6 +10,7 @@ import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomCreateDto;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomJoinResultDto;
 import com.pfplaybackend.api.partyroom.presentation.request.PartyRoomCreateRequest;
 import com.pfplaybackend.api.partyroom.presentation.request.PartyRoomUpdateRequest;
+import com.pfplaybackend.api.partyroom.presentation.response.PartyRoomCreateResponse;
 import com.pfplaybackend.api.partyroom.service.PartyRoomService;
 import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,11 +41,12 @@ public class PartyRoomController {
 
     private final PartyRoomService partyRoomService;
     private final CustomUserDetailService customUserDetailService;
-    @Operation(summary = "파티룸 생성", responses = {
-            @ApiResponse(
-                    description = "파티룸 생성",
-                    content = @Content(schema = @Schema(implementation = PartyRoomCreateDto.class, example = "{data={}}"))),
-    })
+
+    @Operation(summary = "파티룸 생성")
+    @ApiResponse(
+        description = "파티룸 생성",
+        content = @Content(schema = @Schema(implementation = PartyRoomCreateResponse.class))
+    )
     @Secured("ROLE_USER")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody @Valid PartyRoomCreateRequest request) {
