@@ -13,10 +13,6 @@ create table party_room (
 ) engine=InnoDB;
 
 alter table party_room
-    add constraint unique_party_room_name unique (name)
-;
-
-alter table party_room
     add constraint unique_party_room_domain unique (domain)
 ;
 
