@@ -25,7 +25,7 @@ public class Avatar {
     private String image;
 
     @Column(nullable = false)
-    private Long point;
+    private Integer point;
 
     @Column(nullable = false)
     private Boolean isUniform;

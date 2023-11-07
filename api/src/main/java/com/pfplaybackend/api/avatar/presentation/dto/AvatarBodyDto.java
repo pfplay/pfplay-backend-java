@@ -28,7 +28,7 @@ public class AvatarBodyDto {
     private final String image;
 
     @Schema(description = "해금 포인트", example = "0", requiredMode = REQUIRED, type = "integer")
-    private final Long requiredPoint;
+    private final Integer requiredPoint;
 
     @Schema(description = "보유 포인트", example = "0", requiredMode = REQUIRED, type = "integer")
     private final Long myPoint;
