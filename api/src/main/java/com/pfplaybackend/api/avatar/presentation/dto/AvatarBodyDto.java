@@ -35,4 +35,7 @@ public class AvatarBodyDto {
 
     @Schema(description = "사용 가능 여부", example = "true", requiredMode = REQUIRED, type = "boolean")
     private final boolean isAvailable;
+
+    @Schema(description = "일체형 아바타 여부", example = "true", requiredMode = REQUIRED, type = "boolean")
+    private final boolean isUniform;
 }

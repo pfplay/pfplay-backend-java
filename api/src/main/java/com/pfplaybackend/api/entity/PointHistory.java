@@ -31,6 +31,7 @@ public class PointHistory {
 
     @Comment("포인트 타입")
     @Column(length = 50)
+    @Enumerated(value = EnumType.STRING)
     private PointType type;
 
     @Comment("포인트 점수")

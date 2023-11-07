@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AvatarService {
@@ -28,12 +27,11 @@ public class AvatarService {
         List<AvatarBodyDto> dtoList = new ArrayList<>();
 
         List<PointHistoryGroupByDto> pointHistory = pointHistoryService.getPointHistory(userId);
-
         for (Avatar avatar : result) {
-            Boolean isAvailable = false;
+            boolean isAvailable = false;
             Long myPoint = 0L;
             for (PointHistoryGroupByDto pointHistoryDto : pointHistory) {
-                if (avatar.getType().equals(pointHistoryDto.getType())) {
+                if (avatar.getType().name().equals(pointHistoryDto.getType().name())) {
                     if (avatar.getPoint() <= pointHistoryDto.getPoint()) {
                         isAvailable = true;
                     }
@@ -53,6 +51,7 @@ public class AvatarService {
                     .myPoint(myPoint)
                     .requiredPoint(avatar.getPoint())
                     .isAvailable(isAvailable)
+                    .isUniform(avatar.getIsUniform())
                     .build();
             dtoList.add(dto);
         }
