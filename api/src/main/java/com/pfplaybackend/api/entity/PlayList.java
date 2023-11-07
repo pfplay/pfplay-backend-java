@@ -13,7 +13,10 @@ import java.time.LocalDateTime;
 @Getter
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "PLAY_LIST")
+@Table(name = "PLAY_LIST",
+        indexes = {
+                @Index(name = "play_list_user_id_IDX", columnList = "user_id")
+        })
 @Entity
 public class PlayList {
 
@@ -23,7 +26,7 @@ public class PlayList {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_play_list_user_id"))
+    @JoinColumn(name = "user_id")
     private User user;
 
     @Comment("플레이리스트 순서")
