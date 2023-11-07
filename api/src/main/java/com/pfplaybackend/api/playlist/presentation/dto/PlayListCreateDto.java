@@ -21,7 +21,6 @@ public class PlayListCreateDto {
                 .name(name)
                 .user(user)
                 .type(type)
-                .updatedAt(null)
                 .build();
     }
 
