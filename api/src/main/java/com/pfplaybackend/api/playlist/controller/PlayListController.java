@@ -20,6 +20,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -50,7 +51,7 @@ public class PlayListController {
         JwtTokenInfo jwtTokenInfo = userDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
 
         return ResponseEntity
-                .status(201)
+                .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(
                         PlayListCreateResponse.toResponse(playListService.createPlayList(request, jwtTokenInfo.getUser())))
                 );

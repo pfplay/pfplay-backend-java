@@ -8,7 +8,6 @@ import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import java.time.LocalDateTime;
 
 @Getter
 @DynamicInsert
@@ -16,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "MUSIC_LIST",
         indexes = {
-            @Index(name = "idx_music_list_id", columnList = "play_list_id")
+            @Index(name = "music_list_play_list_id_IDX", columnList = "play_list_id")
         }
 )
 @Entity
