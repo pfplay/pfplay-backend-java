@@ -36,7 +36,7 @@ public class PointHistory {
 
     @Comment("포인트 점수")
     @Column(columnDefinition = "integer unsigned")
-    private Long point;
+    private Integer point;
     @Comment("포인트 설명")
     @Column(length = 100)
     private String description;
@@ -51,7 +51,7 @@ public class PointHistory {
     }
 
     @Builder
-    public PointHistory(User user, PointType type, Long point, String description, LocalDateTime updatedAt) {
+    public PointHistory(User user, PointType type, Integer point, String description, LocalDateTime updatedAt) {
         this.user = user;
         this.type = type;
         this.point = point;

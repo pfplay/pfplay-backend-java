@@ -14,7 +14,7 @@ public class PointHistoryGroupByDto {
     @Schema(implementation = PointType.class, description = "포인트 타입", example = "DJ", requiredMode = REQUIRED, type = "string", allowableValues = {"DJ", "REF", "ROOM"})
     private final PointType type;
 
-    @Schema(description = "포인트 점수", example = "1", requiredMode = REQUIRED, type = "long")
+    @Schema(description = "포인트 점수", example = "1", requiredMode = REQUIRED, type = "integer")
     private final Long point;
 
 }
