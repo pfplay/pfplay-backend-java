@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
         log.error(e.getMessage());
         return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
+                .status(HttpStatus.FORBIDDEN)
                 .body(ApiCommonResponse.error(
                                 ExceptionResult.builder()
                                         .code(ExceptionEnum.ACCESS_DENIED_EXCEPTION.getHttpStatusCode())
