@@ -4,10 +4,13 @@ import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.PartyRoom;
 import com.pfplaybackend.api.entity.PartyRoomJoin;
+import com.pfplaybackend.api.enums.ExceptionEnum;
 import com.pfplaybackend.api.partyroom.enums.PartyPermissionRole;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
+import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
 import com.pfplaybackend.api.partyroom.exception.PartyRoomAccessException;
 import com.pfplaybackend.api.partyroom.presentation.dto.*;
+import com.pfplaybackend.api.partyroom.presentation.request.PartyRoomUpdateRequest;
 import com.pfplaybackend.api.partyroom.presentation.response.PartyRoomCreateAdminInfo;
 import com.pfplaybackend.api.partyroom.presentation.response.PartyRoomCreateResponse;
 import com.pfplaybackend.api.partyroom.repository.PartyPermissionRepository;
@@ -18,6 +21,8 @@ import com.pfplaybackend.api.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,9 +41,16 @@ public class PartyRoomService {
     private final PartyRoomJoinRepositorySupport roomJoinRepositorySupport;
 
     @Transactional
-    public PartyRoomCreateResponse createPartyRoom(PartyRoomCreateDto dto) {
-        if(partyRoomRepository.findByDomain(dto.getDomain()).size() > 0) {
-            throw new DuplicateKeyException("domain exists");
+    public PartyRoomCreateResponse createPartyRoom(
+            final PartyRoomCreateDto dto
+    ) {
+        if(partyRoomRepository.findByDomain(dto.domainUrl()).size() > 0) {
+            // 사용자 정의한 도메인일 때는 중복 처리
+            if(!dto.isDomainOption()) {
+                throw new DuplicateKeyException("domain exists");
+            }
+
+            // @TODO uuid가 겹칠 일이 있다면 추후 uuid 중복 체크 로직 추가하여 생성하는 로직 필요
         }
 
         PartyRoom partyRoom = partyRoomRepository.findByUserId(dto.getUser().getId());
@@ -86,7 +98,10 @@ public class PartyRoomService {
     }
 
     @Transactional
-    public PartyRoomJoinResultDto join(Long roomId, JwtTokenInfo user) {
+    public PartyRoomJoinResultDto join(
+            final Long roomId,
+            final JwtTokenInfo user
+    ) {
         PartyRoom partyRoom = partyRoomRepository.findById(roomId)
                 .orElseThrow(NoSuchElementException::new);
 
@@ -128,6 +143,23 @@ public class PartyRoomService {
                 ))
                 .build();
 
+    }
+
+    @Transactional
+    public void updateInfo(
+            final Long id,
+            final JwtTokenInfo user,
+            final PartyRoomUpdateRequest request
+    ) {
+
+        PartyRoom partyRoom = partyRoomRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("파티룸을 찾을 수 없습니다."));
+
+        if(!partyRoom.getUser().getId().equals(user.getUserId())) {
+            throw new AccessDeniedException(ExceptionEnum.ACCESS_DENIED_EXCEPTION.getMessage());
+        }
+
+        partyRoom.updateInfo(request.getName(), request.getIntroduce(), request.getLimit());
     }
 
 }
