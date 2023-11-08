@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.entity;
 
+import com.pfplaybackend.api.entity.audit.BaseTime;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @Table(name = "GUEST")
 @Entity
-public class Guest {
+public class Guest extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

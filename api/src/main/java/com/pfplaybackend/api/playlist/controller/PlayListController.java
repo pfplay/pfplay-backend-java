@@ -9,6 +9,7 @@ import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest
 import com.pfplaybackend.api.playlist.presentation.response.PlayListCreateResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
 import com.pfplaybackend.api.playlist.service.PlayListService;
+import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import com.pfplaybackend.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,6 +36,8 @@ import java.util.Optional;
 public class PlayListController {
     private final UserService userService;
     private final PlayListService playListService;
+    private final CustomUserDetailService userDetailService;
+
 
     @Operation(summary = "플레이리스트 생성")
     @ApiResponses(value = {
@@ -45,14 +48,12 @@ public class PlayListController {
     })
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody @Valid PlayListCreateRequest request) {
-        JwtTokenInfo jwtTokenInfo = new JwtTokenInfo(SecurityContextHolder.getContext().getAuthentication());
-        User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
-                .orElseThrow(NoSuchElementException::new);
+        JwtTokenInfo jwtTokenInfo = userDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(
-                        PlayListCreateResponse.toResponse(playListService.createPlayList(request, user)))
+                        PlayListCreateResponse.toResponse(playListService.createPlayList(request, jwtTokenInfo.getUser())))
                 );
     }
 
@@ -65,12 +66,10 @@ public class PlayListController {
     })
     @GetMapping()
     public ResponseEntity<?> getPlayList() {
-        JwtTokenInfo jwtTokenInfo = new JwtTokenInfo(SecurityContextHolder.getContext().getAuthentication());
-        User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
-                .orElseThrow(NoSuchElementException::new);
+        JwtTokenInfo jwtTokenInfo = userDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
 
         return ResponseEntity
                 .ok()
-                .body(ApiCommonResponse.success(playListService.getPlayList(user)));
+                .body(ApiCommonResponse.success(playListService.getPlayList(jwtTokenInfo.getUser())));
     }
 }

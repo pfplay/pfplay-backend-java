@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.entity;
 
+import com.pfplaybackend.api.entity.audit.BaseTime;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -13,12 +14,14 @@ import java.time.LocalDateTime;
 @Getter
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "PLAY_LIST",
+@Table(
+        name = "PLAY_LIST",
         indexes = {
                 @Index(name = "play_list_user_id_IDX", columnList = "user_id")
-        })
+        }
+)
 @Entity
-public class PlayList {
+public class PlayList extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,20 +44,13 @@ public class PlayList {
     @Enumerated(EnumType.STRING)
     private PlayListType type;
 
-    @Column(columnDefinition = "datetime default current_timestamp")
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    protected PlayList() {
-    }
+    protected PlayList() { }
 
     @Builder
-    public PlayList(User user, Long orderNumber, String name, PlayListType type, LocalDateTime updatedAt) {
+    public PlayList(User user, Long orderNumber, String name, PlayListType type) {
         this.user = user;
         this.orderNumber = orderNumber;
         this.name = name;
         this.type = type;
-        this.updatedAt = updatedAt;
     }
 }
