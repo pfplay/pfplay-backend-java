@@ -7,17 +7,19 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
-@Table( name = "PARTY_ROOM",
+@DynamicUpdate
+@Table(
+        name = "PARTY_ROOM",
         uniqueConstraints = {
-            @UniqueConstraint(name = "unique_party_room_name", columnNames = {"name"}),
-            @UniqueConstraint(name = "unique_party_room_domain", columnNames = {"domain"})
+                @UniqueConstraint(name = "unique_party_room_domain", columnNames = {"domain"})
         },
         indexes = {
-            @Index(name = "idx_party_room_01", columnList = "domain, name, status, type")
+                @Index(name = "idx_party_room_01", columnList = "domain, status, type")
         }
-        )
+)
 @Entity
 public class PartyRoom extends BaseTime {
 
@@ -33,6 +35,7 @@ public class PartyRoom extends BaseTime {
 
     private String introduce;
 
+    @Column(updatable = false)
     private String domain;
 
     @Comment("디제잉 시간")
@@ -61,5 +64,15 @@ public class PartyRoom extends BaseTime {
         this.djingLimit = djingLimit;
         this.type = type;
         this.status = status;
+    }
+
+    public void updateInfo(
+            final String name,
+            final String introduce,
+            final Integer djingLimit
+    ) {
+        this.name = name;
+        this.introduce = introduce;
+        this.djingLimit = djingLimit;
     }
 }
