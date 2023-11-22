@@ -34,7 +34,7 @@ public class PlayList extends BaseTime {
 
     @Comment("플레이리스트 순서")
     @Column(columnDefinition = "integer unsigned")
-    private Long orderNumber;
+    private Integer orderNumber;
 
     @Comment("플레이리스트 이름")
     private String name;
@@ -47,7 +47,7 @@ public class PlayList extends BaseTime {
     protected PlayList() { }
 
     @Builder
-    public PlayList(User user, Long orderNumber, String name, PlayListType type) {
+    public PlayList(User user, Integer orderNumber, String name, PlayListType type) {
         this.user = user;
         this.orderNumber = orderNumber;
         this.name = name;

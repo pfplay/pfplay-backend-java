@@ -38,7 +38,7 @@ public class PlayListService {
                     .build();
         } else {
             dto = PlayListCreateDto.builder()
-                    .orderNumber(1L)
+                    .orderNumber(1)
                     .user(user)
                     .name(request.getName())
                     .type(PlayListType.PLAYLIST)
