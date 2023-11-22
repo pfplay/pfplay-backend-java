@@ -20,15 +20,18 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
 
 
 @Slf4j
@@ -75,7 +78,6 @@ public class PartyRoomController {
                 .body(ApiCommonResponse.success(partyRoomService.createPartyRoom(dto)));
     }
 
-    @GetMapping("/join")
     @Operation(summary = "파티룸 입장")
     @ApiResponses(value = {
             @ApiResponse(description = "파티룸 입장",
@@ -83,6 +85,7 @@ public class PartyRoomController {
                             schema = @Schema(implementation = PartyRoomJoinResultDto.class))
             )
     })
+    @GetMapping("/join")
     public ResponseEntity<?> join(@RequestParam Long id) {
         JwtTokenInfo jwtTokenInfo =
                 customUserDetailService.getUserDetails(
@@ -93,7 +96,6 @@ public class PartyRoomController {
                 .body(ApiCommonResponse.success(partyRoomService.join(id, jwtTokenInfo)));
     }
 
-    @PatchMapping("/{id}")
     @Secured("ROLE_USER")
     @Operation(summary = "파티룸 수정")
     @ApiResponses(value = {
@@ -102,6 +104,7 @@ public class PartyRoomController {
                             schema = @Schema())
             )
     })
+    @PatchMapping("/{id}")
     public ResponseEntity<?> updatePartyRoom(@NotNull @PathVariable Long id,
                                              @RequestBody @Valid PartyRoomUpdateRequest request) {
         JwtTokenInfo user =
@@ -116,5 +119,16 @@ public class PartyRoomController {
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(request));
+    }
+
+    @Operation(summary = "파티룸 리스트")
+    @GetMapping("/list")
+    public ResponseEntity<?> list(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size") @Nullable int size
+    ) {
+        return ResponseEntity.ok().body(ApiCommonResponse.success(
+                partyRoomService.getPartyListAll(PageRequest.of(page, size))
+        ));
     }
 }

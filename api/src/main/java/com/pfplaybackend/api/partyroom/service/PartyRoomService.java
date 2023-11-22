@@ -1,13 +1,13 @@
 package com.pfplaybackend.api.partyroom.service;
 
 import com.pfplaybackend.api.common.JwtTokenInfo;
+import com.pfplaybackend.api.common.dto.PaginationDto;
 import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.PartyRoom;
 import com.pfplaybackend.api.entity.PartyRoomJoin;
 import com.pfplaybackend.api.enums.ExceptionEnum;
 import com.pfplaybackend.api.partyroom.enums.PartyPermissionRole;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
-import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
 import com.pfplaybackend.api.partyroom.exception.PartyRoomAccessException;
 import com.pfplaybackend.api.partyroom.presentation.dto.*;
 import com.pfplaybackend.api.partyroom.presentation.request.PartyRoomUpdateRequest;
@@ -17,11 +17,12 @@ import com.pfplaybackend.api.partyroom.repository.PartyPermissionRepository;
 import com.pfplaybackend.api.partyroom.repository.PartyRoomJoinRepository;
 import com.pfplaybackend.api.partyroom.repository.PartyRoomRepository;
 import com.pfplaybackend.api.partyroom.repository.dsl.PartyRoomJoinRepositorySupport;
-import com.pfplaybackend.api.user.repository.UserRepository;
+import com.pfplaybackend.api.partyroom.repository.dsl.PartyRoomRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,7 @@ public class PartyRoomService {
     private final PartyPermissionRepository partyPermissionRepository;
     private final ObjectMapperConfig om;
     private final PartyRoomJoinRepositorySupport roomJoinRepositorySupport;
+    private final PartyRoomRepositorySupport partyRoomRepositorySupport;
 
     @Transactional
     public PartyRoomCreateResponse createPartyRoom(
@@ -47,7 +49,7 @@ public class PartyRoomService {
         if(partyRoomRepository.findByDomain(dto.domainUrl()).size() > 0) {
             // 사용자 정의한 도메인일 때는 중복 처리
             if(!dto.isDomainOption()) {
-                throw new DuplicateKeyException("domain exists");
+                throw new DuplicateKeyException("이미 존재하는 도메인 주소입니다.");
             }
 
             // @TODO uuid가 겹칠 일이 있다면 추후 uuid 중복 체크 로직 추가하여 생성하는 로직 필요
@@ -160,6 +162,23 @@ public class PartyRoomService {
         }
 
         partyRoom.updateInfo(request.getName(), request.getIntroduce(), request.getLimit());
+    }
+
+    @Transactional(readOnly = true)
+    public PartyRoomHomeResultPaginationDto getPartyListAll(PageRequest pageRequest) {
+        PageImpl<PartyRoomHomeResultDto> result = partyRoomRepositorySupport.findAll(pageRequest);
+        return PartyRoomHomeResultPaginationDto.builder()
+                .content(result.getContent())
+                .pagination(
+                        PaginationDto.builder()
+                                .pageNumber(result.getPageable().getPageNumber())
+                                .pageSize(result.getSize())
+                                .totalPages(result.getTotalPages())
+                                .totalElements(result.getTotalElements())
+                                .next(result.hasNext())
+                                .build()
+                )
+                .build();
     }
 
 }

@@ -6,6 +6,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Schema(description = "유저")
 public class UserDto {
     private String email;

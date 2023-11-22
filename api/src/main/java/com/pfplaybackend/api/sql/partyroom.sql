@@ -21,5 +21,5 @@ create index idx_party_room_user_id
 ;
 
 create index idx_party_room_01
-    on party_room (domain, introduce, name, status, type)
+    on party_room (domain, status, type)
 ;
