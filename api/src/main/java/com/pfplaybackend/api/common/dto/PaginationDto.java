@@ -19,5 +19,5 @@ public class PaginationDto {
     @Schema(description = "총 항목 수")
     private long totalElements;
     @Schema(description = "다음 존재 여부")
-    private boolean next;
+    private boolean hasNext;
 }
