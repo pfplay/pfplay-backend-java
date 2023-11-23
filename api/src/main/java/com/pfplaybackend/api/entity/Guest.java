@@ -26,9 +26,6 @@ public class Guest extends BaseTime {
 
     private String agent;
 
-    @Column(nullable = false, columnDefinition = "datetime default current_timestamp")
-    private LocalDateTime createdAt;
-
     public Guest() { }
 
     @Builder
