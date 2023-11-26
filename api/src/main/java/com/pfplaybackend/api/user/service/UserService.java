@@ -64,14 +64,14 @@ public class UserService {
     }
 
     @Transactional
-    public void setProfile(User user, ProfileUpdateRequest request) {
+    public void updateProfile(User user, ProfileUpdateRequest request) {
         // 회원 프로필 업데이트 시 닉네임 유니크 조건 추가 (게스트는 제외)
         Optional.of(userRepository.findByNickname(request.getNickname().trim()))
                 .ifPresent(o-> {
                     throw new DuplicateKeyException("이미 존재하는 닉네임입니다.");
                 });
 
-        user.setProfile(request);
+        user.updateProfile(request);
     }
 
     public UserPermission getUserPermission(Authority authority) {
