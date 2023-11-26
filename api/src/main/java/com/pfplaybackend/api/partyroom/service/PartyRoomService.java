@@ -119,6 +119,11 @@ public class PartyRoomService {
         PartyRoom partyRoom = partyRoomRepository.findById(roomId)
                 .orElseThrow(NoSuchElementException::new);
 
+        long PartyRoomJoinTotalCount = partyRoomJoinRepository.countPartyRoomJoinByPartyRoomId(roomId);
+        if(PartyRoomJoinTotalCount > 200) {
+            throw new PartyRoomAccessException("정원이 초과된 파티룸이에요.");
+        }
+
         Optional<PartyRoomJoinResultDto> findByPartyRoomJoinDto =
                 roomJoinRepositorySupport.findByRoomIdWhereJoinRoom(roomId, user.getUserId());
 
@@ -126,7 +131,9 @@ public class PartyRoomService {
         if(findByPartyRoomJoinDto.isPresent()) {
             PartyRoomJoinResultDto dto = findByPartyRoomJoinDto.get();
             if (!Objects.isNull(dto.getPartyRoomBan()) ) {
-                throw new PartyRoomAccessException("입장할 수 없습니다.");
+                throw new PartyRoomAccessException(
+                        String.format("관리자에 의해 퇴출되셨습니다. \n 해당 파티룸 재입장이 불가합니다. 사유 %s", dto.getPartyRoomBan().getReason())
+                );
             }
 
             if(partyRoom.getUser().getId().equals(user.getUserId()) || dto.isHasJoined()) {
