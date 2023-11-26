@@ -175,7 +175,7 @@ public class PartyRoomService {
                                 .pageSize(result.getSize())
                                 .totalPages(result.getTotalPages())
                                 .totalElements(result.getTotalElements())
-                                .next(result.hasNext())
+                                .hasNext(result.hasNext())
                                 .build()
                 )
                 .build();
