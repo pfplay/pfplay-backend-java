@@ -1,5 +1,5 @@
 create table party_room_join (
-     id bigint unsigned not null,
+     id bigint unsigned auto_increment not null,
      room_id bigint unsigned,
      ban_id bigint unsigned,
      user_id bigint unsigned,
@@ -11,4 +11,3 @@ create table party_room_join (
 ) comment='파티룸 접속 테이블' engine=InnoDB;
 
 create index idx_party_room_join_01 on party_room_join (room_id, user_id, role);
-
