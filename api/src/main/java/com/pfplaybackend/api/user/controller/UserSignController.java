@@ -3,11 +3,13 @@ package com.pfplaybackend.api.user.controller;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.config.ObjectMapperConfig;
+import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.user.presentation.dto.DummyResponse;
 import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import com.pfplaybackend.api.user.presentation.request.TokenRequest;
 import com.pfplaybackend.api.user.presentation.response.UserInfoResponse;
 import com.pfplaybackend.api.user.presentation.response.UserLoginSuccessResponse;
+import com.pfplaybackend.api.user.presentation.response.UserProfileResponse;
 import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import com.pfplaybackend.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,8 +40,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserSignController {
 
     private final UserService userService;
-    private final ObjectMapperConfig om;
-    private final CustomUserDetailService userDetailService;
+    private final CustomUserDetailService customUserDetailService;
 
     @Operation(summary = "유저 회원가입 및 로그인")
     @ApiResponses(value = {
@@ -69,7 +70,7 @@ public class UserSignController {
     @GetMapping("/jwt-auth-dummy")
     @PreAuthorize("hasRole('ROLE_USER')")
     public ResponseEntity<?> dummy() {
-        JwtTokenInfo userDetails = userDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        JwtTokenInfo userDetails = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         return ResponseEntity.ok(new DummyResponse(userDetails));
     }
 
@@ -83,13 +84,41 @@ public class UserSignController {
             )
     })
     @PatchMapping("/profile")
-    public ResponseEntity<?> userProfile(
+    public ResponseEntity<?> updateUserProfile(
             @Valid @RequestBody ProfileUpdateRequest request
     ) {
         try {
-            JwtTokenInfo user = userDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+            JwtTokenInfo user = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
             userService.updateProfile(user.getUser(), request);
             return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "유저 마이 프로필 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "프로필 조회 성공"
+            ),
+            @ApiResponse(responseCode = "500",
+                    description = "프로필 조회 실패"
+            )
+    })
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile() {
+        try {
+            JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+            User user = userService.getProfileByEmail(jwtTokenInfo.getUser().getEmail());
+            UserProfileResponse response = UserProfileResponse.builder()
+                    .nickname(user.getNickname())
+                    .introduction(user.getIntroduction())
+                    .faceUrl(user.getFaceUrl())
+                    .bodyId(user.getBodyId())
+                    .bodyUrl(user.getAvatar().getImage())
+                    .walletAddress(user.getWalletAddress())
+                    .build();
+            return ResponseEntity.ok().body(ApiCommonResponse.success(response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
