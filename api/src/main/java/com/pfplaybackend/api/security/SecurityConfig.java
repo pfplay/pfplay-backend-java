@@ -26,7 +26,7 @@ import java.util.Set;
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+@EnableMethodSecurity(securedEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig {
 
@@ -52,7 +52,9 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/api/v1/guest/create"
                         ).permitAll()
-                        .requestMatchers("/api/v1/user/info").permitAll()
+                        .requestMatchers(
+                                "/api/v1/user/info"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(o -> o

@@ -18,6 +18,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,8 @@ public class PlayListController {
     private final UserService userService;
     private final CustomUserDetailService customUserDetailService;
     private final PlayListService playListService;
+    private final CustomUserDetailService userDetailService;
+
 
     @Operation(summary = "플레이리스트 생성")
     @ApiResponses(value = {
@@ -49,9 +52,9 @@ public class PlayListController {
                 .orElseThrow(NoSuchElementException::new);
 
         return ResponseEntity
-                .status(201)
+                .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(
-                        PlayListCreateResponse.toResponse(playListService.createPlayList(request, user)))
+                        PlayListCreateResponse.toResponse(playListService.createPlayList(request, jwtTokenInfo.getUser())))
                 );
     }
 
@@ -70,6 +73,6 @@ public class PlayListController {
 
         return ResponseEntity
                 .ok()
-                .body(ApiCommonResponse.success(playListService.getPlayList(user)));
+                .body(ApiCommonResponse.success(playListService.getPlayList(jwtTokenInfo.getUser())));
     }
 }

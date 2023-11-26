@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -18,7 +19,7 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    // @TODO  custom exception 모듈화 리팩토링 필요
+    // @TODO custom exception 모듈화 리팩토링 필요
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<?> handleNoSuchElementFoundException(NoSuchElementException e) {
         log.error(e.getMessage());
@@ -27,7 +28,21 @@ public class GlobalExceptionHandler {
                 .body(ApiCommonResponse.error(
                                 ExceptionResult.builder()
                                         .code(ExceptionEnum.NO_SUCH_ELEMENT.getHttpStatusCode())
-                                        .message(ExceptionEnum.NO_SUCH_ELEMENT.getMessage())
+                                        .message(e.getMessage())
+                                        .build()
+                        )
+                );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e) {
+        log.error(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ApiCommonResponse.error(
+                                ExceptionResult.builder()
+                                        .code(ExceptionEnum.ACCESS_DENIED_EXCEPTION.getHttpStatusCode())
+                                        .message(ExceptionEnum.ACCESS_DENIED_EXCEPTION.getMessage())
                                         .build()
                         )
                 );

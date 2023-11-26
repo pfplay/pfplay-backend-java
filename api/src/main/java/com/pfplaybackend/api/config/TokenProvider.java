@@ -55,7 +55,7 @@ public class TokenProvider {
                 .issuer(email)
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiry))
-                .claim("scope", scope)
+                .claim("scope", scope.getRole())
                 .claim("userId", userId)
                 .build();
 
@@ -68,7 +68,7 @@ public class TokenProvider {
                 .issuer(String.valueOf(id))
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(expiry))
-                .claim("scope", scope)
+                .claim("scope", scope.getRole())
                 .claim("userId", id)
                 .build();
 

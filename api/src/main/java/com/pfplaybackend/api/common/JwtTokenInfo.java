@@ -2,7 +2,6 @@ package com.pfplaybackend.api.common;
 
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.enums.Authority;
-import com.pfplaybackend.api.partyroom.presentation.dto.UserDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +17,13 @@ import java.util.Objects;
 public class JwtTokenInfo implements Authentication {
 
     private final JwtAuthenticationToken token;
-    private final Collection<GrantedAuthority> authorities;
+    private final Collection<GrantedAuthority> authorities; // 시큐리티 role
     private final String email;
     private final Long userId;
     private final User user;
 
     @Builder
-    public JwtTokenInfo(Authentication authentication, User user) {
+    public JwtTokenInfo(final Authentication authentication, final User user) {
         this.token = (JwtAuthenticationToken) authentication;
         this.userId = Long.parseLong(token.getToken().getClaims().get("userId").toString());
         this.email = token.getToken().getClaims().get("iss").toString();
@@ -36,9 +35,13 @@ public class JwtTokenInfo implements Authentication {
         return !Objects.isNull(user);
     }
 
+    public boolean isWalletUser() {
+        return this.user.getAuthority().equals(Authority.ROLE_WALLET_USER);
+    }
+
     public boolean isGuest() {
         return this.authorities.stream().anyMatch(
-                o-> o.getAuthority().equals(Authority.ROLE_GUEST.getRole())
+                o-> o.getAuthority().equals(Authority.ROLE_GUEST.name())
         );
     }
 

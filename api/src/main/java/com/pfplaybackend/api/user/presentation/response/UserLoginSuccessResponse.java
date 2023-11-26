@@ -18,4 +18,6 @@ public class UserLoginSuccessResponse {
     private final String accessToken;
     @Schema(implementation = UserPermissionDto.class, description = "기능 접근 권한")
     private final UserPermissionDto userPermission;
+    @Schema(description = "유저 프로필 업데이트 여부", defaultValue = "false")
+    private final boolean profileUpdated;
 }

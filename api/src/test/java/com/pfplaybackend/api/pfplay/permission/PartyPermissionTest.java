@@ -6,6 +6,7 @@ import com.pfplaybackend.api.partyroom.enums.PartyPermissionRole;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomPermissionDto;
 import com.pfplaybackend.api.partyroom.repository.PartyPermissionRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,10 +24,8 @@ public class PartyPermissionTest {
     @Autowired
     ObjectMapperConfig om;
 
-    @Test
-    @Transactional
-    @Rollback(value = false)
-    void createPartyPermission() {
+    @BeforeEach
+    void setUp() {
         PartyPermission admin = PartyPermission
                 .builder()
                 .authority(PartyPermissionRole.ADMIN)
@@ -122,7 +121,12 @@ public class PartyPermissionTest {
         partyPermissionRepository.save(mod);
         partyPermissionRepository.save(clubber);
         partyPermissionRepository.save(listener);
+    }
 
+    @Test
+    @Transactional
+    @Rollback(value = false)
+    void createPartyPermission() {
         Assertions.assertEquals(partyPermissionRepository.count(), 5);
     }
 
