@@ -53,8 +53,7 @@ public class SecurityConfig {
                                 "/api/v1/guest/create"
                         ).permitAll()
                         .requestMatchers(
-                                "/api/v1/user/info",
-                                "/api/v1/party-room/list"
+                                "/api/v1/user/info"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
