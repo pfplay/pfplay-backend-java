@@ -7,6 +7,7 @@ import com.pfplaybackend.api.enums.ExceptionEnum;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomCreateDto;
+import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomHomeResultPaginationDto;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomJoinResultDto;
 import com.pfplaybackend.api.partyroom.presentation.request.PartyRoomCreateRequest;
 import com.pfplaybackend.api.partyroom.presentation.request.PartyRoomUpdateRequest;
@@ -100,7 +101,7 @@ public class PartyRoomController {
     @ApiResponses(value = {
             @ApiResponse(description = "파티룸 수정",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema())
+                            schema = @Schema(implementation = PartyRoomUpdateRequest.class))
             )
     })
     @PatchMapping("/{id}")
@@ -122,6 +123,12 @@ public class PartyRoomController {
 
     @Secured({"ROLE_USER", "ROLE_GUEST"})
     @Operation(summary = "파티룸 리스트")
+    @ApiResponses(value = {
+            @ApiResponse(description = "파티룸 리스트",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PartyRoomHomeResultPaginationDto.class))
+            )
+    })
     @GetMapping("/list")
     public ResponseEntity<?> list(
             @RequestParam(value = "page", defaultValue = "0") int page,
