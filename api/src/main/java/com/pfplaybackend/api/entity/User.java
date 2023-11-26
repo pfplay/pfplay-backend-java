@@ -6,10 +6,7 @@ import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
-
-import java.time.LocalDateTime;
 
 @Getter
 @DynamicInsert
@@ -19,7 +16,6 @@ import java.time.LocalDateTime;
         })
 @Entity
 public class User extends BaseTime {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "bigint unsigned")
@@ -45,8 +41,12 @@ public class User extends BaseTime {
     @Column(columnDefinition = "integer default 0")
     private Integer taskScore;
 
-    @Column(columnDefinition = "integer unsigned default 1")
+    @Column(name = "body_id", columnDefinition = "integer unsigned default 1")
     private Integer bodyId;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "body_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Avatar avatar;
 
     @Column(length = 500)
     private String faceUrl;

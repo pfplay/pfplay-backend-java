@@ -3,12 +3,11 @@ package com.pfplaybackend.api.playlist.controller;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.playlist.enums.PlayListOrder;
-import com.pfplaybackend.api.playlist.enums.PlayListType;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListCreateResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
 import com.pfplaybackend.api.playlist.service.PlayListService;
+import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import com.pfplaybackend.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -33,6 +32,7 @@ import java.util.Optional;
 @RequestMapping("/api/v1/play-list")
 public class PlayListController {
     private final UserService userService;
+    private final CustomUserDetailService customUserDetailService;
     private final PlayListService playListService;
 
     @Operation(summary = "플레이리스트 생성")
@@ -44,7 +44,7 @@ public class PlayListController {
     })
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody @Valid PlayListCreateRequest request) {
-        JwtTokenInfo jwtTokenInfo = new JwtTokenInfo(SecurityContextHolder.getContext().getAuthentication());
+        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
                 .orElseThrow(NoSuchElementException::new);
 
@@ -64,7 +64,7 @@ public class PlayListController {
     })
     @GetMapping()
     public ResponseEntity<?> getPlayList() {
-        JwtTokenInfo jwtTokenInfo = new JwtTokenInfo(SecurityContextHolder.getContext().getAuthentication());
+        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
                 .orElseThrow(NoSuchElementException::new);
 

@@ -61,6 +61,14 @@ public class UserService {
                 .block();
     }
 
+    public User getProfileByEmail(String email) {
+        User result = userRepository.findByEmail(email);
+        if (Objects.isNull(result)) {
+            throw new NoSuchElementException();
+        }
+        return result;
+    }
+
     @Transactional
     public void updateProfile(User user, ProfileUpdateRequest request) {
         user.updateProfile(request);
