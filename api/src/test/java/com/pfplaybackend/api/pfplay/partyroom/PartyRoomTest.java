@@ -8,9 +8,11 @@ import com.pfplaybackend.api.enums.Authority;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
 import com.pfplaybackend.api.partyroom.presentation.request.PartyRoomCreateRequest;
+import com.pfplaybackend.api.partyroom.presentation.request.PartyRoomUpdateRequest;
 import com.pfplaybackend.api.partyroom.repository.PartyRoomRepository;
 import com.pfplaybackend.api.user.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,12 +21,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Objects;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,36 +38,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
+@Transactional
+@Rollback(value = false)
 class PartyRoomTest {
 
+    @Autowired
     private PartyRoomRepository partyRoomRepository;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
     private MockMvc mockMvc;
+    @Autowired
     private TokenProvider tokenProvider;
-
     @Autowired
     private ObjectMapperConfig om;
 
-    @Autowired
-    public PartyRoomTest(PartyRoomRepository partyRoomRepository, UserRepository userRepository, MockMvc mockMvc, TokenProvider tokenProvider) {
-        this.partyRoomRepository = partyRoomRepository;
-        this.userRepository = userRepository;
-        this.mockMvc = mockMvc;
-        this.tokenProvider = tokenProvider;
-    }
+    User user;
+    PartyRoom partyRoom;
+    String accessToken;
 
-    @Test
-    @Transactional
-    @Rollback(false)
-    public void createPartyRoom() {
-        User user = User.builder()
-                .authority(Authority.ROLE_USER)
+    @BeforeEach
+    void setUp() {
+        user = userRepository.save(User.builder()
+                .authority(Authority.ROLE_WALLET_USER)
                 .email("pfplay.io@gmail.com")
-                .build();
+                .build()
+        );
 
-        User saveUser = userRepository.save(user);
-
-        PartyRoom partyRoom = PartyRoom.builder()
+        accessToken = tokenProvider.createAccessToken(user.getAuthority(), user.getEmail(), user.getId());
+        partyRoom = partyRoomRepository.save(PartyRoom.builder()
                 .name("뉴진스 노래 모음~~")
                 .domain("https://pfplay.io")
                 .status(PartyRoomStatus.ACTIVE)
@@ -71,29 +74,26 @@ class PartyRoomTest {
                 .introduce("뉴진스~~~")
                 .type(PartyRoomType.PARTY)
                 .user(user)
-                .build();
+                .build()
+        );
+    }
 
-        partyRoomRepository.save(partyRoom);
+    @Test
+    public void createPartyRoom() {
         Assertions.assertEquals(partyRoom.getUser().getId(), user.getId());
     }
 
     @Test
-    @Transactional
     public void getPartyRoomInfo() {
-        Long userId = userRepository.findById(1L).orElseThrow().getId();
-        PartyRoom partyRooms = partyRoomRepository.findByUserId(userId);
+        Long userId = userRepository.findById(user.getId()).orElseThrow().getId();
+        PartyRoom partyRoom = partyRoomRepository.findByUserId(userId);
 
-        Assertions.assertEquals(partyRooms.getId(), 1);
-        Assertions.assertEquals(partyRooms.getUser().getId(), 1);
+        Assertions.assertEquals(partyRoom.getId(), 1);
+        Assertions.assertEquals(partyRoom.getUser().getId(), 1);
     }
 
     @Test
     public void createPartyRoomMockMvc() throws Exception {
-        User user = User.builder()
-                .email("test@1234.com")
-                .authority(Authority.ROLE_USER)
-                .build();
-
         User persistUser = userRepository.findByEmail(user.getEmail());
         if(Objects.isNull(persistUser)) {
             persistUser = userRepository.save(user);
@@ -101,7 +101,7 @@ class PartyRoomTest {
 
         String accessToken = tokenProvider.createAccessToken(persistUser.getAuthority(), persistUser.getEmail(), persistUser.getId());
         String content = om.mapper().writeValueAsString(new PartyRoomCreateRequest(
-                "뉴진스", "뉴진스 소개", "domain", true, 3
+                "뉴진스", "뉴진스 소개", "domain", 3
         ));
 
         System.out.println(accessToken);

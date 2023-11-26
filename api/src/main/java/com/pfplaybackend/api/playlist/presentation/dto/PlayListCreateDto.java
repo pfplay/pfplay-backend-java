@@ -10,7 +10,7 @@ import lombok.Getter;
 @Builder
 public class PlayListCreateDto {
     private final PlayList playList;
-    private final Long orderNumber;
+    private final Integer orderNumber;
     private final String name;
     private final PlayListType type;
     private final User user;
@@ -21,7 +21,6 @@ public class PlayListCreateDto {
                 .name(name)
                 .user(user)
                 .type(type)
-                .updatedAt(null)
                 .build();
     }
 

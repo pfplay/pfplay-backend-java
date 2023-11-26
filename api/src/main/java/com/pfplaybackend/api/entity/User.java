@@ -10,10 +10,12 @@ import org.hibernate.annotations.DynamicInsert;
 
 @Getter
 @DynamicInsert
-@Table( name = "USER",
+@Table(
+        name = "USER",
         uniqueConstraints = {
             @UniqueConstraint(name = "unique_user_email", columnNames = {"email"})
-        })
+        }
+)
 @Entity
 public class User extends BaseTime {
     @Id
