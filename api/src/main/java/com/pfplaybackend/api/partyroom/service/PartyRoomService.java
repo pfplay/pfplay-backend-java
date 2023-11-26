@@ -57,7 +57,10 @@ public class PartyRoomService {
 
         PartyRoom partyRoom = partyRoomRepository.findByUserId(dto.getUser().getId());
         PartyRoomPermissionDto partyRoomPermissionDefaultDto =
-                om.mapper().convertValue(partyPermissionRepository.findByAuthority(PartyPermissionRole.ADMIN), PartyRoomPermissionDto.class);
+                om.mapper().convertValue(
+                        partyPermissionRepository.findByAuthority(PartyPermissionRole.ADMIN),
+                        PartyRoomPermissionDto.class
+                );
 
         if(Objects.nonNull(partyRoom)) {
             return PartyRoomCreateResponse
@@ -80,6 +83,15 @@ public class PartyRoomService {
         }
 
         partyRoom = partyRoomRepository.save(dto.toEntity());
+        // 파티룸 생성 시 join 테이블에 생성한 유저 추가
+        partyRoomJoinRepository.save(PartyRoomJoin.builder()
+                .partyRoom(partyRoom)
+                .partyRoomBan(null)
+                .user(dto.getUser())
+                .active(PartyRoomStatus.ACTIVE)
+                .role(PartyPermissionRole.ADMIN)
+                .build()
+        );
         return PartyRoomCreateResponse
                 .builder()
                 .id(partyRoom.getId())

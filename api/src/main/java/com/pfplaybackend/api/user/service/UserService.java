@@ -16,6 +16,7 @@ import com.pfplaybackend.api.user.repository.UserRepository;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -81,6 +82,7 @@ public class UserService {
         Optional<User> findUser = Optional.ofNullable(userRepository.findByEmail(email));
 
         if (findUser.isEmpty()) {
+            // 신규
             UserSaveDto userDto = UserSaveDto.builder()
                     .email(email)
                     .authority(Authority.ROLE_USER)
@@ -95,9 +97,13 @@ public class UserService {
                     true,
                     user.getAuthority(),
                     registeredUserReturnJwt(user, user.getEmail(), user.getId()),
-                    userPermissionDto
+                    userPermissionDto,
+                    false
             );
         }
+
+        boolean isProfileUpdated = StringUtils.hasText(findUser.get().getNickname())
+                && StringUtils.hasText(findUser.get().getIntroduction());
 
         UserPermissionDto userPermissionDto = om.mapper().convertValue(getUserPermission(findUser.get().getAuthority()), UserPermissionDto.class);
         return new UserLoginSuccessResponse(
@@ -106,7 +112,8 @@ public class UserService {
                 false,
                 findUser.get().getAuthority(),
                 registeredUserReturnJwt(findUser.get(), email, findUser.get().getId()),
-                userPermissionDto
+                userPermissionDto,
+                isProfileUpdated
         );
 
     }

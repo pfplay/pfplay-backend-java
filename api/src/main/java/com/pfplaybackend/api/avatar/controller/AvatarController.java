@@ -6,6 +6,7 @@ import com.pfplaybackend.api.avatar.service.AvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.entity.User;
+import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import com.pfplaybackend.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +15,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,18 +28,15 @@ import java.util.NoSuchElementException;
 
 @SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "avatar", description = "avatar api")
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/avatar")
 @RestController
 public class AvatarController {
 
-    private AvatarService avatarService;
+    private final AvatarService avatarService;
 
-    private UserService userService;
-
-    public AvatarController(AvatarService avatarService, UserService userService) {
-        this.avatarService = avatarService;
-        this.userService = userService;
-    }
+    private final UserService userService;
+    private final CustomUserDetailService customUserDetailService;
 
     @Operation(summary = "Avatar body list 조회")
     @ApiResponses(value = {
@@ -50,7 +49,7 @@ public class AvatarController {
     })
     @GetMapping("/body-list")
     public ResponseEntity<?> getAllAvatarBodies() {
-        JwtTokenInfo jwtTokenInfo = new JwtTokenInfo(SecurityContextHolder.getContext().getAuthentication());
+        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
                 .orElseThrow(NoSuchElementException::new);
         List<AvatarBodyDto> response = this.avatarService.getAvatarBodies(user.getId());
