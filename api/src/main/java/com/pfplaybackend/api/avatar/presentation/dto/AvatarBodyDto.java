@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Optional;
+
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 
@@ -25,6 +28,14 @@ public class AvatarBodyDto {
     private final String image;
 
     @Schema(description = "해금 포인트", example = "0", requiredMode = REQUIRED, type = "integer")
-    private final Integer point;
+    private final Integer requiredPoint;
 
+    @Schema(description = "보유 포인트", example = "0", requiredMode = REQUIRED, type = "integer")
+    private final Long myPoint;
+
+    @Schema(description = "사용 가능 여부", example = "true", requiredMode = REQUIRED, type = "boolean")
+    private final boolean isAvailable;
+
+    @Schema(description = "일체형 아바타 여부", example = "true", requiredMode = REQUIRED, type = "boolean")
+    private final boolean isUniform;
 }
