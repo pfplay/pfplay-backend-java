@@ -27,5 +27,8 @@ public class Avatar {
     @Column(nullable = false)
     private Integer point;
 
+    @Column(nullable = false)
+    private Boolean isUniform;
+
     public Avatar() { }
 }
