@@ -22,6 +22,7 @@ create table party_permission
 create index idx_permission_authority on party_permission (authority)
 ;
 
+create index idx_permission_level on party_permission (level);
 
 insert into party_permission (authority, ban_to_clubber, chat_ban, chat_delete, chat_limit_ban_to_clubber, dj_wait_lock,
                               give_to_clubber, kick_to_clubber, music_skip, new_dj, notice, party_close,
@@ -31,3 +32,12 @@ values ('ADMIN', 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
        ('MODERATOR', 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1),
        ('CLUBBER', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
        ('LISTENER', 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+
+alter table party_permission add column level tinyint
+    unsigned default '0' comment '계급 순서' after id;
+
+UPDATE pfplay.party_permission t SET t.level = 1 WHERE t.id = 1;
+UPDATE pfplay.party_permission t SET t.level = 2 WHERE t.id = 2
+UPDATE pfplay.party_permission t SET t.level = 3 WHERE t.id = 3;
+UPDATE pfplay.party_permission t SET t.level = 4 WHERE t.id = 4;
+UPDATE pfplay.party_permission t SET t.level = 5 WHERE t.id = 5;

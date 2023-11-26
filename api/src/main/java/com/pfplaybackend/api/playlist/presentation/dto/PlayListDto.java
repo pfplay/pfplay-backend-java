@@ -15,7 +15,7 @@ public class PlayListDto {
     private final Long id;
 
     @Schema(description = "Playlist order number", example = "1", requiredMode = REQUIRED, type = "long")
-    private final Long orderNumber;
+    private final Integer orderNumber;
     @Schema(description = "Playlist name", example = "나의 플레이리스트 1", requiredMode = REQUIRED, type = "string")
     private final String name;
 

@@ -23,6 +23,9 @@ public class PartyPermission {
     @Column(columnDefinition = "integer unsigned")
     private Integer id;
 
+    @Comment("권한 레벨")
+    private Integer level;
+
     @Enumerated(value = EnumType.STRING)
     private PartyPermissionRole authority;
 
