@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -121,11 +120,12 @@ public class PartyRoomController {
                 .body(ApiCommonResponse.success(request));
     }
 
+    @Secured({"ROLE_USER", "ROLE_GUEST"})
     @Operation(summary = "파티룸 리스트")
     @GetMapping("/list")
     public ResponseEntity<?> list(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size") @Nullable int size
+            @RequestParam(value = "size", defaultValue = "20") int size
     ) {
         return ResponseEntity.ok().body(ApiCommonResponse.success(
                 partyRoomService.getPartyListAll(PageRequest.of(page, size))

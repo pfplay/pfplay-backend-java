@@ -57,7 +57,10 @@ public class PartyRoomService {
 
         PartyRoom partyRoom = partyRoomRepository.findByUserId(dto.getUser().getId());
         PartyRoomPermissionDto partyRoomPermissionDefaultDto =
-                om.mapper().convertValue(partyPermissionRepository.findByAuthority(PartyPermissionRole.ADMIN), PartyRoomPermissionDto.class);
+                om.mapper().convertValue(
+                        partyPermissionRepository.findByAuthority(PartyPermissionRole.ADMIN),
+                        PartyRoomPermissionDto.class
+                );
 
         if(Objects.nonNull(partyRoom)) {
             return PartyRoomCreateResponse
@@ -80,6 +83,15 @@ public class PartyRoomService {
         }
 
         partyRoom = partyRoomRepository.save(dto.toEntity());
+        // 파티룸 생성 시 join 테이블에 생성한 유저 추가
+        partyRoomJoinRepository.save(PartyRoomJoin.builder()
+                .partyRoom(partyRoom)
+                .partyRoomBan(null)
+                .user(dto.getUser())
+                .active(PartyRoomStatus.ACTIVE)
+                .role(PartyPermissionRole.ADMIN)
+                .build()
+        );
         return PartyRoomCreateResponse
                 .builder()
                 .id(partyRoom.getId())
@@ -107,6 +119,11 @@ public class PartyRoomService {
         PartyRoom partyRoom = partyRoomRepository.findById(roomId)
                 .orElseThrow(NoSuchElementException::new);
 
+        long PartyRoomJoinTotalCount = partyRoomJoinRepository.countPartyRoomJoinByPartyRoomId(roomId);
+        if(PartyRoomJoinTotalCount > 200) {
+            throw new PartyRoomAccessException("정원이 초과된 파티룸이에요.");
+        }
+
         Optional<PartyRoomJoinResultDto> findByPartyRoomJoinDto =
                 roomJoinRepositorySupport.findByRoomIdWhereJoinRoom(roomId, user.getUserId());
 
@@ -114,7 +131,9 @@ public class PartyRoomService {
         if(findByPartyRoomJoinDto.isPresent()) {
             PartyRoomJoinResultDto dto = findByPartyRoomJoinDto.get();
             if (!Objects.isNull(dto.getPartyRoomBan()) ) {
-                throw new PartyRoomAccessException("입장할 수 없습니다.");
+                throw new PartyRoomAccessException(
+                        String.format("관리자에 의해 퇴출되셨습니다. \n 해당 파티룸 재입장이 불가합니다. 사유 %s", dto.getPartyRoomBan().getReason())
+                );
             }
 
             if(partyRoom.getUser().getId().equals(user.getUserId()) || dto.isHasJoined()) {
