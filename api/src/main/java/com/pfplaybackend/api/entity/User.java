@@ -46,19 +46,22 @@ public class User extends BaseTime {
     @Column(name = "body_id", columnDefinition = "integer unsigned default 1")
     private Integer bodyId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "body_id", referencedColumnName = "id", insertable = false, updatable = false)
-    private Avatar avatar;
-
     @Column(length = 500)
     private String faceUrl;
 
     protected User() { }
 
     @Builder
-    public User(String email, Authority authority) {
+    public User(String email, String nickname, String introduction, Authority authority, String walletAddress, Integer djScore, Integer taskScore, Integer bodyId, String faceUrl) {
         this.email = email;
+        this.nickname = nickname;
+        this.introduction = introduction;
         this.authority = authority;
+        this.walletAddress = walletAddress;
+        this.djScore = djScore;
+        this.taskScore = taskScore;
+        this.bodyId = bodyId;
+        this.faceUrl = faceUrl;
     }
 
     public void updateProfile(ProfileUpdateRequest dto) {
