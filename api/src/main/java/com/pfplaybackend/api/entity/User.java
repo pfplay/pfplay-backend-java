@@ -43,7 +43,7 @@ public class User extends BaseTime {
     @Column(columnDefinition = "integer default 0")
     private Integer taskScore;
 
-    @Column(name = "body_id", columnDefinition = "integer unsigned default 1")
+    @Column(columnDefinition = "integer unsigned default 1")
     private Integer bodyId;
 
     @Column(length = 500)
