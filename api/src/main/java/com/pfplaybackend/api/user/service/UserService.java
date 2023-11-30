@@ -63,14 +63,6 @@ public class UserService {
                 .block();
     }
 
-    public User getProfileByEmail(String email) {
-        User result = userRepository.findByEmail(email);
-        if (Objects.isNull(result)) {
-            throw new NoSuchElementException();
-        }
-        return result;
-    }
-
     @Transactional
     public void updateProfile(User user, ProfileUpdateRequest request) {
         // 회원 프로필 업데이트 시 닉네임 유니크 조건 추가 (게스트는 제외)
