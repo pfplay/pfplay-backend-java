@@ -68,8 +68,6 @@ public class PlayListController {
     @GetMapping()
     public ResponseEntity<?> getPlayList() {
         JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
-                .orElseThrow(NoSuchElementException::new);
 
         return ResponseEntity
                 .ok()

@@ -1,5 +1,7 @@
 package com.pfplaybackend.api.user.controller;
 
+import com.pfplaybackend.api.avatar.presentation.dto.AvatarBodyDto;
+import com.pfplaybackend.api.avatar.service.AvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.config.ObjectMapperConfig;
@@ -42,6 +44,7 @@ public class UserSignController {
 
     private final UserService userService;
     private final CustomUserDetailService customUserDetailService;
+    private final AvatarService avatarService;
 
     @Operation(summary = "유저 회원가입 및 로그인")
     @ApiResponses(value = {
@@ -111,13 +114,14 @@ public class UserSignController {
     public ResponseEntity<?> getUserProfile() {
         try {
             JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-            User user = userService.getProfileByEmail(jwtTokenInfo.getUser().getEmail());
+            User user = jwtTokenInfo.getUser();
+            AvatarBodyDto avatarBodyDto = avatarService.getAvatarBody(user.getBodyId());
             UserProfileResponse response = UserProfileResponse.builder()
                     .nickname(user.getNickname())
                     .introduction(user.getIntroduction())
                     .faceUrl(user.getFaceUrl())
                     .bodyId(user.getBodyId())
-                    .bodyUrl(user.getAvatar().getImage())
+                    .bodyUrl(avatarBodyDto.getImage())
                     .walletAddress(user.getWalletAddress())
                     .build();
             return ResponseEntity.ok().body(ApiCommonResponse.success(response));
