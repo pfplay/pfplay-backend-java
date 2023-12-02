@@ -6,10 +6,7 @@ import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
-
-import java.time.LocalDateTime;
 
 @Getter
 @DynamicInsert
@@ -21,7 +18,6 @@ import java.time.LocalDateTime;
 )
 @Entity
 public class User extends BaseTime {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "bigint unsigned")
@@ -56,12 +52,20 @@ public class User extends BaseTime {
     protected User() { }
 
     @Builder
-    public User(String email, Authority authority) {
+    public User(String email, String nickname, String introduction, Authority authority, String walletAddress, Integer djScore, Integer taskScore, Integer bodyId, String faceUrl) {
         this.email = email;
+        this.nickname = nickname;
+        this.introduction = introduction;
         this.authority = authority;
+        this.walletAddress = walletAddress;
+        this.djScore = djScore;
+        this.taskScore = taskScore;
+        this.bodyId = bodyId;
+        this.faceUrl = faceUrl;
     }
 
-    public void updateProfile(ProfileUpdateRequest dto) {
+
+    public void setProfile(ProfileUpdateRequest dto) {
         this.introduction = dto.getIntroduction();
         this.nickname = dto.getNickname();
         this.faceUrl = dto.getFaceUrl();
