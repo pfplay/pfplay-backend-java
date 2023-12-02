@@ -3,8 +3,6 @@ package com.pfplaybackend.api.playlist.controller;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.playlist.enums.PlayListOrder;
-import com.pfplaybackend.api.playlist.enums.PlayListType;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListCreateResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
@@ -35,6 +33,7 @@ import java.util.Optional;
 @RequestMapping("/api/v1/play-list")
 public class PlayListController {
     private final UserService userService;
+    private final CustomUserDetailService customUserDetailService;
     private final PlayListService playListService;
     private final CustomUserDetailService userDetailService;
 
@@ -48,7 +47,7 @@ public class PlayListController {
     })
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody @Valid PlayListCreateRequest request) {
-        JwtTokenInfo jwtTokenInfo = userDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -66,7 +65,7 @@ public class PlayListController {
     })
     @GetMapping()
     public ResponseEntity<?> getPlayList() {
-        JwtTokenInfo jwtTokenInfo = userDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
 
         return ResponseEntity
                 .ok()
