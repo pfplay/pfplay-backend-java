@@ -64,8 +64,7 @@ public class User extends BaseTime {
         this.faceUrl = faceUrl;
     }
 
-
-    public void setProfile(ProfileUpdateRequest dto) {
+    public void updateProfile(ProfileUpdateRequest dto) {
         this.introduction = dto.getIntroduction();
         this.nickname = dto.getNickname();
         this.faceUrl = dto.getFaceUrl();
