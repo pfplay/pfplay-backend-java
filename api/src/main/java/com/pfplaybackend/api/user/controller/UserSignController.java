@@ -78,36 +78,6 @@ public class UserSignController {
         return ResponseEntity.ok(new DummyResponse(userDetails));
     }
 
-    @Operation(summary = "유저 마이 프로필 조회")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
-                    description = "프로필 조회 성공"
-            ),
-            @ApiResponse(responseCode = "500",
-                    description = "프로필 조회 실패"
-            )
-    })
-    @Secured("ROLE_USER")
-    @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile() {
-        try {
-            JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-            User user = jwtTokenInfo.getUser();
-            AvatarBodyDto avatarBodyDto = avatarService.getAvatarBody(user.getBodyId());
-            UserProfileResponse response = UserProfileResponse.builder()
-                    .nickname(user.getNickname())
-                    .introduction(user.getIntroduction())
-                    .faceUrl(user.getFaceUrl())
-                    .bodyId(user.getBodyId())
-                    .bodyUrl(avatarBodyDto.getImage())
-                    .walletAddress(user.getWalletAddress())
-                    .build();
-            return ResponseEntity.ok().body(ApiCommonResponse.success(response));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
     @Operation(summary = "유저 마이 프로필 설정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
@@ -126,6 +96,35 @@ public class UserSignController {
             JwtTokenInfo user = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
             userService.setProfile(user.getUser(), request);
             return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "유저 마이 프로필 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "프로필 조회 성공"
+            ),
+            @ApiResponse(responseCode = "500",
+                    description = "프로필 조회 실패"
+            )
+    })
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile() {
+        try {
+            JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+            User user = jwtTokenInfo.getUser();
+            AvatarBodyDto avatarBodyDto = avatarService.getAvatarBody(user.getBodyId());
+            UserProfileResponse response = UserProfileResponse.builder()
+                    .nickname(user.getNickname())
+                    .introduction(user.getIntroduction())
+                    .faceUrl(user.getFaceUrl())
+                    .bodyId(user.getBodyId())
+                    .bodyUrl(avatarBodyDto.getImage())
+                    .walletAddress(user.getWalletAddress())
+                    .build();
+            return ResponseEntity.ok().body(ApiCommonResponse.success(response));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
