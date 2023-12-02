@@ -22,6 +22,19 @@ public class AvatarService {
         this.pointHistoryService = pointHistoryService;
     }
 
+    public AvatarBodyDto getAvatarBody(Integer bodyId) {
+        Avatar avatar = avatarRepository.findById(bodyId).orElseThrow();
+        AvatarBodyDto dto = AvatarBodyDto.builder()
+                .id(avatar.getId())
+                .type(avatar.getType())
+                .name(avatar.getName())
+                .image(avatar.getImage())
+                .requiredPoint(avatar.getPoint())
+                .isUniform(avatar.getIsUniform())
+                .build();
+        return dto;
+    }
+
     public List<AvatarBodyDto> getAvatarBodies(Long userId) {
         List<Avatar> result = avatarRepository.findAll();
         List<AvatarBodyDto> dtoList = new ArrayList<>();
