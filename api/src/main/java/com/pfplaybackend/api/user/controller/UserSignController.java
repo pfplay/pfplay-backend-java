@@ -33,6 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
+
 @SecurityRequirement(name = "Bearer Authentication")
 @Tag(name = "user", description = "user api")
 @Slf4j
@@ -49,7 +50,7 @@ public class UserSignController {
     @ApiResponses(value = {
             @ApiResponse(description = "유저 회원가입 및 로그인",
                     content = @Content(
-                            schema = @Schema(implementation = UserLoginSuccessResponse.class)
+                        schema = @Schema(implementation = UserLoginSuccessResponse.class)
                     )
             )
     })
@@ -66,7 +67,7 @@ public class UserSignController {
     @ApiResponses(value = {
             @ApiResponse(description = "jwt 유저 인증 테스트. 게스트 jwt 접근 불가능",
                     content = @Content(
-                            schema = @Schema(implementation = UserLoginSuccessResponse.class)
+                        schema = @Schema(implementation = UserLoginSuccessResponse.class)
                     )
             )
     })
@@ -75,36 +76,6 @@ public class UserSignController {
     public ResponseEntity<?> dummy() {
         JwtTokenInfo userDetails = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         return ResponseEntity.ok(new DummyResponse(userDetails));
-    }
-
-    @Operation(summary = "유저 마이 프로필 조회")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200",
-                    description = "프로필 조회 성공"
-            ),
-            @ApiResponse(responseCode = "500",
-                    description = "프로필 조회 실패"
-            )
-    })
-    @Secured("ROLE_USER")
-    @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile() {
-        try {
-            JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-            User user = jwtTokenInfo.getUser();
-            AvatarBodyDto avatarBodyDto = avatarService.getAvatarBody(user.getBodyId());
-            UserProfileResponse response = UserProfileResponse.builder()
-                    .nickname(user.getNickname())
-                    .introduction(user.getIntroduction())
-                    .faceUrl(user.getFaceUrl())
-                    .bodyId(user.getBodyId())
-                    .bodyUrl(avatarBodyDto.getImage())
-                    .walletAddress(user.getWalletAddress())
-                    .build();
-            return ResponseEntity.ok().body(ApiCommonResponse.success(response));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
     }
 
     @Operation(summary = "유저 마이 프로필 설정")
@@ -130,4 +101,32 @@ public class UserSignController {
         }
     }
 
+    @Operation(summary = "유저 마이 프로필 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200",
+                    description = "프로필 조회 성공"
+            ),
+            @ApiResponse(responseCode = "500",
+                    description = "프로필 조회 실패"
+            )
+    })
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile() {
+        try {
+            JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+            User user = jwtTokenInfo.getUser();
+            AvatarBodyDto avatarBodyDto = avatarService.getAvatarBody(user.getBodyId());
+            UserProfileResponse response = UserProfileResponse.builder()
+                    .nickname(user.getNickname())
+                    .introduction(user.getIntroduction())
+                    .faceUrl(user.getFaceUrl())
+                    .bodyId(user.getBodyId())
+                    .bodyUrl(avatarBodyDto.getImage())
+                    .walletAddress(user.getWalletAddress())
+                    .build();
+            return ResponseEntity.ok().body(ApiCommonResponse.success(response));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
