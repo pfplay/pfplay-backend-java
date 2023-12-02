@@ -48,8 +48,6 @@ public class PlayListController {
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody @Valid PlayListCreateRequest request) {
         JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-        User user = Optional.of(userService.findByUser(jwtTokenInfo.getEmail()))
-                .orElseThrow(NoSuchElementException::new);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
