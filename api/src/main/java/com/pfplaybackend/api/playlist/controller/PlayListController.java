@@ -35,8 +35,6 @@ public class PlayListController {
     private final UserService userService;
     private final CustomUserDetailService customUserDetailService;
     private final PlayListService playListService;
-    private final CustomUserDetailService userDetailService;
-
 
     @Operation(summary = "플레이리스트 생성")
     @ApiResponses(value = {
