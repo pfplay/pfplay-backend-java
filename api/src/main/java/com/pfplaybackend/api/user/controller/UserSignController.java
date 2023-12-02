@@ -89,12 +89,12 @@ public class UserSignController {
     })
     @Secured("ROLE_USER")
     @PatchMapping("/profile")
-    public ResponseEntity<?> updateUserProfile(
+    public ResponseEntity<?> setUserProfile(
             @Valid @RequestBody ProfileUpdateRequest request
     ) {
         try {
             JwtTokenInfo user = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-            userService.updateProfile(user.getUser(), request);
+            userService.setProfile(user.getUser(), request);
             return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
