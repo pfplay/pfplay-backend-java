@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.user.controller;
 
 import com.pfplaybackend.api.avatar.presentation.dto.AvatarBodyDto;
+import com.pfplaybackend.api.avatar.presentation.response.AvatarBodyResponse;
 import com.pfplaybackend.api.avatar.service.AvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
@@ -104,7 +105,10 @@ public class UserSignController {
     @Operation(summary = "유저 마이 프로필 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200",
-                    description = "프로필 조회 성공"
+                    description = "프로필 조회 성공",
+                    content = @Content(
+                            schema = @Schema(implementation = UserProfileResponse.class)
+                    )
             ),
             @ApiResponse(responseCode = "500",
                     description = "프로필 조회 실패"
