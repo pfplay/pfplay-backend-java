@@ -121,7 +121,7 @@ public class PartyRoomController {
                 .body(ApiCommonResponse.success(request));
     }
 
-    @Secured({"ROLE_USER")
+    @Secured({"ROLE_USER"})
     @Operation(summary = "파티룸 리스트")
     @ApiResponses(value = {
             @ApiResponse(description = "파티룸 리스트",
