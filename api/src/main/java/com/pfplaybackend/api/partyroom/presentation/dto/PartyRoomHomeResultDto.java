@@ -13,8 +13,14 @@ import java.util.List;
 @ToString
 @Schema(description = "파티룸 홈화면")
 public class PartyRoomHomeResultDto {
+    @Schema(description = "파티룸 id(pk)")
+    private Long roomId;
     @Schema(description = "파티룸 소개")
     private String introduce;
+    @Schema(description = "파티룸 제목")
+    private String name;
+    @Schema(description = "파티룸 도메인")
+    private String domain;
     @Schema(description = "생성일")
     private LocalDateTime createdAt;
     @Schema(description = "파티룸 참여 총 수")

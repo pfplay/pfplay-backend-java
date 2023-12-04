@@ -40,6 +40,9 @@ public class PartyRoomRepositorySupport {
                         partyRoomJoin.user.id.count().as(aliasUserCount),
                         partyRoom.introduce,
                         partyRoom.createdAt,
+                        partyRoom.name,
+                        partyRoom.domain,
+                        partyRoom.id,
                         ExpressionUtils.as(WithUserSubQuery(user.nickname), "nickname"),
                         ExpressionUtils.as(WithUserSubQuery(user.faceUrl), "face_url"),
                         ExpressionUtils.as(WithUserSubQuery(partyPermission.authority), "role")
@@ -70,7 +73,10 @@ public class PartyRoomRepositorySupport {
                             }).collect(Collectors.toList());
 
                     return new PartyRoomHomeResultDto(
+                            tuple.get(partyRoom.id),
                             tuple.get(partyRoom.introduce),
+                            tuple.get(partyRoom.name),
+                            tuple.get(partyRoom.domain),
                             tuple.get(partyRoom.createdAt),
                             tuple.get(aliasUserCount),
                             partyRoomHomeResultAttendInfo
