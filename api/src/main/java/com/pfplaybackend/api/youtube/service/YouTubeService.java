@@ -14,13 +14,16 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.VideoListResponse;
+import com.pfplaybackend.api.youtube.presentation.dto.MusicList;
 import com.pfplaybackend.api.youtube.presentation.response.MusicListResponse;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLDecoder;
 import java.security.GeneralSecurityException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -60,7 +63,28 @@ public class YouTubeService {
                 .build();
     }
 
-    public List<MusicListResponse> getSearchList() {
+    public static String formatDuration(String durationString) {
+        Duration duration = Duration.parse(durationString);
+
+        Long hours = duration.toHours();
+        Long minutes = duration.toMinutes() % 60;
+        Long seconds = duration.toSeconds() % 60;
+
+        String hoursStr = String.format("%02d", hours);
+        String minutesStr = minutes == 0 ? "0:" : String.format("%02d", minutes);
+        String secondsStr = String.format("%02d", seconds);
+
+        String formattedDuration = "";
+        if (hours > 0) {
+            formattedDuration += hoursStr + ":";
+        }
+        formattedDuration += minutesStr + ":";
+        formattedDuration += secondsStr;
+
+        return formattedDuration;
+    }
+
+    public MusicListResponse getSearchList() {
         try {
             YouTube youtubeService = getService();
             YouTube.Search.List searchRequest = youtubeService.search().list("snippet");
@@ -69,27 +93,43 @@ public class YouTubeService {
 //            SearchListResponse response = request.setPageToken("CAUQAA")
 //                    .setQ("뉴진스")
 //                    .execute();
-            List<MusicListResponse> musicList = new ArrayList<>();
+
+            List<MusicList> musicList = new ArrayList<>();
 
             for (SearchResult item : searchResponse.getItems()) {
                 String videoId = item.getId().getVideoId();
+
+                String decodedTitle = URLDecoder.decode(item.getSnippet().getTitle(), "UTF-8");
+                String formattedTitle =
+                        decodedTitle.replaceAll("&lt;", "<")
+                                .replaceAll("&gt;", ">")
+                                .replaceAll("&quot;", "\"")
+                                .replaceAll("&apos;", "'")
+                                .replaceAll("&amp;", "&")
+                                .replaceAll("&#39;", "'");
+
                 YouTube.Videos.List videoRequest = youtubeService.videos().list("contentDetails");
                 VideoListResponse videoResponse = videoRequest.setId(videoId).execute();
-                String duration = videoResponse.getItems().get(0).getContentDetails().getDuration();
-                MusicListResponse music = MusicListResponse.builder()
+
+                String duration = formatDuration(videoResponse.getItems().get(0).getContentDetails().getDuration());
+
+                MusicList music = MusicList.builder()
                         .id(videoId)
                         .thumbnailLow(item.getSnippet().getThumbnails().getMedium().getUrl())
                         .thumbnailMedium(item.getSnippet().getThumbnails().getMedium().getUrl())
                         .thumbnailHigh(item.getSnippet().getThumbnails().getHigh().getUrl())
-                        .title(item.getSnippet().getTitle())
+                        .title(formattedTitle)
                         .duration(duration)
-                        .nextPageToken(searchResponse.getNextPageToken())
                         .build();
-
                 musicList.add(music);
             }
 
-            return musicList;
+            MusicListResponse musicListResponse = MusicListResponse.builder()
+                    .musicList(musicList)
+                    .nextPageToken(searchResponse.getNextPageToken())
+                    .build();
+
+            return musicListResponse;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
