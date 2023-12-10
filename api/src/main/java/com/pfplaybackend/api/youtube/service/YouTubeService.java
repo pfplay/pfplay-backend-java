@@ -25,7 +25,7 @@ import java.util.List;
 
 @Service
 public class YouTubeService {
-    @Value("${google.api-key}")
+    @Value("${google.youtube.api-key}")
     private String key;
 
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
