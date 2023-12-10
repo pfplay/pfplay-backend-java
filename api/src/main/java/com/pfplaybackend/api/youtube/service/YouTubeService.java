@@ -1,11 +1,8 @@
 package com.pfplaybackend.api.youtube.service;
 
-import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -16,53 +13,37 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.VideoListResponse;
 import com.pfplaybackend.api.youtube.presentation.dto.MusicList;
 import com.pfplaybackend.api.youtube.presentation.response.MusicListResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URLDecoder;
 import java.security.GeneralSecurityException;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 @Service
 public class YouTubeService {
-    private static final String CLIENT_SECRETS = "/client_secret-local.json";
-    private static final Collection<String> SCOPES =
-            Arrays.asList("https://www.googleapis.com/auth/youtube.force-ssl");
-    private static final String APPLICATION_NAME = "API code samples";
+    @Value("${google.api-key}")
+    private String key;
+
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
-    private static Credential authorize(final NetHttpTransport httpTransport) throws IOException {
-        try {
-            InputStream in = YouTubeService.class.getResourceAsStream(CLIENT_SECRETS);
-            GoogleClientSecrets clientSecrets =
-                    GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
-
-            GoogleAuthorizationCodeFlow flow =
-                    new GoogleAuthorizationCodeFlow.Builder(httpTransport, JSON_FACTORY, clientSecrets, SCOPES)
-                            .build();
-            Credential credential =
-                    new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
-
-            return credential;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
+    // YouTube 객체 생성
     private static YouTube getService() throws GeneralSecurityException, IOException {
         final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-        Credential credential = authorize(httpTransport);
-        return new YouTube.Builder(httpTransport, JSON_FACTORY, credential)
-                .setApplicationName(APPLICATION_NAME)
+        YouTube youtube = new YouTube.Builder(httpTransport, JSON_FACTORY, new HttpRequestInitializer() {
+            public void initialize(HttpRequest request)
+                    throws IOException {
+            }
+        })
+                .setApplicationName("PFPlay")
                 .build();
+        return youtube;
     }
 
+    // YouTube Data API v3의 동영상 길이를 포맷팅
     public static String formatDuration(String durationString) {
         Duration duration = Duration.parse(durationString);
 
@@ -71,7 +52,7 @@ public class YouTubeService {
         Long seconds = duration.toSeconds() % 60;
 
         String hoursStr = String.format("%02d", hours);
-        String minutesStr = minutes == 0 ? "0:" : String.format("%02d", minutes);
+        String minutesStr = minutes == 0 ? "0" : String.format("%02d", minutes);
         String secondsStr = String.format("%02d", seconds);
 
         String formattedDuration = "";
@@ -84,22 +65,26 @@ public class YouTubeService {
         return formattedDuration;
     }
 
-    public MusicListResponse getSearchList() {
+    // YouTube Data API search.list & videos.list 호출
+    public MusicListResponse getSearchList(String q, String pageToken) {
         try {
             YouTube youtubeService = getService();
-            YouTube.Search.List searchRequest = youtubeService.search().list("snippet");
-            SearchListResponse searchResponse = searchRequest.setQ("뉴진스").execute();
-            /* nextPageToken 있는 경우 */
-//            SearchListResponse response = request.setPageToken("CAUQAA")
-//                    .setQ("뉴진스")
-//                    .execute();
+            YouTube.Search.List searchRequest = youtubeService.search().list("snippet").setKey(key);
+
+            // pagination 처리
+            SearchListResponse searchResponse =
+                    pageToken == null ?
+                    searchRequest.setQ(q).setType("video").execute() :
+                    searchRequest.setPageToken(pageToken).setQ(q).setType("video").execute();
 
             List<MusicList> musicList = new ArrayList<>();
 
+            // 검색 결과에 대해 videos.list를 호출하여 동영상 재생 시간을 조회
             for (SearchResult item : searchResponse.getItems()) {
                 String videoId = item.getId().getVideoId();
-
                 String decodedTitle = URLDecoder.decode(item.getSnippet().getTitle(), "UTF-8");
+
+                // YouTube Data API의 특수문자 처리
                 String formattedTitle =
                         decodedTitle.replaceAll("&lt;", "<")
                                 .replaceAll("&gt;", ">")
@@ -108,7 +93,7 @@ public class YouTubeService {
                                 .replaceAll("&amp;", "&")
                                 .replaceAll("&#39;", "'");
 
-                YouTube.Videos.List videoRequest = youtubeService.videos().list("contentDetails");
+                YouTube.Videos.List videoRequest = youtubeService.videos().list("contentDetails").setKey(key);
                 VideoListResponse videoResponse = videoRequest.setId(videoId).execute();
 
                 String duration = formatDuration(videoResponse.getItems().get(0).getContentDetails().getDuration());
@@ -125,8 +110,8 @@ public class YouTubeService {
             }
 
             MusicListResponse musicListResponse = MusicListResponse.builder()
-                    .musicList(musicList)
                     .nextPageToken(searchResponse.getNextPageToken())
+                    .musicList(musicList)
                     .build();
 
             return musicListResponse;
