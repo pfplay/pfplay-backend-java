@@ -47,9 +47,9 @@ public class YouTubeService {
     public static String formatDuration(String durationString) {
         Duration duration = Duration.parse(durationString);
 
-        Long hours = duration.toHours();
-        Long minutes = duration.toMinutes() % 60;
-        Long seconds = duration.toSeconds() % 60;
+        long hours = duration.toHours();
+        long minutes = duration.toMinutes() % 60;
+        long seconds = duration.toSeconds() % 60;
 
         String hoursStr = String.format("%02d", hours);
         String minutesStr = minutes == 0 ? "0" : String.format("%02d", minutes);
