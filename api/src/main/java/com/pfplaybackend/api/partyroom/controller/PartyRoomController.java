@@ -3,7 +3,7 @@ package com.pfplaybackend.api.partyroom.controller;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.common.util.CustomStringUtils;
-import com.pfplaybackend.api.enums.ExceptionEnum;
+import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyRoomCreateDto;

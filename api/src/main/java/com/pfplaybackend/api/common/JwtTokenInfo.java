@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.common;
 
 import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.common.enums.Authority;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

@@ -3,7 +3,7 @@ package com.pfplaybackend.api.security.handle;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.ExceptionResult;
 import com.pfplaybackend.api.config.ObjectMapperConfig;
-import com.pfplaybackend.api.enums.ExceptionEnum;
+import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

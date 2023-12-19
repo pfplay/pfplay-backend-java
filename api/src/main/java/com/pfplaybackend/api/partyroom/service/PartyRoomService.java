@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.dto.PaginationDto;
 import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.PartyRoom;
 import com.pfplaybackend.api.entity.PartyRoomJoin;
-import com.pfplaybackend.api.enums.ExceptionEnum;
+import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import com.pfplaybackend.api.partyroom.enums.PartyPermissionRole;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
 import com.pfplaybackend.api.partyroom.exception.PartyRoomAccessException;

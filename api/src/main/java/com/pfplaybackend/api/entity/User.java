@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.entity;
 
 import com.pfplaybackend.api.entity.audit.BaseTime;
-import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.common.enums.Authority;
 import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.Builder;

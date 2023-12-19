@@ -2,7 +2,7 @@ package com.pfplaybackend.api.pfplay.user;
 
 import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.entity.UserPermission;
-import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.common.enums.Authority;
 import com.pfplaybackend.api.user.presentation.dto.UserPermissionDto;
 import com.pfplaybackend.api.user.repository.UserPermissionRepository;
 import org.junit.jupiter.api.Assertions;

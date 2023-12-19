@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.enums;
+package com.pfplaybackend.api.common.enums;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
