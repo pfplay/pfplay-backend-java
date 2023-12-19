@@ -1,8 +1,8 @@
-package com.pfplaybackend.api.guest.service;
+package com.pfplaybackend.api.user.service;
 
 import com.pfplaybackend.api.common.util.CustomStringUtils;
 import com.pfplaybackend.api.entity.Guest;
-import com.pfplaybackend.api.guest.repository.GuestRepository;
+import com.pfplaybackend.api.user.repository.GuestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

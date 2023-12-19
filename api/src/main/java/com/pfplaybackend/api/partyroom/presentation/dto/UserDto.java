@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation.dto;
 
-import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.common.enums.Authority;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 @Getter

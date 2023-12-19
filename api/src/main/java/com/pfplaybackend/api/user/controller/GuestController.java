@@ -1,13 +1,13 @@
-package com.pfplaybackend.api.guest.controller;
+package com.pfplaybackend.api.user.controller;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.config.TokenProvider;
 import com.pfplaybackend.api.entity.Guest;
-import com.pfplaybackend.api.enums.Authority;
-import com.pfplaybackend.api.guest.presentation.request.GuestCreateRequest;
-import com.pfplaybackend.api.guest.presentation.response.GuestCreateResponse;
-import com.pfplaybackend.api.guest.service.GuestService;
+import com.pfplaybackend.api.common.enums.Authority;
+import com.pfplaybackend.api.user.presentation.request.GuestCreateRequest;
+import com.pfplaybackend.api.user.presentation.response.GuestCreateResponse;
+import com.pfplaybackend.api.user.service.GuestService;
 import com.pfplaybackend.api.user.presentation.dto.UserPermissionDto;
 import com.pfplaybackend.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

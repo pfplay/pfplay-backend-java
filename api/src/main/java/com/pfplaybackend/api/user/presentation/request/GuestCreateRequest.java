@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.guest.presentation.request;
+package com.pfplaybackend.api.user.presentation.request;
 
 import lombok.Getter;
 

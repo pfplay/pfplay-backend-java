@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.common;
 
-import com.pfplaybackend.api.enums.ExceptionEnum;
+import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import com.pfplaybackend.api.partyroom.exception.PartyRoomAccessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;

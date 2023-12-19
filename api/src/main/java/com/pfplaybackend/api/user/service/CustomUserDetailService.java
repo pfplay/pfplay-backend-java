@@ -1,12 +1,9 @@
 package com.pfplaybackend.api.user.service;
 
 import com.pfplaybackend.api.common.JwtTokenInfo;
-import com.pfplaybackend.api.config.ObjectMapperConfig;
 import com.pfplaybackend.api.config.TokenProvider;
 import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.enums.Authority;
-import com.pfplaybackend.api.enums.ExceptionEnum;
-import com.pfplaybackend.api.partyroom.presentation.dto.UserDto;
+import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.entity;
 
-import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.common.enums.Authority;
 import com.pfplaybackend.api.user.converter.UserPermissionConverter;
 import jakarta.persistence.*;
 import lombok.Builder;

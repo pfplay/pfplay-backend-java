@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.security;
 
 import com.pfplaybackend.api.security.handle.*;
-import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.common.enums.Authority;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

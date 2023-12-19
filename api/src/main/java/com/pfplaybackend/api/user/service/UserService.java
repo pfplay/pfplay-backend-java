@@ -5,7 +5,7 @@ import com.pfplaybackend.api.config.TokenProvider;
 import com.pfplaybackend.api.config.WebClientConfig;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.entity.UserPermission;
-import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.common.enums.Authority;
 import com.pfplaybackend.api.user.presentation.dto.UserPermissionDto;
 import com.pfplaybackend.api.user.presentation.dto.UserSaveDto;
 import com.pfplaybackend.api.user.presentation.request.ProfileUpdateRequest;

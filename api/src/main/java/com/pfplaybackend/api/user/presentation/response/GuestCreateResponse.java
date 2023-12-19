@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.guest.presentation.response;
+package com.pfplaybackend.api.user.presentation.response;
 
-import com.pfplaybackend.api.enums.Authority;
+import com.pfplaybackend.api.common.enums.Authority;
 import com.pfplaybackend.api.user.presentation.dto.UserPermissionDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
