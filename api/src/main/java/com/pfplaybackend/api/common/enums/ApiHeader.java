@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.enums;
+package com.pfplaybackend.api.common.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

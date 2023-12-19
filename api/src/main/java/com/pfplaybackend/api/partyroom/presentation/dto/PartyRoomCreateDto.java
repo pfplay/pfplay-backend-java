@@ -3,7 +3,7 @@ package com.pfplaybackend.api.partyroom.presentation.dto;
 
 import com.pfplaybackend.api.entity.PartyRoom;
 import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.enums.Domain;
+import com.pfplaybackend.api.common.enums.Domain;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomStatus;
 import com.pfplaybackend.api.partyroom.enums.PartyRoomType;
 import io.swagger.v3.oas.annotations.media.Schema;
