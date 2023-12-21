@@ -14,27 +14,29 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.time.Duration;
 
 @Service
 public class YouTubeService {
     @Value("${google.youtube.api-key}")
     private String key;
+    private YouTube youtubeService;
 
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
-    // YouTube 객체 생성
-    private static YouTube getService() throws GeneralSecurityException, IOException {
-        final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-        YouTube youtube = new YouTube.Builder(httpTransport, JSON_FACTORY, new HttpRequestInitializer() {
-            public void initialize(HttpRequest request)
-                    throws IOException {
-            }
-        })
-                .setApplicationName("PFPlay")
-                .build();
-        return youtube;
+    public YouTubeService() {
+        // YouTube 객체 생성
+        try {
+            final NetHttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+            YouTube youtube = new YouTube.Builder(httpTransport, JSON_FACTORY, new HttpRequestInitializer() {
+                public void initialize(HttpRequest request)
+                        throws IOException {
+                }
+            }).setApplicationName("PFPlay").build();
+            this.youtubeService = youtube;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     // YouTube Data API의 동영상 길이를 포맷팅
@@ -62,7 +64,6 @@ public class YouTubeService {
     // YouTube Data API search.list
     public SearchListResponse getSearchList(String q, String pageToken) {
         try {
-            YouTube youtubeService = getService();
             YouTube.Search.List searchRequest = youtubeService.search().list("snippet").setKey(key);
 
             SearchListResponse searchResponse =
@@ -79,7 +80,6 @@ public class YouTubeService {
     // YouTube Data API video.list - contentDetails
     public String getVideoDuration(String videoId) {
         try {
-            YouTube youtubeService = getService();
             YouTube.Videos.List videoRequest = youtubeService.videos().list("contentDetails").setKey(key);
             VideoListResponse videoResponse = videoRequest.setId(videoId).execute();
             String duration = formatDuration(videoResponse.getItems().get(0).getContentDetails().getDuration());
