@@ -2,8 +2,8 @@ package com.pfplaybackend.api.playlist.controller;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
-import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
+import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListCreateResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
 import com.pfplaybackend.api.playlist.service.PlayListService;
@@ -23,7 +23,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Tag(name = "playlist", description = "playlist api")
@@ -68,5 +67,24 @@ public class PlayListController {
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(playListService.getPlayList(jwtTokenInfo.getUser())));
+    }
+
+
+    @Operation(summary = "유튜브 곡 검색")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "유튜브 곡 검색 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = MusicListResponse.class))
+            ),
+            @ApiResponse(responseCode = "500",
+                    description = "유튜브 곡 검색 실패"
+            )
+    })
+    @GetMapping("/youtube/music")
+    public ResponseEntity<?> getSearchList(@RequestParam("q") String q, @RequestParam("pageToken") Optional<String> pageToken) {
+        MusicListResponse result = playListService.getSearchList(q, pageToken.orElse(null));
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiCommonResponse.success(result));
     }
 }
