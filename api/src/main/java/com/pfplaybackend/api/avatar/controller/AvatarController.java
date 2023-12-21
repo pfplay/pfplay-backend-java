@@ -9,6 +9,7 @@ import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import com.pfplaybackend.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,7 +44,7 @@ public class AvatarController {
             @ApiResponse(responseCode = "200",
                     description = "조회 성공",
                     content = @Content(
-                            schema = @Schema(implementation = AvatarBodyResponse.class)
+                            array = @ArraySchema(schema = @Schema(implementation = AvatarBodyDto.class))
                     )
             )
     })
