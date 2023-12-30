@@ -2,16 +2,22 @@ package com.pfplaybackend.api.playlist.service;
 
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
+import com.pfplaybackend.api.entity.MusicList;
 import com.pfplaybackend.api.entity.PlayList;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.external.youtube.YouTubeService;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
+import com.pfplaybackend.api.playlist.exception.PlayListLimitExceededException;
 import com.pfplaybackend.api.playlist.presentation.dto.MusicListDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
+import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
+import com.pfplaybackend.api.playlist.presentation.response.MusicListAddResponse;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
+import com.pfplaybackend.api.playlist.repository.MusicListRepository;
 import com.pfplaybackend.api.playlist.repository.PlayListRepository;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
@@ -20,10 +26,12 @@ import java.util.*;
 @Service
 public class PlayListService {
     private PlayListRepository playListRepository;
+    private MusicListRepository musicListRepository;
     private YouTubeService youTubeService;
 
-    public PlayListService(PlayListRepository playListRepository, YouTubeService youTubeService) {
+    public PlayListService(PlayListRepository playListRepository, MusicListRepository musicListRepository, YouTubeService youTubeService) {
         this.playListRepository = playListRepository;
+        this.musicListRepository = musicListRepository;
         this.youTubeService = youTubeService;
     }
 
@@ -110,5 +118,50 @@ public class PlayListService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public MusicListAddResponse addMusic(MusicListAddRequest request) {
+        Optional<PlayList> playList = playListRepository.findById(request.getId());
+
+        if (!playList.isPresent()) {
+            throw new NoSuchElementException("존재하지 않는 플레이리스트");
+        }
+
+        // 곡 추가 중복 여부 및 곡 순서 번호 체크 후 저장 처리
+        List<MusicList> musicList = musicListRepository.findByPlayListId(request.getId());
+        if (musicList.size() > 100) {
+            throw new PlayListLimitExceededException("곡 개수 제한 초과");
+        }
+
+        int orderNumber = 1;
+        for (MusicList music : musicList) {
+            if (music.getUid().equals(request.getUid())) {
+                throw new DuplicateKeyException(""); // Global Exception으로 처리되어 입력한 메시지 전달 X
+            }
+            if (music.getOrderNumber() > orderNumber) {
+                orderNumber = music.getOrderNumber();
+            }
+        }
+
+        int newOrderNumber = musicList.isEmpty() ? orderNumber : orderNumber + 1;
+
+        MusicList music = MusicList.builder()
+                .playList(playList.get())
+                .uid(request.getUid())
+                .orderNumber(newOrderNumber)
+                .name(request.getName())
+                .duration(request.getDuration())
+                .build();
+
+        MusicList result =  musicListRepository.save(music);
+        MusicListAddResponse response = MusicListAddResponse.builder()
+                .playListId(request.getId())
+                .musicId(result.getId())
+                .orderNumber(result.getOrderNumber())
+                .name(request.getName())
+                .duration(request.getDuration())
+                .build();
+
+        return response;
     }
 }
