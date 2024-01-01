@@ -8,6 +8,8 @@ import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.external.youtube.YouTubeService;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
 import com.pfplaybackend.api.playlist.exception.PlayListLimitExceededException;
+import com.pfplaybackend.api.playlist.exception.PlayListMusicLimitExceededException;
+import com.pfplaybackend.api.playlist.exception.PlayListNoWalletException;
 import com.pfplaybackend.api.playlist.presentation.dto.MusicListDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
@@ -38,10 +40,10 @@ public class PlayListService {
     public PlayList createPlayList(PlayListCreateRequest request, User user) {
         List<PlayList> result = playListRepository.findByUserIdAndTypeOrderByOrderNumberDesc(user.getId(), PlayListType.PLAYLIST);
         if (result.size() > 0 && user.getWalletAddress() == null) {
-            throw new RuntimeException("생성 개수 제한 초과 (지갑 미연동)");
+            throw new PlayListNoWalletException("생성 개수 제한 초과 (지갑 미연동)");
         }
         if (result.size() > 9 && user.getWalletAddress() != null) {
-            throw new RuntimeException("생성 개수 제한 초과");
+            throw new PlayListLimitExceededException("생성 개수 제한 초과");
         }
 
         PlayListCreateDto dto;
@@ -130,7 +132,7 @@ public class PlayListService {
         // 곡 추가 중복 여부 및 곡 순서 번호 체크 후 저장 처리
         List<MusicList> musicList = musicListRepository.findByPlayListId(request.getId());
         if (musicList.size() > 100) {
-            throw new PlayListLimitExceededException("곡 개수 제한 초과");
+            throw new PlayListMusicLimitExceededException("곡 개수 제한 초과");
         }
 
         int orderNumber = 1;

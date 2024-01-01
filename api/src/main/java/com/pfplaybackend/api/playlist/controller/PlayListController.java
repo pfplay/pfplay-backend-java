@@ -43,7 +43,20 @@ public class PlayListController {
             @ApiResponse(responseCode = "201", description = "플레이리스트 생성 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = PlayListCreateResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "생성 개수 제한 초과 (지갑 미연동) or 생성 개수 제한 초과",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"errorCode\": \"BR001 or BR002\", \"message\": \"생성 개수 제한 초과 (지갑 미연동) or 생성 개수 제한 초과\"}"
+                            ))
             )
+            // 동일 status code로 한개의 swagger response 예시만 표시 가능하여 위처럼 처리 (가능하긴 하나 커스텀어노테이션 생성이 필요하고 복잡함)
+//            @ApiResponse(responseCode = "400", description = "생성 개수 제한 초과",
+//                    content = @Content(mediaType = "application/json",
+//                            examples = @ExampleObject(
+//                                    value = "{\"errorCode\": \"BR002\", \"message\": \"생성 개수 제한 초과\"}"
+//                            ))
+//            ),
     })
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody @Valid PlayListCreateRequest request) {
