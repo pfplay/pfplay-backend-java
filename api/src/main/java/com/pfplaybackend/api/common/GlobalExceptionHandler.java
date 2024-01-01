@@ -3,6 +3,8 @@ package com.pfplaybackend.api.common;
 import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import com.pfplaybackend.api.partyroom.exception.PartyRoomAccessException;
 import com.pfplaybackend.api.playlist.exception.PlayListLimitExceededException;
+import com.pfplaybackend.api.playlist.exception.PlayListMusicLimitExceededException;
+import com.pfplaybackend.api.playlist.exception.PlayListNoWalletException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -49,8 +51,34 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(PlayListNoWalletException.class)
+    public ResponseEntity<?> handlePlayListNoWalletException(PlayListNoWalletException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiCommonResponse.error(
+                                ExceptionResult.builder()
+                                        .errorCode("BR001")
+                                        .message(e.getMessage())
+                                        .build()
+                        )
+                );
+    }
+
     @ExceptionHandler(PlayListLimitExceededException.class)
     public ResponseEntity<?> handlePlayListLimitExceededException(PlayListLimitExceededException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiCommonResponse.error(
+                                ExceptionResult.builder()
+                                        .errorCode("BR002")
+                                        .message(e.getMessage())
+                                        .build()
+                        )
+                );
+    }
+
+    @ExceptionHandler(PlayListMusicLimitExceededException.class)
+    public ResponseEntity<?> handlePlayListMusicLimitExceededException(PlayListMusicLimitExceededException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiCommonResponse.error(
