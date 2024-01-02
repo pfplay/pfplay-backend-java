@@ -4,15 +4,17 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.entity.PlayList;
 import com.pfplaybackend.api.entity.User;
+import com.pfplaybackend.api.playlist.presentation.dto.MusicListDto;
+import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListAddResponse;
-import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListCreateResponse;
-import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
+import com.pfplaybackend.api.playlist.presentation.response.SearchMusicListResponse;
 import com.pfplaybackend.api.playlist.service.PlayListService;
 import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Tag(name = "playlist", description = "playlist api")
@@ -71,28 +74,49 @@ public class PlayListController {
                 );
     }
 
-    @Operation(summary = "플레이리스트 / 그랩 리스트 조회")
+    @Operation(summary = "플레이리스트 목록 조회 / 그랩 리스트 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "플레이리스트 / 그랩 리스트 조회 성공",
+            @ApiResponse(responseCode = "200", description = "플레이리스트 목록 조회 / 그랩 리스트 조회 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PlayListResponse.class))
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = PlayListDto.class)
+                            ))
             )
     })
     @GetMapping()
     public ResponseEntity<?> getPlayList() {
         JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        User user = jwtTokenInfo.getUser();
+        List<PlayListDto> list = playListService.getPlayList(user);
 
         return ResponseEntity
                 .ok()
-                .body(ApiCommonResponse.success(playListService.getPlayList(jwtTokenInfo.getUser())));
+                .body(ApiCommonResponse.success(list));
     }
 
+    @Operation(summary = "플레이리스트 곡 조회 / 그랩 리스트 곡 조회")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "플레이리스트 곡 조회 / 그랩 리스트 곡 조회 성공",
+                    content = @Content(mediaType = "application/json",
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = MusicListDto.class)
+                            ))
+            )
+    })
+    @GetMapping("{playListId}")
+    public ResponseEntity<?> getMusicList(@RequestParam Long playListId) {
+        List<MusicListDto> list = playListService.getMusicList(playListId);
+
+        return ResponseEntity
+                .ok()
+                .body(ApiCommonResponse.success(list));
+    }
 
     @Operation(summary = "유튜브 곡 검색")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유튜브 곡 검색 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MusicListResponse.class))
+                            schema = @Schema(implementation = SearchMusicListResponse.class))
             ),
             @ApiResponse(responseCode = "500",
                     description = "유튜브 곡 검색 실패"
@@ -100,7 +124,7 @@ public class PlayListController {
     })
     @GetMapping("/youtube/music")
     public ResponseEntity<?> getSearchList(@RequestParam("q") String q, @RequestParam("pageToken") Optional<String> pageToken) {
-        MusicListResponse result = playListService.getSearchList(q, pageToken.orElse(null));
+        SearchMusicListResponse result = playListService.getSearchList(q, pageToken.orElse(null));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiCommonResponse.success(result));
@@ -131,9 +155,9 @@ public class PlayListController {
                             ))
             )
     })
-    @PostMapping("/music-list")
-    public ResponseEntity<?> addMusic(@RequestBody MusicListAddRequest request) {
-        MusicListAddResponse response = playListService.addMusic(request);
+    @PostMapping("{playListId}")
+    public ResponseEntity<?> addMusic(@RequestParam Long playListId, @RequestBody MusicListAddRequest request) {
+        MusicListAddResponse response = playListService.addMusic(playListId, request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

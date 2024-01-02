@@ -13,10 +13,11 @@ import com.pfplaybackend.api.playlist.exception.PlayListNoWalletException;
 import com.pfplaybackend.api.playlist.presentation.dto.MusicListDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
+import com.pfplaybackend.api.playlist.presentation.dto.SearchMusicListDto;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListAddResponse;
-import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
+import com.pfplaybackend.api.playlist.presentation.response.SearchMusicListResponse;
 import com.pfplaybackend.api.playlist.repository.MusicListRepository;
 import com.pfplaybackend.api.playlist.repository.PlayListRepository;
 import org.springframework.dao.DuplicateKeyException;
@@ -80,10 +81,26 @@ public class PlayListService {
         return dtoList;
     }
 
-    public MusicListResponse getSearchList(String q, String pageToken) {
+    public List<MusicListDto> getMusicList(Long playListId) {
+        List<MusicList> result = musicListRepository.findByPlayListIdOrderByOrderNumber(playListId);
+        List<MusicListDto> dtoList = new ArrayList<>();
+        for (MusicList musicList : result) {
+            MusicListDto dto = MusicListDto.builder()
+                    .musicId(musicList.getId())
+                    .orderNumber(musicList.getOrderNumber())
+                    .name(musicList.getName())
+                    .duration(musicList.getDuration())
+                    .thumbnailImage(musicList.getThumbnailImage())
+                    .build();
+            dtoList.add(dto);
+        }
+        return dtoList;
+    }
+
+    public SearchMusicListResponse getSearchList(String q, String pageToken) {
         try {
             SearchListResponse searchResponse = youTubeService.getSearchList(q, pageToken);
-            List<MusicListDto> musicList = new ArrayList<>();
+            List<SearchMusicListDto> musicList = new ArrayList<>();
 
             for (SearchResult item : searchResponse.getItems()) {
                 // 검색 결과 encoding 된 title 을 decoding 및 formatting 처리
@@ -100,7 +117,7 @@ public class PlayListService {
                 String videoId = item.getId().getVideoId();
                 String duration = youTubeService.getVideoDuration(videoId);
 
-                MusicListDto music = MusicListDto.builder()
+                SearchMusicListDto music = SearchMusicListDto.builder()
                         .id(videoId)
                         .thumbnailLow(item.getSnippet().getThumbnails().getMedium().getUrl())
                         .thumbnailMedium(item.getSnippet().getThumbnails().getMedium().getUrl())
@@ -111,7 +128,7 @@ public class PlayListService {
                 musicList.add(music);
             }
 
-            MusicListResponse musicListResponse = MusicListResponse.builder()
+            SearchMusicListResponse musicListResponse = SearchMusicListResponse.builder()
                     .nextPageToken(searchResponse.getNextPageToken())
                     .musicList(musicList)
                     .build();
@@ -122,15 +139,15 @@ public class PlayListService {
         }
     }
 
-    public MusicListAddResponse addMusic(MusicListAddRequest request) {
-        Optional<PlayList> playList = playListRepository.findById(request.getId());
+    public MusicListAddResponse addMusic(Long playListId, MusicListAddRequest request) {
+        Optional<PlayList> playList = playListRepository.findById(playListId);
 
         if (!playList.isPresent()) {
             throw new NoSuchElementException("존재하지 않는 플레이리스트");
         }
 
         // 곡 추가 중복 여부 및 곡 순서 번호 체크 후 저장 처리
-        List<MusicList> musicList = musicListRepository.findByPlayListId(request.getId());
+        List<MusicList> musicList = musicListRepository.findByPlayListIdOrderByOrderNumber(playListId);
         if (musicList.size() > 100) {
             throw new PlayListMusicLimitExceededException("곡 개수 제한 초과");
         }
@@ -153,11 +170,12 @@ public class PlayListService {
                 .orderNumber(newOrderNumber)
                 .name(request.getName())
                 .duration(request.getDuration())
+                .thumbnailImage(request.getThumbnailImage())
                 .build();
 
         MusicList result =  musicListRepository.save(music);
         MusicListAddResponse response = MusicListAddResponse.builder()
-                .playListId(request.getId())
+                .playListId(playListId)
                 .musicId(result.getId())
                 .orderNumber(result.getOrderNumber())
                 .name(request.getName())

@@ -1,12 +1,10 @@
 package com.pfplaybackend.api.avatar.controller;
 
 import com.pfplaybackend.api.avatar.presentation.dto.AvatarBodyDto;
-import com.pfplaybackend.api.avatar.presentation.response.AvatarBodyResponse;
 import com.pfplaybackend.api.avatar.service.AvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
 import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import com.pfplaybackend.api.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
