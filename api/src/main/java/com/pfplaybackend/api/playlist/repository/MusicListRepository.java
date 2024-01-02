@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MusicListRepository extends JpaRepository<MusicList, Long> {
-    List<MusicList> findByPlayListId(Long playListId);
+    List<MusicList> findByPlayListIdOrderByOrderNumber(Long playListId);
+
+
 }

@@ -19,6 +19,6 @@ public class PlayListDto {
     @Schema(description = "Playlist name", example = "나의 플레이리스트 1", requiredMode = REQUIRED, type = "string")
     private final String name;
 
-    @Schema(description = "Playlist type", example = "PLAYLIST", requiredMode = REQUIRED, type = "string", allowableValues = {"PLAYLIST", "GRAB"})
+    @Schema(description = "Playlist type", example = "PLAYLIST", requiredMode = REQUIRED, type = "string", allowableValues = {"PLAYLIST", "GRABLIST"})
     private final PlayListType type;
 }
