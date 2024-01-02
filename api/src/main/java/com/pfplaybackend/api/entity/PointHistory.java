@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.entity;
 
+import com.pfplaybackend.api.entity.audit.BaseTime;
 import com.pfplaybackend.api.pointhistory.enums.PointType;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_point_history_user_id", columnList = "user_id")
         })
 @Entity
-public class PointHistory {
+public class PointHistory extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
