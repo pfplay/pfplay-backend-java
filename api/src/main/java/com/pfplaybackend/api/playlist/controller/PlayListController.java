@@ -130,13 +130,13 @@ public class PlayListController {
                 .body(ApiCommonResponse.success(result));
     }
 
-    @Operation(summary = "곡 추가")
+    @Operation(summary = "플레이리스트 곡 추가")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "곡 추가 성공",
+            @ApiResponse(responseCode = "201", description = "플레이리스트 곡 추가 성공",
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = MusicListAddResponse.class))
             ),
-            @ApiResponse(responseCode = "400", description = "곡 개수 제한 초과",
+            @ApiResponse(responseCode = "400", description = "플레이리스트 곡 개수 제한 초과",
                     content = @Content(mediaType = "application/json",
                             examples = @ExampleObject(
                                     value = "{\"message\": \"곡 개수 제한 초과\"}"
