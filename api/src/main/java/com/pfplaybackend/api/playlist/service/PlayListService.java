@@ -87,6 +87,7 @@ public class PlayListService {
         for (MusicList musicList : result) {
             MusicListDto dto = MusicListDto.builder()
                     .musicId(musicList.getId())
+                    .uid(musicList.getUid())
                     .orderNumber(musicList.getOrderNumber())
                     .name(musicList.getName())
                     .duration(musicList.getDuration())
