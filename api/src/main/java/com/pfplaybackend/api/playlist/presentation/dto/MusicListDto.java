@@ -7,6 +7,7 @@ import lombok.Getter;
 @Builder
 public class MusicListDto {
     private Long musicId;
+    private String uid;
     private Integer orderNumber;
     private String name;
     private String duration;
