@@ -8,7 +8,9 @@ import com.pfplaybackend.api.playlist.presentation.dto.MusicListDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
+import com.pfplaybackend.api.playlist.presentation.request.PlayListDeleteRequest;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListAddResponse;
+import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListCreateResponse;
 import com.pfplaybackend.api.playlist.presentation.response.SearchMusicListResponse;
 import com.pfplaybackend.api.playlist.service.PlayListService;
@@ -74,9 +76,9 @@ public class PlayListController {
                 );
     }
 
-    @Operation(summary = "플레이리스트 목록 조회 / 그랩 리스트 조회")
+    @Operation(summary = "플레이리스트 & 그랩리스트 목록 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "플레이리스트 목록 조회 / 그랩 리스트 조회 성공",
+            @ApiResponse(responseCode = "200", description = "플레이리스트 & 그랩리스트 목록 조회 성공",
                     content = @Content(mediaType = "application/json",
                             array = @ArraySchema(
                                     schema = @Schema(implementation = PlayListDto.class)
@@ -94,18 +96,20 @@ public class PlayListController {
                 .body(ApiCommonResponse.success(list));
     }
 
-    @Operation(summary = "플레이리스트 곡 조회 / 그랩 리스트 곡 조회")
+    @Operation(summary = "플레이리스트/그랩리스트 곡 조회")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "플레이리스트 곡 조회 / 그랩 리스트 곡 조회 성공",
+            @ApiResponse(responseCode = "200", description = "플레이리스트 곡 조회",
                     content = @Content(mediaType = "application/json",
                             array = @ArraySchema(
                                     schema = @Schema(implementation = MusicListDto.class)
                             ))
             )
     })
-    @GetMapping("{playListId}")
-    public ResponseEntity<?> getMusicList(@RequestParam Long playListId) {
-        List<MusicListDto> list = playListService.getMusicList(playListId);
+    @GetMapping("{listId}")
+    public ResponseEntity<?> getMusicList(@RequestParam Long listId,
+                                          @RequestParam(required = false, defaultValue = "0", value = "page") int page,
+                                          @RequestParam(required = false, defaultValue = "20", value = "pageSize") int pageSize) {
+        MusicListResponse list = playListService.getMusicList(page, pageSize, listId);
 
         return ResponseEntity
                 .ok()
@@ -163,4 +167,15 @@ public class PlayListController {
                 .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(response));
     }
+
+//    @DeleteMapping()
+//    public ResponseEntity<?> deletePlayList(@RequestBody PlayListDeleteRequest request) {
+//        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+//        User user = jwtTokenInfo.getUser();
+//        Object response = playListService.deletePlayList(user.getId(), request);
+//
+//        return ResponseEntity
+//                .status(HttpStatus.CREATED)
+//                .body(ApiCommonResponse.success(response));
+//    }
 }

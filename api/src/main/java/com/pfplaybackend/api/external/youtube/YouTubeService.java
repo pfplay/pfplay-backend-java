@@ -20,7 +20,7 @@ import java.time.Duration;
 public class YouTubeService {
     @Value("${google.youtube.api-key}")
     private String key;
-    private YouTube youtubeService;
+    private YouTube youtube;
 
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
 
@@ -33,7 +33,7 @@ public class YouTubeService {
                         throws IOException {
                 }
             }).setApplicationName("PFPlay").build();
-            this.youtubeService = youtube;
+            this.youtube = youtube;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -64,7 +64,7 @@ public class YouTubeService {
     // YouTube Data API search.list
     public SearchListResponse getSearchList(String q, String pageToken) {
         try {
-            YouTube.Search.List searchRequest = youtubeService.search().list("snippet").setKey(key);
+            YouTube.Search.List searchRequest = youtube.search().list("snippet").setKey(key);
 
             SearchListResponse searchResponse =
                     pageToken == null ?
@@ -80,7 +80,7 @@ public class YouTubeService {
     // YouTube Data API video.list - contentDetails
     public String getVideoDuration(String videoId) {
         try {
-            YouTube.Videos.List videoRequest = youtubeService.videos().list("contentDetails").setKey(key);
+            YouTube.Videos.List videoRequest = youtube.videos().list("contentDetails").setKey(key);
             VideoListResponse videoResponse = videoRequest.setId(videoId).execute();
             String duration = formatDuration(videoResponse.getItems().get(0).getContentDetails().getDuration());
             return duration;

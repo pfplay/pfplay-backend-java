@@ -16,11 +16,18 @@ import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
 import com.pfplaybackend.api.playlist.presentation.dto.SearchMusicListDto;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
+import com.pfplaybackend.api.playlist.presentation.request.PlayListDeleteRequest;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListAddResponse;
+import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
 import com.pfplaybackend.api.playlist.presentation.response.SearchMusicListResponse;
 import com.pfplaybackend.api.playlist.repository.MusicListRepository;
 import com.pfplaybackend.api.playlist.repository.PlayListRepository;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
@@ -81,8 +88,11 @@ public class PlayListService {
         return dtoList;
     }
 
-    public List<MusicListDto> getMusicList(Long playListId) {
-        List<MusicList> result = musicListRepository.findByPlayListIdOrderByOrderNumber(playListId);
+    public MusicListResponse getMusicList(int page, int pageSize, Long playListId) {
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "orderNumber"));
+
+        int totalPage = (int) Math.ceil(musicListRepository.countByPlayListId(playListId) / pageSize);
+        Page<MusicList> result = musicListRepository.findByPlayListIdOrderByOrderNumber(pageable, playListId);
         List<MusicListDto> dtoList = new ArrayList<>();
         for (MusicList musicList : result) {
             MusicListDto dto = MusicListDto.builder()
@@ -95,7 +105,11 @@ public class PlayListService {
                     .build();
             dtoList.add(dto);
         }
-        return dtoList;
+        MusicListResponse response = MusicListResponse.builder()
+                .totalPage(totalPage)
+                .musicList(dtoList)
+                .build();
+        return response;
     }
 
     public SearchMusicListResponse getSearchList(String q, String pageToken) {
@@ -148,7 +162,7 @@ public class PlayListService {
         }
 
         // 곡 추가 중복 여부 및 곡 순서 번호 체크 후 저장 처리
-        List<MusicList> musicList = musicListRepository.findByPlayListIdOrderByOrderNumber(playListId);
+        List<MusicList> musicList = musicListRepository.findAllByPlayListId(playListId);
         if (musicList.size() > 100) {
             throw new PlayListMusicLimitExceededException("곡 개수 제한 초과");
         }
@@ -184,5 +198,10 @@ public class PlayListService {
                 .build();
 
         return response;
+    }
+
+    public ResponseEntity<?> deletePlayList(Long userId, PlayListDeleteRequest request) {
+
+        return null;
     }
 }
