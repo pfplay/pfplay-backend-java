@@ -29,9 +29,12 @@ public class MusicList extends BaseTime {
     @JoinColumn(name = "play_list_id")
     private PlayList playList;
 
+    @Comment("곡 고유 id")
+    private String uid;
+
     @Comment("플레이리스트의 곡 순서")
     @Column(columnDefinition = "integer unsigned")
-    private Long orderNumber;
+    private Integer orderNumber;
 
     @Comment("곡 이름")
     private String name;
@@ -39,17 +42,18 @@ public class MusicList extends BaseTime {
     @Comment("곡 총 재생 시간")
     private String duration;
 
-    @Comment("url")
-    private String url;
+    @Comment("썸네일 이미지 url")
+    private String thumbnailImage;
 
     protected MusicList() { }
 
     @Builder
-    public MusicList(PlayList playList, Long orderNumber, String name, String duration, String url) {
+    public MusicList(PlayList playList, String uid, Integer orderNumber, String name, String duration, String thumbnailImage) {
         this.playList = playList;
+        this.uid = uid;
         this.orderNumber = orderNumber;
         this.name = name;
         this.duration = duration;
-        this.url = url;
+        this.thumbnailImage = thumbnailImage;
     }
 }

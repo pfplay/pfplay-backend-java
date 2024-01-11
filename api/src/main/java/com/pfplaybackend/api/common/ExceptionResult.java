@@ -16,4 +16,5 @@ public class ExceptionResult {
     private HttpStatus status;
     private int code;
     private String message;
+    private String errorCode; // private int code를 안쓴다면 errorCode 이름을 code로 변경 예정
 }
