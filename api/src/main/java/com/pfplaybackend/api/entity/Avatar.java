@@ -1,13 +1,14 @@
 package com.pfplaybackend.api.entity;
 
 import com.pfplaybackend.api.avatar.enums.AvatarType;
+import com.pfplaybackend.api.entity.audit.BaseTime;
 import jakarta.persistence.*;
 import lombok.Getter;
 
 @Getter
 @Table(name = "AVATAR")
 @Entity
-public class Avatar {
+public class Avatar extends BaseTime {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
