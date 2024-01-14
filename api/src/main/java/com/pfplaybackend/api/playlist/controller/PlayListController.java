@@ -105,7 +105,7 @@ public class PlayListController {
                             ))
             )
     })
-    @GetMapping("{listId}")
+    @GetMapping("{listId}/{page}/{pageSize}")
     public ResponseEntity<?> getMusicList(@RequestParam Long listId,
                                           @RequestParam(required = false, defaultValue = "0", value = "page") int page,
                                           @RequestParam(required = false, defaultValue = "20", value = "pageSize") int pageSize) {
