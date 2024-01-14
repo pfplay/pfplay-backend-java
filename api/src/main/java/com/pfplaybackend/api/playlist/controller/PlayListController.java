@@ -160,7 +160,7 @@ public class PlayListController {
             )
     })
     @PostMapping("{listId}")
-    public ResponseEntity<?> addMusic(@RequestParam Long listId, @RequestBody MusicListAddRequest request) {
+    public ResponseEntity<?> addMusic(@PathVariable Long listId, @RequestBody MusicListAddRequest request) {
         MusicListAddResponse response = playListService.addMusic(listId, request);
 
         return ResponseEntity
