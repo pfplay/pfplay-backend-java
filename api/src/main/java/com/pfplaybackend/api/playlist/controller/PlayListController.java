@@ -105,8 +105,8 @@ public class PlayListController {
                             ))
             )
     })
-    @GetMapping("{listId}/{page}/{pageSize}")
-    public ResponseEntity<?> getMusicList(@RequestParam Long listId,
+    @GetMapping("{listId}")
+    public ResponseEntity<?> getMusicList(@PathVariable Long listId,
                                           @RequestParam(required = false, defaultValue = "0", value = "page") int page,
                                           @RequestParam(required = false, defaultValue = "20", value = "pageSize") int pageSize) {
         MusicListResponse list = playListService.getMusicList(page, pageSize, listId);
