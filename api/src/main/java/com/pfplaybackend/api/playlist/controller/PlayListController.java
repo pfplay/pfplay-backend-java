@@ -159,9 +159,9 @@ public class PlayListController {
                             ))
             )
     })
-    @PostMapping("{playListId}")
-    public ResponseEntity<?> addMusic(@RequestParam Long playListId, @RequestBody MusicListAddRequest request) {
-        MusicListAddResponse response = playListService.addMusic(playListId, request);
+    @PostMapping("{listId}")
+    public ResponseEntity<?> addMusic(@RequestParam Long listId, @RequestBody MusicListAddRequest request) {
+        MusicListAddResponse response = playListService.addMusic(listId, request);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
