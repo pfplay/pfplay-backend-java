@@ -127,7 +127,7 @@ public class GlobalExceptionHandler {
                 .body(ApiCommonResponse.error(
                                 ExceptionResult.builder()
                                         .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
-                                        .message(ExceptionEnum.EXCEPTION.getMessage())
+                                        .message(e.getMessage())
                                         .build()
                         )
                 );
