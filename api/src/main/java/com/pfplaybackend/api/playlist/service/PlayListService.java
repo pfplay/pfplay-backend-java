@@ -12,16 +12,19 @@ import com.pfplaybackend.api.playlist.exception.PlayListMusicLimitExceededExcept
 import com.pfplaybackend.api.playlist.exception.PlayListNoWalletException;
 import com.pfplaybackend.api.playlist.presentation.dto.MusicListDto;
 import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
-import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
 import com.pfplaybackend.api.playlist.presentation.dto.SearchMusicListDto;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListDeleteRequest;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListAddResponse;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
+import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
 import com.pfplaybackend.api.playlist.presentation.response.SearchMusicListResponse;
 import com.pfplaybackend.api.playlist.repository.MusicListRepository;
+import com.pfplaybackend.api.playlist.repository.PlayListClassRepository;
 import com.pfplaybackend.api.playlist.repository.PlayListRepository;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,14 +36,18 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.util.*;
 
+import static com.pfplaybackend.api.entity.QPlayList.playList;
+
 @Service
 public class PlayListService {
     private PlayListRepository playListRepository;
+    private PlayListClassRepository playListClassRepository;
     private MusicListRepository musicListRepository;
     private YouTubeService youTubeService;
 
-    public PlayListService(PlayListRepository playListRepository, MusicListRepository musicListRepository, YouTubeService youTubeService) {
+    public PlayListService(PlayListRepository playListRepository, PlayListClassRepository playListClassRepository, MusicListRepository musicListRepository, YouTubeService youTubeService) {
         this.playListRepository = playListRepository;
+        this.playListClassRepository = playListClassRepository;
         this.musicListRepository = musicListRepository;
         this.youTubeService = youTubeService;
     }
@@ -74,15 +81,17 @@ public class PlayListService {
         return playListRepository.save(dto.toEntity());
     }
 
-    public List<PlayListDto> getPlayList(User user) {
-        List<PlayList> result = playListRepository.findByUserIdOrderByTypeDescOrderNumberAsc(user.getId());
-        List<PlayListDto> dtoList = new ArrayList<>();
-        for (PlayList playList : result) {
-            PlayListDto dto = PlayListDto.builder()
-                    .id(playList.getId())
-                    .name(playList.getName())
-                    .orderNumber(playList.getOrderNumber())
-                    .type(playList.getType()).build();
+    public List<PlayListResponse> getPlayList(User user) {
+        List<Tuple> result = playListClassRepository.findByUserId(user.getId());
+        List<PlayListResponse> dtoList = new ArrayList<>();
+        for (Tuple tuple : result) {
+            PlayListResponse dto = PlayListResponse.builder()
+                    .id(tuple.get(playList.id))
+                    .name(tuple.get(playList.name))
+                    .orderNumber(tuple.get(playList.orderNumber))
+                    .type(tuple.get(playList.type))
+                    .count(tuple.get(Expressions.numberPath(Long.class, "count")))
+                    .build();
             dtoList.add(dto);
         }
         return dtoList;
