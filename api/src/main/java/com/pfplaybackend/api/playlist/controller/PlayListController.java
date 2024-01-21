@@ -78,7 +78,7 @@ public class PlayListController {
             @ApiResponse(responseCode = "200", description = "플레이리스트 & 그랩리스트 목록 조회 성공",
                     content = @Content(mediaType = "application/json",
                             array = @ArraySchema(
-                                    schema = @Schema(implementation = PlayListDto.class)
+                                    schema = @Schema(implementation = PlayListResponse.class)
                             ))
             )
     })
