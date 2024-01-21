@@ -9,10 +9,7 @@ import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListDeleteRequest;
-import com.pfplaybackend.api.playlist.presentation.response.MusicListAddResponse;
-import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
-import com.pfplaybackend.api.playlist.presentation.response.PlayListCreateResponse;
-import com.pfplaybackend.api.playlist.presentation.response.SearchMusicListResponse;
+import com.pfplaybackend.api.playlist.presentation.response.*;
 import com.pfplaybackend.api.playlist.service.PlayListService;
 import com.pfplaybackend.api.user.service.CustomUserDetailService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -81,7 +78,7 @@ public class PlayListController {
             @ApiResponse(responseCode = "200", description = "플레이리스트 & 그랩리스트 목록 조회 성공",
                     content = @Content(mediaType = "application/json",
                             array = @ArraySchema(
-                                    schema = @Schema(implementation = PlayListDto.class)
+                                    schema = @Schema(implementation = PlayListResponse.class)
                             ))
             )
     })
@@ -89,7 +86,7 @@ public class PlayListController {
     public ResponseEntity<?> getPlayList() {
         JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = jwtTokenInfo.getUser();
-        List<PlayListDto> list = playListService.getPlayList(user);
+        List<PlayListResponse> list = playListService.getPlayList(user);
 
         return ResponseEntity
                 .ok()
