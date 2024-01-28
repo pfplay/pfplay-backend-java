@@ -2,6 +2,7 @@ package com.pfplaybackend.api.common;
 
 import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import com.pfplaybackend.api.partyroom.exception.PartyRoomAccessException;
+import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
 import com.pfplaybackend.api.playlist.exception.PlayListLimitExceededException;
 import com.pfplaybackend.api.playlist.exception.PlayListMusicLimitExceededException;
 import com.pfplaybackend.api.playlist.exception.PlayListNoWalletException;
@@ -85,6 +86,18 @@ public class GlobalExceptionHandler {
                                 ExceptionResult.builder()
 //                                        .status() ResponseEntity HttpStatusCode 의미 중복되므로 불필요
 //                                        .code() ResponseEntity HttpStatusCode 의미 중복되므로 불필요
+                                        .message(e.getMessage())
+                                        .build()
+                        )
+                );
+    }
+
+    @ExceptionHandler(InvalidDeleteRequestException.class)
+    public ResponseEntity<?> handleInvalidDeleteRequestException(InvalidDeleteRequestException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiCommonResponse.error(
+                                ExceptionResult.builder()
                                         .message(e.getMessage())
                                         .build()
                         )
