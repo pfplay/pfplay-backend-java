@@ -5,10 +5,9 @@ import com.pfplaybackend.api.common.JwtTokenInfo;
 import com.pfplaybackend.api.entity.PlayList;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.playlist.presentation.dto.MusicListDto;
-import com.pfplaybackend.api.playlist.presentation.dto.PlayListDto;
+import com.pfplaybackend.api.playlist.presentation.request.ListDeleteRequest;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
-import com.pfplaybackend.api.playlist.presentation.request.PlayListDeleteRequest;
 import com.pfplaybackend.api.playlist.presentation.response.*;
 import com.pfplaybackend.api.playlist.service.PlayListService;
 import com.pfplaybackend.api.user.service.CustomUserDetailService;
@@ -165,14 +164,73 @@ public class PlayListController {
                 .body(ApiCommonResponse.success(response));
     }
 
-//    @DeleteMapping()
-//    public ResponseEntity<?> deletePlayList(@RequestBody PlayListDeleteRequest request) {
-//        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
-//        User user = jwtTokenInfo.getUser();
-//        Object response = playListService.deletePlayList(user.getId(), request);
-//
-//        return ResponseEntity
-//                .status(HttpStatus.CREATED)
-//                .body(ApiCommonResponse.success(response));
-//    }
+    @Operation(summary = "플레이리스트 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "플레이리스트 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ListDeleteResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "비정상적인 삭제 요청",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"message\": \"비정상적인 삭제 요청\"}"
+                            ))
+            ),
+            @ApiResponse(responseCode = "404", description = "존재하지 않거나 유효하지 않은 플레이리스트",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"message\": \"존재하지 않거나 유효하지 않은 플레이리스트\"}"
+                            ))
+            ),
+    })
+    @DeleteMapping()
+    public ResponseEntity<?> deletePlayList(@RequestBody ListDeleteRequest request) {
+        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        User user = jwtTokenInfo.getUser();
+        playListService.deletePlayList(user.getId(), request.getListIds());
+
+        return ResponseEntity
+                .status(HttpStatus.OK).body(
+                        ApiCommonResponse.success(
+                                ListDeleteResponse.builder()
+                                        .listIds(request.getListIds())
+                                        .build()
+                        )
+                );
+    }
+
+    @Operation(summary = "곡 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "곡 삭제 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ListDeleteResponse.class))
+            ),
+            @ApiResponse(responseCode = "400", description = "비정상적인 삭제 요청",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"message\": \"비정상적인 삭제 요청\"}"
+                            ))
+            ),
+            @ApiResponse(responseCode = "404", description = "존재하지 않거나 유효하지 않은 곡",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"message\": \"존재하지 않거나 유효하지 않은 곡\"}"
+                            ))
+            ),
+    })
+    @DeleteMapping("/music")
+    public ResponseEntity<?> deleteMusicList(@RequestBody ListDeleteRequest request) {
+        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        User user = jwtTokenInfo.getUser();
+        playListService.deleteMusicList(user.getId(), request.getListIds());
+
+        return ResponseEntity
+                .status(HttpStatus.OK).body(
+                        ApiCommonResponse.success(
+                                ListDeleteResponse.builder()
+                                        .listIds(request.getListIds())
+                                        .build()
+                        )
+                );
+    }
 }
