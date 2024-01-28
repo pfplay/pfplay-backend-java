@@ -8,6 +8,7 @@ import com.pfplaybackend.api.playlist.presentation.dto.MusicListDto;
 import com.pfplaybackend.api.playlist.presentation.request.ListDeleteRequest;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
+import com.pfplaybackend.api.playlist.presentation.request.PlayListRenameRequest;
 import com.pfplaybackend.api.playlist.presentation.response.*;
 import com.pfplaybackend.api.playlist.service.PlayListService;
 import com.pfplaybackend.api.user.service.CustomUserDetailService;
@@ -232,5 +233,33 @@ public class PlayListController {
                                         .build()
                         )
                 );
+    }
+
+    @Operation(summary = "플레이리스트 이름 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "플레이리스트 이름 수정 성공",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = PlayListRenameResponse.class))
+            ),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 플레이리스트",
+                    content = @Content(mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = "{\"message\": \"존재하지 않는 플레이리스트\"}"
+                            ))
+            ),
+    })
+    @PatchMapping("{listId}")
+    public ResponseEntity<?> modifyPlayListName(@PathVariable Long listId, @RequestBody PlayListRenameRequest request) {
+        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        User user = jwtTokenInfo.getUser();
+        playListService.renamePlayList(user.getId(), listId, request.getName());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiCommonResponse.success(
+                        PlayListRenameResponse.builder()
+                        .id(listId)
+                        .name(request.getName())
+                        .build()));
     }
 }
