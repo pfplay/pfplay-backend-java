@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PlayListRepository extends JpaRepository<PlayList, Long> {
+    PlayList findByIdAndUserIdAndType(Long id, Long userId, PlayListType type);
+
     // 내 플레이리스트, 그랩리스트 전체 조회
     List<PlayList> findByUserIdOrderByTypeDescOrderNumberAsc(Long userId);
 

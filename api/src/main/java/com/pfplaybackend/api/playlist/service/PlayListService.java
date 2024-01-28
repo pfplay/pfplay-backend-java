@@ -252,4 +252,13 @@ public class PlayListService {
             throw new RuntimeException(e);
         }
     }
+
+    public void renamePlayList(Long userId, Long playListId, String name) {
+        PlayList playList = playListRepository.findByIdAndUserIdAndType(playListId, userId, PlayListType.PLAYLIST);
+        if(playList == null) {
+            throw new NoSuchElementException("존재하지 않는 플레이리스트");
+        }
+        playList.rename(name);
+        playListRepository.save(playList);
+    }
 }
