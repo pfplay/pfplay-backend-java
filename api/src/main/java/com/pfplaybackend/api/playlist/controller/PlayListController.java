@@ -62,7 +62,7 @@ public class PlayListController {
     })
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody @Valid PlayListCreateRequest request) {
-        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        final JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = jwtTokenInfo.getUser();
         PlayList playList = playListService.createPlayList(request, user);
 
@@ -84,7 +84,7 @@ public class PlayListController {
     })
     @GetMapping()
     public ResponseEntity<?> getPlayList() {
-        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        final JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = jwtTokenInfo.getUser();
         List<PlayListResponse> list = playListService.getPlayList(user);
 
@@ -186,7 +186,7 @@ public class PlayListController {
     })
     @DeleteMapping()
     public ResponseEntity<?> deletePlayList(@RequestBody ListDeleteRequest request) {
-        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        final JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = jwtTokenInfo.getUser();
         playListService.deletePlayList(user.getId(), request.getListIds());
 
@@ -221,7 +221,7 @@ public class PlayListController {
     })
     @DeleteMapping("/music")
     public ResponseEntity<?> deleteMusicList(@RequestBody ListDeleteRequest request) {
-        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        final JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = jwtTokenInfo.getUser();
         playListService.deleteMusicList(user.getId(), request.getListIds());
 
@@ -250,7 +250,7 @@ public class PlayListController {
     })
     @PatchMapping("{listId}")
     public ResponseEntity<?> modifyPlayListName(@PathVariable Long listId, @RequestBody PlayListRenameRequest request) {
-        JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
+        final JwtTokenInfo jwtTokenInfo = customUserDetailService.getUserDetails(SecurityContextHolder.getContext().getAuthentication());
         User user = jwtTokenInfo.getUser();
         playListService.renamePlayList(user.getId(), listId, request.getName());
 
