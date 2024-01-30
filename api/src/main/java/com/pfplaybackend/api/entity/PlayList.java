@@ -53,4 +53,8 @@ public class PlayList extends BaseTime {
         this.name = name;
         this.type = type;
     }
+
+    public void rename(String name) {
+        this.name = name;
+    }
 }
