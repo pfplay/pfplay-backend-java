@@ -7,6 +7,7 @@ import com.pfplaybackend.api.entity.PlayList;
 import com.pfplaybackend.api.entity.User;
 import com.pfplaybackend.api.external.youtube.YouTubeService;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
+import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
 import com.pfplaybackend.api.playlist.exception.PlayListLimitExceededException;
 import com.pfplaybackend.api.playlist.exception.PlayListMusicLimitExceededException;
 import com.pfplaybackend.api.playlist.exception.PlayListNoWalletException;
@@ -15,22 +16,22 @@ import com.pfplaybackend.api.playlist.presentation.dto.PlayListCreateDto;
 import com.pfplaybackend.api.playlist.presentation.dto.SearchMusicListDto;
 import com.pfplaybackend.api.playlist.presentation.request.MusicListAddRequest;
 import com.pfplaybackend.api.playlist.presentation.request.PlayListCreateRequest;
-import com.pfplaybackend.api.playlist.presentation.request.PlayListDeleteRequest;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListAddResponse;
 import com.pfplaybackend.api.playlist.presentation.response.MusicListResponse;
 import com.pfplaybackend.api.playlist.presentation.response.PlayListResponse;
 import com.pfplaybackend.api.playlist.presentation.response.SearchMusicListResponse;
+import com.pfplaybackend.api.playlist.repository.MusicListClassRepository;
 import com.pfplaybackend.api.playlist.repository.MusicListRepository;
 import com.pfplaybackend.api.playlist.repository.PlayListClassRepository;
 import com.pfplaybackend.api.playlist.repository.PlayListRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
+import jakarta.transaction.Transactional;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
@@ -43,12 +44,14 @@ public class PlayListService {
     private PlayListRepository playListRepository;
     private PlayListClassRepository playListClassRepository;
     private MusicListRepository musicListRepository;
+    private MusicListClassRepository musicListClassRepository;
     private YouTubeService youTubeService;
 
-    public PlayListService(PlayListRepository playListRepository, PlayListClassRepository playListClassRepository, MusicListRepository musicListRepository, YouTubeService youTubeService) {
+    public PlayListService(PlayListRepository playListRepository, PlayListClassRepository playListClassRepository, MusicListRepository musicListRepository, MusicListClassRepository musicListClassRepository, YouTubeService youTubeService) {
         this.playListRepository = playListRepository;
         this.playListClassRepository = playListClassRepository;
         this.musicListRepository = musicListRepository;
+        this.musicListClassRepository = musicListClassRepository;
         this.youTubeService = youTubeService;
     }
 
@@ -209,8 +212,53 @@ public class PlayListService {
         return response;
     }
 
-    public ResponseEntity<?> deletePlayList(Long userId, PlayListDeleteRequest request) {
+    @Transactional
+    public void deletePlayList(Long userId, List<Long> listIds) {
+        List<Long> ids = playListClassRepository.findByUserIdAndListIdAndType(userId, listIds, PlayListType.PLAYLIST);
+        if (ids.size() != listIds.size()) {
+            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 플레이리스트");
+        }
+        try {
+            musicListClassRepository.deleteByPlayListIds(ids);
+            Long count = playListClassRepository.deleteByListIds(ids);
+            if (count != ids.size()) {
+                throw new InvalidDeleteRequestException("비정상적인 삭제 요청");
+            }
+        } catch (Exception e) {
+            if (e instanceof InvalidDeleteRequestException) {
+                throw e;
+            }
+            throw new RuntimeException(e);
+        }
+    }
 
-        return null;
+    @Transactional
+    public void deleteMusicList(Long userId, List<Long> listIds) {
+        // 곡 보유자가 삭제 요청자 Id와 일치하는지 확인
+        MusicList musicList = musicListRepository.findById(listIds.get(0)).orElseThrow(() -> new NoSuchElementException("존재하지 않거나 유효하지 않은 곡"));
+        if (userId != musicList.getPlayList().getUser().getId()) {
+            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 곡");
+        }
+        try {
+            Long playListId = musicList.getPlayList().getId();
+            Long count = musicListClassRepository.deleteByIdsAndPlayListId(listIds, playListId);
+            if (count != listIds.size()) {
+                throw new InvalidDeleteRequestException("비정상적인 삭제 요청");
+            }
+        } catch (Exception e) {
+            if (e instanceof InvalidDeleteRequestException) {
+                throw e;
+            }
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void renamePlayList(Long userId, Long playListId, String name) {
+        PlayList playList = playListRepository.findByIdAndUserIdAndType(playListId, userId, PlayListType.PLAYLIST);
+        if(playList == null) {
+            throw new NoSuchElementException("존재하지 않는 플레이리스트");
+        }
+        playList.rename(name);
+        playListRepository.save(playList);
     }
 }
