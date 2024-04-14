@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.common;
 
 import com.pfplaybackend.api.common.enums.ExceptionEnum;
-import com.pfplaybackend.api.partyroom.exception.PartyRoomAccessException;
 import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
 import com.pfplaybackend.api.playlist.exception.PlayListLimitExceededException;
 import com.pfplaybackend.api.playlist.exception.PlayListMusicLimitExceededException;
@@ -99,20 +98,6 @@ public class GlobalExceptionHandler {
                 .body(ApiCommonResponse.error(
                                 ExceptionResult.builder()
                                         .message(e.getMessage())
-                                        .build()
-                        )
-                );
-    }
-
-    @ExceptionHandler(PartyRoomAccessException.class)
-    public ResponseEntity<?> handleNoSuchElementFoundException(PartyRoomAccessException e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.NOT_ACCEPTABLE)
-                .body(ApiCommonResponse.error(
-                                ExceptionResult.builder()
-                                        .code(ExceptionEnum.PARTY_ROOM_BAN.getHttpStatusCode())
-                                        .message(ExceptionEnum.PARTY_ROOM_BAN.getMessage())
                                         .build()
                         )
                 );

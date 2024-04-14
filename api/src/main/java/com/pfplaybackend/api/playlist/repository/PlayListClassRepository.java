@@ -8,8 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.pfplaybackend.api.entity.QMusicList.musicList;
-import static com.pfplaybackend.api.entity.QPlayList.playList;
+import static com.pfplaybackend.api.playlist.model.QMusicList.musicList;
+import static com.pfplaybackend.api.playlist.model.QPlayList.playList;
+
 
 @RequiredArgsConstructor
 @Repository

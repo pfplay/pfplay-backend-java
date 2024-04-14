@@ -1,0 +1,56 @@
+package com.pfplaybackend.api.config.oauth2.handler;
+
+import com.pfplaybackend.api.config.jwt.JwtProvider;
+import com.pfplaybackend.api.config.oauth2.dto.UserPrincipal;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
+
+    private final JwtProvider jwtProvider;
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
+        // Attach 'access token' to cookies
+        attachAccessTokenToCookie(authentication, response);
+        // Redirect where the user wants to go
+        redirectToView(response, extractRedirectLocationFromQueryString(request));
+    }
+
+    private void attachAccessTokenToCookie(Authentication authentication, HttpServletResponse response) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+        // Generate 'access token' for 'social login' user
+        String accessToken = jwtProvider.generateAccessTokenForMember(userPrincipal.getUsername());
+
+        final String cookieKey = "AccessToken";
+        ResponseCookie responseCookie = ResponseCookie.from(cookieKey, accessToken)
+                .path("/")
+                .sameSite("None")
+                .httpOnly(false)
+                .secure(false)
+                .maxAge(3600000)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+    }
+
+    private void redirectToView(HttpServletResponse response, String redirectLocation) throws IOException {
+        final String redirectPrefix = "http://localhost:5500/";
+        response.sendRedirect(redirectPrefix + redirectLocation);
+    }
+
+    private String extractRedirectLocationFromQueryString(HttpServletRequest request) {
+        return request.getParameterMap().get("state")[0];
+    }
+}

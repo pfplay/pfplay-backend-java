@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.playlist.presentation.dto;
 
-import com.pfplaybackend.api.entity.PlayList;
-import com.pfplaybackend.api.entity.User;
+import com.pfplaybackend.api.playlist.model.PlayList;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
+import com.pfplaybackend.api.user.model.entity.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
