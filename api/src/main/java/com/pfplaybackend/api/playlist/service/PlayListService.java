@@ -2,10 +2,9 @@ package com.pfplaybackend.api.playlist.service;
 
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
-import com.pfplaybackend.api.entity.MusicList;
-import com.pfplaybackend.api.entity.PlayList;
-import com.pfplaybackend.api.entity.User;
-import com.pfplaybackend.api.external.youtube.YouTubeService;
+import com.pfplaybackend.api.config.external.YoutubeService;
+import com.pfplaybackend.api.playlist.model.MusicList;
+import com.pfplaybackend.api.playlist.model.PlayList;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
 import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
 import com.pfplaybackend.api.playlist.exception.PlayListLimitExceededException;
@@ -24,9 +23,11 @@ import com.pfplaybackend.api.playlist.repository.MusicListClassRepository;
 import com.pfplaybackend.api.playlist.repository.MusicListRepository;
 import com.pfplaybackend.api.playlist.repository.PlayListClassRepository;
 import com.pfplaybackend.api.playlist.repository.PlayListRepository;
+import com.pfplaybackend.api.user.model.entity.user.User;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,23 +38,16 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.util.*;
 
-import static com.pfplaybackend.api.entity.QPlayList.playList;
+import static com.pfplaybackend.api.playlist.model.QPlayList.playList;
 
 @Service
+@RequiredArgsConstructor
 public class PlayListService {
     private PlayListRepository playListRepository;
     private PlayListClassRepository playListClassRepository;
     private MusicListRepository musicListRepository;
     private MusicListClassRepository musicListClassRepository;
-    private YouTubeService youTubeService;
-
-    public PlayListService(PlayListRepository playListRepository, PlayListClassRepository playListClassRepository, MusicListRepository musicListRepository, MusicListClassRepository musicListClassRepository, YouTubeService youTubeService) {
-        this.playListRepository = playListRepository;
-        this.playListClassRepository = playListClassRepository;
-        this.musicListRepository = musicListRepository;
-        this.musicListClassRepository = musicListClassRepository;
-        this.youTubeService = youTubeService;
-    }
+    private YoutubeService youtubeService;
 
     public PlayList createPlayList(PlayListCreateRequest request, User user) {
         List<PlayList> result = playListRepository.findByUserIdAndTypeOrderByOrderNumberDesc(user.getId(), PlayListType.PLAYLIST);
@@ -126,7 +120,7 @@ public class PlayListService {
 
     public SearchMusicListResponse getSearchList(String q, String pageToken) {
         try {
-            SearchListResponse searchResponse = youTubeService.getSearchList(q, pageToken);
+            SearchListResponse searchResponse = youtubeService.getSearchList(q, pageToken);
             List<SearchMusicListDto> musicList = new ArrayList<>();
 
             for (SearchResult item : searchResponse.getItems()) {
@@ -142,7 +136,7 @@ public class PlayListService {
 
                 // video id 를 통해 video.list 를 호출하여 동영상 재생 시간을 조회
                 String videoId = item.getId().getVideoId();
-                String duration = youTubeService.getVideoDuration(videoId);
+                String duration = youtubeService.getVideoDuration(videoId);
 
                 SearchMusicListDto music = SearchMusicListDto.builder()
                         .id(videoId)

@@ -1,7 +1,7 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.0.6'
-	id 'io.spring.dependency-management' version '1.1.0'
+	id 'org.springframework.boot' version '3.2.3'
+	id 'io.spring.dependency-management' version '1.1.4'
 }
 
 group = 'com.pfplay-backend.api'
@@ -17,7 +17,6 @@ def queryDslVersion = '5.0.0'
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     testImplementation 'org.projectlombok:lombok:1.18.22'
-	testImplementation 'org.projectlombok:lombok:1.18.22'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
@@ -34,8 +33,8 @@ dependencies {
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	// oauth2.0 jwt
-	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation group: 'com.auth0', name: 'java-jwt', version: '4.4.0'
+	implementation group: 'org.passay', name: 'passay', version: '1.6.4'
 
 	// swagger
 	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'

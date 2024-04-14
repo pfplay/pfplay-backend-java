@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.presentation.response;
 
-import com.pfplaybackend.api.entity.PlayList;
+import com.pfplaybackend.api.playlist.model.PlayList;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;

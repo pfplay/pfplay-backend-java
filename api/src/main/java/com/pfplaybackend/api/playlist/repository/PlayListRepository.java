@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.repository;
 
-import com.pfplaybackend.api.entity.PlayList;
+import com.pfplaybackend.api.playlist.model.PlayList;
 import com.pfplaybackend.api.playlist.enums.PlayListType;
 import org.springframework.data.jpa.repository.JpaRepository;
 

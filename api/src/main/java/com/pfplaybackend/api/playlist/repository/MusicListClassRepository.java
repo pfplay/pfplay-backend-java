@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.pfplaybackend.api.entity.QMusicList.musicList;
+import static com.pfplaybackend.api.playlist.model.QMusicList.musicList;
 
 @RequiredArgsConstructor
 @Repository
