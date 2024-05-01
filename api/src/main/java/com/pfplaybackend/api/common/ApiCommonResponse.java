@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class ApiCommonResponse<T> {
-    private T data;
+    private final T data;
 
     @Builder
     public ApiCommonResponse(T data) {

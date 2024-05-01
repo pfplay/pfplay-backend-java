@@ -1,7 +1,9 @@
 package com.pfplaybackend.api.user.repository;
 
-import com.pfplaybackend.api.entity.Guest;
+import com.pfplaybackend.api.user.model.entity.Guest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface GuestRepository extends JpaRepository<Guest, Long> {
+import java.util.UUID;
+
+public interface GuestRepository extends JpaRepository<Guest, UUID> {
 }
