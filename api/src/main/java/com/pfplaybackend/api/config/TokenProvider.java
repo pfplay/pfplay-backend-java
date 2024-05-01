@@ -30,6 +30,7 @@ public class TokenProvider {
     @Value("${jwt.private.key}")
     private RSAPrivateKey privateKey;
 
+    private final Instant now = Instant.now();
     private final long expiry = 2600000L;   // 한달
 
     @Bean
@@ -50,7 +51,6 @@ public class TokenProvider {
     }
 
     public String createAccessToken(Authority scope, String email, Long userId) {
-        Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(email)
                 .issuedAt(now)
@@ -64,7 +64,6 @@ public class TokenProvider {
     }
 
     public String createGuestAccessToken(Authority scope, Long id) {
-        Instant now = Instant.now();
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(String.valueOf(id))
                 .issuedAt(now)
@@ -75,4 +74,5 @@ public class TokenProvider {
 
         return jwtEncoder().encode(JwtEncoderParameters.from(claims)).getTokenValue();
     }
+
 }
