@@ -8,11 +8,7 @@ import java.util.Collection;
 
 @Getter
 public class CustomAuthentication extends UsernamePasswordAuthenticationToken {
-
-    private final String email;
-
-    public CustomAuthentication(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities, String email) {
+    public CustomAuthentication(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
         super(principal, credentials, authorities);
-        this.email = email;
     }
 }
