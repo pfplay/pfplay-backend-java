@@ -18,5 +18,4 @@ public abstract class BaseEntity {
     @LastModifiedDate
     @Column(columnDefinition = "datetime default current_timestamp on update current_timestamp")
     private LocalDateTime updatedAt;
-
 }

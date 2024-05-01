@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.config.oauth2.dto;
 
-import com.pfplaybackend.api.config.oauth2.enums.AuthorityType;
+import com.pfplaybackend.api.config.oauth2.enums.AccessLevel;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -12,7 +12,7 @@ import java.util.Map;
 public class CustomOAuth2User extends DefaultOAuth2User {
 
     private final String email;
-    private final AuthorityType authorityType;
+    private final AccessLevel accessLevel;
 
     /**
      * Constructs a {@code DefaultOAuth2User} using the provided parameters.
@@ -24,9 +24,9 @@ public class CustomOAuth2User extends DefaultOAuth2User {
      */
     public CustomOAuth2User(Collection<? extends GrantedAuthority> authorities,
                             Map<String, Object> attributes, String nameAttributeKey,
-                            String email, AuthorityType authorityType) {
+                            String email, AccessLevel accessLevel) {
         super(authorities, attributes, nameAttributeKey);
         this.email = email;
-        this.authorityType = authorityType;
+        this.accessLevel = accessLevel;
     }
 }

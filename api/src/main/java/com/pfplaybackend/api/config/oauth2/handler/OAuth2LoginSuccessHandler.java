@@ -1,11 +1,12 @@
 package com.pfplaybackend.api.config.oauth2.handler;
 
 import com.pfplaybackend.api.config.jwt.JwtProvider;
-import com.pfplaybackend.api.config.oauth2.dto.UserPrincipal;
+import com.pfplaybackend.api.config.oauth2.dto.CustomUserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
@@ -19,6 +20,9 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
+    @Value("${app.redirect.web.uri}")
+    private String redirectWebUri;
+
     private final JwtProvider jwtProvider;
 
     @Override
@@ -30,9 +34,8 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     private void attachAccessTokenToCookie(Authentication authentication, HttpServletResponse response) {
-        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         // Generate 'access token' for 'social login' user
-        String accessToken = jwtProvider.generateAccessTokenForMember(userPrincipal.getUsername());
+        String accessToken = jwtProvider.generateAccessTokenForMember((CustomUserPrincipal) authentication.getPrincipal());
 
         final String cookieKey = "AccessToken";
         ResponseCookie responseCookie = ResponseCookie.from(cookieKey, accessToken)
@@ -46,8 +49,10 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     }
 
     private void redirectToView(HttpServletResponse response, String redirectLocation) throws IOException {
-        final String redirectPrefix = "http://localhost:5500/";
-        response.sendRedirect(redirectPrefix + redirectLocation);
+        // TODO
+        System.out.println(this.redirectWebUri + "/" + redirectLocation);
+        // response.sendRedirect(this.redirectWebUri + redirectLocation);
+        response.sendRedirect(this.redirectWebUri + "/index.html");
     }
 
     private String extractRedirectLocationFromQueryString(HttpServletRequest request) {
