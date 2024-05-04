@@ -14,7 +14,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @Table(
-        name = "PALYLIST_MUSIC",
+        name = "PLAYLIST_MUSIC",
         indexes = {
             @Index(name = "playlist_music_playlist_id_IDX", columnList = "playlist_id")
         }
@@ -28,7 +28,7 @@ public class PlaylistMusic extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "playlist_id")
-    private Playlist playList;
+    private Playlist playlist;
 
     @Comment("플레이리스트의 곡 순서")
     @Column(columnDefinition = "integer unsigned")
@@ -46,8 +46,8 @@ public class PlaylistMusic extends BaseEntity {
     protected PlaylistMusic() { }
 
     @Builder
-    public PlaylistMusic(Playlist playList, UserId uid, Integer orderNumber, String name, String duration, String thumbnailImage) {
-        this.playList = playList;
+    public PlaylistMusic(Playlist playlist, UserId uid, Integer orderNumber, String name, String duration, String thumbnailImage) {
+        this.playlist = playlist;
         this.orderNumber = orderNumber;
         this.name = name;
         this.duration = duration;

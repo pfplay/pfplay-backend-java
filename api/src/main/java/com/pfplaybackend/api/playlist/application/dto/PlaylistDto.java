@@ -10,7 +10,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 @Data
 @Schema
 @Builder
-public class PlayListDto {
+public class PlaylistDto {
     @Schema(description = "Playlist id", example = "1", requiredMode = REQUIRED, type = "long")
     private final Long id;
 

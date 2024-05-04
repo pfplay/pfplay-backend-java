@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface PlayListRepository extends JpaRepository<Playlist, Long> {
+public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     Playlist findByIdAndUserIdAndType(Long id, UUID userId, PlaylistType type);
 
     // 내 플레이리스트, 그랩리스트 전체 조회
