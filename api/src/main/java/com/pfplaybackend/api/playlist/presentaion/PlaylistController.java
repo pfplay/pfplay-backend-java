@@ -2,13 +2,13 @@ package com.pfplaybackend.api.playlist.presentaion;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
-import com.pfplaybackend.api.playlist.presentaion.api.PlayListApi;
+import com.pfplaybackend.api.playlist.presentaion.api.PlaylistApi;
 import com.pfplaybackend.api.playlist.presentaion.dto.response.*;
 import com.pfplaybackend.api.playlist.presentaion.dto.request.ListDeleteRequest;
 import com.pfplaybackend.api.playlist.presentaion.dto.request.MusicListAddRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlayListCreateRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlayListRenameRequest;
-import com.pfplaybackend.api.playlist.application.PlayListService;
+import com.pfplaybackend.api.playlist.presentaion.dto.request.PlaylistCreateRequest;
+import com.pfplaybackend.api.playlist.presentaion.dto.request.PlaylistRenameRequest;
+import com.pfplaybackend.api.playlist.application.PlaylistService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,28 +23,25 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/playlist")
-public class PlaylistController implements PlayListApi {
+public class PlaylistController implements PlaylistApi {
 
-    private final PlayListService playListService;
+    private final PlaylistService playlistService;
 
     @PostMapping()
-    public ResponseEntity<?> create(@RequestBody @Valid PlayListCreateRequest request) {
+    public ResponseEntity<?> create(@RequestBody @Valid PlaylistCreateRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
         // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
-        // PlayList playList = playListService.createPlayList(request);
+        // Playlist playlist = playlistService.createPlaylist(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success("OK")
-                        // PlayListCreateResponse.toResponse(playList))
+                        // PlaylistCreateResponse.toResponse(playlist))
                 );
     }
 
     @GetMapping()
-    public ResponseEntity<?> getPlayList() {
+    public ResponseEntity<?> getPlaylist() {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
-
-        // List<PlayListResponse> list = playListService.getPlayList();
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(
@@ -57,7 +54,7 @@ public class PlaylistController implements PlayListApi {
     public ResponseEntity<?> getMusicList(@PathVariable Long listId,
                                           @RequestParam(required = false, defaultValue = "0", value = "page") int page,
                                           @RequestParam(required = false, defaultValue = "20", value = "pageSize") int pageSize) {
-        MusicListResponse list = playListService.getMusicList(page, pageSize, listId);
+        MusicListResponse list = playlistService.getMusicList(page, pageSize, listId);
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(list));
@@ -65,7 +62,7 @@ public class PlaylistController implements PlayListApi {
 
     @GetMapping("/youtube/music")
     public ResponseEntity<?> getSearchList(@RequestParam("q") String q, @RequestParam("pageToken") Optional<String> pageToken) {
-        SearchMusicListResponse result = playListService.getSearchList(q, pageToken.orElse(null));
+        SearchMusicListResponse result = playlistService.getSearchList(q, pageToken.orElse(null));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiCommonResponse.success(result));
@@ -73,18 +70,18 @@ public class PlaylistController implements PlayListApi {
 
     @PostMapping("{listId}")
     public ResponseEntity<?> addMusic(@PathVariable Long listId, @RequestBody MusicListAddRequest request) {
-        MusicListAddResponse response = playListService.addMusic(listId, request);
+        MusicListAddResponse response = playlistService.addMusic(listId, request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(response));
     }
 
     @DeleteMapping()
-    public ResponseEntity<?> deletePlayList(@RequestBody ListDeleteRequest request) {
+    public ResponseEntity<?> deletePlaylist(@RequestBody ListDeleteRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
         // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
 
-        // playListService.deletePlayList(member.getId(), request.getListIds());
+        // playlistService.deletePlaylist(member.getId(), request.getListIds());
         return ResponseEntity
                 .status(HttpStatus.OK).body(
                         ApiCommonResponse.success(
@@ -100,7 +97,7 @@ public class PlaylistController implements PlayListApi {
     public ResponseEntity<?> deleteMusicList(@RequestBody ListDeleteRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
         // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
-        // playListService.deleteMusicList(member.getId(), request.getListIds());
+        // playlistService.deleteMusicList(member.getId(), request.getListIds());
         return ResponseEntity
                 .status(HttpStatus.OK).body(
                         ApiCommonResponse.success(
@@ -113,15 +110,15 @@ public class PlaylistController implements PlayListApi {
     }
 
     @PatchMapping("{listId}")
-    public ResponseEntity<?> modifyPlayListName(@PathVariable Long listId, @RequestBody PlayListRenameRequest request) {
+    public ResponseEntity<?> modifyPlaylistName(@PathVariable Long listId, @RequestBody PlaylistRenameRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
         // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
-        // playListService.renamePlayList(member.getId(), listId, request.getName());
+        // playlistService.renamePlaylist(member.getId(), listId, request.getName());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiCommonResponse.success(
                         "OK"
-//                        PlayListRenameResponse.builder()
+//                        PlaylistRenameResponse.builder()
 //                        .id(listId)
 //                        .name(request.getName())
 //                        .build()

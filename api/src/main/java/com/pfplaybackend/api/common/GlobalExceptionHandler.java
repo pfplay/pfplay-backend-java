@@ -2,9 +2,9 @@ package com.pfplaybackend.api.common;
 
 import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
-import com.pfplaybackend.api.playlist.exception.PlayListLimitExceededException;
-import com.pfplaybackend.api.playlist.exception.PlayListMusicLimitExceededException;
-import com.pfplaybackend.api.playlist.exception.PlayListNoWalletException;
+import com.pfplaybackend.api.playlist.exception.PlaylistLimitExceededException;
+import com.pfplaybackend.api.playlist.exception.PlaylistMusicLimitExceededException;
+import com.pfplaybackend.api.playlist.exception.PlaylistNoWalletException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -51,8 +51,8 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(PlayListNoWalletException.class)
-    public ResponseEntity<?> handlePlayListNoWalletException(PlayListNoWalletException e) {
+    @ExceptionHandler(PlaylistNoWalletException.class)
+    public ResponseEntity<?> handlePlaylistNoWalletException(PlaylistNoWalletException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiCommonResponse.error(
@@ -64,8 +64,8 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(PlayListLimitExceededException.class)
-    public ResponseEntity<?> handlePlayListLimitExceededException(PlayListLimitExceededException e) {
+    @ExceptionHandler(PlaylistLimitExceededException.class)
+    public ResponseEntity<?> handlePlaylistLimitExceededException(PlaylistLimitExceededException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiCommonResponse.error(
@@ -77,8 +77,8 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(PlayListMusicLimitExceededException.class)
-    public ResponseEntity<?> handlePlayListMusicLimitExceededException(PlayListMusicLimitExceededException e) {
+    @ExceptionHandler(PlaylistMusicLimitExceededException.class)
+    public ResponseEntity<?> handlePlaylistMusicLimitExceededException(PlaylistMusicLimitExceededException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ApiCommonResponse.error(

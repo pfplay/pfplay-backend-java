@@ -9,14 +9,14 @@ import lombok.Getter;
 @Getter
 @Builder
 public class PlaylistDomain {
-    private final Playlist playList;
+    private final Playlist playlist;
     private final Integer orderNumber;
     private final String name;
     private final PlaylistType type;
     private final Member member;
 
-//    public PlayList toEntity() {
-//        return PlayList.builder()
+//    public Playlist toEntity() {
+//        return Playlist.builder()
 //                .orderNumber(orderNumber)
 //                .name(name)
 //                .user(member)
