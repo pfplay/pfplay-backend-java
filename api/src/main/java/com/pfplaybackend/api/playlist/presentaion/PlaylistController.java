@@ -4,11 +4,8 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.config.jwt.dto.UserAuthenticationDto;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
 import com.pfplaybackend.api.playlist.presentaion.api.PlaylistApi;
+import com.pfplaybackend.api.playlist.presentaion.dto.request.*;
 import com.pfplaybackend.api.playlist.presentaion.dto.response.*;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.ListDeleteRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.MusicListAddRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlaylistCreateRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlaylistRenameRequest;
 import com.pfplaybackend.api.playlist.application.PlaylistService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -52,18 +49,16 @@ public class PlaylistController implements PlaylistApi {
     }
 
     @GetMapping("{listId}")
-    public ResponseEntity<?> getMusicList(@PathVariable Long listId,
-                                          @RequestParam(required = false, defaultValue = "0", value = "page") int page,
-                                          @RequestParam(required = false, defaultValue = "20", value = "pageSize") int pageSize) {
-        MusicListResponse list = playlistService.getMusicList(page, pageSize, listId);
+    public ResponseEntity<?> getMusicList(@PathVariable Long listId, @ModelAttribute @Valid PaginationRequest request) {
+        MusicListResponse list = playlistService.getMusicList(request.getPage(), request.getPageSize(), listId);
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(list));
     }
 
     @GetMapping("/youtube/music")
-    public ResponseEntity<?> getSearchList(@RequestParam("q") String q, @RequestParam("pageToken") Optional<String> pageToken) {
-        SearchMusicListResponse result = playlistService.getSearchList(q, pageToken.orElse(null));
+    public ResponseEntity<?> getSearchList(@ModelAttribute @Valid SearchListRequest request) {
+        SearchMusicListResponse result = playlistService.getSearchList(request.getQ(), request.getPageToken());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiCommonResponse.success(result));
