@@ -1,11 +1,8 @@
 package com.pfplaybackend.api.playlist.presentaion.api;
 
+import com.pfplaybackend.api.playlist.presentaion.dto.request.*;
 import com.pfplaybackend.api.playlist.presentaion.dto.response.*;
 import com.pfplaybackend.api.playlist.application.dto.MusicListDto;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.ListDeleteRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.MusicListAddRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlaylistCreateRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlaylistRenameRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,11 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.util.Optional;
 
 public interface PlaylistApi {
     @Operation(summary = "플레이리스트 생성")
@@ -58,8 +53,7 @@ public interface PlaylistApi {
             )
     })
     public ResponseEntity<?> getMusicList(@PathVariable Long listId,
-                                          @RequestParam(required = false, defaultValue = "0", value = "page") int page,
-                                          @RequestParam(required = false, defaultValue = "20", value = "pageSize") int pageSize);
+                                          @ModelAttribute @Valid PaginationRequest request);
 
 
     @Operation(summary = "유튜브 곡 검색")
@@ -72,7 +66,7 @@ public interface PlaylistApi {
                     description = "유튜브 곡 검색 실패"
             )
     })
-    public ResponseEntity<?> getSearchList(@RequestParam("q") String q, @RequestParam("pageToken") Optional<String> pageToken);
+    public ResponseEntity<?> getSearchList(@ModelAttribute @Valid SearchListRequest request);
 
 
     @Operation(summary = "플레이리스트 곡 추가")
