@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.playlist.presentaion;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.config.jwt.dto.UserAuthenticationDto;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
 import com.pfplaybackend.api.playlist.presentaion.api.PlaylistApi;
 import com.pfplaybackend.api.playlist.presentaion.dto.response.*;
@@ -24,29 +25,29 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/playlist")
 public class PlaylistController implements PlaylistApi {
-
     private final PlaylistService playlistService;
 
     @PostMapping()
     public ResponseEntity<?> create(@RequestBody @Valid PlaylistCreateRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
-        // Playlist playlist = playlistService.createPlaylist(request);
+        UserAuthenticationDto userAuthenticationDto = (UserAuthenticationDto) authentication.getPrincipal();
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiCommonResponse.success("OK")
-                        // PlaylistCreateResponse.toResponse(playlist))
-                );
+                .body(ApiCommonResponse.success(
+                        "OK"
+//                         PlaylistCreateResponse.toResponse(playlistService.createPlaylist(request, userAuthenticationDto.getUserId())))
+                ));
     }
 
     @GetMapping()
     public ResponseEntity<?> getPlaylist() {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
+        UserAuthenticationDto userAuthenticationDto = (UserAuthenticationDto) authentication.getPrincipal();
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(
                         "OK"
-                        // list
+//                        playlistService.getPlaylist(userAuthenticationDto.getUserId())
                 ));
     }
 
@@ -79,9 +80,8 @@ public class PlaylistController implements PlaylistApi {
     @DeleteMapping()
     public ResponseEntity<?> deletePlaylist(@RequestBody ListDeleteRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
-
-        // playlistService.deletePlaylist(member.getId(), request.getListIds());
+        UserAuthenticationDto userAuthenticationDto = (UserAuthenticationDto) authentication.getPrincipal();
+        playlistService.deletePlaylist(userAuthenticationDto.getUserId(), request.getListIds());
         return ResponseEntity
                 .status(HttpStatus.OK).body(
                         ApiCommonResponse.success(
@@ -96,8 +96,8 @@ public class PlaylistController implements PlaylistApi {
     @DeleteMapping("/music")
     public ResponseEntity<?> deleteMusicList(@RequestBody ListDeleteRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
-        // playlistService.deleteMusicList(member.getId(), request.getListIds());
+        UserAuthenticationDto userAuthenticationDto = (UserAuthenticationDto) authentication.getPrincipal();
+        playlistService.deleteMusicList(userAuthenticationDto.getUserId(), request.getListIds());
         return ResponseEntity
                 .status(HttpStatus.OK).body(
                         ApiCommonResponse.success(
@@ -112,8 +112,8 @@ public class PlaylistController implements PlaylistApi {
     @PatchMapping("{listId}")
     public ResponseEntity<?> modifyPlaylistName(@PathVariable Long listId, @RequestBody PlaylistRenameRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
-        // Member member = userInfoService.findByUser(authentication.getEmail()).orElseThrow();
-        // playlistService.renamePlaylist(member.getId(), listId, request.getName());
+        UserAuthenticationDto userAuthenticationDto = (UserAuthenticationDto) authentication.getPrincipal();
+        playlistService.renamePlaylist(userAuthenticationDto.getUserId(), listId, request.getName());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiCommonResponse.success(

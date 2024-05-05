@@ -17,7 +17,7 @@ import com.pfplaybackend.api.playlist.presentaion.dto.response.MusicListResponse
 import com.pfplaybackend.api.playlist.presentaion.dto.response.SearchMusicListResponse;
 import com.pfplaybackend.api.playlist.repository.MusicListRepository;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
-import com.pfplaybackend.api.user.model.entity.Member;
+import com.pfplaybackend.api.user.model.value.UserId;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,8 +36,8 @@ public class PlaylistService {
     private MusicListRepository musicListRepository;
     private YoutubeService youtubeService;
 
-    public Playlist createPlaylist(PlaylistCreateRequest request, Member member) {
-        List<Playlist> result = playlistRepository.findByUserIdAndTypeOrderByOrderNumberDesc(member.getUserId(), PlaylistType.PLAYLIST);
+    public Playlist createPlaylist(PlaylistCreateRequest request, UserId userId) {
+        List<Playlist> result = playlistRepository.findByUserIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST);
 
         // TODO 플레이리스트 생성 권한 여부
         // TODO 플레이리스트 생성 조건
@@ -54,14 +54,14 @@ public class PlaylistService {
         if (!result.isEmpty()) {
             dto = PlaylistCreateDto.builder()
                     .orderNumber(result.get(0).getOrderNumber() + 1)
-                    .userId(member.getUserId())
+                    .userId(userId)
                     .name(request.getName())
                     .type(PlaylistType.PLAYLIST)
                     .build();
         } else {
             dto = PlaylistCreateDto.builder()
                     .orderNumber(1)
-                    .userId(member.getUserId())
+                    .userId(userId)
                     .name(request.getName())
                     .type(PlaylistType.PLAYLIST)
                     .build();
@@ -70,8 +70,8 @@ public class PlaylistService {
         return playlistRepository.save(dto.toEntity());
     }
 
-//    public List<PlaylistResponse> getPlaylist(Member member) {
-//        List<Tuple> result = playlistClassRepository.findByUserId(member.getId());
+//    public List<PlaylistResponse> getPlaylist(UserId userId) {
+//        List<Tuple> result = playlistClassRepository.findByUserId(userId);
 //        List<PlaylistResponse> dtoList = new ArrayList<>();
 //        for (Tuple tuple : result) {
 //            PlaylistResponse dto = PlaylistResponse.builder()
@@ -198,7 +198,7 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void deletePlaylist(UUID userId, List<Long> listIds) {
+    public void deletePlaylist(UserId userId, List<Long> listIds) {
 //        List<Long> ids = playlistClassRepository.findByUserIdAndListIdAndType(userId, listIds, PlaylistType.PLAYLIST);
 //        if (ids.size() != listIds.size()) {
 //            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 플레이리스트");
@@ -218,7 +218,7 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void deleteMusicList(UUID userId, List<Long> listIds) {
+    public void deleteMusicList(UserId userId, List<Long> listIds) {
         // 곡 보유자가 삭제 요청자 Id와 일치하는지 확인
         // TODO '리소스 쓰기 권한' 여부 확인 절차
 //        MusicList musicList = musicListRepository.findById(listIds.get(0)).orElseThrow(() -> new NoSuchElementException("존재하지 않거나 유효하지 않은 곡"));
@@ -239,7 +239,7 @@ public class PlaylistService {
 //        }
     }
 
-    public void renamePlaylist(UUID userId, Long playlistId, String name) {
+    public void renamePlaylist(UserId userId, Long playlistId, String name) {
         Playlist playlist = playlistRepository.findByIdAndUserIdAndType(playlistId, userId, PlaylistType.PLAYLIST);
         if(playlist == null) {
             throw new NoSuchElementException("존재하지 않는 플레이리스트");
