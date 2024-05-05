@@ -14,7 +14,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @Table(
-        name = "PALYLIST_MUSIC",
+        name = "PLAYLIST_MUSIC",
         indexes = {
             @Index(name = "playlist_music_playlist_id_IDX", columnList = "playlist_id")
         }
