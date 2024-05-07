@@ -1,6 +1,8 @@
 package com.pfplaybackend.api.common;
 
 import com.pfplaybackend.api.common.enums.ExceptionEnum;
+import com.pfplaybackend.api.partyroom.exception.UnsupportedChatMessageTypeException;
+import com.pfplaybackend.api.partyroom.exception.UnsupportedChatRequestException;
 import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
 import com.pfplaybackend.api.playlist.exception.PlaylistLimitExceededException;
 import com.pfplaybackend.api.playlist.exception.PlaylistMusicLimitExceededException;
@@ -135,6 +137,35 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiCommonResponse.error(
+                        ExceptionResult.builder()
+                                .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
+                                .message(ExceptionEnum.EXCEPTION.getMessage())
+                                .build()
+                        )
+                );
+    }
+
+    @ExceptionHandler(UnsupportedChatMessageTypeException.class)
+    public final ResponseEntity<?> handleUnsupportedChatMessageTypeException(UnsupportedChatMessageTypeException e) {
+        log.error(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiCommonResponse.error(
+                        ExceptionResult.builder()
+                                .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
+                                .message(ExceptionEnum.EXCEPTION.getMessage())
+                                .build()
+                        )
+                );
+
+    }
+
+    @ExceptionHandler(UnsupportedChatRequestException.class)
+    public final ResponseEntity<?> handleUnsupportedChatRequestException(UnsupportedChatRequestException e) {
+        log.error(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ApiCommonResponse.error(
                                 ExceptionResult.builder()
                                         .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
