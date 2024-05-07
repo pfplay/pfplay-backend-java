@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.model.value;
 
-import com.pfplaybackend.api.common.enums.PartyroomGrade;
+import com.pfplaybackend.api.partyroom.enums.PartyroomGrade;
 import lombok.Getter;
 
 @Getter

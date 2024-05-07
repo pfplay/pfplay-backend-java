@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfplaybackend.api.partyroom.enums.MessageType;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedChatMessageTypeException;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
 import lombok.RequiredArgsConstructor;
@@ -26,17 +27,17 @@ public class RedisChatSubscriberService implements MessageListener {
             final ChatDto chatDto = objectMapper.readValue(publishMessage, ChatDto.class);
             final String messageChannel = (String) redisTemplate.getStringSerializer().deserialize(message.getChannel());
 
-            if (chatDto.getMessageType().equals(ChatDto.MessageType.CHAT)) {
+            if (chatDto.getMessageType().equals(MessageType.CHAT.getName())) {
                 messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatRoomId(), chatDto);
                 return;
             }
 
-            if (chatDto.getMessageType().equals(ChatDto.MessageType.PENALTY)) {
+            if (chatDto.getMessageType().equals(MessageType.PENALTY)) {
                 messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatRoomId(), chatDto);
                 return;
             }
 
-            if (chatDto.getMessageType().equals(ChatDto.MessageType.PROMOTE)) {
+            if (chatDto.getMessageType().equals(MessageType.PROMOTE)) {
                 messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatRoomId(), chatDto);
                 return;
             }

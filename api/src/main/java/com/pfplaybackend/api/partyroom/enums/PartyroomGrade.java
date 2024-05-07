@@ -1,7 +1,8 @@
-package com.pfplaybackend.api.common.enums;
+package com.pfplaybackend.api.partyroom.enums;
 
 import lombok.Getter;
 
+@Getter
 public enum PartyroomGrade {
     ADMIN("admin", 1),
     CM("cm", 2),
@@ -9,10 +10,7 @@ public enum PartyroomGrade {
     CLUBBER("clubber", 4),
     LISTENER("listener", 5);
 
-    @Getter
     private final String name;
-
-    @Getter
     private final int priority;
 
     PartyroomGrade(String name, int priority) {
