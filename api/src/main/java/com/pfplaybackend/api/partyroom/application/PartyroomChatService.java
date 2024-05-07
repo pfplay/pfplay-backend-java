@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.application;
 
-import com.pfplaybackend.api.common.enums.PartyroomGrade;
+import com.pfplaybackend.api.partyroom.enums.MessageType;
+import com.pfplaybackend.api.partyroom.enums.PartyroomGrade;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedChatMessageTypeException;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedChatRequestException;
 import com.pfplaybackend.api.partyroom.model.value.PromoteInfo;
@@ -14,12 +15,12 @@ import org.springframework.stereotype.Service;
 public class PartyroomChatService {
     private final RedisChatPublisherService redisChatPublisherService;
     public void sendChat(ChatDto chatDto) throws UnsupportedChatMessageTypeException, UnsupportedChatRequestException {
-        if (chatDto.getMessageType().equals(ChatDto.MessageType.CHAT)) {
+        if (chatDto.getMessageType().equals(MessageType.CHAT)) {
             sendToBroker(chatDto);
             return;
         }
 
-        if (chatDto.getMessageType().equals(ChatDto.MessageType.PENALTY)) {
+        if (chatDto.getMessageType().equals(MessageType.PENALTY)) {
             if (chatDto.getToUser() != null && chatDto.getPenaltyInfo() != null) {
                 isAvailablePenaltyRequest(
                         chatDto.getFromUser().getPartyroomGrade(),
@@ -30,7 +31,7 @@ public class PartyroomChatService {
             return;
         }
 
-        if (chatDto.getMessageType().equals(ChatDto.MessageType.PROMOTE)) {
+        if (chatDto.getMessageType().equals(MessageType.PROMOTE)) {
             if (chatDto.getToUser() != null && chatDto.getPromoteInfo() != null
             ) {
                 isAvailablePromoteRequest(

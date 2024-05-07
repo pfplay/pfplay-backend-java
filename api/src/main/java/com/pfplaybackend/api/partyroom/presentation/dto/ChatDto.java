@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation.dto;
 
-import com.pfplaybackend.api.common.enums.PartyroomGrade;
+import com.pfplaybackend.api.partyroom.enums.MessageType;
 import com.pfplaybackend.api.partyroom.model.entity.PartyroomUser;
 import com.pfplaybackend.api.partyroom.model.value.PenaltyInfo;
 import com.pfplaybackend.api.partyroom.model.value.PromoteInfo;
@@ -18,7 +18,7 @@ public class ChatDto {
 
 
     public ChatDto(
-            Long id, PartyroomUser fromUser, String message,
+            PartyroomUser fromUser, String message,
             String chatRoomId, MessageType messageType, PartyroomUser toUser,
             PromoteInfo promoteInfo, PenaltyInfo penaltyInfo
     ) {
@@ -29,20 +29,5 @@ public class ChatDto {
         this.promoteInfo = promoteInfo;
         this.penaltyInfo = penaltyInfo;
         this.message = message;
-    }
-
-    public enum MessageType {
-        CHAT("chat"),
-        PROMOTE("promote"),
-        PENALTY("penalty");
-
-
-
-        @Getter
-        private final String name;
-
-        MessageType(String name) {
-            this.name = name;
-        }
     }
 }

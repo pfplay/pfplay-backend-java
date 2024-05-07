@@ -1,16 +1,15 @@
-package com.pfplaybackend.api.common.enums;
+package com.pfplaybackend.api.partyroom.enums;
 
 import lombok.Getter;
 
+@Getter
 public enum PartyroomPenaltyType {
     DELETE("delete"),
     GGUL("ggul"),
     KICK("kick"),
     BAN("ban");
 
-
-    @Getter
-    private String name;
+    private final String name;
     PartyroomPenaltyType(String name){
         this.name = name;
     }

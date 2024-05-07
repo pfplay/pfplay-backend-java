@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.model.entity;
 
-import com.pfplaybackend.api.common.enums.PartyroomGrade;
+import com.pfplaybackend.api.partyroom.enums.PartyroomGrade;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.Getter;
