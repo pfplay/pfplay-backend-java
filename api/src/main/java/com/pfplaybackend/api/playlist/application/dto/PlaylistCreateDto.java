@@ -8,8 +8,8 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class PlayListCreateDto {
-    private final Playlist playList;
+public class PlaylistCreateDto {
+    private final Playlist playlist;
     private final Integer orderNumber;
     private final String name;
     private final PlaylistType type;

@@ -1,11 +1,8 @@
 package com.pfplaybackend.api.playlist.presentaion.api;
 
+import com.pfplaybackend.api.playlist.presentaion.dto.request.*;
 import com.pfplaybackend.api.playlist.presentaion.dto.response.*;
 import com.pfplaybackend.api.playlist.application.dto.MusicListDto;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.ListDeleteRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.MusicListAddRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlayListCreateRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlayListRenameRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,18 +12,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.Optional;
-
-public interface PlayListApi {
+public interface PlaylistApi {
     @Operation(summary = "플레이리스트 생성")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "플레이리스트 생성 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PlayListCreateResponse.class))
+                            schema = @Schema(implementation = PlaylistCreateResponse.class))
             ),
             @ApiResponse(responseCode = "400", description = "생성 개수 제한 초과 (지갑 미연동) or 생성 개수 제한 초과",
                     content = @Content(mediaType = "application/json",
@@ -35,18 +30,18 @@ public interface PlayListApi {
                             ))
             )
     })
-    public ResponseEntity<?> create(@RequestBody @Valid PlayListCreateRequest request);
+    public ResponseEntity<?> create(@RequestBody @Valid PlaylistCreateRequest request);
 
     @Operation(summary = "플레이리스트 & 그랩리스트 목록 조회")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "플레이리스트 & 그랩리스트 목록 조회 성공",
                     content = @Content(mediaType = "application/json",
                             array = @ArraySchema(
-                                    schema = @Schema(implementation = PlayListResponse.class)
+                                    schema = @Schema(implementation = PlaylistResponse.class)
                             ))
             )
     })
-    public ResponseEntity<?> getPlayList();
+    public ResponseEntity<?> getPlaylist();
 
     @Operation(summary = "플레이리스트/그랩리스트 곡 조회")
     @ApiResponses(value = {
@@ -58,8 +53,7 @@ public interface PlayListApi {
             )
     })
     public ResponseEntity<?> getMusicList(@PathVariable Long listId,
-                                          @RequestParam(required = false, defaultValue = "0", value = "page") int page,
-                                          @RequestParam(required = false, defaultValue = "20", value = "pageSize") int pageSize);
+                                          @ModelAttribute @Valid PaginationRequest request);
 
 
     @Operation(summary = "유튜브 곡 검색")
@@ -72,7 +66,7 @@ public interface PlayListApi {
                     description = "유튜브 곡 검색 실패"
             )
     })
-    public ResponseEntity<?> getSearchList(@RequestParam("q") String q, @RequestParam("pageToken") Optional<String> pageToken);
+    public ResponseEntity<?> getSearchList(@ModelAttribute @Valid SearchListRequest request);
 
 
     @Operation(summary = "플레이리스트 곡 추가")
@@ -122,7 +116,7 @@ public interface PlayListApi {
                             ))
             ),
     })
-    public ResponseEntity<?> deletePlayList(@RequestBody ListDeleteRequest request);
+    public ResponseEntity<?> deletePlaylist(@RequestBody ListDeleteRequest request);
 
 
 
@@ -153,7 +147,7 @@ public interface PlayListApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "플레이리스트 이름 수정 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = PlayListRenameResponse.class))
+                            schema = @Schema(implementation = PlaylistRenameResponse.class))
             ),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 플레이리스트",
                     content = @Content(mediaType = "application/json",
@@ -162,5 +156,5 @@ public interface PlayListApi {
                             ))
             ),
     })
-    public ResponseEntity<?> modifyPlayListName(@PathVariable Long listId, @RequestBody PlayListRenameRequest request);
+    public ResponseEntity<?> modifyPlaylistName(@PathVariable Long listId, @RequestBody PlaylistRenameRequest request);
 }

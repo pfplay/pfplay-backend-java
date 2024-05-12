@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface MusicListRepository extends JpaRepository<PlaylistMusic, Long> {
-    Page<PlaylistMusic> findByPlayListIdOrderByOrderNumber(Pageable pageable, Long playListId);
-    List<PlaylistMusic> findAllByPlayListId(Long playListId);
-    double countByPlayListId(Long playListId);
+    Page<PlaylistMusic> findByPlaylistIdOrderByOrderNumber(Pageable pageable, Long playlistId);
+    List<PlaylistMusic> findAllByPlaylistId(Long playlistId);
+    double countByPlaylistId(Long playlistId);
 }
