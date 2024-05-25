@@ -27,18 +27,18 @@ public class RedisChatSubscriberService implements MessageListener {
             final ChatDto chatDto = objectMapper.readValue(publishMessage, ChatDto.class);
             final String messageChannel = (String) redisTemplate.getStringSerializer().deserialize(message.getChannel());
 
-            if (chatDto.getMessageType().equals(MessageType.CHAT.getName())) {
-                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatRoomId(), chatDto);
+            if (chatDto.getMessageType().getName().equals(MessageType.CHAT.getName())) {
+                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatroomId(), chatDto);
                 return;
             }
 
-            if (chatDto.getMessageType().equals(MessageType.PENALTY)) {
-                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatRoomId(), chatDto);
+            if (chatDto.getMessageType().getName().equals(MessageType.PENALTY.getName())) {
+                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatroomId(), chatDto);
                 return;
             }
 
-            if (chatDto.getMessageType().equals(MessageType.PROMOTE)) {
-                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatRoomId(), chatDto);
+            if (chatDto.getMessageType().getName().equals(MessageType.PROMOTE.getName())) {
+                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatroomId(), chatDto);
                 return;
             }
 

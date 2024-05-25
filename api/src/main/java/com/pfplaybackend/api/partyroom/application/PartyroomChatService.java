@@ -1,19 +1,17 @@
 package com.pfplaybackend.api.partyroom.application;
 
-import com.pfplaybackend.api.config.jwt.dto.UserAuthenticationDto;
-import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
 import com.pfplaybackend.api.partyroom.enums.MessageType;
 import com.pfplaybackend.api.partyroom.enums.PartyroomGrade;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedChatMessageTypeException;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedChatRequestException;
-import com.pfplaybackend.api.partyroom.model.entity.PartyroomUser;
 import com.pfplaybackend.api.partyroom.model.value.PromoteInfo;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -23,8 +21,10 @@ public class PartyroomChatService {
     private final RedisChatPublisherService redisChatPublisherService;
     private final PartyroomRepository partyroomRepository;
 
-    public String findChatroomId(String requestUserIdUid) {
-        String chatroomId = partyroomRepository.findChatroomIdByUserIdUid(UUID.fromString(requestUserIdUid));
+    @Transactional(readOnly = true)
+    @Cacheable(cacheNames="partyroomUser", key="#userId.Uid")
+    public String findChatroomId(String userIdUid) {
+        String chatroomId = partyroomRepository.findChatroomIdByUserIdUid(UUID.fromString(userIdUid));
         return chatroomId;
     }
 
@@ -34,7 +34,7 @@ public class PartyroomChatService {
             return;
         }
 
-        if (chatDto.getMessageType().equals(MessageType.PENALTY)) {
+        if (chatDto.getMessageType().getName().equals(MessageType.PENALTY.getName())) {
             if (chatDto.getToUser() != null && chatDto.getPenaltyInfo() != null) {
                 isAvailablePenaltyRequest(
                         chatDto.getFromUser().getPartyroomGrade(),
@@ -45,7 +45,7 @@ public class PartyroomChatService {
             return;
         }
 
-        if (chatDto.getMessageType().equals(MessageType.PROMOTE)) {
+        if (chatDto.getMessageType().getName().equals(MessageType.PROMOTE.getName())) {
             if (chatDto.getToUser() != null && chatDto.getPromoteInfo() != null
             ) {
                 isAvailablePromoteRequest(
