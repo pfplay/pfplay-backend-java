@@ -29,8 +29,8 @@ public class PartyroomChatController implements PartyroomChatApi {
         try {
             CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
             UserAuthenticationDto userAuthenticationDto = (UserAuthenticationDto) authentication.getPrincipal();
-            String requestUserIdUid = userAuthenticationDto.getUserId().getUid().toString();
-            String chatroomId = partyroomChatService.findChatroomId(requestUserIdUid);
+            String userIdUid = userAuthenticationDto.getUserId().getUid().toString();
+            String chatroomId = partyroomChatService.findChatroomId(userIdUid);
             chatDto.setChatroomId(chatroomId);
             partyroomChatService.sendChat(chatDto);
             return ResponseEntity.ok(ApiCommonResponse.success("OK"));
