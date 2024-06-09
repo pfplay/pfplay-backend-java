@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MusicListAddResponse {
+public class PlaylistMusicAddResponse {
     private Long playlistId;
     private Long musicId;
     private Integer orderNumber;

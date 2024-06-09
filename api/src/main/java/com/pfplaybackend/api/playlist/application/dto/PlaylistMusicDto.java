@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MusicListDto {
+public class PlaylistMusicDto {
     private Long musicId;
     private UserId uid;
     private Integer orderNumber;
