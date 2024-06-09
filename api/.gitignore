@@ -37,7 +37,3 @@ out/
 .vscode/
 
 /src/test/resources/key/**
-
-/src/main/resources/private_key.pem
-/src/main/resources/public_key.pem
-/docker-compose.yml
