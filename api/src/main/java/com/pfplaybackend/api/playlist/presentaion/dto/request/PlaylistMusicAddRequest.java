@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Schema(description = "Music list")
 @Getter
-public class MusicListAddRequest {
+public class PlaylistMusicAddRequest {
     @Schema(description = "곡 고유 id", example = "POe9SOEKotk", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private UserId uid;
 

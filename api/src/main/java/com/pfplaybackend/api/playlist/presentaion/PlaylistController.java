@@ -49,8 +49,8 @@ public class PlaylistController implements PlaylistApi {
     }
 
     @GetMapping("{listId}")
-    public ResponseEntity<?> getMusicList(@PathVariable Long listId, @ModelAttribute @Valid PaginationRequest request) {
-        MusicListResponse list = playlistService.getMusicList(request.getPage(), request.getPageSize(), listId);
+    public ResponseEntity<?> getPlaylistMusic(@PathVariable Long listId, @ModelAttribute @Valid PaginationRequest request) {
+        PlaylistMusicResponse list = playlistService.getPlaylistMusic(request.getPage(), request.getPageSize(), listId);
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(list));
@@ -58,15 +58,15 @@ public class PlaylistController implements PlaylistApi {
 
     @GetMapping("/youtube/music")
     public ResponseEntity<?> getSearchList(@ModelAttribute @Valid SearchListRequest request) {
-        SearchMusicListResponse result = playlistService.getSearchList(request.getQ(), request.getPageToken());
+        SearchPlaylistMusicResponse result = playlistService.getSearchList(request.getQ(), request.getPageToken());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiCommonResponse.success(result));
     }
 
     @PostMapping("{listId}")
-    public ResponseEntity<?> addMusic(@PathVariable Long listId, @RequestBody MusicListAddRequest request) {
-        MusicListAddResponse response = playlistService.addMusic(listId, request);
+    public ResponseEntity<?> addMusic(@PathVariable Long listId, @RequestBody PlaylistMusicAddRequest request) {
+        PlaylistMusicAddResponse response = playlistService.addMusic(listId, request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(response));
@@ -89,10 +89,10 @@ public class PlaylistController implements PlaylistApi {
     }
 
     @DeleteMapping("/music")
-    public ResponseEntity<?> deleteMusicList(@RequestBody ListDeleteRequest request) {
+    public ResponseEntity<?> deletePlaylistMusic(@RequestBody ListDeleteRequest request) {
         CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
         UserAuthenticationDto userAuthenticationDto = (UserAuthenticationDto) authentication.getPrincipal();
-        playlistService.deleteMusicList(userAuthenticationDto.getUserId(), request.getListIds());
+        playlistService.deletePlaylistMusic(userAuthenticationDto.getUserId(), request.getListIds());
         return ResponseEntity
                 .status(HttpStatus.OK).body(
                         ApiCommonResponse.success(

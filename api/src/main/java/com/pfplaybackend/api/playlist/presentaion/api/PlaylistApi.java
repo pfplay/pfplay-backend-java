@@ -2,7 +2,7 @@ package com.pfplaybackend.api.playlist.presentaion.api;
 
 import com.pfplaybackend.api.playlist.presentaion.dto.request.*;
 import com.pfplaybackend.api.playlist.presentaion.dto.response.*;
-import com.pfplaybackend.api.playlist.application.dto.MusicListDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -48,11 +48,11 @@ public interface PlaylistApi {
             @ApiResponse(responseCode = "200", description = "플레이리스트 곡 조회",
                     content = @Content(mediaType = "application/json",
                             array = @ArraySchema(
-                                    schema = @Schema(implementation = MusicListDto.class)
+                                    schema = @Schema(implementation = PlaylistMusicDto.class)
                             ))
             )
     })
-    public ResponseEntity<?> getMusicList(@PathVariable Long listId,
+    public ResponseEntity<?> getPlaylistMusic(@PathVariable Long listId,
                                           @ModelAttribute @Valid PaginationRequest request);
 
 
@@ -60,7 +60,7 @@ public interface PlaylistApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유튜브 곡 검색 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = SearchMusicListResponse.class))
+                            schema = @Schema(implementation = SearchPlaylistMusicResponse.class))
             ),
             @ApiResponse(responseCode = "500",
                     description = "유튜브 곡 검색 실패"
@@ -73,7 +73,7 @@ public interface PlaylistApi {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "플레이리스트 곡 추가 성공",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = MusicListAddResponse.class))
+                            schema = @Schema(implementation = PlaylistMusicAddResponse.class))
             ),
             @ApiResponse(responseCode = "400", description = "플레이리스트 곡 개수 제한 초과",
                     content = @Content(mediaType = "application/json",
@@ -94,7 +94,7 @@ public interface PlaylistApi {
                             ))
             )
     })
-    public ResponseEntity<?> addMusic(@PathVariable Long listId, @RequestBody MusicListAddRequest request);
+    public ResponseEntity<?> addMusic(@PathVariable Long listId, @RequestBody PlaylistMusicAddRequest request);
 
 
     @Operation(summary = "플레이리스트 삭제")
@@ -139,7 +139,7 @@ public interface PlaylistApi {
                             ))
             ),
     })
-    public ResponseEntity<?> deleteMusicList(@RequestBody ListDeleteRequest request);
+    public ResponseEntity<?> deletePlaylistMusic(@RequestBody ListDeleteRequest request);
 
 
 

@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.presentaion.dto.response;
 
-import com.pfplaybackend.api.playlist.application.dto.SearchMusicListDto;
+import com.pfplaybackend.api.playlist.application.dto.SearchPlaylistMusicDto;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Builder
-public class SearchMusicListResponse {
+public class SearchPlaylistMusicResponse {
     private String nextPageToken;
-    private List<SearchMusicListDto> musicList;
+    private List<SearchPlaylistMusicDto> musicList;
 }
