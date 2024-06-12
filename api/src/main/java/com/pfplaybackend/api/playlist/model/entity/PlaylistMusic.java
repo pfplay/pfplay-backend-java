@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.playlist.model.entity;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.user.model.value.UserId;
+import com.pfplaybackend.api.user.domain.model.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.config.oauth2.handler;
 
 import com.pfplaybackend.api.config.jwt.JwtProvider;
+import com.pfplaybackend.api.config.jwt.util.CookieUtil;
 import com.pfplaybackend.api.config.oauth2.dto.CustomUserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,15 +37,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private void attachAccessTokenToCookie(Authentication authentication, HttpServletResponse response) {
         // Generate 'access token' for 'social login' user
         String accessToken = jwtProvider.generateAccessTokenForMember((CustomUserPrincipal) authentication.getPrincipal());
-
-        final String cookieKey = "AccessToken";
-        ResponseCookie responseCookie = ResponseCookie.from(cookieKey, accessToken)
-                .path("/")
-                .sameSite("None")
-                .httpOnly(false)
-                .secure(false)
-                .maxAge(3600000)
-                .build();
+        ResponseCookie responseCookie = CookieUtil.getCookieWithToken("AccessToken", accessToken);
         response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
     }
 
