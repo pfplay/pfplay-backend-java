@@ -4,10 +4,10 @@ package com.pfplaybackend.api.config.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.pfplaybackend.api.config.jwt.dto.UserAuthenticationDto;
+import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.config.jwt.enums.TokenClaim;
 import com.pfplaybackend.api.config.jwt.enums.TokenSubject;
-import com.pfplaybackend.api.user.model.enums.AuthorityTier;
+import com.pfplaybackend.api.user.domain.model.enums.AuthorityTier;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
@@ -60,9 +60,9 @@ public class JwtValidator {
         }
     }
 
-    public UserAuthenticationDto getUserAuthentication(DecodedJWT decodedJWT) {
+    public UserCredentials getUserAuthentication(DecodedJWT decodedJWT) {
         String extractedUid = decodedJWT.getClaim(TokenClaim.UID.getValue()).asString();
         String extractedAuthorityTier = decodedJWT.getClaim(TokenClaim.AUTHORITY_TIER.getValue()).asString();
-        return UserAuthenticationDto.create(UUID.fromString(extractedUid), AuthorityTier.valueOf(extractedAuthorityTier));
+        return UserCredentials.create(UUID.fromString(extractedUid), AuthorityTier.valueOf(extractedAuthorityTier));
     }
 }

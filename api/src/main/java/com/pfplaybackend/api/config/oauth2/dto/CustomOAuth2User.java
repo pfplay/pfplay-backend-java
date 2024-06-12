@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.config.oauth2.dto;
 
-import com.pfplaybackend.api.config.oauth2.enums.AccessLevel;
+import com.pfplaybackend.api.config.security.enums.AccessLevel;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
