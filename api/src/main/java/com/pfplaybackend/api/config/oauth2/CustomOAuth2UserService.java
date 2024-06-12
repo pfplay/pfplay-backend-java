@@ -2,9 +2,8 @@ package com.pfplaybackend.api.config.oauth2;
 
 
 import com.pfplaybackend.api.config.oauth2.dto.CustomUserPrincipal;
-import com.pfplaybackend.api.user.application.MemberSignService;
-import com.pfplaybackend.api.user.model.domain.MemberDomain;
-import com.pfplaybackend.api.user.repository.MemberRepository;
+import com.pfplaybackend.api.user.application.service.MemberSignService;
+import com.pfplaybackend.api.user.domain.model.domain.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final MemberRepository memberRepository;
     private final MemberSignService memberSignService;
 
     @Override
@@ -30,7 +28,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private OAuth2User processOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         // OAuth2User.getAttributes() 에는 사전에 합의된 사용자 리소스 정보가 key:value 로 이루어져 있다.
-        MemberDomain memberDomain = memberSignService.getMemberDomain(oAuth2User.getAttributes().get("email").toString());
+        Member memberDomain = memberSignService.getMemberOrCreate(oAuth2User.getAttributes().get("email").toString());
         return CustomUserPrincipal.create(memberDomain, oAuth2User.getAttributes());
     }
 }

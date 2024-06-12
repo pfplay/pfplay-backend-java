@@ -4,7 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pfplaybackend.api.config.jwt.enums.TokenClaim;
 import com.pfplaybackend.api.config.jwt.handler.JwtAuthenticationFailureHandler;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
-import com.pfplaybackend.api.config.jwt.dto.UserAuthenticationDto;
+import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,13 +26,18 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final Set<String> skipableURIs = new HashSet<>(Set.of("/api/v1/member/sign", "/api/v1/guest/sign"));
-    private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
+    private final Set<String> skipableURIs = new HashSet<>(Set.of(
+            "/error",
+            "/v3/api-docs",
+            "/spec/swagger-ui",
+            "/swagger-ui",
+            "/api/v1/members/sign",
+            "/api/v1/guests/sign"));
+    private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler = new JwtAuthenticationFailureHandler();
     private final JwtValidator jwtValidator;
 
     @Override
@@ -45,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }else {
                     throw new AuthenticationServiceException("Token is not Valid");
                 }
-            }catch (AuthenticationException  e) {
+            }catch (AuthenticationException e) {
                 jwtAuthenticationFailureHandler.onAuthenticationFailure(request, response, e);
             }
         }
@@ -53,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isNotSkipableURI(String requestURI) {
-        return !skipableURIs.contains(requestURI);
+        return skipableURIs.stream().noneMatch(requestURI::startsWith);
     }
 
     private void checkAccessTokenAndAuthentication(String accessToken) throws ServletException, IOException {
@@ -61,7 +66,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void saveAuthentication(DecodedJWT decodedJWT) {
-        UserAuthenticationDto userAuthentication = jwtValidator.getUserAuthentication(decodedJWT);
+        UserCredentials userAuthentication = jwtValidator.getUserAuthentication(decodedJWT);
         Collection<? extends GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(decodedJWT.getClaim(TokenClaim.ACCESS_LEVEL.getValue()).toString()));
         CustomAuthentication authentication = new CustomAuthentication(userAuthentication, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
