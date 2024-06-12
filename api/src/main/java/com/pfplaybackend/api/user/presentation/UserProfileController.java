@@ -7,14 +7,16 @@ import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyBioRequest;
 import com.pfplaybackend.api.user.presentation.payload.request.GetOtherProfileSummaryRequest;
 import com.pfplaybackend.api.user.presentation.payload.response.MyProfileSummaryResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
-@RestController
+@Tag(name = "User Profile API", description = "Operations related to user's profile management")
 @RequestMapping("/api/v1/users")
+@RestController
+@RequiredArgsConstructor
 public class UserProfileController {
 
     private final UserProfileService userProfileService;

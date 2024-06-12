@@ -6,14 +6,16 @@ import com.pfplaybackend.api.config.jwt.util.CookieUtil;
 import com.pfplaybackend.api.user.application.service.GuestSignService;
 import com.pfplaybackend.api.user.domain.model.domain.Guest;
 import com.pfplaybackend.api.user.presentation.payload.request.SignGuestRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
-@RestController
+@Tag(name = "User Sign API", description = "Operations related to user's sign management")
 @RequestMapping("/api/v1/guests")
+@RestController
+@RequiredArgsConstructor
 public class GuestSignController {
 
     private final GuestSignService guestSignService;

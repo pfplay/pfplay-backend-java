@@ -26,13 +26,18 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final Set<String> skipableURIs = new HashSet<>(Set.of("/api/v1/members/sign", "/api/v1/guests/sign"));
-    private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
+    private final Set<String> skipableURIs = new HashSet<>(Set.of(
+            "/error",
+            "/v3/api-docs",
+            "/spec/swagger-ui",
+            "/swagger-ui",
+            "/api/v1/members/sign",
+            "/api/v1/guests/sign"));
+    private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler = new JwtAuthenticationFailureHandler();
     private final JwtValidator jwtValidator;
 
     @Override
@@ -45,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }else {
                     throw new AuthenticationServiceException("Token is not Valid");
                 }
-            }catch (AuthenticationException  e) {
+            }catch (AuthenticationException e) {
                 jwtAuthenticationFailureHandler.onAuthenticationFailure(request, response, e);
             }
         }
@@ -53,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isNotSkipableURI(String requestURI) {
-        return !skipableURIs.contains(requestURI);
+        return skipableURIs.stream().noneMatch(requestURI::startsWith);
     }
 
     private void checkAccessTokenAndAuthentication(String accessToken) throws ServletException, IOException {

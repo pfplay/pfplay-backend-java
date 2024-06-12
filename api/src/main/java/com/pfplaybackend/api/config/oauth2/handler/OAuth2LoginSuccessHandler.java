@@ -16,14 +16,10 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Slf4j
-@Component
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
-    @Value("${app.redirect.web.uri}")
-    private String redirectWebUri;
-
+    private final String redirectWebUri;
     private final JwtProvider jwtProvider;
 
     @Override

@@ -3,7 +3,6 @@ package com.pfplaybackend.api.playlist.presentaion;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
-import com.pfplaybackend.api.playlist.presentaion.api.PlaylistApi;
 import com.pfplaybackend.api.playlist.presentaion.dto.request.*;
 import com.pfplaybackend.api.playlist.presentaion.dto.response.*;
 import com.pfplaybackend.api.playlist.application.PlaylistService;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/playlist")
-public class PlaylistController implements PlaylistApi {
+public class PlaylistController {
     private final PlaylistService playlistService;
 
     @PostMapping()

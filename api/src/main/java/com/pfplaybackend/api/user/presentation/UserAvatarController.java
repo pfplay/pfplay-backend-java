@@ -7,6 +7,8 @@ import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.presentation.api.UserAvatarApi;
+import com.pfplaybackend.api.user.presentation.api.UserProfileApi;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyAvatarBodyRequest;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyAvatarFaceRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,11 +19,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "avatar", description = "avatar api")
-@RequiredArgsConstructor
+@Tag(name = "User Profile API", description = "Operations related to user's profile management")
 @RequestMapping("/api/v1/users")
 @RestController
-public class UserAvatarController {
+@RequiredArgsConstructor
+public class UserAvatarController implements UserAvatarApi {
 
     private final UserAvatarService userAvatarService;
 

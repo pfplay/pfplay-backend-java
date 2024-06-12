@@ -16,7 +16,6 @@ public class ApplicationReadyEventListener {
     private final TemporaryAvatarResourceService temporaryAvatarResourceService;
     private final TemporaryUserService temporaryUserService;
 
-
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationEvent() {
         String[] activeProfiles = environment.getActiveProfiles();
