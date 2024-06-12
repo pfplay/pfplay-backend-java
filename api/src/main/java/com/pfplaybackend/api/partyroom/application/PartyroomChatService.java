@@ -1,19 +1,33 @@
 package com.pfplaybackend.api.partyroom.application;
 
+import com.pfplaybackend.api.config.jwt.dto.UserAuthenticationDto;
+import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
 import com.pfplaybackend.api.partyroom.enums.MessageType;
 import com.pfplaybackend.api.partyroom.enums.PartyroomGrade;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedChatMessageTypeException;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedChatRequestException;
+import com.pfplaybackend.api.partyroom.model.entity.PartyroomUser;
 import com.pfplaybackend.api.partyroom.model.value.PromoteInfo;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
+import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PartyroomChatService {
     private final RedisChatPublisherService redisChatPublisherService;
+    private final PartyroomRepository partyroomRepository;
+
+    public String findChatroomId(String requestUserIdUid) {
+        String chatroomId = partyroomRepository.findChatroomIdByUserIdUid(UUID.fromString(requestUserIdUid));
+        return chatroomId;
+    }
+
     public void sendChat(ChatDto chatDto) throws UnsupportedChatMessageTypeException, UnsupportedChatRequestException {
         if (chatDto.getMessageType().equals(MessageType.CHAT)) {
             sendToBroker(chatDto);
@@ -53,7 +67,10 @@ public class PartyroomChatService {
 
     private void isAvailablePenaltyRequest(PartyroomGrade fromUserPartyroomGrade, PartyroomGrade toUserPartyroomGrade) throws UnsupportedChatRequestException {
         if (fromUserPartyroomGrade.getPriority() <= toUserPartyroomGrade.getPriority()) {
-            throw new UnsupportedChatRequestException("The penalty request not supported, the requester's party room grade must be higher than the target's party room grade.");
+            throw new UnsupportedChatRequestException(
+                    "The penalty request not supported, " +
+                            "the requester's party room grade must be higher than the target's party room grade."
+            );
         }
     }
 
@@ -63,7 +80,10 @@ public class PartyroomChatService {
         }
 
         if (fromUserPartyroomGrade.getPriority() <= promoteInfo.getPromoteNextGrade().getPriority()) {
-            throw new UnsupportedChatRequestException("The penalty request not supported, the requester's party room grade must be higher than the target's party room grade.");
+            throw new UnsupportedChatRequestException(
+                    "The penalty request not supported, " +
+                            "the requester's party room grade must be higher than the target's party room grade."
+            );
         }
     }
 }

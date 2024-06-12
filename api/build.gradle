@@ -61,6 +61,10 @@ dependencies {
 
 	// Websocket
 	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.0.6'
+
+	// Cache
+	implementation 'org.springframework.boot:spring-boot-starter-cache:3.0.6'
+
 }
 
 tasks.named('test') {
