@@ -22,10 +22,11 @@ public class PartymemberRegulationController {
     public void modifyLevel(@PathVariable("partyroomId") Long partyroomId,
                             @PathVariable("partymemberId") UUID partymemberId,
                             ModifyLevelRequest modifyLevelRequest) {
+        // TODO Q. 같은 레벨 사람에게도 강등시킬 수 있나?
     }
 
     @PostMapping("/{partyroomId}/partymembers/{partymemberId}/penalties")
     public void issuePenalty(@PathVariable("partyroomId") Long partyroomId, @PathVariable("partymemberId") UUID partymemberId) {
-
+        // TODO Q. 같은 레벨 사람에게도 페널티를 부과할 수 있나?
     }
 }
