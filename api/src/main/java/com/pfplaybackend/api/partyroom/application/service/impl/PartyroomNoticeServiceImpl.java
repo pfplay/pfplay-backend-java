@@ -18,6 +18,7 @@ public class PartyroomNoticeServiceImpl implements PartyroomNoticeService {
 
     private final EventPublisher eventPublisher;
     private final PartyroomRepository partyroomRepository;
+    private final static String topic = "PARTYROOM::NOTICE";
 
     /**
      * 1. 공지사항 수정 가능 여부는 AOP에서 진행한다.
@@ -60,6 +61,9 @@ public class PartyroomNoticeServiceImpl implements PartyroomNoticeService {
 //        partyroomRepository.save(partyroom.toData());
 
         // 6. Event Publishing
-//        eventPublisher.publish("notice", notice);
+        // Q3. Event Publisher 토픽이 다양해질 것 같은데, Enum 같은 걸로 관리하는 건 어떨까요?!
+//        eventPublisher.publish(topic + "::" + partyroomId + "::" + "REGISTER", notice);
+        // Q3-1
+//        eventPublisher.publish(EventTopic.PARTYROOM_REGISTER_NOTICE + partyroomId, notice);
     }
 }
