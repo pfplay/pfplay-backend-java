@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.playlist.presentation.dto.response;
+package com.pfplaybackend.api.playlist.presentation.payload.response;
 
 import com.pfplaybackend.api.playlist.model.enums.PlaylistType;
 import io.swagger.v3.oas.annotations.media.Schema;
