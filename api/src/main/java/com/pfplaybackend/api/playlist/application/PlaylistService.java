@@ -7,15 +7,15 @@ import com.pfplaybackend.api.playlist.model.entity.Playlist;
 import com.pfplaybackend.api.playlist.model.entity.PlaylistMusic;
 import com.pfplaybackend.api.playlist.model.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.exception.PlaylistMusicLimitExceededException;
-import com.pfplaybackend.api.playlist.application.dto.MusicListDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistCreateDto;
-import com.pfplaybackend.api.playlist.application.dto.SearchMusicListDto;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.MusicListAddRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.request.PlaylistCreateRequest;
-import com.pfplaybackend.api.playlist.presentaion.dto.response.MusicListAddResponse;
-import com.pfplaybackend.api.playlist.presentaion.dto.response.MusicListResponse;
-import com.pfplaybackend.api.playlist.presentaion.dto.response.SearchMusicListResponse;
-import com.pfplaybackend.api.playlist.repository.MusicListRepository;
+import com.pfplaybackend.api.playlist.application.dto.SearchPlaylistMusicDto;
+import com.pfplaybackend.api.playlist.presentation.dto.request.PlaylistMusicAddRequest;
+import com.pfplaybackend.api.playlist.presentation.dto.request.PlaylistCreateRequest;
+import com.pfplaybackend.api.playlist.presentation.dto.response.PlaylistMusicAddResponse;
+import com.pfplaybackend.api.playlist.presentation.dto.response.PlaylistMusicResponse;
+import com.pfplaybackend.api.playlist.presentation.dto.response.SearchPlaylistMusicResponse;
+import com.pfplaybackend.api.playlist.repository.PlaylistMusicRepository;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.model.value.UserId;
 import jakarta.transaction.Transactional;
@@ -33,7 +33,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class PlaylistService {
     private PlaylistRepository playlistRepository;
-    private MusicListRepository musicListRepository;
+    private PlaylistMusicRepository musicListRepository;
     private YoutubeService youtubeService;
 
     public Playlist createPlaylist(PlaylistCreateRequest request, UserId userId) {
@@ -86,14 +86,14 @@ public class PlaylistService {
 //        return dtoList;
 //    }
 
-    public MusicListResponse getMusicList(int page, int pageSize, Long playlistId) {
+    public PlaylistMusicResponse getPlaylistMusic(int page, int pageSize, Long playlistId) {
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "orderNumber"));
 
         int totalPage = (int) Math.ceil(musicListRepository.countByPlaylistId(playlistId) / pageSize);
         Page<PlaylistMusic> result = musicListRepository.findByPlaylistIdOrderByOrderNumber(pageable, playlistId);
-        List<MusicListDto> dtoList = new ArrayList<>();
+        List<PlaylistMusicDto> dtoList = new ArrayList<>();
         for (PlaylistMusic playlistMusic : result) {
-            MusicListDto dto = MusicListDto.builder()
+            PlaylistMusicDto dto = PlaylistMusicDto.builder()
                     .musicId(playlistMusic.getId())
                     .orderNumber(playlistMusic.getOrderNumber())
                     .name(playlistMusic.getName())
@@ -102,17 +102,17 @@ public class PlaylistService {
                     .build();
             dtoList.add(dto);
         }
-        MusicListResponse response = MusicListResponse.builder()
+        PlaylistMusicResponse response = PlaylistMusicResponse.builder()
                 .totalPage(totalPage)
                 .musicList(dtoList)
                 .build();
         return response;
     }
 
-    public SearchMusicListResponse getSearchList(String q, String pageToken) {
+    public SearchPlaylistMusicResponse getSearchList(String q, String pageToken) {
         try {
             SearchListResponse searchResponse = youtubeService.getSearchList(q, pageToken);
-            List<SearchMusicListDto> musicList = new ArrayList<>();
+            List<SearchPlaylistMusicDto> musicList = new ArrayList<>();
 
             for (SearchResult item : searchResponse.getItems()) {
                 // 검색 결과 encoding 된 title 을 decoding 및 formatting 처리
@@ -129,7 +129,7 @@ public class PlaylistService {
                 String videoId = item.getId().getVideoId();
                 String duration = youtubeService.getVideoDuration(videoId);
 
-                SearchMusicListDto music = SearchMusicListDto.builder()
+                SearchPlaylistMusicDto music = SearchPlaylistMusicDto.builder()
                         .id(videoId)
                         .thumbnailLow(item.getSnippet().getThumbnails().getMedium().getUrl())
                         .thumbnailMedium(item.getSnippet().getThumbnails().getMedium().getUrl())
@@ -140,7 +140,7 @@ public class PlaylistService {
                 musicList.add(music);
             }
 
-            SearchMusicListResponse musicListResponse = SearchMusicListResponse.builder()
+            SearchPlaylistMusicResponse musicListResponse = SearchPlaylistMusicResponse.builder()
                     .nextPageToken(searchResponse.getNextPageToken())
                     .musicList(musicList)
                     .build();
@@ -151,7 +151,7 @@ public class PlaylistService {
         }
     }
 
-    public MusicListAddResponse addMusic(Long playlistId, MusicListAddRequest request) {
+    public PlaylistMusicAddResponse addMusic(Long playlistId, PlaylistMusicAddRequest request) {
         Optional<Playlist> playlist = playlistRepository.findById(playlistId);
 
         if (!playlist.isPresent()) {
@@ -186,7 +186,7 @@ public class PlaylistService {
                 .build();
 
         PlaylistMusic result =  musicListRepository.save(music);
-        MusicListAddResponse response = MusicListAddResponse.builder()
+        PlaylistMusicAddResponse response = PlaylistMusicAddResponse.builder()
                 .playlistId(playlistId)
                 .musicId(result.getId())
                 .orderNumber(result.getOrderNumber())
@@ -218,10 +218,10 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void deleteMusicList(UserId userId, List<Long> listIds) {
+    public void deletePlaylistMusic(UserId userId, List<Long> listIds) {
         // 곡 보유자가 삭제 요청자 Id와 일치하는지 확인
         // TODO '리소스 쓰기 권한' 여부 확인 절차
-//        MusicList musicList = musicListRepository.findById(listIds.get(0)).orElseThrow(() -> new NoSuchElementException("존재하지 않거나 유효하지 않은 곡"));
+//        PlaylistMusic musicList = musicListRepository.findById(listIds.get(0)).orElseThrow(() -> new NoSuchElementException("존재하지 않거나 유효하지 않은 곡"));
 //        if (userId != musicList.getPlaylist().getMember().getId()) {
 //            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 곡");
 //        }

@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class SearchMusicListDto {
+public class SearchPlaylistMusicDto {
     private String id;
     private String thumbnailLow;
     private String thumbnailMedium;
