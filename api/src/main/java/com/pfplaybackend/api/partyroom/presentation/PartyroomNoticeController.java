@@ -18,6 +18,7 @@ public class PartyroomNoticeController {
     @PutMapping("/{partyroomId}/notice")
     public ResponseEntity<Void> registerNotice(@PathVariable Long partyroomId,
                                                RegisterNoticeRequest registerNoticeRequest) {
+        partyroomNoticeService.registerNotice(partyroomId, registerNoticeRequest.getContent());
         return ResponseEntity.ok().build();
     }
 }
