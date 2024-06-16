@@ -16,6 +16,8 @@ public class SimpleEventPublisher implements EventPublisher {
      */
     @Override
     public void publish(ChannelTopic topic, Message message) {
+        //
+
         // TODO redisTemplate.convertAndSend(topic, message);
     }
 }

@@ -1,36 +1,37 @@
 package com.pfplaybackend.api.user.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.user.model.entity.Guest;
-import com.pfplaybackend.api.user.presentation.dto.request.GuestCreateRequest;
-import com.pfplaybackend.api.user.application.GuestSignService;
+import com.pfplaybackend.api.config.jwt.JwtProvider;
+import com.pfplaybackend.api.config.jwt.util.CookieUtil;
+import com.pfplaybackend.api.user.application.service.GuestSignService;
+import com.pfplaybackend.api.user.domain.model.domain.Guest;
+import com.pfplaybackend.api.user.presentation.payload.request.SignGuestRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RequiredArgsConstructor
+@Tag(name = "User Sign API", description = "Operations related to user's sign management")
+@RequestMapping("/api/v1/guests")
 @RestController
-@RequestMapping("/api/v1/guest")
+@RequiredArgsConstructor
 public class GuestSignController {
 
     private final GuestSignService guestSignService;
+    private final JwtProvider jwtProvider;
 
-    @GetMapping("/sign")
+    @PostMapping("/sign")
     public ResponseEntity<?> createGuest(
-            @RequestBody GuestCreateRequest request
+            @RequestBody SignGuestRequest request
     ) {
-        Guest guest = guestSignService.createGuest(request.getUserAgent());
+        Guest guest = guestSignService.getGuestOrCreate(request.getUserAgent());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.SET_COOKIE, CookieUtil.getCookieWithToken("AccessToken",
+                        jwtProvider.generateAccessTokenForGuest(guest)).toString());
 
-//        GuestCreateResponse guestCreateResponse =
-//                new GuestCreateResponse(
-//                        guest.getId(),
-//                        guest.getName(),
-//                        false,
-//                        Authority.ROLE_GUEST,
-//                        guest.token
-//                );
-
-        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
-        // return ResponseEntity.ok().body(ApiCommonResponse.success(guestCreateResponse));
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(ApiCommonResponse.success("OK"));
     }
 }
