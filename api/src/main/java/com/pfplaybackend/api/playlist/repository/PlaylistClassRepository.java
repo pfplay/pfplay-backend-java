@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.playlist.repository;
 
 import com.pfplaybackend.api.playlist.model.enums.PlaylistType;
-import com.pfplaybackend.api.user.model.value.UserId;
+import com.pfplaybackend.api.user.domain.model.value.UserId;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

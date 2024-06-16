@@ -2,11 +2,10 @@ package com.pfplaybackend.api.playlist.repository;
 
 import com.pfplaybackend.api.playlist.model.entity.Playlist;
 import com.pfplaybackend.api.playlist.model.enums.PlaylistType;
-import com.pfplaybackend.api.user.model.value.UserId;
+import com.pfplaybackend.api.user.domain.model.value.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface PlaylistRepository extends JpaRepository<Playlist, Long> {
     Playlist findByIdAndUserIdAndType(Long id, UserId userId, PlaylistType type);

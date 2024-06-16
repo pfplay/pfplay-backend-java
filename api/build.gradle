@@ -39,7 +39,7 @@ dependencies {
 	implementation group: 'org.passay', name: 'passay', version: '1.6.4'
 
 	// swagger
-	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.1.0'
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.4.0'
 
 	// querydsl
 	implementation("com.querydsl:querydsl-core:${queryDslVersion}")

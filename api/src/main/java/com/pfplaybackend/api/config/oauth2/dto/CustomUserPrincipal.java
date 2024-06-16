@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.config.oauth2.dto;
 
-import com.pfplaybackend.api.config.oauth2.enums.AccessLevel;
-import com.pfplaybackend.api.user.model.domain.UserDomain;
+import com.pfplaybackend.api.config.security.enums.AccessLevel;
+import com.pfplaybackend.api.user.domain.model.domain.User;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -19,20 +19,20 @@ import java.util.Map;
 public class CustomUserPrincipal implements OAuth2User, UserDetails {
 
     private final String name;
-    private final UserDomain userDomain;
+    private final User user;
     private final Collection<GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public static CustomUserPrincipal create(UserDomain userDomain, AccessLevel accessLevel) {
+    public static CustomUserPrincipal create(User user, AccessLevel accessLevel) {
         return new CustomUserPrincipal(
-                userDomain.getUserId().getUid().toString(),
-                userDomain,
+                user.getUserId().getUid().toString(),
+                user,
                 Collections.singletonList(new SimpleGrantedAuthority(accessLevel.toString())
         ));
     }
 
-    public static CustomUserPrincipal create(UserDomain userDomain, Map<String, Object> attributes) {
-        CustomUserPrincipal customUserPrincipal = create(userDomain, AccessLevel.ROLE_MEMBER);
+    public static CustomUserPrincipal create(User user, Map<String, Object> attributes) {
+        CustomUserPrincipal customUserPrincipal = create(user, AccessLevel.ROLE_MEMBER);
         customUserPrincipal.setAttributes(attributes);
         return customUserPrincipal;
     }
