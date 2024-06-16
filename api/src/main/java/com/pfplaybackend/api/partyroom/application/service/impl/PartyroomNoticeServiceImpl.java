@@ -24,13 +24,13 @@ public class PartyroomNoticeServiceImpl implements PartyroomNoticeService {
      * 2. AOP를 통해 PartyroomContext에 주입된 정보를 바탕으로 실행한다.
      * 3. PartyroomContext에 주입되는 정보는 다음과 같음
      * 3-1. 호출 유저 ID, 대상 유저 ID, PartyroomInfo
-     * @param request
+     * @param notice
      * @return
      */
     @Override
     @Transactional
 //    @PartyroomContextAop
-    public void registerNotice(RegisterNoticeRequest request) {
+    public void registerNotice(Long partyroomId, String notice) {
         // 1. PartyInfo 객체 선언
         // Q1. PartyroomContext 내 정보에 대한 null 체크를 해야할까요??
 //        PartyroomInfo partyroomInfo = PartyroomContext.getPartyInfo().orElseThrow(
@@ -47,9 +47,9 @@ public class PartyroomNoticeServiceImpl implements PartyroomNoticeService {
         // Q2. updatePartyroom 객체를 새로 생성하는 이유가 있나요??                                  ---- CASE (1)
         // Q2-1. Partyroom 객체 자체를 업데이트하고, 업데이트 된 객체 자체를 넣는 방식은 지양해야 하나요??  ---- CASE (2)
         // Case (1)
-//        Partyroom updatePartyroom = partyroom.updateNotice(request.getContent());
+//        Partyroom updatePartyroom = partyroom.updateNotice(notice);
         // Case (2)
-//        partyroom.updateNotice(request.getContent());
+//        partyroom.updateNotice(notice);
 
         // 5. PartyroomDomain 객체 업데이트 내역 반영
         // 5-1. Domain 객체 -> Data 객체 전환
@@ -60,6 +60,6 @@ public class PartyroomNoticeServiceImpl implements PartyroomNoticeService {
 //        partyroomRepository.save(partyroom.toData());
 
         // 6. Event Publishing
-//        eventPublisher.publish("notice", request.getContent());
+//        eventPublisher.publish("notice", notice);
     }
 }
