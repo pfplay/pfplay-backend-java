@@ -10,11 +10,11 @@ import com.pfplaybackend.api.playlist.exception.PlaylistMusicLimitExceededExcept
 import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistCreateDto;
 import com.pfplaybackend.api.playlist.application.dto.SearchPlaylistMusicDto;
-import com.pfplaybackend.api.playlist.presentation.dto.request.PlaylistMusicAddRequest;
-import com.pfplaybackend.api.playlist.presentation.dto.request.PlaylistCreateRequest;
-import com.pfplaybackend.api.playlist.presentation.dto.response.PlaylistMusicAddResponse;
-import com.pfplaybackend.api.playlist.presentation.dto.response.PlaylistMusicResponse;
-import com.pfplaybackend.api.playlist.presentation.dto.response.SearchPlaylistMusicResponse;
+import com.pfplaybackend.api.playlist.presentation.payload.request.PlaylistMusicAddRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.request.PlaylistCreateRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.response.PlaylistMusicAddResponse;
+import com.pfplaybackend.api.playlist.presentation.payload.response.PlaylistMusicResponse;
+import com.pfplaybackend.api.playlist.presentation.payload.response.SearchPlaylistMusicResponse;
 import com.pfplaybackend.api.playlist.repository.PlaylistMusicRepository;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.model.value.UserId;
