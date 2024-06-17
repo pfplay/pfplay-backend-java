@@ -1,5 +1,7 @@
 package com.pfplaybackend.api.partyroom.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 @Getter
@@ -16,5 +18,21 @@ public enum PartyroomGrade {
     PartyroomGrade(String name, int priority) {
         this.name = name;
         this.priority = priority;
+    }
+
+    @JsonValue
+    public String getName() {
+        return name;
+    }
+
+    @JsonCreator
+    public static PartyroomGrade fromValue(String value) {
+        for (PartyroomGrade grade: PartyroomGrade.values()) {
+            if (grade.name.equalsIgnoreCase(value)) {
+                return grade;
+            }
+        }
+
+        throw new IllegalArgumentException("Unknown Partyroom Grade, " + value);
     }
 }

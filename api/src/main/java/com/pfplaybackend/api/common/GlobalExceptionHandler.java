@@ -1,8 +1,7 @@
 package com.pfplaybackend.api.common;
 
 import com.pfplaybackend.api.common.enums.ExceptionEnum;
-import com.pfplaybackend.api.partyroom.exception.UnsupportedChatMessageTypeException;
-import com.pfplaybackend.api.partyroom.exception.UnsupportedChatRequestException;
+import com.pfplaybackend.api.partyroom.exception.*;
 import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
 import com.pfplaybackend.api.playlist.exception.PlaylistLimitExceededException;
 import com.pfplaybackend.api.playlist.exception.PlaylistMusicLimitExceededException;
@@ -11,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -146,23 +146,8 @@ public class GlobalExceptionHandler {
                 );
     }
 
-    @ExceptionHandler(UnsupportedChatMessageTypeException.class)
-    public final ResponseEntity<?> handleUnsupportedChatMessageTypeException(UnsupportedChatMessageTypeException e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ApiCommonResponse.error(
-                        ExceptionResult.builder()
-                                .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
-                                .message(ExceptionEnum.EXCEPTION.getMessage())
-                                .build()
-                        )
-                );
-
-    }
-
-    @ExceptionHandler(UnsupportedChatRequestException.class)
-    public final ResponseEntity<?> handleUnsupportedChatRequestException(UnsupportedChatRequestException e) {
+    @ExceptionHandler(UnknownSocketDtoException.class)
+    public final ResponseEntity<?> handleUnsupportedSocketDtoException(UnknownSocketDtoException e) {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -175,4 +160,45 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(UnsupportedSocketRequestException.class)
+    public final ResponseEntity<?> handleUnsupportedSocketRequestException(UnsupportedSocketRequestException e) {
+        log.error(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiCommonResponse.error(
+                                ExceptionResult.builder()
+                                        .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
+                                        .message(ExceptionEnum.EXCEPTION.getMessage())
+                                        .build()
+                        )
+                );
+    }
+
+    @MessageExceptionHandler(InvalidPartyroomIdRequestException.class)
+    public ResponseEntity<?> handleInvalidPartyroomIdRequestException(InvalidPartyroomIdRequestException ex) {
+        log.error(ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ApiCommonResponse.error(
+                                ExceptionResult.builder()
+                                        .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
+                                        .message(ExceptionEnum.EXCEPTION.getMessage())
+                                        .build()
+                        )
+                );
+    }
+
+    @MessageExceptionHandler(InvalidJWTTokenException.class)
+    public ResponseEntity<?> handleInvalidJWTTokenException(InvalidJWTTokenException ex) {
+        log.error(ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(ApiCommonResponse.error(
+                                ExceptionResult.builder()
+                                        .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
+                                        .message(ExceptionEnum.EXCEPTION.getMessage())
+                                        .build()
+                        )
+                );
+    }
 }

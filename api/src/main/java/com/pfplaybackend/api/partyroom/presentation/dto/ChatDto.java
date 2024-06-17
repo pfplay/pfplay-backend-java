@@ -1,22 +1,18 @@
 package com.pfplaybackend.api.partyroom.presentation.dto;
 
-import com.pfplaybackend.api.partyroom.enums.MessageType;
 import com.pfplaybackend.api.partyroom.model.entity.PartyroomUser;
-import com.pfplaybackend.api.partyroom.model.value.PenaltyInfo;
-import com.pfplaybackend.api.partyroom.model.value.PromoteInfo;
+import jakarta.persistence.Embedded;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class ChatDto {
+public class ChatDto implements PartyroomSocketDto {
     private String message;
-    private MessageType messageType;
+    @Embedded
     private PartyroomUser fromUser;
-    private PartyroomUser toUser;
-    private String chatroomId;
-    private PromoteInfo promoteInfo;
-    private PenaltyInfo penaltyInfo;
 }

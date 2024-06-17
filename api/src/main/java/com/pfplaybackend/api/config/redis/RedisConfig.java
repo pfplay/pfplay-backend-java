@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.config.redis;
 
+import com.pfplaybackend.api.partyroom.application.RedisChatSubscriberService;
 import com.pfplaybackend.api.partyroom.event.listener.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -53,9 +54,15 @@ public class RedisConfig {
         return container;
     }
 
+//    @Bean
+//    @Qualifier("chat")
+//    public MessageListenerAdapter chatTopicListenerAdapter(ChatTopicListener listener) {
+//        return new MessageListenerAdapter(listener, "handleMessage");
+//    }
+
     @Bean
     @Qualifier("chat")
-    public MessageListenerAdapter chatTopicListenerAdapter(ChatTopicListener listener) {
+    public MessageListenerAdapter chatTopicListenerAdapter(RedisChatSubscriberService listener) {
         return new MessageListenerAdapter(listener, "handleMessage");
     }
 
