@@ -8,11 +8,9 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-public class PromoteDto implements PartyroomSocketDto{
+public class PromoteDto implements PartyroomSocketDto {
     private String message;
     private PartyroomUser fromUser;
     private PartyroomUser toUser;
-    @Setter
-    private String partyroomId;
     private PromoteInfo promoteInfo;
 }

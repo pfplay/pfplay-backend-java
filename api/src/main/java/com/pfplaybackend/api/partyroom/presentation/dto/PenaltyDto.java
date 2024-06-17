@@ -8,11 +8,9 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-public class PenaltyDto implements PartyroomSocketDto{
+public class PenaltyDto implements PartyroomSocketDto {
     private String message;
     private PartyroomUser fromUser;
     private PartyroomUser toUser;
-    @Setter
-    private String partyroomId;
     private PenaltyInfo penaltyInfo;
 }

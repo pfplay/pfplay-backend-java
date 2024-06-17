@@ -1,9 +1,10 @@
 package com.pfplaybackend.api.partyroom.application;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pfplaybackend.api.partyroom.enums.MessageType;
-import com.pfplaybackend.api.partyroom.exception.UnsupportedChatMessageTypeException;
+import com.pfplaybackend.api.partyroom.exception.UnknownSocketDtoException;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
+import com.pfplaybackend.api.partyroom.presentation.dto.PenaltyDto;
+import com.pfplaybackend.api.partyroom.presentation.dto.PromoteDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -24,25 +25,33 @@ public class RedisChatSubscriberService implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             final String publishMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
-            final ChatDto chatDto = objectMapper.readValue(publishMessage, ChatDto.class);
             final String messageChannel = (String) redisTemplate.getStringSerializer().deserialize(message.getChannel());
 
-            if (chatDto.getMessageType().getName().equals(MessageType.CHAT.getName())) {
-                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatroomId(), chatDto);
+            if (messageChannel.equals("chat")) {
+                final ChatDto chatDto = objectMapper.readValue(publishMessage, ChatDto.class);
+                final String partyroomId = chatDto.getFromUser().getPartyroomId();
+                final String payload = "/sub/partyroom/" + partyroomId;
+                messagingTemplate.convertAndSend(payload, chatDto);
                 return;
             }
 
-            if (chatDto.getMessageType().getName().equals(MessageType.PENALTY.getName())) {
-                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatroomId(), chatDto);
+            if (messageChannel.equals("penalty")) {
+                final PenaltyDto penaltyDto = objectMapper.readValue(publishMessage, PenaltyDto.class);
+                final String partyroomId = penaltyDto.getFromUser().getPartyroomId();
+                final String payload = "/sub/partyroom/" + partyroomId;
+                messagingTemplate.convertAndSend(payload, penaltyDto);
                 return;
             }
 
-            if (chatDto.getMessageType().getName().equals(MessageType.PROMOTE.getName())) {
-                messagingTemplate.convertAndSend("/sub/chat/" + chatDto.getChatroomId(), chatDto);
+            if (messageChannel.equals("promote")) {
+                final PromoteDto promoteDto = objectMapper.readValue(publishMessage, PromoteDto.class);
+                final String partyroomId = promoteDto.getFromUser().getPartyroomId();
+                final String payload = "/sub/partyroom/" + partyroomId;
+                messagingTemplate.convertAndSend(payload, promoteDto);
                 return;
             }
 
-            throw new UnsupportedChatMessageTypeException("Unsupported ChatMessageType request");
+            throw new UnknownSocketDtoException("cannot send message, unknown socket dto");
         } catch (Exception e) {
             log.error(e.getMessage());
         }

@@ -32,7 +32,7 @@ public class PartyroomData {
     @AttributeOverrides({
             @AttributeOverride(name = "uid", column = @Column(name = "host_id")),
     })
-    private UserId hostId;
+    private UserId userId;
 
     @Embedded
     private Notice notice;
