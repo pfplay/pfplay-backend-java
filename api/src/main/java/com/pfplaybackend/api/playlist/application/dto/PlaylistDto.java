@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.application.dto;
 
-import com.pfplaybackend.api.playlist.model.enums.PlaylistType;
+import com.pfplaybackend.api.playlist.domain.model.enums.PlaylistType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
