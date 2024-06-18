@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.playlist.model.entity;
+package com.pfplaybackend.api.playlist.domain.model.entity;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.user.domain.model.value.UserId;
@@ -20,7 +20,7 @@ import org.hibernate.annotations.DynamicUpdate;
         }
 )
 @Entity
-public class PlaylistMusic extends BaseEntity {
+public class PlaylistMusicData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "integer unsigned")
@@ -28,7 +28,7 @@ public class PlaylistMusic extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "playlist_id")
-    private Playlist playlist;
+    private PlaylistData playlistData;
 
     @Comment("플레이리스트의 곡 순서")
     @Column(columnDefinition = "integer unsigned")
@@ -43,11 +43,11 @@ public class PlaylistMusic extends BaseEntity {
     @Comment("썸네일 이미지 url")
     private String thumbnailImage;
 
-    protected PlaylistMusic() { }
+    protected PlaylistMusicData() { }
 
     @Builder
-    public PlaylistMusic(Playlist playlist, UserId uid, Integer orderNumber, String name, String duration, String thumbnailImage) {
-        this.playlist = playlist;
+    public PlaylistMusicData(PlaylistData playlistData, UserId uid, Integer orderNumber, String name, String duration, String thumbnailImage) {
+        this.playlistData = playlistData;
         this.orderNumber = orderNumber;
         this.name = name;
         this.duration = duration;

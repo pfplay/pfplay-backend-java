@@ -1,7 +1,7 @@
-package com.pfplaybackend.api.playlist.model.entity;
+package com.pfplaybackend.api.playlist.domain.model.entity;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.playlist.model.enums.PlaylistType;
+import com.pfplaybackend.api.playlist.domain.model.enums.PlaylistType;
 import com.pfplaybackend.api.user.domain.model.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -20,7 +20,7 @@ import org.hibernate.annotations.DynamicUpdate;
         }
 )
 @Entity
-public class Playlist extends BaseEntity {
+public class PlaylistData extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,17 +42,18 @@ public class Playlist extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PlaylistType type;
 
-    protected Playlist() { }
+    protected PlaylistData() { }
 
     @Builder
-    public Playlist(UserId userId, Integer orderNumber, String name, PlaylistType type) {
+    public PlaylistData(UserId userId, Integer orderNumber, String name, PlaylistType type) {
         this.userId = userId;
         this.orderNumber = orderNumber;
         this.name = name;
         this.type = type;
     }
 
-    public void rename(String name) {
-        this.name = name;
-    }
+
+//    public void rename(String name) {
+//        this.name = name;
+//    }
 }
