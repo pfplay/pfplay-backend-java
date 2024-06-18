@@ -13,6 +13,8 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final PartyroomChannelInterceptor partyroomChannelInterceptor;
+    private final PartyroomHandshakeInterceptor partyroomHandshakeInterceptor;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry brokerRegistry) {
         brokerRegistry.enableSimpleBroker("/sub");
@@ -23,6 +25,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry endpointRegistry) {
         endpointRegistry
                 .addEndpoint("/ws")
+                .addInterceptors(partyroomHandshakeInterceptor)
                 .setAllowedOriginPatterns("*"); // TODO: update to pfplay client url
     }
 
