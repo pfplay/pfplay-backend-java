@@ -1,27 +1,30 @@
-package com.pfplaybackend.api.playlist.repository;
+package com.pfplaybackend.api.playlist.repository.impl;
 
+import com.pfplaybackend.api.playlist.repository.custom.PlaylistMusicRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.util.List;
 
 import static com.pfplaybackend.api.playlist.domain.model.entity.QPlaylistMusicData.playlistMusicData;
 
+public class PlaylistMusicRepositoryImpl implements PlaylistMusicRepositoryCustom {
+    @PersistenceContext
+    private EntityManager em;
 
-@RequiredArgsConstructor
-@Repository
-public class PlaylistMusicClassRepository {
-    private final JPAQueryFactory queryFactory;
-
+    @Override
     public Long deleteByPlayListIds(List<Long> listIds) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         return queryFactory
                 .delete(playlistMusicData)
                 .where(playlistMusicData.playlistData.id.in(listIds))
                 .execute();
     }
 
+    @Override
     public Long deleteByIdsAndPlayListId(List<Long> ids, Long playListId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         return queryFactory
                 .delete(playlistMusicData)
                 .where(playlistMusicData.id.in(ids)
