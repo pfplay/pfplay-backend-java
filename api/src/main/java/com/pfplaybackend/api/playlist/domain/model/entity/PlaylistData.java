@@ -16,7 +16,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @Table(
         name = "PLAYLIST",
         indexes = {
-                @Index(name = "playlist_uid_IDX", columnList = "uid")
+                @Index(name = "playlist_owner_id_IDX", columnList = "owner_id")
         }
 )
 @Entity
@@ -28,7 +28,10 @@ public class PlaylistData extends BaseEntity {
     private Long id;
 
     @Embedded
-    private UserId userId;
+    @AttributeOverrides({
+            @AttributeOverride(name = "uid", column = @Column(name = "owner_id")),
+    })
+    private UserId ownerId;
 
     @Comment("플레이리스트 순서")
     @Column(columnDefinition = "integer unsigned")
@@ -45,8 +48,8 @@ public class PlaylistData extends BaseEntity {
     protected PlaylistData() { }
 
     @Builder
-    public PlaylistData(UserId userId, Integer orderNumber, String name, PlaylistType type) {
-        this.userId = userId;
+    public PlaylistData(UserId ownerId, Integer orderNumber, String name, PlaylistType type) {
+        this.ownerId = ownerId;
         this.orderNumber = orderNumber;
         this.name = name;
         this.type = type;

@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 public class PlaylistMusicAddRequest {
     @Schema(description = "곡 고유 id", example = "POe9SOEKotk", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
-    private UserId uid;
+    private UserId ownerId;
 
     @Schema(description = "곡 이름", example = "BLACKPINK - ‘Shut Down’ M/V", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String name;
