@@ -1,13 +1,9 @@
 package com.pfplaybackend.api.partyroom.application;
 
-import com.pfplaybackend.api.partyroom.enums.PartyroomGrade;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
 import com.pfplaybackend.api.partyroom.model.entity.PartyroomPenalty;
-import com.pfplaybackend.api.partyroom.model.value.PromoteInfo;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyroomSocketDto;
-import com.pfplaybackend.api.partyroom.presentation.dto.PenaltyDto;
-import com.pfplaybackend.api.partyroom.presentation.dto.PromoteDto;
 import com.pfplaybackend.api.partyroom.repository.PartyroomPenaltyRepository;
 import com.pfplaybackend.api.partyroom.repository.PartyroomUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +17,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class PartyroomSocketService {
+public class PartyroomChatService {
     private final RedisChatPublisherService redisChatPublisherService;
     private final PartyroomUserRepository partyroomUserRepository;
     private final PartyroomPenaltyRepository partyroomPenaltyRepository;
@@ -62,52 +58,7 @@ public class PartyroomSocketService {
         sendToTopic(chatDto, "chat");
     }
 
-    public void sendPenalty(PenaltyDto penaltyDto) throws UnsupportedSocketRequestException {
-        if (penaltyDto.getToUser() != null && penaltyDto.getPenaltyInfo() != null) {
-            isAvailablePenaltyRequest(
-                    penaltyDto.getFromUser().getPartyroomGrade(),
-                    penaltyDto.getToUser().getPartyroomGrade()
-            );
-
-            sendToTopic(penaltyDto, "penalty");
-        }
-    }
-
-    public void sendPromote(PromoteDto promoteDto) throws UnsupportedSocketRequestException {
-        if (promoteDto.getToUser() != null && promoteDto.getPromoteInfo() != null) {
-            isAvailablePromoteRequest(
-                    promoteDto.getFromUser().getPartyroomGrade(),
-                    promoteDto.getToUser().getPartyroomGrade(),
-                    promoteDto.getPromoteInfo()
-            );
-
-            sendToTopic(promoteDto, "promote");
-        }
-    }
-
     private void sendToTopic(PartyroomSocketDto partyroomSocketDto, String topic) {
         redisChatPublisherService.publish(new ChannelTopic(topic), partyroomSocketDto);
-    }
-
-    private void isAvailablePenaltyRequest(PartyroomGrade fromUserPartyroomGrade, PartyroomGrade toUserPartyroomGrade) throws UnsupportedSocketRequestException {
-        if (fromUserPartyroomGrade.getPriority() <= toUserPartyroomGrade.getPriority()) {
-            throw new UnsupportedSocketRequestException(
-                    "The penalty request not supported, " +
-                            "the requester's party room grade must be higher than the target's party room grade."
-            );
-        }
-    }
-
-    private void isAvailablePromoteRequest(PartyroomGrade fromUserPartyroomGrade, PartyroomGrade toUserPartyroomGrade, PromoteInfo promoteInfo) throws UnsupportedSocketRequestException {
-        if (fromUserPartyroomGrade.getPriority() <= toUserPartyroomGrade.getPriority()) {
-            throw new UnsupportedSocketRequestException("You cannot assign a grade higher than your own");
-        }
-
-        if (fromUserPartyroomGrade.getPriority() <= promoteInfo.getPromoteNextGrade().getPriority()) {
-            throw new UnsupportedSocketRequestException(
-                    "The penalty request not supported, " +
-                            "the requester's party room grade must be higher than the target's party room grade."
-            );
-        }
     }
 }
