@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.playlist.presentation.dto.request;
+package com.pfplaybackend.api.playlist.presentation.payload.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
