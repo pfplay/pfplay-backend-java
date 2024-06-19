@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.playlist.presentation.dto.request;
+package com.pfplaybackend.api.playlist.presentation.payload.request;
 
 import com.pfplaybackend.api.user.domain.model.value.UserId;
 import io.swagger.v3.oas.annotations.media.Schema;

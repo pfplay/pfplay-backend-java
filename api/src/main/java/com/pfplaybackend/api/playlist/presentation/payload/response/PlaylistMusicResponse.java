@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.playlist.presentation.dto.response;
+package com.pfplaybackend.api.playlist.presentation.payload.response;
 
 import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
 import lombok.Builder;
