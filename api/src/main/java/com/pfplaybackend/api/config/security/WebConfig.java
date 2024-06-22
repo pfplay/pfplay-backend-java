@@ -15,7 +15,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
-                .allowedOrigins("http://localhost:3000", "http://localhost:8080", "https://pfplay.io")
+                .allowedOrigins(
+                        "http://localhost:3000",
+                        "http://localhost:4000",
+                        "http://localhost:8080",
+                        "https://pfplay.io",
+                        "https://pfplay-api.app")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .maxAge(3600); // 프리플라이트 요청의 유효 기간
     }
