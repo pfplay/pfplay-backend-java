@@ -28,7 +28,7 @@ public class PartyroomChatController implements PartyroomChatApi {
     private final PartyroomChatService partyroomSocketService;
 
     @Operation(summary = "Send a message to WebSocket topic")
-    @MessageMapping("/partyroom/api/v1/send/message")
+    @MessageMapping("/partyroom/api/v1/send/chat")
     public ResponseEntity<?> sendMessage(MessageHeaders headers, ChatDto chatDto) {
         try {
             //TODO; uid 파싱 부분 AOP로 분리
