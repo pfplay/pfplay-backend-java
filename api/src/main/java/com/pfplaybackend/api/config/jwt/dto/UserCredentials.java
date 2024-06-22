@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.config.jwt.dto;
 
-import com.pfplaybackend.api.user.domain.model.enums.AuthorityTier;
-import com.pfplaybackend.api.user.domain.model.value.UserId;
+import com.pfplaybackend.api.user.domain.enums.AuthorityTier;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

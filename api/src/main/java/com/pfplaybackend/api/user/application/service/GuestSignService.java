@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.user.application.service;
 
-import com.pfplaybackend.api.user.domain.model.domain.Guest;
-import com.pfplaybackend.api.user.domain.model.domain.Profile;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.repository.GuestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

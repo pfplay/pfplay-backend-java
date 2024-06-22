@@ -2,10 +2,10 @@ package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
-import com.pfplaybackend.api.user.domain.model.data.GuestData;
-import com.pfplaybackend.api.user.domain.model.data.MemberData;
-import com.pfplaybackend.api.user.domain.model.domain.User;
-import com.pfplaybackend.api.user.domain.model.enums.AuthorityTier;
+import com.pfplaybackend.api.user.domain.entity.data.GuestData;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
+import com.pfplaybackend.api.user.domain.enums.AuthorityTier;
 import com.pfplaybackend.api.user.repository.GuestRepository;
 import com.pfplaybackend.api.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;

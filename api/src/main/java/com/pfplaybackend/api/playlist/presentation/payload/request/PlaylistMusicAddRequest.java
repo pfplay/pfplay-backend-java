@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.presentation.payload.request;
 
-import com.pfplaybackend.api.user.domain.model.value.UserId;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 

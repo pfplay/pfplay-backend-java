@@ -3,7 +3,7 @@ package com.pfplaybackend.api.config.oauth2;
 
 import com.pfplaybackend.api.config.oauth2.dto.CustomUserPrincipal;
 import com.pfplaybackend.api.user.application.service.MemberSignService;
-import com.pfplaybackend.api.user.domain.model.domain.Member;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

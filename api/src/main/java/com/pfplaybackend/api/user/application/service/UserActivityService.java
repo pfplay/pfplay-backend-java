@@ -1,10 +1,8 @@
 package com.pfplaybackend.api.user.application.service;
 
-import com.pfplaybackend.api.user.domain.model.domain.Activity;
-import com.pfplaybackend.api.user.domain.model.domain.Member;
-import com.pfplaybackend.api.user.domain.model.enums.ActivityType;
-import com.pfplaybackend.api.user.domain.service.UserDomainService;
-import com.pfplaybackend.api.user.repository.MemberRepository;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

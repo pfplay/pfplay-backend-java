@@ -7,7 +7,6 @@ public class UserContext {
     private static final ThreadLocal<UserCredentials> userThreadLocal = new ThreadLocal<>();
 
     public static void setUserCredentials(Authentication authentication) {
-        System.out.println(authentication);
         UserCredentials userCredentials = (UserCredentials) authentication.getPrincipal();
         userThreadLocal.set(userCredentials);
     }
