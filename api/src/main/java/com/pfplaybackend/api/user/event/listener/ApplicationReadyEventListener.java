@@ -27,9 +27,11 @@ public class ApplicationReadyEventListener {
                 break;
             }
         }
+
+        temporaryAvatarResourceService.addTemporaryAvatarBodies();
+
         if (isLocalProfileActive) {
             System.out.println("Local profile is active");
-            temporaryAvatarResourceService.addTemporaryAvatarBodies();
             temporaryUserService.addTemporaryUsers();
         } else {
             System.out.println("Local profile is not active");
