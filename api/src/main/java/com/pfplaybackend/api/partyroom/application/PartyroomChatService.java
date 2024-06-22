@@ -3,7 +3,6 @@ package com.pfplaybackend.api.partyroom.application;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
 import com.pfplaybackend.api.partyroom.model.entity.PartyroomPenalty;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
-import com.pfplaybackend.api.partyroom.presentation.dto.PartyroomSocketDto;
 import com.pfplaybackend.api.partyroom.repository.PartyroomPenaltyRepository;
 import com.pfplaybackend.api.partyroom.repository.PartyroomUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +57,7 @@ public class PartyroomChatService {
         sendToTopic(chatDto, "chat");
     }
 
-    private void sendToTopic(PartyroomSocketDto partyroomSocketDto, String topic) {
-        redisChatPublisherService.publish(new ChannelTopic(topic), partyroomSocketDto);
+    private void sendToTopic(ChatDto chatDto, String topic) {
+        redisChatPublisherService.publish(new ChannelTopic(topic), chatDto);
     }
 }

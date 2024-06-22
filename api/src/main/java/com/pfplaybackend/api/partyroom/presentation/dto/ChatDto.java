@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ChatDto implements PartyroomSocketDto {
+public class ChatDto {
     private String message;
     @Embedded
     private PartyroomUser fromUser;
