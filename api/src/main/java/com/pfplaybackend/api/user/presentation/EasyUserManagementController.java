@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @Tag(name = "User Sign API", description = "Operations related to user's sign management")
-@Profile("local")
+@Profile("dev")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/members")
