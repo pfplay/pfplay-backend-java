@@ -19,7 +19,6 @@ import java.util.UUID;
 public class PartyroomChannelInterceptor implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         final StompHeaderAccessor stompHeaderAccessor = StompHeaderAccessor.wrap(message);
-
         if(!isValidJwtToken(stompHeaderAccessor)) {
             throw new InvalidJWTTokenException("Invalid JWT Token");
         }

@@ -10,20 +10,24 @@ import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestExcepti
 import com.pfplaybackend.api.partyroom.presentation.api.PartyroomChatApi;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
 import com.pfplaybackend.api.user.domain.model.value.UserId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-@Controller
+@Tag(name = "Partyroom Chat API", description = "Chat api")
+@RestController
 @RequiredArgsConstructor
 public class PartyroomChatController implements PartyroomChatApi {
     private final PartyroomChatService partyroomSocketService;
 
+    @Operation(summary = "Send a message to WebSocket topic")
     @MessageMapping("/partyroom/api/v1/send/message")
     public ResponseEntity<?> sendMessage(MessageHeaders headers, ChatDto chatDto) {
         try {

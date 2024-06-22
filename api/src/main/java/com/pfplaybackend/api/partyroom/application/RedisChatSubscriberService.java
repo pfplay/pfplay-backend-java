@@ -25,33 +25,12 @@ public class RedisChatSubscriberService implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             final String publishMessage = (String) redisTemplate.getStringSerializer().deserialize(message.getBody());
-            final String messageChannel = (String) redisTemplate.getStringSerializer().deserialize(message.getChannel());
 
-            if (messageChannel.equals("chat")) {
-                final ChatDto chatDto = objectMapper.readValue(publishMessage, ChatDto.class);
-                final String partyroomId = chatDto.getFromUser().getPartyroomId();
-                final String payload = "/sub/partyroom/" + partyroomId;
-                messagingTemplate.convertAndSend(payload, chatDto);
-                return;
-            }
+            final ChatDto chatDto = objectMapper.readValue(publishMessage, ChatDto.class);
+            final String partyroomId = chatDto.getFromUser().getPartyroomId();
+            final String payload = "/sub/partyroom/" + partyroomId;
+            messagingTemplate.convertAndSend(payload, chatDto);
 
-            if (messageChannel.equals("penalty")) {
-                final PenaltyDto penaltyDto = objectMapper.readValue(publishMessage, PenaltyDto.class);
-                final String partyroomId = penaltyDto.getFromUser().getPartyroomId();
-                final String payload = "/sub/partyroom/" + partyroomId;
-                messagingTemplate.convertAndSend(payload, penaltyDto);
-                return;
-            }
-
-            if (messageChannel.equals("promote")) {
-                final PromoteDto promoteDto = objectMapper.readValue(publishMessage, PromoteDto.class);
-                final String partyroomId = promoteDto.getFromUser().getPartyroomId();
-                final String payload = "/sub/partyroom/" + partyroomId;
-                messagingTemplate.convertAndSend(payload, promoteDto);
-                return;
-            }
-
-            throw new UnknownSocketDtoException("cannot send message, unknown socket dto");
         } catch (Exception e) {
             log.error(e.getMessage());
         }
