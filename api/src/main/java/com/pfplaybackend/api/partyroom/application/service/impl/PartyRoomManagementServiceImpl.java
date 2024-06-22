@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.partyroom.application.service.impl;
 
 import com.pfplaybackend.api.partyroom.application.service.PartyRoomManagementService;
-import com.pfplaybackend.api.partyroom.domain.model.entity.data.PartyroomData;
-import com.pfplaybackend.api.partyroom.domain.model.entity.domain.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import org.springframework.stereotype.Service;
 
 @Service

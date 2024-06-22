@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation.dto;
 
-import com.pfplaybackend.api.partyroom.model.entity.PartyroomUser;
-import com.pfplaybackend.api.partyroom.model.value.PenaltyInfo;
+import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomUser;
+import com.pfplaybackend.api.partyroom.domain.value.PenaltyInfo;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

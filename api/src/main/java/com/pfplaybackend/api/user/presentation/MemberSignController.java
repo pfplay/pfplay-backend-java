@@ -1,14 +1,19 @@
 package com.pfplaybackend.api.user.presentation;
 
+import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.config.jwt.util.CookieUtil;
 import com.pfplaybackend.api.user.application.service.MemberSignService;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
+import com.pfplaybackend.api.user.presentation.payload.request.SignGuestRequest;
 import com.pfplaybackend.api.user.presentation.payload.request.SignMemberRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User Sign API", description = "Operations related to user's sign management")
 @RequestMapping("/api/v1/members")

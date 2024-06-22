@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.user.repository;
 
 
-import com.pfplaybackend.api.user.domain.model.data.AvatarResourceData;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarResourceData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

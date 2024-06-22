@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.repository;
 
-import com.pfplaybackend.api.playlist.domain.model.entity.PlaylistMusicData;
+import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistMusicData;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

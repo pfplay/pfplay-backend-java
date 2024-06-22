@@ -9,7 +9,7 @@ import com.pfplaybackend.api.partyroom.exception.InvalidPartyroomIdRequestExcept
 import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
 import com.pfplaybackend.api.partyroom.presentation.api.PartyroomChatApi;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
-import com.pfplaybackend.api.user.domain.model.value.UserId;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

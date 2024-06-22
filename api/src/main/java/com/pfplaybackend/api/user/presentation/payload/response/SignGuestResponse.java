@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.presentation.payload.response;
 
-import com.pfplaybackend.api.user.domain.model.enums.AuthorityTier;
+import com.pfplaybackend.api.user.domain.enums.AuthorityTier;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;

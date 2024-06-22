@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.user.application.dto.shared;
 
-import com.pfplaybackend.api.user.domain.model.domain.AvatarResource;
-import com.pfplaybackend.api.user.domain.model.enums.ObtainmentType;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
+import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import lombok.*;
 
 @Data
