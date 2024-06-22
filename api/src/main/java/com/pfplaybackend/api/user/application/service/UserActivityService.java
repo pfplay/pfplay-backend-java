@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 
 @Service
@@ -22,5 +23,17 @@ public class UserActivityService {
             activityDomains.put(activityType, new Activity(member.getUserId(), activityType, 0));
         }
         return activityDomains;
+    }
+
+    public void updateDJPointScore(UUID uuid, int point) {
+        // TODO 취소가 가능하기 때문에 마이너스가 될 수도 있다.
+    }
+
+    public void updateRefererLinkScore(UUID uuid) {
+
+    }
+
+    public void updatePartyroomActivationScore(UUID uuid) {
+
     }
 }

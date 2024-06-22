@@ -46,6 +46,18 @@ public class JwtProvider {
                 .sign(Algorithm.HMAC512(secretKey));
     }
 
+    public String generateAccessTokenForMember(Member member) {
+        Date now = new Date();
+        return JWT.create()
+                .withSubject(TokenSubject.ACCESS_TOKEN_SUBJECT.getValue())
+                .withExpiresAt(new Date(now.getTime() + accessTokenExpirationPeriod))
+                .withClaim(TokenClaim.UID.getValue(), member.getUserId().getUid().toString())
+                .withClaim(TokenClaim.EMAIL.getValue(), member.getEmail())
+                .withClaim(TokenClaim.ACCESS_LEVEL.getValue(), AccessLevel.ROLE_MEMBER.toString())
+                .withClaim(TokenClaim.AUTHORITY_TIER.getValue(), member.getAuthorityTier().toString())
+                .sign(Algorithm.HMAC512(secretKey));
+    }
+
     public String generateAccessTokenForGuest(Guest guest) {
         Date now = new Date();
         return JWT.create()
