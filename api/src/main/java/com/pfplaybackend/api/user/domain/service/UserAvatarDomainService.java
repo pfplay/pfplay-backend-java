@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.user.domain.service;
 
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.domain.model.domain.Activity;
-import com.pfplaybackend.api.user.domain.model.enums.ActivityType;
-import com.pfplaybackend.api.user.domain.model.enums.ObtainmentType;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
+import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

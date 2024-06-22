@@ -58,8 +58,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/spec/swagger-ui/**",
                                 "/swagger-ui/**",
-                                "/api/v1/members/sign",
-                                "/api/v1/guests/sign").permitAll()
+                                "/api/v1/members/sign/**",
+                                "/api/v1/guests/sign/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

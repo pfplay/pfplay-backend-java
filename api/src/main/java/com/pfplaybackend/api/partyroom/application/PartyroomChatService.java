@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.application;
 
+import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomPenaltyHistory;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
-import com.pfplaybackend.api.partyroom.model.entity.PartyroomPenalty;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
 import com.pfplaybackend.api.partyroom.repository.PartyroomPenaltyRepository;
 import com.pfplaybackend.api.partyroom.repository.PartyroomUserRepository;
@@ -21,7 +21,6 @@ public class PartyroomChatService {
     private final PartyroomUserRepository partyroomUserRepository;
     private final PartyroomPenaltyRepository partyroomPenaltyRepository;
 
-
     @Transactional(readOnly = true)
     @Cacheable(cacheNames="partyroomUser", key="#uid.toString()")
     public String getPartyroomId(UUID uid) {
@@ -32,11 +31,11 @@ public class PartyroomChatService {
     @Transactional(readOnly = true)
     @Cacheable(cacheNames="partyroomPenalty", key="#uid.toString()")
     public boolean isProhibitedSendChatUser(String userIdUid, String partyroomId) {
-        final List<PartyroomPenalty> partyroomPenalties = partyroomPenaltyRepository.findPartyroomPaneltyByUserIdUidAndPartyroomId(
+        final List<PartyroomPenaltyHistory> partyroomPenalties = partyroomPenaltyRepository.findPartyroomPenaltyHistoriesByUserIdUidAndPartyroomId(
                 UUID.fromString(userIdUid), partyroomId
         );
 
-        for (PartyroomPenalty penalty : partyroomPenalties) {
+        for (PartyroomPenaltyHistory penalty : partyroomPenalties) {
             if (penalty.getUserId().getUid().equals(userIdUid)
                     && penalty.getPartyroomId().equals(partyroomId)
                     && penalty.getPartyroomPenaltyType().getName().equals("GGUL")) {

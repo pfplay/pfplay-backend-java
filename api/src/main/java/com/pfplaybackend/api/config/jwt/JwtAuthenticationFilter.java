@@ -36,7 +36,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/spec/swagger-ui",
             "/swagger-ui",
             "/api/v1/members/sign",
-            "/api/v1/guests/sign"));
+            "/api/v1/guests/sign"
+
+    ));
     private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler = new JwtAuthenticationFailureHandler();
     private final JwtValidator jwtValidator;
 

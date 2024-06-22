@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.playlist.repository;
 
-import com.pfplaybackend.api.playlist.domain.Playlist;
-import com.pfplaybackend.api.playlist.domain.model.entity.PlaylistData;
-import com.pfplaybackend.api.playlist.domain.model.enums.PlaylistType;
-import com.pfplaybackend.api.user.domain.model.value.UserId;
+import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
+import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
+import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
