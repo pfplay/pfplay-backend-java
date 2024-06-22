@@ -12,13 +12,13 @@ public class Playlist {
     private final Integer orderNumber;
     private final String name;
     private final PlaylistType type;
-    private final UserId userId;
+    private final UserId ownerId;
 
-    public Playlist(Integer orderNumber, String name, PlaylistType type, UserId userId) {
+    public Playlist(Integer orderNumber, String name, PlaylistType type, UserId ownerId) {
         this.orderNumber = orderNumber;
         this.name = name;
         this.type = type;
-        this.userId = userId;
+        this.ownerId = ownerId;
     }
 
     public PlaylistData toData() {
@@ -26,12 +26,12 @@ public class Playlist {
                 .orderNumber(orderNumber)
                 .name(name)
                 .type(type)
-                .userId(userId)
+                .ownerId(ownerId)
                 .build();
     }
 
-    static public Playlist create(Integer orderNumber, String name, PlaylistType type, UserId userId) {
-        return new Playlist(orderNumber, name, type, userId);
+    static public Playlist create(Integer orderNumber, String name, PlaylistType type, UserId ownerId) {
+        return new Playlist(orderNumber, name, type, ownerId);
     }
 
 }

@@ -20,8 +20,8 @@ public class PlaylistService {
     private YoutubeService youtubeService;
 
     @Transactional
-    public Playlist createPlaylist(String name, UserId userId) {
-        List<Playlist> result = playlistRepository.findByUserIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST);
+    public Playlist createPlaylist(String name, UserId ownerId) {
+        List<Playlist> result = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(ownerId, PlaylistType.PLAYLIST);
         // TODO 플레이리스트 생성 권한 여부
         // TODO 플레이리스트 생성 조건
         // TODO 플레이리스트 생성 제약
@@ -35,16 +35,16 @@ public class PlaylistService {
 
         Playlist playlist;
         if (!result.isEmpty()) {
-            playlist = Playlist.create(result.get(0).getOrderNumber() + 1, name, PlaylistType.PLAYLIST, userId);
+            playlist = Playlist.create(result.get(0).getOrderNumber() + 1, name, PlaylistType.PLAYLIST, ownerId);
         } else {
-            playlist = Playlist.create(1, name, PlaylistType.PLAYLIST, userId);
+            playlist = Playlist.create(1, name, PlaylistType.PLAYLIST, ownerId);
         }
         playlistRepository.save(playlist.toData());
         return playlist;
     }
 
-//    public List<PlaylistResponse> getPlaylist(UserId userId) {
-//        List<Tuple> result = playlistClassRepository.findByUserId(userId);
+//    public List<PlaylistResponse> getPlaylist(UserId ownerId) {
+//        List<Tuple> result = playlistClassRepository.findByOwnerId(ownerId);
 //        List<PlaylistResponse> dtoList = new ArrayList<>();
 //        for (Tuple tuple : result) {
 //            PlaylistResponse dto = PlaylistResponse.builder()
@@ -171,8 +171,8 @@ public class PlaylistService {
 //    }
 //
 //    @Transactional
-//    public void deletePlaylist(UserId userId, List<Long> listIds) {
-////        List<Long> ids = playlistClassRepository.findByUserIdAndListIdAndType(userId, listIds, PlaylistType.PLAYLIST);
+//    public void deletePlaylist(UserId ownerId, List<Long> listIds) {
+////        List<Long> ids = playlistClassRepository.findByOwnerIdAndListIdAndType(ownerId, listIds, PlaylistType.PLAYLIST);
 ////        if (ids.size() != listIds.size()) {
 ////            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 플레이리스트");
 ////        }
@@ -191,11 +191,11 @@ public class PlaylistService {
 //    }
 //
 //    @Transactional
-//    public void deletePlaylistMusic(UserId userId, List<Long> listIds) {
+//    public void deletePlaylistMusic(UserId ownerId, List<Long> listIds) {
 //        // 곡 보유자가 삭제 요청자 Id와 일치하는지 확인
 //        // TODO '리소스 쓰기 권한' 여부 확인 절차
 ////        PlaylistMusic musicList = musicListRepository.findById(listIds.get(0)).orElseThrow(() -> new NoSuchElementException("존재하지 않거나 유효하지 않은 곡"));
-////        if (userId != musicList.getPlaylist().getMember().getId()) {
+////        if (ownerId != musicList.getPlaylist().getMember().getId()) {
 ////            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 곡");
 ////        }
 ////        try {
@@ -212,8 +212,8 @@ public class PlaylistService {
 ////        }
 //    }
 //
-//    public void renamePlaylist(UserId userId, Long playlistId, String name) {
-//        Playlist playlist = playlistRepository.findByIdAndUserIdAndType(playlistId, userId, PlaylistType.PLAYLIST);
+//    public void renamePlaylist(UserId ownerId, Long playlistId, String name) {
+//        Playlist playlist = playlistRepository.findByIdAndOwnerIdAndType(playlistId, ownerId, PlaylistType.PLAYLIST);
 //        if(playlist == null) {
 //            throw new NoSuchElementException("존재하지 않는 플레이리스트");
 //        }
