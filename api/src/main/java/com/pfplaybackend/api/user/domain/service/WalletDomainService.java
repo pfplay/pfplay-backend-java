@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.domain.service;
 
-import com.pfplaybackend.api.user.domain.model.value.WalletAddress;
+import com.pfplaybackend.api.user.domain.value.WalletAddress;
 import org.springframework.stereotype.Service;
 
 @Service

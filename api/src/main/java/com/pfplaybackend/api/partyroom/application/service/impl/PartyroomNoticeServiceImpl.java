@@ -1,13 +1,9 @@
 package com.pfplaybackend.api.partyroom.application.service.impl;
 
 import com.pfplaybackend.api.partyroom.application.service.PartyroomNoticeService;
-import com.pfplaybackend.api.partyroom.domain.model.entity.data.PartyroomData;
-import com.pfplaybackend.api.partyroom.domain.model.entity.domain.Partyroom;
 import com.pfplaybackend.api.partyroom.event.EventPublisher;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
-import jakarta.servlet.http.Part;
 import jakarta.transaction.Transactional;
-import jdk.jfr.TransitionTo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.repository;
 
-import com.pfplaybackend.api.user.domain.model.data.MemberData;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.repository.custom.MemberRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
