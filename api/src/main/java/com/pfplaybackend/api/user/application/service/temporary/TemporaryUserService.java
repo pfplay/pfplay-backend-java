@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.user.application.service.temporary;
 
-import com.pfplaybackend.api.config.jwt.JwtProvider;
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
-import com.pfplaybackend.api.playlist.application.service.PlaylistManagementService;
+import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
+import com.pfplaybackend.api.playlist.application.service.PlaylistQueryService;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
@@ -31,7 +31,7 @@ public class TemporaryUserService {
     private final MemberRepository memberRepository;
     private final UserProfileService userProfileService;
     private final UserActivityService userActivityService;
-    private final PlaylistManagementService playlistManagementService;
+    private final PlaylistCommandService playlistCommandService;
 
     @Transactional
     public void addTemporaryUsers() {
@@ -61,7 +61,7 @@ public class TemporaryUserService {
                 .initializeActivityMap(activityMap);
 
         MemberData memberData = memberRepository.save(updatedMember.toData());
-        playlistManagementService.createDefaultPlaylist(updatedMember.getUserId());
+        playlistCommandService.createDefaultPlaylist(updatedMember.getUserId());
         return memberData.toDomain();
     }
 

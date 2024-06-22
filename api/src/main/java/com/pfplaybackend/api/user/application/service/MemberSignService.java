@@ -3,7 +3,8 @@ package com.pfplaybackend.api.user.application.service;
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
 import com.pfplaybackend.api.config.oauth2.properties.OAuth2ProviderConfig;
 import com.pfplaybackend.api.config.oauth2.model.OAuth2Redirection;
-import com.pfplaybackend.api.playlist.application.service.PlaylistManagementService;
+import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
+import com.pfplaybackend.api.playlist.application.service.PlaylistQueryService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
@@ -26,7 +27,7 @@ public class MemberSignService {
     private final MemberRepository memberRepository;
     private final UserProfileService userProfileService;
     private final UserActivityService userActivityService;
-    private final PlaylistManagementService playlistManagementService;
+    private final PlaylistCommandService playlistCommandService;
 
     public String getOAuth2RedirectUri(SignMemberRequest request) {
         OAuth2Redirection oauth2Redirection = OAuth2Redirection.create(oauth2ProviderConfig.getProviders(), request.getOauth2Provider(), request.getRedirectLocation());
@@ -51,7 +52,7 @@ public class MemberSignService {
                 .initializeProfile(profile)
                 .initializeActivityMap(activityMap);
 
-        playlistManagementService.createDefaultPlaylist(updatedMember.getUserId());
+        playlistCommandService.createDefaultPlaylist(updatedMember.getUserId());
 
         return memberRepository.save(updatedMember.toData());
     }
