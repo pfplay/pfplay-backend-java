@@ -14,5 +14,6 @@ public class SimpleEventBroadcaster implements EventBroadcaster {
     public void broadcast(String topic, String message) {
         System.out.println(topic + ": " + message);
         // webSocketMessagingTemplate.convertAndSend(topic, message);
+        // webSocketMessagingTemplate.convertAndSendToUser();
     }
 }

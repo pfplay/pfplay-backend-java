@@ -1,7 +1,9 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.partyroom.application.service.PartyRoomManagementService;
-import com.pfplaybackend.api.partyroom.domain.model.entity.domain.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.model.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +21,13 @@ public class PartyroomManagementController {
     private final PartyRoomManagementService partyRoomManagementService;
 
     @PostMapping
-    public ResponseEntity<Partyroom> createPartyroom() {
-        Partyroom partyRoom = partyRoomManagementService.createPartyRoom();
+    public ResponseEntity<Partyroom> createPartyroom(CreatePartyroomRequest createPartyroomRequest) {
+        Partyroom partyRoom = partyRoomManagementService.createGeneralPartyRoom(createPartyroomRequest);
         return ResponseEntity.ok(partyRoom);
     }
 
     @DeleteMapping("/{partyroomId}")
     public void deletePartyroom(@PathVariable Long partyroomId) {
+        partyRoomManagementService.deletePartyRoom(new PartyroomId(partyroomId));
     }
 }

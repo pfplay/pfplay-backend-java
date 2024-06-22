@@ -19,7 +19,7 @@ public class UserWalletService {
     private final WalletDomainService walletDomainService;
 
     @Transactional
-    public void updateMyWalletAddress(UpdateWalletCommand updateWalletCommand) {
+    public Member updateMyWalletAddress(UpdateWalletCommand updateWalletCommand) {
         UserCredentials userCredentials = UserContext.getUserCredentials();
         // Get UserId → Query 'Member' Object
         Member member = memberRepository.findByUserId(userCredentials.getUserId()).orElseThrow().toDomain();
@@ -27,5 +27,6 @@ public class UserWalletService {
         // WalletAddress verifiedWalletAddress =  walletDomainService.verifyWalletSignature();
         Member updatedMember = member.updateWalletAddress(new WalletAddress(updateWalletCommand.getWalletAddress()));
         memberRepository.save(updatedMember.toData());
+        return updatedMember;
     }
 }

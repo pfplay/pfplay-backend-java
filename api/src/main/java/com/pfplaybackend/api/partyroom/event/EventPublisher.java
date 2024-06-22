@@ -1,9 +1,8 @@
 package com.pfplaybackend.api.partyroom.event;
 
-import org.springframework.data.redis.connection.Message;
-import org.springframework.data.redis.listener.ChannelTopic;
+import com.pfplaybackend.api.partyroom.domain.model.enums.MessageTopic;
 
 public interface EventPublisher {
 
-    public void publish(ChannelTopic topic, Message message);
+    public void publish(MessageTopic topicType, Object object);
 }

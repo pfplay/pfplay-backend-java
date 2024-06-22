@@ -3,7 +3,11 @@ package com.pfplaybackend.api.user.presentation;
 import com.pfplaybackend.api.user.application.service.UserInfoService;
 import com.pfplaybackend.api.user.presentation.payload.response.MyInfoResponse;
 import com.pfplaybackend.api.user.domain.model.domain.User;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +22,11 @@ public class UserInfoController {
 
     final private UserInfoService userInfoService;
 
+    @Operation(summary = "Example endpoint", security = @SecurityRequirement(name = "cookieAuth"))
     @GetMapping("/me/info")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
-    public ResponseEntity<MyInfoResponse> getMyInfo() {
+    public ResponseEntity<MyInfoResponse> getMyInfo(HttpServletRequest request) {
+
         User user = userInfoService.getMyInfo();
         return ResponseEntity
                 .status(HttpStatus.OK)

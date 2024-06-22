@@ -7,6 +7,8 @@ import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyBioRequest;
 import com.pfplaybackend.api.user.presentation.payload.request.GetOtherProfileSummaryRequest;
 import com.pfplaybackend.api.user.presentation.payload.response.MyProfileSummaryResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +26,7 @@ public class UserProfileController {
     /**
      * 호출한(인증된) 사용자의 프로필 리소스를 조회한다.
      */
+    @Operation(summary = "Example endpoint", security = @SecurityRequirement(name = "cookieAuth"))
     @GetMapping("/me/profile/summary")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     public ResponseEntity<?> getMyProfileSummary() {

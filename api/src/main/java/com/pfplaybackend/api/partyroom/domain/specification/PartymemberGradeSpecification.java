@@ -1,17 +1,15 @@
 package com.pfplaybackend.api.partyroom.domain.specification;
 
-import com.pfplaybackend.api.partyroom.domain.model.collection.Partymember;
-import com.pfplaybackend.api.partyroom.domain.model.enums.MemberGrade;
-import com.pfplaybackend.api.user.domain.model.domain.Member;
+import com.pfplaybackend.api.partyroom.domain.model.enums.PartymemberGrade;
 
 public class PartymemberGradeSpecification {
     public boolean isAllowedToUpdateLevel() {
         // PartyInfo partyInfo = PartyContext.getPartyInfo();
         // partyInfo
         // 1. 호출자의 아이디와 파티 Grade
-        MemberGrade myGrade = MemberGrade.HOST;
+        PartymemberGrade myGrade = PartymemberGrade.HOST;
         // 2. 상대방의 아이디와 파티 Grade
-        MemberGrade targetGrade = MemberGrade.MODERATE;
+        PartymemberGrade targetGrade = PartymemberGrade.MODERATOR;
         if(myGrade.ordinal() > targetGrade.ordinal()) {
             return true;
         }else {

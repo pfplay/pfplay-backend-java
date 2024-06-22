@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.model.entity.data;
 
+import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.model.value.Notice;
 import com.pfplaybackend.api.partyroom.domain.model.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.model.value.UserId;
@@ -42,7 +43,7 @@ public class PartyroomData {
         this.partyroomId = new PartyroomId(this.id);
     }
 
-    public com.pfplaybackend.api.partyroom.domain.model.entity.domain.Partyroom toDomain() {
-        return new com.pfplaybackend.api.partyroom.domain.model.entity.domain.Partyroom();
+    public Partyroom toDomain() {
+        return Partyroom.builder().build();
     }
 }
