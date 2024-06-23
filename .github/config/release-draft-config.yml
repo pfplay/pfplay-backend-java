@@ -1,0 +1,25 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🚀 Features'
+    label: 'enhancement'
+  - title: '🐛 Bugfixes'
+    label: 'bug'
+  - title: '📚 Docs'
+    label: 'documentation'
+change-template: '- $TITLE #$NUMBER @$AUTHOR '
+template: |
+  $CHANGES
+  ### 모든 PR이 반영된 후에는 Pre-release에서 release로 변경 부탁드립니다.
+
+version-resolver:
+  major:
+    labels:
+      - 'major'
+  minor:
+    labels:
+      - 'minor'
+  patch:
+    labels:
+      - 'patch'
+  default: patch
