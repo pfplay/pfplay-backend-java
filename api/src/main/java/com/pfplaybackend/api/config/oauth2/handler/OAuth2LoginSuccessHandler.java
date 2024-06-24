@@ -40,7 +40,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private void redirectToView(HttpServletResponse response, String redirectLocation) throws IOException {
         // TODO
         System.out.println(this.redirectWebUri + "/" + redirectLocation);
-        response.sendRedirect(this.redirectWebUri + redirectLocation);
+        response.sendRedirect(this.redirectWebUri + "/" + redirectLocation);
         // response.sendRedirect(this.redirectWebUri + "/index.html");
     }
 

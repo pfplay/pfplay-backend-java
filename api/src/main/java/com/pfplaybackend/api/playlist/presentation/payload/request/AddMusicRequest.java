@@ -6,12 +6,12 @@ import lombok.Getter;
 
 @Schema(description = "Music list")
 @Getter
-public class PlaylistMusicAddRequest {
-    @Schema(description = "곡 고유 id", example = "POe9SOEKotk", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
-    private UserId ownerId;
-
+public class AddMusicRequest {
     @Schema(description = "곡 이름", example = "BLACKPINK - ‘Shut Down’ M/V", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String name;
+
+    @Schema(description = "곡 링크 id", example = "POe9SOEKotk", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
+    private String linkId;
 
     @Schema(description = "곡 재생 시간", example = "03:01", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String duration;

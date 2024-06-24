@@ -1,39 +1,36 @@
 package com.pfplaybackend.api.playlist.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
-import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
 import com.pfplaybackend.api.playlist.application.service.MusicCommandService;
-import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
-import com.pfplaybackend.api.playlist.presentation.payload.request.ListDeleteRequest;
-import com.pfplaybackend.api.playlist.presentation.payload.request.PlaylistMusicAddRequest;
-import com.pfplaybackend.api.playlist.presentation.payload.response.PlaylistMusicAddResponse;
+import com.pfplaybackend.api.playlist.presentation.payload.request.DeletePlaylistListRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.request.AddMusicRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.response.AddMusicResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "playlist", description = "playlist api")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/playlist")
+@RequestMapping("/api/v1/playlists")
 public class MusicCommandController {
 
     private final MusicCommandService musicCommandService;
 
-    @PostMapping("{listId}")
-    public ResponseEntity<?> addMusic(@PathVariable Long listId, @RequestBody PlaylistMusicAddRequest request) {
-        return null;
-        //        PlaylistMusicAddResponse response = musicCommandService.addMusic(listId, request);
-//        return ResponseEntity
-//                .status(HttpStatus.CREATED)
-//                .body(ApiCommonResponse.success(response));
+    @PostMapping("{playlistId}/musics")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    public ResponseEntity<?> addMusic(@PathVariable Long playlistId, @RequestBody AddMusicRequest request) {
+        musicCommandService.addMusicInPlaylist(playlistId, request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiCommonResponse.success("OK"));
     }
 
-        @DeleteMapping("/music")
-    public ResponseEntity<?> deleteMusicList(@RequestBody ListDeleteRequest request) {
+        @DeleteMapping("{playlistId}/musics")
+    public ResponseEntity<?> deleteMusic(@PathVariable String playlistId, @RequestBody DeletePlaylistListRequest request) {
         return null;
 //        CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
 //        UserCredentials userCredentials = (UserCredentials) authentication.getPrincipal();

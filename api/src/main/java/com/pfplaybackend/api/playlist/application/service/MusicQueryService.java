@@ -1,46 +1,27 @@
 package com.pfplaybackend.api.playlist.application.service;
 
-import com.google.api.services.youtube.model.SearchListResponse;
-import com.pfplaybackend.api.playlist.application.dto.SearchPlaylistMusicDto;
-import com.pfplaybackend.api.playlist.presentation.payload.response.PlaylistMusicResponse;
-import com.pfplaybackend.api.playlist.presentation.payload.response.SearchPlaylistMusicResponse;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
+import com.pfplaybackend.api.playlist.presentation.payload.response.QueryMusicListResponse;
+import com.pfplaybackend.api.playlist.repository.PlaylistMusicRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 뮤직 재생 관련 기능
- */
 @Service
+@RequiredArgsConstructor
 public class MusicQueryService {
 
-    public PlaylistMusicResponse getPlaylistMusic() {
-        return null;
-    }
+    private final PlaylistMusicRepository playlistMusicRepository;
 
-    //
-//    public PlaylistMusicResponse getPlaylistMusic(int page, int pageSize, Long playlistId) {
-//        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Sort.Direction.ASC, "orderNumber"));
-//
-//        int totalPage = (int) Math.ceil(musicListRepository.countByPlaylistId(playlistId) / pageSize);
-//        Page<PlaylistMusic> result = musicListRepository.findByPlaylistIdOrderByOrderNumber(pageable, playlistId);
-//        List<PlaylistMusicDto> dtoList = new ArrayList<>();
-//        for (PlaylistMusic playlistMusic : result) {
-//            PlaylistMusicDto dto = PlaylistMusicDto.builder()
-//                    .musicId(playlistMusic.getId())
-//                    .orderNumber(playlistMusic.getOrderNumber())
-//                    .name(playlistMusic.getName())
-//                    .duration(playlistMusic.getDuration())
-//                    .thumbnailImage(playlistMusic.getThumbnailImage())
-//                    .build();
-//            dtoList.add(dto);
-//        }
-//        PlaylistMusicResponse response = PlaylistMusicResponse.builder()
-//                .totalPage(totalPage)
-//                .musicList(dtoList)
-//                .build();
-//        return response;
-//    }
+    public Page<PlaylistMusicDto> getMusics(Long playlistId, int pageNo, int pageSize) {
+        System.out.println(playlistId);
+        Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.ASC, "orderNumber"));
+        return playlistMusicRepository.getMusicsWithPagination(playlistId, pageable);
+    }
 }

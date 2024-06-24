@@ -28,7 +28,6 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
-        template.setConnectionFactory(connectionFactory);
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
         return template;
@@ -53,12 +52,6 @@ public class RedisConfig {
 
         return container;
     }
-
-//    @Bean
-//    @Qualifier("chat")
-//    public MessageListenerAdapter chatTopicListenerAdapter(ChatTopicListener listener) {
-//        return new MessageListenerAdapter(listener, "handleMessage");
-//    }
 
     @Bean
     @Qualifier("chat")
