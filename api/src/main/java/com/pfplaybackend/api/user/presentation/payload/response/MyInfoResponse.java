@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.presentation.payload.response;
 
-import com.pfplaybackend.api.user.domain.enums.AuthorityTier;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import lombok.Builder;
 import lombok.Data;
 

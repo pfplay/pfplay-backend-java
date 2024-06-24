@@ -5,7 +5,7 @@ import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
-import com.pfplaybackend.api.user.domain.enums.AuthorityTier;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;

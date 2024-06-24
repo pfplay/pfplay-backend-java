@@ -28,15 +28,15 @@ public class PartyContextAspect {
 
 
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
-            UserContext.setUserCredentials(authentication);
-        }
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
+//            UserContext.setUserCredentials(authentication);
+//        }
 
     }
 
     @After("partyContextRequiredMethods()")
     public void clearUserContext() {
-        UserContext.clear();
+        // UserContext.clear();
     }
 }

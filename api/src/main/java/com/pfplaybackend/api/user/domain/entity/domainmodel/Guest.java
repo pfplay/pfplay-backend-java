@@ -2,7 +2,7 @@ package com.pfplaybackend.api.user.domain.entity.domainmodel;
 
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
-import com.pfplaybackend.api.user.domain.enums.AuthorityTier;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.*;
 import lombok.experimental.SuperBuilder;

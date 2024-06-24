@@ -7,15 +7,16 @@ import org.springframework.web.bind.annotation.BindParam;
 
 @Getter
 @Setter
-public class SearchListRequest {
+public class SearchMusicListRequest {
     @NotNull(message = "q cannot be null")
     private final String q;
-    private final String pageToken;
 
-    SearchListRequest(@BindParam("q") String q,
-                      @BindParam("pageToken") String pageToken) {
+    @NotNull(message = "platform cannot be null")
+    private final String platform;
+
+    SearchMusicListRequest(@BindParam("q") String q, @BindParam("platform") String platform) {
         this.q = q;
-        this.pageToken = pageToken;
+        this.platform = platform;
     }
 }
 

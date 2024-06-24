@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.user.application.service;
 
+import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
@@ -39,13 +40,12 @@ public class UserAvatarService {
 
     @Transactional(readOnly = true)
     public List<AvatarBodyDto> findMyAvatarBodies() {
-        UserCredentials userCredentials = UserContext.getUserCredentials();
+        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
         List<AvatarBodyDto> avatarBodyDtoList = avatarResourceService.findAllAvatarBodies();
-
-        if(userDomainService.isGuest(userCredentials)) {
+        if(userDomainService.isGuest(userContext)) {
             return avatarBodyDtoList;
         }else {
-            Member member = memberRepository.findByUserId(userCredentials.getUserId()).orElseThrow().toDomain();
+            Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
             Map<ActivityType, Activity> activityMap = member.getActivityMap();
             return avatarBodyDtoList.stream()
                     .map(avatarBodyDto -> avatarBodyDto.toBuilder()
@@ -57,16 +57,16 @@ public class UserAvatarService {
 
     @Transactional
     public void updateAvatarBodyUri(UpdateAvatarBodyCommand avatarBodyCommand) {
-        UserCredentials userCredentials = UserContext.getUserCredentials();
-        Member member = memberRepository.findByUserId(userCredentials.getUserId()).orElseThrow().toDomain();
+        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
+        Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
         Member updatedMember = member.updateAvatarBody(new AvatarBodyUri(avatarBodyCommand.getAvatarBodyUri()));
         memberRepository.save(updatedMember.toData());
     }
 
     @Transactional
     public void updateAvatarFaceUri(UpdateAvatarFaceCommand avatarFaceCommand) {
-        UserCredentials userCredentials = UserContext.getUserCredentials();
-        Member member = memberRepository.findByUserId(userCredentials.getUserId()).orElseThrow().toDomain();
+        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
+        Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
         Member updatedMember = member.updateAvatarFace(new AvatarFaceUri(avatarFaceCommand.getAvatarFaceUri()));
         memberRepository.save(updatedMember.toData());
     }
