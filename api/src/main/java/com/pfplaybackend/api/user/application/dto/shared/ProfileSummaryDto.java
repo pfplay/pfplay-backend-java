@@ -8,9 +8,9 @@ import java.util.List;
 @Getter
 @Builder
 public class ProfileSummaryDto {
-    private String nickName;
+    private String nickname;
     private String introduction;
-    private String avatarBodyId;
+    private String avatarBodyUri;
     private String avatarFaceUri;
     private String walletAddress;
     private List<ActivitySummaryDto> activitySummaries;

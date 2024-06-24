@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * 이 클래스는 파티룸의 기본적인 생애주기(생성/삭제/조회)를 관리하는 표현 계층을 담당한다.
  */
-@Tag(name = "Partyroom Management API", description = "Operations related to partyroom management")
+@Tag(name = "Partyroom API")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor

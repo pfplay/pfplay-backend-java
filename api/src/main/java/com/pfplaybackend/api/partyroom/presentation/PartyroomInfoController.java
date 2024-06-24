@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Partyroom Info API", description = "Operations related to partyroom management")
+@Tag(name = "Partyroom API")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor
