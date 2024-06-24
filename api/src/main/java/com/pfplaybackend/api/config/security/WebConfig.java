@@ -23,6 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "https://pfplay.io",
                         "https://pfplay-api.app")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                .allowCredentials(true)
                 .maxAge(3600); // 프리플라이트 요청의 유효 기간
     }
 }
