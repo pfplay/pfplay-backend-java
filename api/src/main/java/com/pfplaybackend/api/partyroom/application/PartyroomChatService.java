@@ -3,7 +3,7 @@ package com.pfplaybackend.api.partyroom.application;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomPenaltyHistory;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
-import com.pfplaybackend.api.partyroom.repository.PartyroomPenaltyRepository;
+import com.pfplaybackend.api.partyroom.repository.PartyroomPenaltyHistoryRepository;
 import com.pfplaybackend.api.partyroom.repository.PartyroomUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class PartyroomChatService {
     private final RedisChatPublisherService redisChatPublisherService;
     private final PartyroomUserRepository partyroomUserRepository;
-    private final PartyroomPenaltyRepository partyroomPenaltyRepository;
+    private final PartyroomPenaltyHistoryRepository partyroomPenaltyHistoryRepository;
 
     @Transactional(readOnly = true)
     @Cacheable(cacheNames="partyroomUser", key="#uid.toString()")
@@ -31,7 +31,7 @@ public class PartyroomChatService {
     @Transactional(readOnly = true)
     @Cacheable(cacheNames="partyroomPenalty", key="#uid.toString()")
     public boolean isProhibitedSendChatUser(String userIdUid, String partyroomId) {
-        final List<PartyroomPenaltyHistory> partyroomPenalties = partyroomPenaltyRepository.findPartyroomPenaltyHistoriesByUserIdUidAndPartyroomId(
+        final List<PartyroomPenaltyHistory> partyroomPenalties = partyroomPenaltyHistoryRepository.findPartyroomPenaltyHistoriesByUserIdUidAndPartyroomId(
                 UUID.fromString(userIdUid), partyroomId
         );
 

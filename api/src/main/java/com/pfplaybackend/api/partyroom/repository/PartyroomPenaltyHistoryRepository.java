@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface PartyroomPenaltyRepository extends JpaRepository<PartyroomPenaltyHistory, Long> {
+public interface PartyroomPenaltyHistoryRepository extends JpaRepository<PartyroomPenaltyHistory, Long> {
     List<PartyroomPenaltyHistory> findPartyroomPenaltyHistoriesByUserIdUidAndPartyroomId(UUID uid, String partyroomId);
 }

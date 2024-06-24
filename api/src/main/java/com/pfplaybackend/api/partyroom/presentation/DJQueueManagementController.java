@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
+import com.pfplaybackend.api.partyroom.application.service.DJQueueManagementService;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.DJQueueAddRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
