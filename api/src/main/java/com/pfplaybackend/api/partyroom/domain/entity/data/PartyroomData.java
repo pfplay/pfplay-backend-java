@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
-import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.value.Notice;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;

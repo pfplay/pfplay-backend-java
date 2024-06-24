@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
-import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partymember;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.event.EventPublisher;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
