@@ -10,7 +10,7 @@ import java.util.UUID;
 /**
  * 이 클래스는 특정 파티룸 내에서의 DJ 관리에 대한 표현 계층을 담당한다.
  */
-@Tag(name = "DJ Queue Management API", description = "Operations related to partyroom management")
+@Tag(name = "DJ API")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor

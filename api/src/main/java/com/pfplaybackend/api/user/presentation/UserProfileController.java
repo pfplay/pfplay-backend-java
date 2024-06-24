@@ -4,16 +4,20 @@ import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyBioRequest;
 import com.pfplaybackend.api.user.presentation.payload.request.GetOtherProfileSummaryRequest;
 import com.pfplaybackend.api.user.presentation.payload.response.MyProfileSummaryResponse;
+import com.pfplaybackend.api.user.presentation.payload.response.OtherProfileSummaryResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "User Profile API", description = "Operations related to user's profile management")
+import java.util.UUID;
+
+@Tag(name = "User Profile API")
 @RequestMapping("/api/v1/users")
 @RestController
 @RequiredArgsConstructor
@@ -51,10 +55,11 @@ public class UserProfileController {
      * @param uid
      * @return
      */
-    @GetMapping("/{uid}/profile/summary")
+    @PostMapping("/{uid}/profile/summary")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     public ResponseEntity<?> getOtherProfileSummary(@PathVariable String uid,
-                                                    @RequestBody GetOtherProfileSummaryRequest getOtherProfileSummaryRequest) {
-        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
+                                                    @RequestBody GetOtherProfileSummaryRequest request) {
+        ProfileSummaryDto profileSummaryDto = userProfileService.getOtherProfileSummary(new UserId(UUID.fromString(uid)), request.getAuthorityTier());
+        return ResponseEntity.ok().body(ApiCommonResponse.success(OtherProfileSummaryResponse.from(profileSummaryDto)));
     }
 }

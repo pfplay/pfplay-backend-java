@@ -145,9 +145,9 @@ public class Member extends User {
                 .collect(Collectors.toList());
 
         return ProfileSummaryDto.builder()
-                .nickName(this.profile.getNickname())
+                .nickname(this.profile.getNickname())
                 .introduction(this.profile.getIntroduction())
-                .avatarBodyId(this.profile.getAvatarBodyUri().getAvatarBodyUri())
+                .avatarBodyUri(this.profile.getAvatarBodyUri().getAvatarBodyUri())
                 .avatarFaceUri(this.profile.getAvatarFaceUri().getAvatarFaceUri())
                 .walletAddress(this.profile.getWalletAddress().getWalletAddress())
                 .activitySummaries(activitySummaries)

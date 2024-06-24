@@ -12,7 +12,6 @@ public class AvatarFaceUri {
     public AvatarFaceUri() {
         this.avatarFaceUri = "";
     }
-
     public AvatarFaceUri(String avatarFaceUri) {
         this.avatarFaceUri = avatarFaceUri;
     }

@@ -38,6 +38,10 @@ public class UserAvatarService {
         return new AvatarBodyUri(avatarResource.getResourceUri());
     }
 
+    public AvatarFaceUri getDefaultAvatarFaceUri() {
+        return new AvatarFaceUri(avatarResourceService.getDefaultSettingFace().getResourceUri());
+    }
+
     @Transactional(readOnly = true)
     public List<AvatarBodyDto> findMyAvatarBodies() {
         UserContext userContext = (UserContext) ThreadLocalContext.getContext();
