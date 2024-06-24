@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.config.jwt.JwtProvider;
 import com.pfplaybackend.api.config.jwt.util.CookieUtil;
 import com.pfplaybackend.api.user.application.service.GuestSignService;
-import com.pfplaybackend.api.user.domain.model.domain.Guest;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
 import com.pfplaybackend.api.user.presentation.payload.request.SignGuestRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

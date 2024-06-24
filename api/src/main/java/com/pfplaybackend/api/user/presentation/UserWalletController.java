@@ -5,7 +5,7 @@ import com.pfplaybackend.api.config.jwt.JwtProvider;
 import com.pfplaybackend.api.config.jwt.util.CookieUtil;
 import com.pfplaybackend.api.user.application.dto.command.UpdateWalletCommand;
 import com.pfplaybackend.api.user.application.service.UserWalletService;
-import com.pfplaybackend.api.user.domain.model.domain.Member;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyWalletRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

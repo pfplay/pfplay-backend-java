@@ -1,7 +1,9 @@
 package com.pfplaybackend.api.user.repository.impl;
 
-import com.pfplaybackend.api.user.domain.model.data.*;
-import com.pfplaybackend.api.user.domain.model.value.UserId;
+import com.pfplaybackend.api.user.domain.entity.data.GuestData;
+import com.pfplaybackend.api.user.domain.entity.data.QGuestData;
+import com.pfplaybackend.api.user.domain.entity.data.QProfileData;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.user.repository.custom.GuestRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

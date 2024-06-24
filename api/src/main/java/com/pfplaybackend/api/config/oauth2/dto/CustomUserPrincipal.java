@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.config.oauth2.dto;
 
 import com.pfplaybackend.api.config.security.enums.AccessLevel;
-import com.pfplaybackend.api.user.domain.model.domain.User;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

@@ -4,7 +4,6 @@ import com.pfplaybackend.api.config.jwt.JwtAuthenticationEntryPoint;
 import com.pfplaybackend.api.config.jwt.JwtAuthenticationFilter;
 import com.pfplaybackend.api.config.jwt.JwtProvider;
 import com.pfplaybackend.api.config.jwt.JwtValidator;
-import com.pfplaybackend.api.config.jwt.handler.JwtAuthenticationFailureHandler;
 import com.pfplaybackend.api.config.oauth2.CustomOAuth2AuthorizationRequestResolver;
 import com.pfplaybackend.api.config.oauth2.handler.OAuth2LoginFailureHandler;
 import com.pfplaybackend.api.config.oauth2.handler.OAuth2LoginSuccessHandler;
@@ -59,8 +58,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/spec/swagger-ui/**",
                                 "/swagger-ui/**",
-                                "/api/v1/members/sign",
-                                "/api/v1/guests/sign").permitAll()
+                                "/api/v1/members/sign/**",
+                                "/api/v1/guests/sign/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
