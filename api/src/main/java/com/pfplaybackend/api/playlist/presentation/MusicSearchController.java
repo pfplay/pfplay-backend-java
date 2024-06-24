@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "music search", description = "music search api")
+@Tag(name = "Playlist API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/music-search")

@@ -7,15 +7,15 @@ import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyBioRequest;
 import com.pfplaybackend.api.user.presentation.payload.request.GetOtherProfileSummaryRequest;
 import com.pfplaybackend.api.user.presentation.payload.response.MyProfileSummaryResponse;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "User Profile API", description = "Operations related to user's profile management")
+import java.util.UUID;
+
+@Tag(name = "User Profile API")
 @RequestMapping("/api/v1/users")
 @RestController
 @RequiredArgsConstructor
@@ -26,7 +26,6 @@ public class UserProfileController {
     /**
      * 호출한(인증된) 사용자의 프로필 리소스를 조회한다.
      */
-    @Operation(summary = "Example endpoint", security = @SecurityRequirement(name = "cookieAuth"))
     @GetMapping("/me/profile/summary")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     public ResponseEntity<?> getMyProfileSummary() {
@@ -47,17 +46,11 @@ public class UserProfileController {
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 
-    /**
-     * 타인의 프로필 리소스를 조회한다.
-     * 자신의 프로필 리소스를 호출했던 것과 비교했을 때
-     * 응답 객체의 필드 구성이 달라질 수 있음에 주의한다.
-     * @param uid
-     * @return
-     */
-    @GetMapping("/{uid}/profile/summary")
+    @GetMapping("/{userId}/profile/summary")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
-    public ResponseEntity<?> getOtherProfileSummary(@PathVariable String uid,
-                                                    @RequestBody GetOtherProfileSummaryRequest getOtherProfileSummaryRequest) {
-        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
+    public ResponseEntity<?> getOtherProfileSummary(@PathVariable String userId,
+                                                    @RequestBody GetOtherProfileSummaryRequest request) {
+        ProfileSummaryDto profileSummaryDto = userProfileService.getOtherProfileSummary(new UserId(UUID.fromString(userId)), request.getAuthorityTier());
+        return ResponseEntity.ok().body(ApiCommonResponse.success(OtherProfileSummaryResponse.from(profileSummaryDto)));
     }
 }

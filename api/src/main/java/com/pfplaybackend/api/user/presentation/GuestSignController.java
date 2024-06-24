@@ -12,8 +12,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "User Sign API", description = "Operations related to user's sign management")
-@RequestMapping("/api/v1/guests")
+@Tag(name = "User Sign API")
+@RequestMapping("/api/v1/users")
 @RestController
 @RequiredArgsConstructor
 public class GuestSignController {
@@ -21,7 +21,7 @@ public class GuestSignController {
     private final GuestSignService guestSignService;
     private final JwtProvider jwtProvider;
 
-    @PostMapping("/sign")
+    @PostMapping("/guests/sign")
     public ResponseEntity<?> createGuest(
             @RequestBody SignGuestRequest request
     ) {

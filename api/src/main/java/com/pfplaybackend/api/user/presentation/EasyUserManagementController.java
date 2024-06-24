@@ -16,23 +16,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Tag(name = "User Sign API", description = "Operations related to user's sign management")
-@Profile("dev")
+@Tag(name = "User Sign API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/members")
+@RequestMapping("/api/v1/users")
 public class EasyUserManagementController {
-
-    // RedirectUri after 'social login'
-    @Value("${app.redirect.web.uri}")
-    private String redirectWebUri;
 
     private final JwtProvider jwtProvider;
     private final TemporaryUserService temporaryUserService;
 
-    @PostMapping("/sign/temporary/associate-member")
+    @PostMapping("/members/sign/temporary/associate-member")
     public ResponseEntity<?> createAssociateMember() {
-
         UserId userId = new UserId(UUID.randomUUID());
         Member member = temporaryUserService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com");
         HttpHeaders headers = new HttpHeaders();
@@ -44,9 +38,8 @@ public class EasyUserManagementController {
                 .body(ApiCommonResponse.success("OK"));
     }
 
-    @PostMapping("/sign/temporary/full-member")
+    @PostMapping("/members/sign/temporary/full-member")
     public ResponseEntity<?> createFullMember() {
-
         UserId userId = new UserId(UUID.randomUUID());
         Member member = temporaryUserService.upgradeMember(
                 temporaryUserService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com"));
@@ -56,15 +49,6 @@ public class EasyUserManagementController {
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(ApiCommonResponse.success("OK"));
-    }
-
-    @PostMapping("/sign/temporary/redirect-uri/{redirectUri}")
-    public ResponseEntity<?> configureRedirectUri(@PathVariable String redirectUri) {
-
-        this.redirectWebUri = redirectUri;
-
-        return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));
     }
 }
