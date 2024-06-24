@@ -17,14 +17,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AvatarController {
 
-    private final AvatarResourceService avatarResourceService;
 
-    // TODO 1개 이상의 Face 가 제공될 수 있는지 여부에 따라서 확장(개선) 필요
-    @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
-    @GetMapping("/faces")
-    public ResponseEntity<?> getMyDefaultAvatarFaces() {
-        return ResponseEntity.ok().body(ApiCommonResponse.success(
-                avatarResourceService.getDefaultSettingFace())
-        );
-    }
 }
