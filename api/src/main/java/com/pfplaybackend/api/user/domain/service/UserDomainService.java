@@ -10,4 +10,8 @@ public class UserDomainService {
     public boolean isGuest(UserContext userContext) {
         return userContext.getAuthorityTier() == AuthorityTier.GT;
     }
+
+    public boolean isGuest(AuthorityTier authorityTier) {
+        return authorityTier == AuthorityTier.GT;
+    }
 }

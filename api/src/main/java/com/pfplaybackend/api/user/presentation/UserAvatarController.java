@@ -3,6 +3,7 @@ package com.pfplaybackend.api.user.presentation;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "User Profile API", description = "Operations related to user's profile management")
+@Tag(name = "User Profile API")
 @RequestMapping("/api/v1/users")
 @RestController
 @RequiredArgsConstructor
