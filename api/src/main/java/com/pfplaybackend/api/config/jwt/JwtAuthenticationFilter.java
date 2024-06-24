@@ -68,9 +68,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void saveAuthentication(DecodedJWT decodedJWT) {
-        UserCredentials userAuthentication = jwtValidator.getUserAuthentication(decodedJWT);
+        UserCredentials customUserPrincipal = jwtValidator.getCustomUserPrincipal(decodedJWT);
         Collection<? extends GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(decodedJWT.getClaim(TokenClaim.ACCESS_LEVEL.getValue()).toString()));
-        CustomAuthentication authentication = new CustomAuthentication(userAuthentication, null, authorities);
+        CustomAuthentication authentication = new CustomAuthentication(customUserPrincipal, null, authorities);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }

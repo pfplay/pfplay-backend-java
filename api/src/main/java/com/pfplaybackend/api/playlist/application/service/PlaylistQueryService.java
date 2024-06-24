@@ -1,10 +1,15 @@
 package com.pfplaybackend.api.playlist.application.service;
 
+import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
-import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.playlist.presentation.payload.response.PlaylistResponse;
+import com.pfplaybackend.api.playlist.presentation.payload.response.QueryPlaylistResponse;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,21 +27,15 @@ public class PlaylistQueryService {
 
     private final PlaylistRepository playlistRepository;
 
-    public List<PlaylistResponse> getPlaylist(UserId ownerId) {
-        return null;
-//        List<Tuple> result = playlistClassRepository.findByOwnerId(ownerId);
-//        List<PlaylistResponse> dtoList = new ArrayList<>();
-//        for (Tuple tuple : result) {
-//            PlaylistResponse dto = PlaylistResponse.builder()
-//                    .id(tuple.get(playlist.id))
-//                    .name(tuple.get(playlist.name))
-//                    .orderNumber(tuple.get(playlist.orderNumber))
-//                    .type(tuple.get(playlist.type))
-//                    .count(tuple.get(Expressions.numberPath(Long.class, "count")))
-//                    .build();
-//            dtoList.add(dto);
-//        }
-//        return dtoList;
+    @Transactional(readOnly = true)
+    public List<PlaylistSummary> getPlaylists() {
+        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+        return playlistRepository.findAllByUserId(playlistContext.getUserId());
     }
 
+    @Transactional(readOnly = true)
+    public PlaylistSummary getPlaylist(Long playlistId) {
+        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+        return playlistRepository.findByIdAndUserId(playlistId, playlistContext.getUserId());
+    }
 }

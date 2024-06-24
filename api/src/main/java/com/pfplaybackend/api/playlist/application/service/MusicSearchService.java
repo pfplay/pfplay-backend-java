@@ -1,23 +1,20 @@
 package com.pfplaybackend.api.playlist.application.service;
 
-import com.google.api.services.youtube.model.SearchListResponse;
-import com.pfplaybackend.api.playlist.application.dto.SearchPlaylistMusicDto;
-import com.pfplaybackend.api.playlist.presentation.payload.response.SearchPlaylistMusicResponse;
+import com.pfplaybackend.api.playlist.application.dto.search.SearchMusicResultDto;
+import com.pfplaybackend.api.playlist.application.service.search.YoutubeSearchService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
+@RequiredArgsConstructor
 public class MusicSearchService {
 
-    public SearchPlaylistMusicResponse getSearchList() {
-        return null;
-    }
+    private final YoutubeSearchService youtubeSearchService;
 
-//    public SearchPlaylistMusicResponse getSearchList(String q, String pageToken) {
-//        try {
+    public SearchMusicResultDto getSearchList(String q, String pageToken) {
+        return youtubeSearchService.searchByWord(q, 10);
+
+        //        try {
 //            SearchListResponse searchResponse = youtubeService.getSearchList(q, pageToken);
 //            List<SearchPlaylistMusicDto> musicList = new ArrayList<>();
 //
@@ -56,5 +53,5 @@ public class MusicSearchService {
 //        } catch (Exception e) {
 //            throw new RuntimeException(e);
 //        }
-//    }
+    }
 }

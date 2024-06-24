@@ -32,7 +32,8 @@ public class PartyroomChannelInterceptor implements ChannelInterceptor {
         }
 
         final UserCredentials userCredentials = (UserCredentials) authentication.getPrincipal();
-        final UUID uid = userCredentials.getUserId().getUid();
+        final UUID uid = userCredentials.getUid();
+
         if (uid == null) {
             return false;
         }

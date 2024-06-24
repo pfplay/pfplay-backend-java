@@ -37,6 +37,9 @@ public class PlaylistMusicData extends BaseEntity {
     @Comment("곡 이름")
     private String name;
 
+    @Comment("링크 식별자")
+    private String linkId;
+
     @Comment("곡 총 재생 시간")
     private String duration;
 
@@ -46,11 +49,12 @@ public class PlaylistMusicData extends BaseEntity {
     protected PlaylistMusicData() { }
 
     @Builder
-    public PlaylistMusicData(PlaylistData playlistData, UserId ownerId, Integer orderNumber, String name, String duration, String thumbnailImage) {
+    public PlaylistMusicData(PlaylistData playlistData, Integer orderNumber, String name, String duration, String linkId, String thumbnailImage) {
         this.playlistData = playlistData;
         this.orderNumber = orderNumber;
         this.name = name;
         this.duration = duration;
+        this.linkId = linkId;
         this.thumbnailImage = thumbnailImage;
     }
 }

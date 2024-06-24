@@ -1,65 +1,59 @@
 package com.pfplaybackend.api.playlist.application.service;
 
-import com.pfplaybackend.api.playlist.presentation.payload.request.PlaylistMusicAddRequest;
-import com.pfplaybackend.api.playlist.presentation.payload.response.PlaylistMusicAddResponse;
+import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
+import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistMusicData;
+import com.pfplaybackend.api.playlist.presentation.payload.request.AddMusicRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.response.AddMusicResponse;
+import com.pfplaybackend.api.playlist.repository.PlaylistMusicRepository;
+import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class MusicCommandService {
 
-    public PlaylistMusicAddResponse addMusicInPlaylist(Long playlistId, PlaylistMusicAddRequest request) {
-        return null;
-        //        Optional<Playlist> playlist = playlistRepository.findById(playlistId);
-//
-//        if (!playlist.isPresent()) {
-//            throw new NoSuchElementException("존재하지 않는 플레이리스트");
-//        }
-//
-//        // 곡 추가 중복 여부 및 곡 순서 번호 체크 후 저장 처리
-//        List<PlaylistMusic> playlistMusic = musicListRepository.findAllByPlaylistId(playlistId);
-//        if (playlistMusic.size() > 100) {
-//            throw new PlaylistMusicLimitExceededException("곡 개수 제한 초과");
-//        }
-//
-//        int orderNumber = 1;
-//        for (PlaylistMusic music : playlistMusic) {
-////            if (music.getUid().equals(request.getUid())) {
-////                throw new DuplicateKeyException(""); // Global Exception으로 처리되어 입력한 메시지 전달 X
-////            }
-//            if (music.getOrderNumber() > orderNumber) {
-//                orderNumber = music.getOrderNumber();
-//            }
-//        }
-//
-//        int newOrderNumber = playlistMusic.isEmpty() ? orderNumber : orderNumber + 1;
-//
-//        PlaylistMusic music = PlaylistMusic.builder()
-//                .playlist(playlist.get())
-//                .uid(request.getUid())
-//                .orderNumber(newOrderNumber)
-//                .name(request.getName())
-//                .duration(request.getDuration())
-//                .thumbnailImage(request.getThumbnailImage())
-//                .build();
-//
-//        PlaylistMusic result =  musicListRepository.save(music);
-//        PlaylistMusicAddResponse response = PlaylistMusicAddResponse.builder()
-//                .playlistId(playlistId)
-//                .musicId(result.getId())
-//                .orderNumber(result.getOrderNumber())
-//                .name(request.getName())
-//                .duration(request.getDuration())
-//                .build();
-//
-//        return response;
+    private final PlaylistRepository playlistRepository;
+    private final PlaylistMusicRepository playlistMusicRepository;
+    private final PlaylistQueryService playlistQueryService;
+
+    public void addMusicInPlaylist(Long playlistId, AddMusicRequest request) {
+        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+
+        // TODO 플레이리스트 식별자 유효성 검증은 소유주 여부와 함께 체크
+        // throw new NoSuchElementException("존재하지 않는 플레이리스트");
+
+        // TODO 저장 한계치 초과 여부 체크
+        // throw new PlaylistMusicLimitExceededException("곡 개수 제한 초과");
+
+        // TODO Optional
+        PlaylistSummary PlaylistSummary = playlistQueryService.getPlaylist(playlistId);
+        PlaylistData playlistData = playlistRepository.findById(playlistId).orElseThrow();
+
+        long nextMusicOrderNumber = PlaylistSummary.getMusicCount() == 0 ? 1 : PlaylistSummary.getMusicCount() + 1;
+
+        PlaylistMusicData playlistMusicData = PlaylistMusicData.builder()
+                .playlistData(playlistData)
+                .name(request.getName())
+                .linkId(request.getLinkId())
+                .duration(request.getDuration())
+                .orderNumber((int) nextMusicOrderNumber)
+                .thumbnailImage(request.getThumbnailImage())
+                .build();
+
+        playlistMusicRepository.save(playlistMusicData);
     }
 
     @Transactional
-    public void updateMusicMetadataInPlaylist(Long playlistId, PlaylistMusicAddRequest request) {}
+    public void updateMusicMetadataInPlaylist(Long playlistId, AddMusicRequest request) {}
 
     @Transactional
     public void deleteMusicFromPlaylist() {}

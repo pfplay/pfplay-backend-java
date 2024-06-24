@@ -8,7 +8,7 @@ import com.pfplaybackend.api.config.oauth2.dto.CustomUserPrincipal;
 import com.pfplaybackend.api.config.security.enums.AccessLevel;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
-import com.pfplaybackend.api.user.domain.enums.AuthorityTier;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

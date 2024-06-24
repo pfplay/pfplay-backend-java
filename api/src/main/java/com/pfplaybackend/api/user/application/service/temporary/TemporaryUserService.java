@@ -2,7 +2,6 @@ package com.pfplaybackend.api.user.application.service.temporary;
 
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
-import com.pfplaybackend.api.playlist.application.service.PlaylistQueryService;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import com.pfplaybackend.api.user.application.service.UserProfileService;

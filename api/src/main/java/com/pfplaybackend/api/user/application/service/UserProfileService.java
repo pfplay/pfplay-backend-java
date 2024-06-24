@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.user.application.service;
 
+import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
@@ -40,21 +41,20 @@ public class UserProfileService {
     }
 
     public ProfileSummaryDto getMyProfileSummary() {
-        UserCredentials userCredentials = UserContext.getUserCredentials();
-        if(userDomainService.isGuest(userCredentials)) {
-            GuestData guestData = guestRepository.findByUserId(userCredentials.getUserId()).orElseThrow();
+        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
+        if(userDomainService.isGuest(userContext)) {
+            GuestData guestData = guestRepository.findByUserId(userContext.getUserId()).orElseThrow();
             return guestData.toDomain().getProfileSummary();
         }else {
-            MemberData memberData = memberRepository.findByUserId(userCredentials.getUserId()).orElseThrow();
+            MemberData memberData = memberRepository.findByUserId(userContext.getUserId()).orElseThrow();
             return memberData.toDomain().getProfileSummary();
         }
     }
 
     @Transactional
     public void updateMyBio(UpdateBioCommand updateBioCommand) {
-        UserCredentials userCredentials = UserContext.getUserCredentials();
-        UserId userId = userCredentials.getUserId();
-        MemberData memberData = memberRepository.findByUserId(userId).orElseThrow();
+        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
+        MemberData memberData = memberRepository.findByUserId(userContext.getUserId()).orElseThrow();
         Member member = memberData.toDomain();
         Member updatedMember = member.updateProfileBio(updateBioCommand);
         memberRepository.save(updatedMember.toData());
