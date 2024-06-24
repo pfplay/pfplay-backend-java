@@ -32,7 +32,7 @@ public class PartyroomChatController implements PartyroomChatApi {
     public ResponseEntity<?> sendMessage(MessageHeaders headers, ChatDto chatDto) {
         try {
             //TODO; uid 파싱 부분 AOP로 분리
-            final UUID uid = ((UserCredentials)((CustomAuthentication) headers.get("simpUser")).getPrincipal()).getUserId().getUid();
+            final UUID uid = ((UserCredentials)((CustomAuthentication) headers.get("simpUser")).getPrincipal()).getUid();
             chatDto.getFromUser().setUserId(new UserId(uid));
 
             final String partyroomId = chatDto.getFromUser().getPartyroomId();

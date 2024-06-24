@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.BindParam;
 @Setter
 public class PaginationRequest {
     @NotNull(message = "Page cannot be null")
-    private final int page;
+    private final int pageNo;
     @NotNull(message = "Page Size cannot be null")
     private final int pageSize;
 
-    PaginationRequest(@BindParam("page") int page,
+    PaginationRequest(@BindParam("pageNo") int pageNo,
                       @BindParam("pageSize") int pageSize) {
-        this.page = page;
+        this.pageNo = pageNo;
         this.pageSize = pageSize;
     }
 }

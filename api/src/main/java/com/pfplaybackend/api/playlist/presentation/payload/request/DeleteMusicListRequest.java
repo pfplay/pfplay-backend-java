@@ -7,7 +7,7 @@ import java.util.List;
 
 @Schema(description = "List")
 @Getter
-public class ListDeleteRequest {
+public class DeleteMusicListRequest {
     @Schema(description = "list Id", example = "[1,2,3]", requiredMode = Schema.RequiredMode.REQUIRED)
     private List<Long> listIds;
 }

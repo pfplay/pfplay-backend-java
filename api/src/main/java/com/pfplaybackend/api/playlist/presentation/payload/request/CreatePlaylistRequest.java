@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Schema(description = "Play list")
 @Getter
-public class PlaylistRenameRequest {
+public class CreatePlaylistRequest {
     @Schema(description = "이름", example = "나의 플레이리스트 1", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String name;
 }

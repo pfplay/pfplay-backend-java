@@ -4,11 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 @Schema
 @Builder
-public class ListDeleteResponse {
-    private final List<Long> listIds;
+public class UpdatePlaylistResponse {
+    private final Long id;
+    private final String name;
 }
