@@ -1,18 +1,18 @@
 package com.pfplaybackend.api.user.application.service.temporary;
 
-import com.pfplaybackend.api.config.jwt.JwtProvider;
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
+import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
-import com.pfplaybackend.api.user.domain.model.data.MemberData;
-import com.pfplaybackend.api.user.domain.model.domain.Activity;
-import com.pfplaybackend.api.user.domain.model.domain.Guest;
-import com.pfplaybackend.api.user.domain.model.domain.Member;
-import com.pfplaybackend.api.user.domain.model.domain.Profile;
-import com.pfplaybackend.api.user.domain.model.enums.ActivityType;
-import com.pfplaybackend.api.user.domain.model.value.UserId;
-import com.pfplaybackend.api.user.domain.model.value.WalletAddress;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
+import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.user.domain.value.WalletAddress;
 import com.pfplaybackend.api.user.repository.GuestRepository;
 import com.pfplaybackend.api.user.repository.MemberRepository;
 import jakarta.transaction.Transactional;
@@ -30,6 +30,7 @@ public class TemporaryUserService {
     private final MemberRepository memberRepository;
     private final UserProfileService userProfileService;
     private final UserActivityService userActivityService;
+    private final PlaylistCommandService playlistCommandService;
 
     @Transactional
     public void addTemporaryUsers() {
@@ -43,30 +44,33 @@ public class TemporaryUserService {
         upgradeMember(addAssociateMember(fullMemberId, "FM@google.com"));
     }
 
-    private void addGuest(UserId userId) {
+    public void addGuest(UserId userId) {
         Guest guest = Guest.createWithFixedUserId(userId, "Firefox/MacOS");
         Profile profile = userProfileService.createProfileForGuest(guest);
         Guest updatedGuest = guest.initiateProfile(profile);
         guestRepository.save(updatedGuest.toData());
     }
 
-    private Member addAssociateMember(UserId userId, String email) {
+    public Member addAssociateMember(UserId userId, String email) {
         Member member = Member.createWithFixedUserId(userId, email, ProviderType.GOOGLE);
         Profile profile = userProfileService.createProfileForMember(member);
         Map<ActivityType, Activity> activityMap = userActivityService.createUserActivities(member);
         Member updatedMember = member
                 .initializeProfile(profile)
                 .initializeActivityMap(activityMap);
+
         MemberData memberData = memberRepository.save(updatedMember.toData());
+        playlistCommandService.createDefaultPlaylist(updatedMember.getUserId());
         return memberData.toDomain();
     }
 
-    private void upgradeMember(Member member) {
+    public Member upgradeMember(Member member) {
         // 1. Profile Update
         Member profileUpdatedMember = member.updateProfileBio(new UpdateBioCommand("nickname", "introduction"));
         memberRepository.save(profileUpdatedMember.toData());
         // 2. Wallet Update
         Member walletUpdatedMember = profileUpdatedMember.updateWalletAddress(new WalletAddress("wallet-address"));
         memberRepository.save(walletUpdatedMember.toData());
+        return walletUpdatedMember;
     }
 }

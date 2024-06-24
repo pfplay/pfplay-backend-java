@@ -37,3 +37,4 @@ out/
 .vscode/
 
 /src/test/resources/key/**
+/src/main/resources/application.yml

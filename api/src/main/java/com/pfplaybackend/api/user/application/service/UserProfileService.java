@@ -1,14 +1,17 @@
 package com.pfplaybackend.api.user.application.service;
 
+import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
-import com.pfplaybackend.api.user.domain.model.data.MemberData;
-import com.pfplaybackend.api.user.domain.model.domain.*;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.domain.service.GuestDomainService;
-import com.pfplaybackend.api.user.domain.model.data.GuestData;
-import com.pfplaybackend.api.user.domain.model.value.UserId;
+import com.pfplaybackend.api.user.domain.entity.data.GuestData;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.service.UserDomainService;
 import com.pfplaybackend.api.user.repository.GuestRepository;
 import com.pfplaybackend.api.user.repository.MemberRepository;
@@ -38,21 +41,20 @@ public class UserProfileService {
     }
 
     public ProfileSummaryDto getMyProfileSummary() {
-        UserCredentials userCredentials = UserContext.getUserCredentials();
-        if(userDomainService.isGuest(userCredentials)) {
-            GuestData guestData = guestRepository.findByUserId(userCredentials.getUserId()).orElseThrow();
+        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
+        if(userDomainService.isGuest(userContext)) {
+            GuestData guestData = guestRepository.findByUserId(userContext.getUserId()).orElseThrow();
             return guestData.toDomain().getProfileSummary();
         }else {
-            MemberData memberData = memberRepository.findByUserId(userCredentials.getUserId()).orElseThrow();
+            MemberData memberData = memberRepository.findByUserId(userContext.getUserId()).orElseThrow();
             return memberData.toDomain().getProfileSummary();
         }
     }
 
     @Transactional
     public void updateMyBio(UpdateBioCommand updateBioCommand) {
-        UserCredentials userCredentials = UserContext.getUserCredentials();
-        UserId userId = userCredentials.getUserId();
-        MemberData memberData = memberRepository.findByUserId(userId).orElseThrow();
+        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
+        MemberData memberData = memberRepository.findByUserId(userContext.getUserId()).orElseThrow();
         Member member = memberData.toDomain();
         Member updatedMember = member.updateProfileBio(updateBioCommand);
         memberRepository.save(updatedMember.toData());

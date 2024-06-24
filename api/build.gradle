@@ -55,6 +55,16 @@ dependencies {
 	implementation 'com.google.api-client:google-api-client:1.23.0'
 	implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
 	implementation 'com.google.apis:google-api-services-youtube:v3-rev222-1.25.0'
+
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.0.6'
+
+	// Websocket
+	implementation 'org.springframework.boot:spring-boot-starter-websocket:3.0.6'
+
+	// Cache
+	implementation 'org.springframework.boot:spring-boot-starter-cache:3.0.6'
+
 }
 
 tasks.named('test') {

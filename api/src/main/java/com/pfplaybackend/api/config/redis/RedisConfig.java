@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.config.redis;
 
+import com.pfplaybackend.api.partyroom.application.RedisChatSubscriberService;
 import com.pfplaybackend.api.partyroom.event.listener.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -10,8 +11,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
+@EnableRedisRepositories
 public class RedisConfig {
 
     @Bean
@@ -23,6 +28,8 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
         return template;
     }
 
@@ -42,12 +49,13 @@ public class RedisConfig {
         container.addMessageListener(partymemberRegulationListenerAdapter, new ChannelTopic("partymemberRegulation"));
         container.addMessageListener(djPlaybackListenerAdapter, new ChannelTopic("djPlayback"));
         container.addMessageListener(djQueueListenerAdapter, new ChannelTopic("djQueue"));
+
         return container;
     }
 
     @Bean
     @Qualifier("chat")
-    public MessageListenerAdapter chatTopicListenerAdapter(ChatTopicListener listener) {
+    public MessageListenerAdapter chatTopicListenerAdapter(RedisChatSubscriberService listener) {
         return new MessageListenerAdapter(listener, "handleMessage");
     }
 

@@ -1,7 +1,8 @@
 package com.pfplaybackend.api.playlist.application.dto;
 
-import com.pfplaybackend.api.playlist.domain.model.enums.PlaylistType;
+import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 @Data
 @Schema
 @Builder
+@AllArgsConstructor
 public class PlaylistDto {
     @Schema(description = "Playlist id", example = "1", requiredMode = REQUIRED, type = "long")
     private final Long id;

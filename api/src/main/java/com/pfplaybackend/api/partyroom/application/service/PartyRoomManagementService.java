@@ -1,11 +1,10 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
+import com.pfplaybackend.api.partyroom.domain.enums.PartyroomType;
 import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partyroom;
-import com.pfplaybackend.api.partyroom.domain.model.enums.PartyroomType;
-import com.pfplaybackend.api.partyroom.domain.model.value.LinkAddress;
-import com.pfplaybackend.api.partyroom.domain.model.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
+import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
