@@ -48,18 +48,11 @@ public class UserProfileController {
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 
-    /**
-     * 타인의 프로필 리소스를 조회한다.
-     * 자신의 프로필 리소스를 호출했던 것과 비교했을 때
-     * 응답 객체의 필드 구성이 달라질 수 있음에 주의한다.
-     * @param uid
-     * @return
-     */
-    @PostMapping("/{uid}/profile/summary")
+    @GetMapping("/{userId}/profile/summary")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
-    public ResponseEntity<?> getOtherProfileSummary(@PathVariable String uid,
+    public ResponseEntity<?> getOtherProfileSummary(@PathVariable String userId,
                                                     @RequestBody GetOtherProfileSummaryRequest request) {
-        ProfileSummaryDto profileSummaryDto = userProfileService.getOtherProfileSummary(new UserId(UUID.fromString(uid)), request.getAuthorityTier());
+        ProfileSummaryDto profileSummaryDto = userProfileService.getOtherProfileSummary(new UserId(UUID.fromString(userId)), request.getAuthorityTier());
         return ResponseEntity.ok().body(ApiCommonResponse.success(OtherProfileSummaryResponse.from(profileSummaryDto)));
     }
 }

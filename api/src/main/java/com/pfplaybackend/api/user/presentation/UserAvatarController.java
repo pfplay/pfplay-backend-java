@@ -5,6 +5,7 @@ import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceComman
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
+import com.pfplaybackend.api.user.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
@@ -33,6 +34,15 @@ public class UserAvatarController implements UserAvatarApi {
     public ResponseEntity<?> getMyAllAvatarBodies() {
         List<AvatarBodyDto> avatarBodies = userAvatarService.findMyAvatarBodies();
         return ResponseEntity.ok().body(ApiCommonResponse.success(avatarBodies));
+    }
+
+    // TODO 1개 이상의 Face 가 제공될 수 있는지 여부에 따라서 확장(개선) 필요
+    @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
+    @GetMapping("/me/profile/avatar/faces")
+    public ResponseEntity<?> getMyDefaultAvatarFaces() {
+        return ResponseEntity.ok().body(ApiCommonResponse.success(
+                userAvatarService.findMyAvatarFaces())
+        );
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBER')")

@@ -6,6 +6,7 @@ import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
@@ -34,12 +35,16 @@ public class UserAvatarService {
 
     @Transactional(readOnly = true)
     public AvatarBodyUri getDefaultAvatarBodyUri() {
-        AvatarResource avatarResource = avatarResourceService.getDefaultSettingResource();
+        AvatarResource avatarResource = avatarResourceService.getDefaultSettingResourceAvatarBody();
         return new AvatarBodyUri(avatarResource.getResourceUri());
     }
 
     public AvatarFaceUri getDefaultAvatarFaceUri() {
-        return new AvatarFaceUri(avatarResourceService.getDefaultSettingFace().getResourceUri());
+        return new AvatarFaceUri(avatarResourceService.findAllAvatarFaces().get(0).getResourceUri());
+    }
+
+    public List<AvatarFaceDto> findMyAvatarFaces() {
+        return avatarResourceService.findAllAvatarFaces();
     }
 
     @Transactional(readOnly = true)
