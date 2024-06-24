@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "DJ Music Interaction API", description = "Operations related to partyroom management")
+@Tag(name = "DJ API")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor

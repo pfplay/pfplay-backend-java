@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 이 클래스는 재생 시작/종료와 같은 DJ 행위에 대한 표현 계층을 담당한다.
  * 현재 DJ의 곡 재생과 관련된 동작을 트리거하는 요청을 처리한다.
  */
-@Tag(name = "DJ Playback API", description = "Operations related to partyroom management")
+@Tag(name = "DJ API")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor

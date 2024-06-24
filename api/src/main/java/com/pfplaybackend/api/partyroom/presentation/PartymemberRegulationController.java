@@ -12,7 +12,7 @@ import java.util.UUID;
  * 이 클래스는 파티룸 내에서의 파티원 간의 규제 활동에 대한 표현 계층을 담당한다.
  * 여기서 말하는 규제 활동이란 사용자 간의 등급을 조정하거나 페널티를 부과하는 행위 등을 의미한다.
  */
-@Tag(name = "Partyroom Regulation API", description = "Operations related to partyroom management")
+@Tag(name = "Partyroom API")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor

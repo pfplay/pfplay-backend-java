@@ -12,4 +12,14 @@ public class CookieUtil {
                 .maxAge(3600000)
                 .build();
     }
+
+    public static ResponseCookie getExpiredCookie(String cookieKey) {
+        return ResponseCookie.from(cookieKey, "")
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(0)
+                .build();
+    }
 }
