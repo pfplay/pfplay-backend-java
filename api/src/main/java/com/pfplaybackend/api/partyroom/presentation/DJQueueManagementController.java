@@ -25,9 +25,9 @@ public class DJQueueManagementController {
                              @RequestBody DJQueueAddRequest DJQueueAddRequest) {
     }
 
-    @DeleteMapping("/{partyroomId}/dj/queue/djs/{uid}")
+    @DeleteMapping("/{partyroomId}/dj/queue/djs/{djId}")
     public void removeDJFromQueue(@PathVariable Long partyroomId,
-                                  @PathVariable String uid) {
+                                  @PathVariable String djId) {
 
     }
 }
