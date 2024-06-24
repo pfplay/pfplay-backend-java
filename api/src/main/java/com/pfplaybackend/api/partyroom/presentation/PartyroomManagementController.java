@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.partyroom.application.service.PartyRoomManagementService;
-import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;

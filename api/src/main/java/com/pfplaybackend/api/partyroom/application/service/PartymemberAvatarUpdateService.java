@@ -1,9 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
-import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 

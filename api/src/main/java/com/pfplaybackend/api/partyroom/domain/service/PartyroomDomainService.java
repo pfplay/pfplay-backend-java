@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.partyroom.domain.service;
 
-import com.pfplaybackend.api.partyroom.domain.model.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
