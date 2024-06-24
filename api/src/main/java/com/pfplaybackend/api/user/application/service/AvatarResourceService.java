@@ -7,6 +7,9 @@ import com.pfplaybackend.api.user.repository.AvatarResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -15,15 +18,18 @@ public class AvatarResourceService {
 
     private final AvatarResourceRepository avatarResourceRepository;
 
-    public AvatarResource getDefaultSettingResource() {
+    public AvatarResource getDefaultSettingResourceAvatarBody() {
         return avatarResourceRepository.getDefaultSettingResource().orElseThrow().toDomain();
     }
 
-    public AvatarFaceDto getDefaultSettingFace() {
-        return AvatarFaceDto.builder()
+    public List<AvatarFaceDto> findAllAvatarFaces() {
+        return new ArrayList<>(Collections.singletonList(AvatarFaceDto.builder()
+                .id(1)
                 .name("기본 Face")
                 .resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/avatar_body_1.png?alt=media")
-                .build();
+                .isAvailable(true)
+                .build())
+        );
     }
 
     public List<AvatarBodyDto> findAllAvatarBodies() {
