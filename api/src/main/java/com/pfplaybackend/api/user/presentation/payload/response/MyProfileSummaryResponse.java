@@ -10,18 +10,18 @@ import java.util.List;
 @Data
 @Builder
 public class MyProfileSummaryResponse {
-    private String nickName;
+    private String nickname;
     private String introduction;
-    private String avatarBodyId;
+    private String avatarBodyUri;
     private String avatarFaceUri;
     private String walletAddress;
     private List<ActivitySummaryDto> activitySummaries;
 
     public static MyProfileSummaryResponse from(ProfileSummaryDto profileSummaryDto) {
         return MyProfileSummaryResponse.builder()
-                .nickName(profileSummaryDto.getNickName())
+                .nickname(profileSummaryDto.getNickname())
                 .introduction(profileSummaryDto.getIntroduction())
-                .avatarBodyId(profileSummaryDto.getAvatarBodyId())
+                .avatarBodyUri(profileSummaryDto.getAvatarBodyUri())
                 .avatarFaceUri(profileSummaryDto.getAvatarFaceUri())
                 .walletAddress(profileSummaryDto.getWalletAddress())
                 .activitySummaries(profileSummaryDto.getActivitySummaries())

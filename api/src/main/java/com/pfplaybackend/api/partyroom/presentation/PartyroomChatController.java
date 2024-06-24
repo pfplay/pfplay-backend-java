@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
 
-@Tag(name = "Partyroom Chat API", description = "Chat api")
+@Tag(name = "Chat API")
 @RestController
 @RequiredArgsConstructor
 public class PartyroomChatController implements PartyroomChatApi {

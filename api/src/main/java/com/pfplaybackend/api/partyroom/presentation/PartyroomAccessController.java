@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@Tag(name = "Partyroom Access API", description = "Operations related to partyroom management")
+@Tag(name = "Partyroom API")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor

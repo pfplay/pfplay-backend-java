@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "playlist", description = "playlist api")
+@Tag(name = "Playlist API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/playlists")

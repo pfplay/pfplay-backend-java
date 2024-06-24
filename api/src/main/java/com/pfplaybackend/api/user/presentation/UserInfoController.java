@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "User Info API", description = "Operations related to user's info management")
+@Tag(name = "User Sign API")
 @RequestMapping("/api/v1/users")
 @RestController
 @RequiredArgsConstructor
@@ -24,11 +24,6 @@ public class UserInfoController {
         User user = userInfoService.getMyInfo();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(MyInfoResponse.builder()
-                        .uid(user.getUserId().getUid().toString())
-                        .isProfileUpdated(user.isProfileUpdated())
-                        .registrationDate(user.getCreatedAt().toLocalDate())
-                        .authorityTier(user.getAuthorityTier())
-                        .build());
+                .body(MyInfoResponse.from(user));
     }
 }

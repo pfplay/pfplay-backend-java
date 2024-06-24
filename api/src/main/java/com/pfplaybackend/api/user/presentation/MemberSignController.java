@@ -15,15 +15,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "User Sign API", description = "Operations related to user's sign management")
-@RequestMapping("/api/v1/members")
+@Tag(name = "User Sign API")
+@RequestMapping("/api/v1/users")
 @Controller
 @RequiredArgsConstructor
 public class MemberSignController {
 
     final MemberSignService memberSignService;
 
-    @GetMapping("/sign")
+    @GetMapping("/members/sign")
     public String memberSign(@ModelAttribute @Valid SignMemberRequest request) {
         return memberSignService.getOAuth2RedirectUri(request);
     }
