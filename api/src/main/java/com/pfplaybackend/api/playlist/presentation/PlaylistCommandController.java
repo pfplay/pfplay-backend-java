@@ -8,6 +8,7 @@ import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.presentation.payload.request.DeletePlaylistListRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.request.CreatePlaylistRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.request.UpdatePlaylistRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.response.CreatePlaylistResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,13 +29,10 @@ public class PlaylistCommandController {
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<?> create(@RequestBody @Valid CreatePlaylistRequest request) {
-//        CustomAuthentication authentication = (CustomAuthentication) SecurityContextHolder.getContext().getAuthentication();
-//        UserCredentials userCredentials = (UserCredentials) authentication.getPrincipal();
-//        userCredentials.getUserId()
         Playlist playlist = playlistCommandService.createPlaylist(request.getName());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiCommonResponse.success(playlist));
+                .body(ApiCommonResponse.success(CreatePlaylistResponse.from(playlist)));
     }
 
     @DeleteMapping()

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.playlist.presentation.payload.response;
 
+import com.pfplaybackend.api.common.dto.PaginationDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,15 +11,19 @@ import java.util.List;
 @Getter
 @Builder
 public class QueryMusicListResponse {
-    private List<PlaylistMusicDto> musicList;
-    private int totalPage;
-    private int totalElements;
+    private List<PlaylistMusicDto> content;
+    private PaginationDto pagination;
 
     public static QueryMusicListResponse from(Page<PlaylistMusicDto> page) {
         return QueryMusicListResponse.builder()
-                .musicList(page.getContent())
-                .totalPage(page.getTotalPages())
-                .totalElements((int) page.getTotalElements())
+                .content(page.getContent())
+                .pagination(PaginationDto.builder()
+                        .pageNumber(page.getNumber())
+                        .pageSize(page.getSize())
+                        .totalPages(page.getTotalPages())
+                        .totalElements(page.getTotalElements())
+                        .hasNext(page.hasNext())
+                        .build())
                 .build();
     }
 }

@@ -29,7 +29,7 @@ public class PlaylistCommandService {
      */
     @Transactional
     public void createDefaultPlaylist(UserId userId) {
-        Playlist playlist = new Playlist(0, "그랩한 곡", PlaylistType.GRABLIST, userId);
+        Playlist playlist = Playlist.create(0, "그랩한 곡", PlaylistType.GRABLIST, userId);
         playlistRepository.save(playlist.toData());
     }
 
@@ -42,10 +42,11 @@ public class PlaylistCommandService {
         // 권한 계층별 '생성 제약' 조건에 대한 위반 여부를 검증한다.
         playlistDomainService.checkWhetherExceedConstraints(playlistContext.getAuthorityTier(), playlistDataList.size());
 
+        // Save
         int nextOrderNumber = playlistDataList.isEmpty() ? 1 : playlistDataList.size();
         Playlist playlist = Playlist.create(nextOrderNumber, playlistName, PlaylistType.PLAYLIST, userId);
-        playlistRepository.save(playlist.toData());
-        return playlist;
+        PlaylistData playlistData = playlistRepository.save(playlist.toData());
+        return playlistData.toDomain();
     }
 
 //    public void renamePlaylist(UserId ownerId, Long playlistId, String name) {
