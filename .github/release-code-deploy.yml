@@ -68,8 +68,8 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: JeekLee
+          password: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
 
       - name: Build, tag and push image to Github Container Registry
         uses: docker/build-push-action@v2
@@ -82,17 +82,17 @@ jobs:
             ghcr.io/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
           cache-from: type=gha # Refer: https://docs.docker.com/build/ci/github-actions/cache/
           cache-to: type=gha,mode=max
-
-      # TODO: Pull docker image and run image from Github Packages(Container Registry)
-      # 1. Docker pull
-      # 2. Docker kill
-      # 3. Docker rm
-      # 4. Docker run
-      # 5. Docker rmi
-      - name: Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.GCP_VM_HOST }}
-          username: ubuntu
-          port: 22
-          script: |
+#
+#      # TODO: Pull docker image and run image from Github Packages(Container Registry)
+#      # 1. Docker pull
+#      # 2. Docker kill
+#      # 3. Docker rm
+#      # 4. Docker run
+#      # 5. Docker rmi
+#      - name: Deploy
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.GCP_VM_HOST }}
+#          username: ubuntu
+#          port: 22
+#          script: |
