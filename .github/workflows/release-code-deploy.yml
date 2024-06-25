@@ -104,8 +104,9 @@ jobs:
           port: 22
           key: ${{ secrets.GCP_VM_SSH_SECRET}}
           passphrase: ${{ secrets.GCP_VM_SSH_PASSPHRASE }}
+          envs: PACKAGE_ACCESS_TOKEN, GCR_PACKAGE_NAME
           script: |
-            echo $PACKAGE_ACCESS_TOKEN | docker login ghcr.io -u JeekLee --password-stdin
+            docker login ghcr.io -u JeekLee --password $PACKAGE_ACCESS_TOKEN
             docker pull ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
 
 #      # TODO: Pull docker image and run image from Github Packages(Container Registry)
