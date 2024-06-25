@@ -21,6 +21,9 @@ jobs:
       - name: Set env
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
 
+      - name: Create directory for resources
+        run: mkdir src/main/resources/key
+
       - name: Set application.yml
         env:
           PROPERTY_FILE: ${{ secrets.PROD_PROFILE }}
