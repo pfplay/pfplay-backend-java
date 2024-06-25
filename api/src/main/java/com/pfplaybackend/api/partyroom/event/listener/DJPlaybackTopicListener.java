@@ -8,8 +8,9 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
+
 @AllArgsConstructor
-public class PartyroomNoticeTopicListener implements MessageListener {
+public class DJPlaybackTopicListener implements MessageListener {
 
     private SimpMessageSender messageSender;
     private ObjectMapper objectMapper;

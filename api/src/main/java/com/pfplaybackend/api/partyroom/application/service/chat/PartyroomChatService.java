@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application;
+package com.pfplaybackend.api.partyroom.application.service.chat;
 
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomPenaltyHistory;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
@@ -52,7 +52,6 @@ public class PartyroomChatService {
         if (isProhibitedSendChatUser(userIdUid, partyroomId)) {
             throw new UnsupportedSocketRequestException("This user ggul user");
         }
-
         sendToTopic(chatDto, "chat");
     }
 

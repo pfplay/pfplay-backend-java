@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
-import com.pfplaybackend.api.partyroom.event.EventPublisher;
+import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PartyroomNoticeService {
 
-    private final EventPublisher eventPublisher;
+    private final RedisMessagePublisher redisMessagePublisher;
     private final PartyroomRepository partyroomRepository;
 
     @Transactional

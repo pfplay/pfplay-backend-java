@@ -1,22 +1,22 @@
 package com.pfplaybackend.api.partyroom.event.listener;
 
-import com.pfplaybackend.api.partyroom.event.EventBroadcaster;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfplaybackend.api.config.websocket.SimpMessageSender;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
 
-@Component
-@RequiredArgsConstructor
-public class ChatTopicListener extends AbstractTopicListener {
+@AllArgsConstructor
+public class ChatTopicListener implements MessageListener {
 
-    private final EventBroadcaster eventBroadcaster;
+    private SimpMessageSender messageSender;
+    private ObjectMapper objectMapper;
 
     @Override
-    public void handleMessage(String message) {
-        System.out.println("Received message: " + message);
-        // Convert Logic
-        // ...
+    public void onMessage(Message message, byte[] pattern) {
 
-        // Call Bridge Message
     }
 }

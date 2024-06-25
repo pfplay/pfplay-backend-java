@@ -1,6 +1,5 @@
-package com.pfplaybackend.api.partyroom.application.service;
+package com.pfplaybackend.api.partyroom.application.service.dj;
 
-import com.pfplaybackend.api.partyroom.application.DJPlaybackService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class DJQueueManagementService {
 
     private final PartyroomRepository partyroomRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+    // private final RedisTemplate<String, Object> redisTemplate;
     private final PartyroomDomainService partyroomDomainService;
     private final DJPlaybackService djPlaybackService;
 

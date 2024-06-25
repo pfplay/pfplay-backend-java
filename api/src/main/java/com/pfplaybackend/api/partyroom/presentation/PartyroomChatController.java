@@ -3,7 +3,7 @@ package com.pfplaybackend.api.partyroom.presentation;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
-import com.pfplaybackend.api.partyroom.application.PartyroomChatService;
+import com.pfplaybackend.api.partyroom.application.service.chat.PartyroomChatService;
 
 import com.pfplaybackend.api.partyroom.exception.InvalidPartyroomIdRequestException;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;

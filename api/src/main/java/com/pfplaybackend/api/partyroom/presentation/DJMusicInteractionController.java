@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
-import com.pfplaybackend.api.partyroom.presentation.payload.request.GrabMusicRequest;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.MusicReactionRequest;
+import com.pfplaybackend.api.partyroom.application.service.dj.DJMusicInteractionService;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.TrackReactionRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,17 +13,20 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class DJMusicInteractionController {
 
-    @PutMapping("/{partyroomId}/dj/current-music/reaction")
-    public ResponseEntity<Void> reactToMusic(
+    private final DJMusicInteractionService DJMusicInteractionService;
+
+    @PutMapping("/{partyroomId}/dj/current-track/reaction")
+    public ResponseEntity<Void> reactToTrack(
             @PathVariable Long partyroomId,
-            @RequestBody MusicReactionRequest musicReactionRequest) {
+            @RequestBody TrackReactionRequest trackReactionRequest) {
+        DJMusicInteractionService.reactToCurrentTrack();
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{partyroomId}/dj/current-music/grab")
-    public ResponseEntity<Void> grabMusic(
-            @PathVariable Long partyroomId,
-            @RequestBody GrabMusicRequest grabMusicRequest) {
+    @PostMapping("/{partyroomId}/dj/current-track/grab")
+    public ResponseEntity<Void> grabTrack(
+            @PathVariable Long partyroomId) {
+        DJMusicInteractionService.grabCurrentTrack();
         return ResponseEntity.ok().build();
     }
 }
