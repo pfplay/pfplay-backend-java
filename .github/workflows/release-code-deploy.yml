@@ -90,8 +90,8 @@ jobs:
           file: ./api/Dockerfile-deploy
           push: true
           tags: |
-            ghcr.io/${{ env.GCR_PACKAGE_NAME }}:latest
-            ghcr.io/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
+            ghcr.io/JeekLee/${{ env.GCR_PACKAGE_NAME }}:latest
+            ghcr.io/JeekLee/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
           cache-from: type=gha # Refer: https://docs.docker.com/build/ci/github-actions/cache/
           cache-to: type=gha,mode=max
 #
