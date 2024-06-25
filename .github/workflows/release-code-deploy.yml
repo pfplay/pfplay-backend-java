@@ -8,7 +8,6 @@ on:
 env:
   RESOURCE_DIR: src/main/resources
   GCR_PACKAGE_NAME: prod-pfplay-backend-java
-
 jobs:
   deploy:
     name: Build and dockerize & deploy
@@ -61,7 +60,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-            
+
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
@@ -85,21 +84,26 @@ jobs:
           file: ./api/Dockerfile-deploy
           push: true
           tags: |
-            ghcr.io/${{ env.GCR_PACKAGE_NAME }}:latest
-            ghcr.io/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
+            ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:latest
+            ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
           cache-from: type=gha # Refer: https://docs.docker.com/build/ci/github-actions/cache/
           cache-to: type=gha,mode=max
-#
-#      # TODO: Pull docker image and run image from Github Packages(Container Registry)
-#      # 1. Docker pull
-#      # 2. Docker kill
-#      # 3. Docker rm
-#      # 4. Docker run
-#      # 5. Docker rmi
-#      - name: Deploy
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.GCP_VM_HOST }}
-#          username: ubuntu
-#          port: 22
-#          script: |
+
+      - name: Pull image from Github registry to GCP VM
+        uses: appleboy/ssh-action@master
+        env:
+          PACKAGE_ACCESS_TOKEN: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
+          GCR_PACKAGE_NAME: ${{ env.GCR_PACKAGE_NAME }}
+        with:
+          host: ${{ secrets.GCP_VM_INSTANCE }}
+          username: gm
+          port: 22
+          key: ${{ secrets.GCP_VM_SSH_SECRET}}
+          passphrase: ${{ secrets.GCP_VM_SSH_PASSPHRASE }}
+          envs: PACKAGE_ACCESS_TOKEN, GCR_PACKAGE_NAME
+          script: |
+            docker stop pfplay-api-server && docker rm pfplay-api-server
+            echo $PACKAGE_ACCESS_TOKEN | docker login ghcr.io -u JeekLee --password-stdin
+            docker pull ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
+            docker run -d --name pfplay-api-server -p 8088:8088 --restart unless-stopped ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
+            
