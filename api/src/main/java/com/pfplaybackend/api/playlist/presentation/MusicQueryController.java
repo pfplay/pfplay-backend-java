@@ -27,7 +27,7 @@ public class MusicQueryController {
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(
-                        QueryMusicListResponse.from(musicQueryService.getMusics(playlistId, request.getPageNo(), request.getPageSize()))
+                        QueryMusicListResponse.from(musicQueryService.getMusics(playlistId, request.getPageNumber(), request.getPageSize()))
                 ));
     }
 }
