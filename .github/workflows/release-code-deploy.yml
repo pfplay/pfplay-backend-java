@@ -89,7 +89,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:latest
-            ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
+#            ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
           cache-from: type=gha # Refer: https://docs.docker.com/build/ci/github-actions/cache/
           cache-to: type=gha,mode=max
 
