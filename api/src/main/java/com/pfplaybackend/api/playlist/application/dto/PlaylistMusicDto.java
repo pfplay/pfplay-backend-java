@@ -9,10 +9,9 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class PlaylistMusicDto {
-    private Long musicId;
-    private UserId ownerId;
-    private Integer orderNumber;
+    private String linkId;
     private String name;
+    private Integer orderNumber;
     private String duration;
     private String thumbnailImage;
 }
