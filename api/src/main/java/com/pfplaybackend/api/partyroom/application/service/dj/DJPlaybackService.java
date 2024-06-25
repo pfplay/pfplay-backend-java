@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application;
+package com.pfplaybackend.api.partyroom.application.service.dj;
 
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import lombok.RequiredArgsConstructor;

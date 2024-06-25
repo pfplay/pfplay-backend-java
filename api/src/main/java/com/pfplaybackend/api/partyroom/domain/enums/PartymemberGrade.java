@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.domain.model.enums;
+package com.pfplaybackend.api.partyroom.domain.enums;
 
 public enum PartymemberGrade {
     HOST,

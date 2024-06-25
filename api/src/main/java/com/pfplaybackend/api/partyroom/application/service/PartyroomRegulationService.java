@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class PartymemberRegulationService {
+public class PartyroomRegulationService {
 
     private final PartyroomAccessService partyroomAccessService;
 

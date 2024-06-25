@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
-import com.pfplaybackend.api.partyroom.application.DJPlaybackService;
+import com.pfplaybackend.api.partyroom.application.service.dj.DJPlaybackService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application;
+package com.pfplaybackend.api.partyroom.application.service.chat;
 
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
 import lombok.RequiredArgsConstructor;

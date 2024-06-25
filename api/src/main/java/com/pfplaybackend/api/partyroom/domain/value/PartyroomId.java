@@ -1,18 +1,23 @@
 package com.pfplaybackend.api.partyroom.domain.value;
 
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.Objects;
 
-@NoArgsConstructor
+@Getter
 public class PartyroomId {
     private Long id;
+
+    public PartyroomId() {}
 
     public PartyroomId(Long id) {
         this.id = id;
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -20,12 +25,10 @@ public class PartyroomId {
         return Objects.equals(id, partyroomId.id);
     }
 
-    @Override
     public int hashCode() {
         return Objects.hash(id);
     }
 
-    @Override
     public String toString() {
         return String.valueOf(id);
     }

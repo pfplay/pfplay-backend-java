@@ -1,7 +1,10 @@
 package com.pfplaybackend.api.config.redis;
 
-import com.pfplaybackend.api.partyroom.application.RedisChatSubscriberService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfplaybackend.api.config.websocket.SimpMessageSender;
+import com.pfplaybackend.api.partyroom.application.service.chat.RedisChatSubscriberService;
 import com.pfplaybackend.api.partyroom.event.listener.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,11 +17,13 @@ import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @EnableRedisRepositories
+@RequiredArgsConstructor
 public class RedisConfig {
 
     @Value("${spring.data.redis.host}")
@@ -39,64 +44,30 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
+        //
         template.setKeySerializer(new StringRedisSerializer());
-        template.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+        template.setHashKeySerializer(new StringRedisSerializer());
+        //
+        Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
+        template.setValueSerializer(serializer);
+        template.setHashValueSerializer(serializer);
+        //
+        template.afterPropertiesSet();
         return template;
     }
 
     @Bean
     public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
-                                                        @Qualifier("chat") MessageListenerAdapter chatListenerAdapter,
-                                                        @Qualifier("partyroomAccess") MessageListenerAdapter partyroomAccessListenerAdapter,
-                                                        @Qualifier("partyroomNotice") MessageListenerAdapter partyroomNoticeListenerAdapter,
-                                                        @Qualifier("partymemberRegulation") MessageListenerAdapter partymemberRegulationListenerAdapter,
-                                                        @Qualifier("djPlayback") MessageListenerAdapter djPlaybackListenerAdapter,
-                                                        @Qualifier("djQueue") MessageListenerAdapter djQueueListenerAdapter) {
+                                                        SimpMessageSender simpMessageSender, ObjectMapper objectMapper) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.addMessageListener(chatListenerAdapter, new ChannelTopic("chat"));
-        container.addMessageListener(partyroomAccessListenerAdapter, new ChannelTopic("partyroomAccess"));
-        container.addMessageListener(partyroomNoticeListenerAdapter, new ChannelTopic("partyroomNotice"));
-        container.addMessageListener(partymemberRegulationListenerAdapter, new ChannelTopic("partymemberRegulation"));
-        container.addMessageListener(djPlaybackListenerAdapter, new ChannelTopic("djPlayback"));
-        container.addMessageListener(djQueueListenerAdapter, new ChannelTopic("djQueue"));
-
+        // TODO
+        container.addMessageListener(new SampleTopicListener(simpMessageSender, objectMapper), new ChannelTopic("sample"));
+        container.addMessageListener(new ChatTopicListener(simpMessageSender, objectMapper), new ChannelTopic("chat"));
+        container.addMessageListener(new PartyroomAccessTopicListener(simpMessageSender, objectMapper), new ChannelTopic("access"));
+        container.addMessageListener(new PartyroomNoticeTopicListener(simpMessageSender, objectMapper), new ChannelTopic("regulation"));
+        container.addMessageListener(new PartyroomRegulationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("notice"));
+        container.addMessageListener(new DJPlaybackTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback"));
         return container;
-    }
-
-    @Bean
-    @Qualifier("chat")
-    public MessageListenerAdapter chatTopicListenerAdapter(RedisChatSubscriberService listener) {
-        return new MessageListenerAdapter(listener, "handleMessage");
-    }
-
-    @Bean
-    @Qualifier("partyroomAccess")
-    public MessageListenerAdapter partyroomAccessListenerAdapter(PartyroomAccessTopicListener listener) {
-        return new MessageListenerAdapter(listener, "handleMessage");
-    }
-
-    @Bean
-    @Qualifier("partyroomNotice")
-    public MessageListenerAdapter partyroomNoticeListenerAdapter(PartyroomNoticeTopicListener listener) {
-        return new MessageListenerAdapter(listener, "handleMessage");
-    }
-
-    @Bean
-    @Qualifier("partymemberRegulation")
-    public MessageListenerAdapter partymemberRegulationTopicListenerAdapter(PartymemberRegulationTopicListener listener) {
-        return new MessageListenerAdapter(listener, "handleMessage");
-    }
-
-    @Bean
-    @Qualifier("djPlayback")
-    public MessageListenerAdapter djPlaybackListenerAdapter(DJPlaybackListener listener) {
-        return new MessageListenerAdapter(listener, "handleMessage");
-    }
-
-    @Bean
-    @Qualifier("djQueue")
-    public MessageListenerAdapter djQueueListenerAdapter(DJQueueTopicListener listener) {
-        return new MessageListenerAdapter(listener, "handleMessage");
     }
 }

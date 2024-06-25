@@ -1,5 +1,10 @@
-package com.pfplaybackend.api.partyroom.domain.model.enums;
+package com.pfplaybackend.api.partyroom.domain.enums;
 
 public enum MessageTopic {
-    PARTYROOM_ACCESS,
+    SAMPLE,
+    ACCESS,
+    NOTICE,
+    REGULATION,
+    PLAYBACK,
+    CHAT
 }

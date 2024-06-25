@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.domain.specification;
 
-import com.pfplaybackend.api.partyroom.domain.model.enums.PartymemberGrade;
+
+import com.pfplaybackend.api.partyroom.domain.enums.PartymemberGrade;
 
 public class PartymemberGradeSpecification {
     public boolean isAllowedToUpdateLevel() {

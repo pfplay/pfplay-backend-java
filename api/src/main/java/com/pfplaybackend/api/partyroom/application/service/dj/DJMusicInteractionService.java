@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application.service;
+package com.pfplaybackend.api.partyroom.application.service.dj;
 
 import com.pfplaybackend.api.playlist.application.GrabService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
@@ -11,9 +11,9 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class TrackInteractionService {
+public class DJMusicInteractionService {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    // private final RedisTemplate<String, Object> redisTemplate;
     // private final TrackInteractionHistoryRepository trackInteractionHistoryRepository;
     // TODO Call Other BoundaryContext
     private final GrabService grabService;

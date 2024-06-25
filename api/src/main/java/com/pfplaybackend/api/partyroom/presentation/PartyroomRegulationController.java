@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
-import com.pfplaybackend.api.partyroom.application.service.PartymemberRegulationService;
+import com.pfplaybackend.api.partyroom.application.service.PartyroomRegulationService;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.ModifyLevelRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,9 @@ import java.util.UUID;
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor
-public class PartymemberRegulationController {
+public class PartyroomRegulationController {
 
-    final private PartymemberRegulationService partymemberRegulationService;
+    final private PartyroomRegulationService partyroomRegulationService;
 
     @PutMapping("/{partyroomId}/partymembers/{partymemberId}/level")
     public void modifyLevel(@PathVariable("partyroomId") Long partyroomId,
