@@ -6,7 +6,7 @@ on:
       - 'v*'
 
 env:
-  RESOURCE_DIR: src/main/resources
+  RESOURCE_DIR: api/src/main/resources
   GCR_PACKAGE_NAME: prod-pfplay-backend-java
 
 jobs:
@@ -22,7 +22,7 @@ jobs:
         run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
 
       - name: Create directory for resources
-        run: mkdir src/main/resources/key
+        run: mkdir -p $RESOURCE_DIR/key
 
       - name: Set application.yml
         env:
@@ -78,7 +78,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./Dockerfile
+          file: ./api/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ env.GCR_PACKAGE_NAME }}:latest
