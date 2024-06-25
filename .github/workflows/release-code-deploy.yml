@@ -94,6 +94,18 @@ jobs:
             ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
           cache-from: type=gha # Refer: https://docs.docker.com/build/ci/github-actions/cache/
           cache-to: type=gha,mode=max
+
+      - name: Pull image from Github registry to GCP VM
+        uses: appleboy/ssh-action@master
+        env:
+          host: ${{ secrets.GCP_VM_INSTANCE }}
+          username: pfplay-ops
+          port: 22
+          key: ${{ secrets.GCP_VM_SSH_SECRET}}
+          script: |
+            cat ${{ secrets.PACKAGE_ACCESS_TOKEN }} | docker login ghcr.io -u JeekLee --password-stdin
+            docker pull ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:latest
+
 #
 #      # TODO: Pull docker image and run image from Github Packages(Container Registry)
 #      # 1. Docker pull
