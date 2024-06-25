@@ -82,7 +82,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./api/Dockerfile
+          file: ./api/Dockerfile-deploy
           push: true
           tags: |
             ghcr.io/${{ env.GCR_PACKAGE_NAME }}:latest
