@@ -99,7 +99,7 @@ jobs:
         uses: appleboy/ssh-action@master
         env:
           host: ${{ secrets.GCP_VM_INSTANCE }}
-          username: pfplay-ops
+          username: gm
           port: 22
           key: ${{ secrets.GCP_VM_SSH_SECRET}}
           script: |
