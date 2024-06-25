@@ -6,13 +6,17 @@ on:
       - 'v*'
 
 env:
-  RESOURCE_DIR: api/src/main/resources
+  RESOURCE_DIR: src/main/resources
   GCR_PACKAGE_NAME: prod-pfplay-backend-java
 
 jobs:
   deploy:
     name: Build and dockerize & deploy
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: api
 
     steps:
       - name: Checkout
@@ -59,10 +63,10 @@ jobs:
             ${{ runner.os }}-gradle-
             
       - name: Grant execute permission for gradlew
-        run: chmod +x ./api/gradlew
+        run: chmod +x ./gradlew
 
       - name: Build with Gradle
-        run: ./api/gradlew build -x test
+        run: ./gradlew build -x test
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -78,7 +82,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: .
-          file: ./api/Dockerfile
+          file: ./Dockerfile
           push: true
           tags: |
             ghcr.io/${{ env.GCR_PACKAGE_NAME }}:latest
