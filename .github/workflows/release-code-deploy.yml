@@ -106,19 +106,8 @@ jobs:
           passphrase: ${{ secrets.GCP_VM_SSH_PASSPHRASE }}
           envs: PACKAGE_ACCESS_TOKEN, GCR_PACKAGE_NAME
           script: |
+            docker stop pfplay-api-server && docker rm pfplay-api-server
             echo $PACKAGE_ACCESS_TOKEN | docker login ghcr.io -u JeekLee --password-stdin
             docker pull ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
-
-#      # TODO: Pull docker image and run image from Github Packages(Container Registry)
-#      # 1. Docker pull
-#      # 2. Docker kill
-#      # 3. Docker rm
-#      # 4. Docker run
-#      # 5. Docker rmi
-#      - name: Deploy
-#        uses: appleboy/ssh-action@master
-#        with:
-#          host: ${{ secrets.GCP_VM_HOST }}
-#          username: ubuntu
-#          port: 22
-#          script: |
+            docker run -d --name pfplay-api-server -p 8088:8088 --restart unless-stopped ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
+            
