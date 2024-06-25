@@ -102,6 +102,7 @@ jobs:
           username: gm
           port: 22
           key: ${{ secrets.GCP_VM_SSH_SECRET}}
+          passphrase: ${{ secrets.GCP_VM_SSH_PASSPHRASE }}
           script: |
             cat ${{ secrets.PACKAGE_ACCESS_TOKEN }} | docker login ghcr.io -u JeekLee --password-stdin
             docker pull ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:latest
