@@ -59,10 +59,10 @@ jobs:
             ${{ runner.os }}-gradle-
             
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+        run: chmod +x ./api/gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build -x test
+        run: ./api/gradlew build -x test
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
