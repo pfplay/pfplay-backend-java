@@ -23,7 +23,8 @@
 hs_err_pid*
 replay_pid*
 
-*.yml
+application.yml
+docker-compose.yml
 .idea
 
 
