@@ -103,7 +103,7 @@ jobs:
           envs: PACKAGE_ACCESS_TOKEN, GCR_PACKAGE_NAME
           script: |
             docker stop pfplay-api-server && docker rm pfplay-api-server
-            sudo docker rmi $(docker images | grep "pfplay-api-server") -f
+            sudo docker rmi $(docker images | grep "prod-pfplay-backend-java") -f
             echo $PACKAGE_ACCESS_TOKEN | docker login ghcr.io -u JeekLee --password-stdin
             docker pull ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
             docker run -d --name pfplay-api-server -p 8088:8080 --restart unless-stopped ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
