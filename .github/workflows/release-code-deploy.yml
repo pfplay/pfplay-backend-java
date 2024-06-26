@@ -106,5 +106,6 @@ jobs:
             sudo docker rmi $(docker images | grep "pfplay-api-server") -f
             echo $PACKAGE_ACCESS_TOKEN | docker login ghcr.io -u JeekLee --password-stdin
             docker pull ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
-            docker run -d --name pfplay-api-server -p 8088:8080 --restart unless-stopped ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest --network api_backend
-            
+            docker run -d --name pfplay-api-server -p 8088:8080 --restart unless-stopped ghcr.io/pfplay/$GCR_PACKAGE_NAME:latest
+            docker network connect api_backend pfplay-api-server
+
