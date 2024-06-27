@@ -12,6 +12,6 @@ public class SamplePartyroomService {
     private final RedisMessagePublisher redisMessagePublisher;
 
     public void method_a() {
-        redisMessagePublisher.publish(MessageTopic.SAMPLE, new Object());
+        // redisMessagePublisher.publish(MessageTopic.SAMPLE, new Object());
     }
 }

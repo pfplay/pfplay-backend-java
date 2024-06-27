@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.repository;
 
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomUser;
+import com.pfplaybackend.api.partyroom.domain.entity.data.deprecated.PartyroomUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

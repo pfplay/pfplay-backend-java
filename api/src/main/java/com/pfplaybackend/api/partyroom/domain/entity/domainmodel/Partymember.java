@@ -1,14 +1,38 @@
 package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
-import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.user.domain.value.UserId;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
+@Setter
 @Getter
 public class Partymember {
-    private PartymemberId partymemberId;
+    private long id;
+    private PartyroomId partyroomId;
+    private UserId userId;
+    private AuthorityTier authorityTier;
+    private GradeType gradeType;
+    private boolean isActive;
+    private boolean isBanned;
 
-    public static Partymember create() {
-        return new Partymember();
+    public Partymember() {}
+
+    @Builder
+    public Partymember(long id, PartyroomId partyroomId, UserId userId, AuthorityTier authorityTier) {
+        this.id = id;
+        this.partyroomId = partyroomId;
+        this.userId = userId;
+        this.authorityTier = authorityTier;
+    }
+
+    public static Partymember create(UserId userId, AuthorityTier authorityTier) {
+        return Partymember.builder()
+                .userId(userId)
+                .authorityTier(authorityTier)
+                .build();
     }
 }

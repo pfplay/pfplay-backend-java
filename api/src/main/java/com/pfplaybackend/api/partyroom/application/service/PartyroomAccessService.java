@@ -17,14 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class PartyroomAccessService {
 
     private final PartyroomRepository partyroomRepository;
-    // TODO
     private final UserProfileService userProfileService;
     private final PartyroomDomainService partyroomDomainService;
     private final RedisMessagePublisher redisMessagePublisher;
 
     // TODO Publish event only when the transaction is successful
     @Transactional
-    public void enter() {
+    public void tryEnter() {
         // AccessMessage message = new AccessMessage(new TmpUser(50L));
         AccessMessage message = new AccessMessage(new PartyroomId(50L));
 

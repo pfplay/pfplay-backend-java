@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.partyroom.application.service.PartyroomRegulationService;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.ModifyLevelRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateMemberGradeRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +23,8 @@ public class PartyroomRegulationController {
     @PutMapping("/{partyroomId}/partymembers/{partymemberId}/level")
     public void modifyLevel(@PathVariable("partyroomId") Long partyroomId,
                             @PathVariable("partymemberId") UUID partymemberId,
-                            ModifyLevelRequest modifyLevelRequest) {
-        // TODO Q. 같은 레벨 사람에게도 강등시킬 수 있나?
+                            UpdateMemberGradeRequest request) {
+        // TODO
     }
 
     @PostMapping("/{partyroomId}/partymembers/{partymemberId}/penalties")

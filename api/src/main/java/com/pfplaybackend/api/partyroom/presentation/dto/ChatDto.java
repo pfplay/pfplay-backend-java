@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation.dto;
 
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomUser;
+import com.pfplaybackend.api.partyroom.domain.entity.data.deprecated.PartyroomUser;
 import jakarta.persistence.Embedded;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

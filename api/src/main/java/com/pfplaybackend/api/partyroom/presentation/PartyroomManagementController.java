@@ -1,9 +1,11 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
-import com.pfplaybackend.api.partyroom.application.service.PartyRoomManagementService;
+import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.partyroom.application.service.PartyroomManagementService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateDjQueueStatusRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class PartyroomManagementController {
 
-    private final PartyRoomManagementService partyRoomManagementService;
+    private final PartyroomManagementService partyRoomManagementService;
 
     @PostMapping
     public ResponseEntity<Partyroom> createPartyroom(CreatePartyroomRequest createPartyroomRequest) {
@@ -29,5 +31,12 @@ public class PartyroomManagementController {
     @DeleteMapping("/{partyroomId}")
     public void deletePartyroom(@PathVariable Long partyroomId) {
         partyRoomManagementService.deletePartyRoom(new PartyroomId(partyroomId));
+    }
+
+    @PutMapping("/{partyroomId}/dj-queue")
+    public ResponseEntity<?> updateDjQueue(@PathVariable Long partyroomId, @RequestBody UpdateDjQueueStatusRequest request) {
+        partyRoomManagementService.updateDjQueueStatus(new PartyroomId(partyroomId), request);
+        return ResponseEntity.ok()
+                .body(ApiCommonResponse.success("OK"));
     }
 }

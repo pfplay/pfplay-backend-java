@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.application.service.chat;
 
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomPenaltyHistory;
+import com.pfplaybackend.api.partyroom.domain.entity.data.deprecated.PartyroomPenaltyHistory;
 import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
 import com.pfplaybackend.api.partyroom.presentation.dto.ChatDto;
 import com.pfplaybackend.api.partyroom.repository.PartyroomPenaltyHistoryRepository;
