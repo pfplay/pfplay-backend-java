@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.partyroom.application.service.PartyroomNoticeService;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.RegisterNoticeRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateNoticeRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,7 @@ public class PartyroomNoticeController {
 
     @PutMapping("/{partyroomId}/notice")
     public ResponseEntity<Void> registerNotice(@PathVariable Long partyroomId,
-                                               RegisterNoticeRequest registerNoticeRequest) {
+                                               UpdateNoticeRequest updateNoticeRequest) {
         return ResponseEntity.ok().build();
     }
 }

@@ -1,35 +1,32 @@
 package com.pfplaybackend.api.partyroom.domain.value;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Embeddable;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 @Getter
-public class PartyroomId {
-    private Long id;
-
+@Embeddable
+public class PartyroomId implements Serializable {
+    private long id;
     public PartyroomId() {}
-
-    public PartyroomId(Long id) {
+    public PartyroomId(long id) {
         this.id = id;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PartyroomId partyroomId = (PartyroomId) o;
-        return Objects.equals(id, partyroomId.id);
+        return id == partyroomId.id;
     }
 
+    @Override
     public int hashCode() {
         return Objects.hash(id);
     }
-
-    public String toString() {
-        return String.valueOf(id);
-    }
 }
+

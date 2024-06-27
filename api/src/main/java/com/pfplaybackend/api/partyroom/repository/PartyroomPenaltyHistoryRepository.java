@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.repository;
 
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomPenaltyHistory;
+import com.pfplaybackend.api.partyroom.domain.entity.data.deprecated.PartyroomPenaltyHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
