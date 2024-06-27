@@ -27,10 +27,9 @@ public class PlaylistMusicRepositoryImpl implements PlaylistMusicRepositoryCusto
 
         List<PlaylistMusicDto> playlistMusics = queryFactory
                 .select(Projections.constructor(PlaylistMusicDto.class,
-                        qPlaylistMusicData.id,
-                        qPlaylistMusicData.playlistData.ownerId,
-                        qPlaylistMusicData.orderNumber,
+                        qPlaylistMusicData.linkId,
                         qPlaylistMusicData.name,
+                        qPlaylistMusicData.orderNumber,
                         qPlaylistMusicData.duration,
                         qPlaylistMusicData.thumbnailImage))
                 .from(qPlaylistMusicData)
