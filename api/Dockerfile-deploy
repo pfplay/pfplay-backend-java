@@ -1,0 +1,5 @@
+FROM eclipse-temurin:17-jdk
+
+COPY api/build/libs/*-SNAPSHOT.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev", "app.jar"]

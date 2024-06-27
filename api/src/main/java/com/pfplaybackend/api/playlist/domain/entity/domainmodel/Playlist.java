@@ -7,14 +7,16 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
 public class Playlist {
-    private final Integer orderNumber;
+    private long id;
     private final String name;
-    private final PlaylistType type;
     private final UserId ownerId;
+    private final PlaylistType type;
+    private final Integer orderNumber;
 
-    public Playlist(Integer orderNumber, String name, PlaylistType type, UserId ownerId) {
+    @Builder
+    public Playlist(long id, Integer orderNumber, String name, PlaylistType type, UserId ownerId) {
+        this.id = id;
         this.orderNumber = orderNumber;
         this.name = name;
         this.type = type;
@@ -31,6 +33,11 @@ public class Playlist {
     }
 
     static public Playlist create(Integer orderNumber, String name, PlaylistType type, UserId ownerId) {
-        return new Playlist(orderNumber, name, type, ownerId);
+        return Playlist.builder()
+                .type(type)
+                .name(name)
+                .ownerId(ownerId)
+                .orderNumber(orderNumber)
+                .build();
     }
 }
