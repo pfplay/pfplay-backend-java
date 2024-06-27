@@ -38,6 +38,17 @@ public class DjManagementController {
      *
      * @param partyroomId
      */
+    @DeleteMapping("/{partyroomId}/djs/me")
+    public ResponseEntity<?> dequeueDj(@PathVariable Long partyroomId) {
+        djManagementService.dequeueDj(new PartyroomId(partyroomId));
+        return ResponseEntity.ok()
+                .body(ApiCommonResponse.success("OK"));
+    }
+
+    /**
+     *
+     * @param partyroomId
+     */
     @DeleteMapping("/{partyroomId}/djs/{djId}")
     public ResponseEntity<?> dequeueDj(@PathVariable Long partyroomId, @PathVariable Long djId) {
         djManagementService.dequeueDj(new PartyroomId(partyroomId), new DjId(djId));

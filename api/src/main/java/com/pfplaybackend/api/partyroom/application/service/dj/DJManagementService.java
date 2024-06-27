@@ -13,13 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DJManagementService {
 
     private final PartyroomRepository partyroomRepository;
-    // private final RedisTemplate<String, Object> redisTemplate;
     private final PartyroomDomainService partyroomDomainService;
     private final DjPlaybackService djPlaybackService;
-
-    // TODO
-    // Q. DJQueue 를 '객체 수준'으로 관리할 것인가?
-    //
 
     @Transactional
     public void enqueueDj(PartyroomId partyroomId) {
@@ -32,8 +27,21 @@ public class DJManagementService {
         // TODO 파티룸 활성화 상태 여부 조사
     }
 
+    /**
+     * 대기열에 등록된 자신을 제거한다. (무효화한다.)
+     * @param partyroomId
+     */
+    @Transactional
+    public void dequeueDj(PartyroomId partyroomId) {
+    }
+
+    /**
+     * 대기열에 등록된 특정 Dj를 제거한다. (무효화한다.)
+     * @param partyroomId
+     * @param djId
+     */
     @Transactional
     public void dequeueDj(PartyroomId partyroomId, DjId djId) {
-        // 대기열이 잠겨 있어도 삭제는 된다.
+        // TODO 관리자 등급 여부를 체크
     }
 }

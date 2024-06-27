@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.repository;
+package com.pfplaybackend.api.partyroom.repository.deprecated;
 
 import com.pfplaybackend.api.partyroom.domain.entity.data.deprecated.PartyroomUser;
 import org.springframework.data.jpa.repository.JpaRepository;

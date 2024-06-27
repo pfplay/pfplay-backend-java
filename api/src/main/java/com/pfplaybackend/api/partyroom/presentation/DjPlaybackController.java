@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.partyroom.application.service.dj.DjPlaybackService;
+import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,22 +21,13 @@ public class DjPlaybackController {
 
     private DjPlaybackService djPlaybackService;
 
-//    /**
-//     * 현재 DJ의 곡 재생에 대한 시작 동작을 트리거 한다.
-//     * @param partyroomId
-//     */
-//    @PostMapping("/{partyroomId}/dj/playback/start")
-//    void playBackStart(@PathVariable Long partyroomId) {
-//
-//    }
-
     /**
      * 현재 DJ의 곡 재생에 대한 완료 동작을 트리거 한다.
      * @param partyroomId
      */
     @PostMapping("/{partyroomId}/dj/playback/complete")
     void playBackComplete(@PathVariable Long partyroomId) {
-
+        djPlaybackService.complete(new PartyroomId(partyroomId));
     }
 
     /**
@@ -43,7 +35,7 @@ public class DjPlaybackController {
      * 현재 DJ의 곡 재생에 대한 중단 동작을 트리거 한다.
      * @param partyroomId
      */
-    @PostMapping("/{partyroomId}/dj/playback/stop")
+    @PostMapping("/{partyroomId}/dj/playback/skip")
     void playBackStop(@PathVariable Long partyroomId) {
 
     }

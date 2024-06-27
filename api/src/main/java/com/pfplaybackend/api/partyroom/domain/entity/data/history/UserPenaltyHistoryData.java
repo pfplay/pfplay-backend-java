@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
         name = "USER_PENALTY_HISTORY"
 )
 @Entity
-public class UserPenaltyHistory {
+public class UserPenaltyHistoryData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,5 +54,5 @@ public class UserPenaltyHistory {
     @Column(name = "released_by_user_id")
     private Long releasedByUserId;
 
-    public UserPenaltyHistory() {}
+    public UserPenaltyHistoryData() {}
 }

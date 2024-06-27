@@ -26,6 +26,9 @@ public class DjData {
 
     private int orderNumber;
 
+    // Dj 대기열에서 삭제되었을 경우, 레코드 무효화
+    private boolean isDeleted;
+
     // 데이터 엔티티 생성자
     public DjData() {}
 }

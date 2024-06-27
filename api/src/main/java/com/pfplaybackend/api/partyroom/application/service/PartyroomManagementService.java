@@ -25,7 +25,7 @@ public class PartyroomManagementService {
         String title = "메인 스테이지";
         String description = "이곳은 메인 스테이지입니다.";
         String suffixUri = "main";
-        partyroomDomainService.isLinkAddressDuplicated(suffixUri);
+        partyroomDomainService.checkIsLinkAddressDuplicated(suffixUri);
 //        Partymember partymember = Partymember.create();
 //        Partyroom partyroom = Partyroom.create(title, description, suffixUri, partymember, StageType.MAIN);
 //        partyroomRepository.save(partyroom.toData());
@@ -35,11 +35,11 @@ public class PartyroomManagementService {
     public Partyroom createGeneralPartyRoom(CreatePartyroomRequest createPartyroomRequest) {
         try {
             // AuthorityType.FM
-            partyroomDomainService.isQualifiedToCreatePartyroom();
+            partyroomDomainService.checkIsQualifiedToCreate();
             String title = createPartyroomRequest.getTitle();
-            String description = createPartyroomRequest.getDescription();
-            String suffixUri = createPartyroomRequest.getSuffixUri();
-            partyroomDomainService.isLinkAddressDuplicated(suffixUri);
+            String introduction = createPartyroomRequest.getIntroduction();
+            String suffixUri = createPartyroomRequest.getLinkDomain();
+            partyroomDomainService.checkIsLinkAddressDuplicated(suffixUri);
 //            Partymember partymember = Partymember.create();
 //            Partyroom partyroom = Partyroom.create(title, description, suffixUri, partymember, StageType.GENERAL);
 //            partyroomRepository.save(partyroom.toData());
@@ -59,5 +59,9 @@ public class PartyroomManagementService {
     @Transactional
     public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
 
+    }
+
+    public void updatePlaybackActivationStatus(PartyroomId partyroomId, boolean isPlaybackActivated) {
+        // TODO
     }
 }
