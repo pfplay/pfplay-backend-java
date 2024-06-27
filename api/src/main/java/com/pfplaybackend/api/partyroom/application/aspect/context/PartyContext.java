@@ -1,21 +1,20 @@
 package com.pfplaybackend.api.partyroom.application.aspect.context;
 
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
+import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
+import com.pfplaybackend.api.user.domain.value.UserId;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.security.core.Authentication;
 
+@Getter
+@AllArgsConstructor
 public class PartyContext {
-    private static final ThreadLocal<UserCredentials> userThreadLocal = new ThreadLocal<>();
+    UserId userId;
+    AuthorityTier authorityTier;
 
-    public static void setUserCredentials(Authentication authentication) {
-        UserCredentials userCredentials = (UserCredentials) authentication.getPrincipal();
-        userThreadLocal.set(userCredentials);
-    }
-
-    public static UserCredentials getUserCredentials() {
-        return userThreadLocal.get();
-    }
-
-    public static void clear() {
-        userThreadLocal.remove();
+    public static PartyContext create(UserCredentials userCredentials) {
+        return new PartyContext(new UserId(userCredentials.getUid()), userCredentials.getAuthorityTier());
     }
 }

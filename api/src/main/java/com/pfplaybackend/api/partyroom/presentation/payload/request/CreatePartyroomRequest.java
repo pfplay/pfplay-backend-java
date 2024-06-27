@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class CreatePartyroomRequest {
     private String title;
-    private String description;
-    private String suffixUri;
+    private String introduction;
+    private String linkDomain;
+    private int playbackTimeLimit;
 }

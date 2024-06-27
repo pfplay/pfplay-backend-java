@@ -14,7 +14,7 @@ import org.hibernate.annotations.DynamicUpdate;
         name = "PLAYBACK_REACTION_HISTORY"
 )
 @Entity
-public class PlaybackReactionHistory {
+public class PlaybackReactionHistoryData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,11 +31,19 @@ public class PlaybackReactionHistory {
     })
     private PlaybackId playbackId;
 
-    @Column(name = "liked", nullable = false)
+    @Column(name = "liked")
     private boolean liked;
 
-    @Column(name = "disliked", nullable = false)
+    @Column(name = "disliked")
     private boolean disliked;
 
-    public PlaybackReactionHistory() {}
+    @Column(name = "grabbed")
+    private boolean grabbed;
+
+    // 그랩 호출 시 playlist_music 테이블의 식별자를 저장
+    // 그랩 취소 시 해당 값을 이용하여, 레코드 삭제 가능
+    @Column(name = "grabbed_music_id")
+    private long grabbedMusicId;
+
+    public PlaybackReactionHistoryData() {}
 }

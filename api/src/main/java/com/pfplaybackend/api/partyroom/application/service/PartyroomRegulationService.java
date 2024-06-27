@@ -1,6 +1,10 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
-import com.pfplaybackend.api.partyroom.domain.specification.PartymemberGradeSpecification;
+import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
+import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
+import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateMemberGradeRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateMemberPenaltyRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -8,20 +12,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PartyroomRegulationService {
 
+    private final PartyroomDomainService partyroomDomainService;
     private final PartyroomAccessService partyroomAccessService;
 
-    public void updateTargetPartymemberGrade() {
-        // PartyInfo partyInfo = PartyContext.getPartyInfo();
-        // partyInfo
-        // 1. 호출자의 아이디와 파티 Grade
-        // 2. 상대방의 아이디와 파티 Grade
-        PartymemberGradeSpecification partymemberGradeSpecification = new PartymemberGradeSpecification();
-        if(partymemberGradeSpecification.isAllowedToUpdateLevel()) {
-            //
-        }
+    public void updateGrade(PartyroomId partyroomId, PartymemberId partymemberId, UpdateMemberGradeRequest request) {
+
     }
 
-    public void forceOut() {
-        partyroomAccessService.forceOut();
+    public void updatePenalty(PartyroomId partyroomId, PartymemberId partymemberId, UpdateMemberPenaltyRequest request) {
+        // TODO
     }
 }

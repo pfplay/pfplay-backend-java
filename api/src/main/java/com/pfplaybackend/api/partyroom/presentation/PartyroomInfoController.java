@@ -49,7 +49,9 @@ public class PartyroomInfoController {
      * → 파티룸 입장 시 초기화 정보 조회 목적
      */
     @GetMapping("/{partyroomId}/partymembers")
-    public void getPartymembers(@PathVariable Long partyroomId) {
+    public void getPartymembers(@PathVariable Long partyroomId,
+                                @RequestParam(value = "groupByGrade", required = false, defaultValue = "false") boolean groupByGrade) {
+        // Grade 별로 그루핑할 수 있는 옵션을 제공한다.
         partyroomInfoService.getPartymembers(new PartyroomId(partyroomId));
     }
 }

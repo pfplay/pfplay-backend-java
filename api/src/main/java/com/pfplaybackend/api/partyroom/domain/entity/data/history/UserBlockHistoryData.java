@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
         name = "USER_BLOCK_HISTORY"
 )
 @Entity
-public class UserBlockHistory {
+public class UserBlockHistoryData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -44,5 +44,5 @@ public class UserBlockHistory {
     @Column(name = "unblock_date")
     private LocalDateTime unblockDate;
 
-    public UserBlockHistory() {}
+    public UserBlockHistoryData() {}
 }

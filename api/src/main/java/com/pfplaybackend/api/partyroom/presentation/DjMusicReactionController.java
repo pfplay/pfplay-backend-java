@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class DjMusicReactionController {
 
-    private final DjMusicReactionService DJMusicInteractionService;
+    private final DjMusicReactionService djMusicReactionService;
 
     @PutMapping("/{partyroomId}/dj/current-playback/reaction")
     public ResponseEntity<Void> reactToPlayback(
             @PathVariable Long partyroomId,
             @RequestBody ReactCurrentPlaybackRequest request) {
-        DJMusicInteractionService.reactToCurrentTrack();
+        djMusicReactionService.reactToCurrentPlayback();
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{partyroomId}/dj/current-playback/grab")
     public ResponseEntity<Void> grabPlayback(
             @PathVariable Long partyroomId) {
-        DJMusicInteractionService.grabCurrentTrack();
+        djMusicReactionService.grabCurrentPlayback();
         return ResponseEntity.ok().build();
     }
 }

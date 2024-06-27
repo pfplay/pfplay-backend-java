@@ -32,10 +32,12 @@ public class PartymemberData {
     })
     private UserId userId;
 
+    // 파티룸에서 활동중 여부
     private boolean isActive;
 
     private GradeType gradeType;
 
+    // 영구 퇴장 여부
     private boolean isBanned;
 
     @Column(nullable = false)

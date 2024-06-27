@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
         name = "USER_GRADE_ADJUSTMENT_HISTORY"
 )
 @Entity
-public class UserGradeAdjustmentHistory {
+public class UserGradeAdjustmentHistoryData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -54,5 +54,5 @@ public class UserGradeAdjustmentHistory {
     @Column(name = "adjustment_date", nullable = false)
     private LocalDateTime adjustmentDate;
 
-    public UserGradeAdjustmentHistory() {}
+    public UserGradeAdjustmentHistoryData() {}
 }
