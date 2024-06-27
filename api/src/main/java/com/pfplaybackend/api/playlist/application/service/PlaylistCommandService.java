@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.playlist.application.service;
 
-import ch.qos.logback.core.encoder.EchoEncoder;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
@@ -8,8 +7,6 @@ import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.service.PlaylistDomainService;
 import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
-import com.pfplaybackend.api.playlist.exception.PlaylistLimitExceededException;
-import com.pfplaybackend.api.playlist.exception.PlaylistNoWalletException;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.transaction.Transactional;
