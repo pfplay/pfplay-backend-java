@@ -34,12 +34,16 @@ public class AvatarResourceData {
     @Column(nullable = false)
     private boolean isDefaultSetting;
 
+    private int x;
+    private int y;
+
+
     public AvatarResourceData() {}
 
     @Builder
     public AvatarResourceData(Long id, String name, String resourceUri,
                               ObtainmentType obtainableType, int obtainableScore,
-                              boolean isCombinable, boolean isDefaultSetting) {
+                              boolean isCombinable, boolean isDefaultSetting, int x, int y) {
         this.id = id;
         this.name = name;
         this.resourceUri = resourceUri;
@@ -47,6 +51,8 @@ public class AvatarResourceData {
         this.obtainableScore = obtainableScore;
         this.isCombinable = isCombinable;
         this.isDefaultSetting = isDefaultSetting;
+        this.x = x;
+        this.y = y;
     }
 
     public AvatarResource toDomain() {
@@ -58,6 +64,8 @@ public class AvatarResourceData {
                 .obtainableScore(this.obtainableScore)
                 .isCombinable(this.isCombinable)
                 .isDefaultSetting(this.isDefaultSetting)
+                .x(this.x)
+                .y(this.y)
                 .build();
     }
 }
