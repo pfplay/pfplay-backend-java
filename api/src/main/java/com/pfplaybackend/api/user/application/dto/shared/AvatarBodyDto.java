@@ -17,8 +17,8 @@ public class AvatarBodyDto {
     private final boolean isCombinable;
     private final boolean isDefaultSetting;
     private final boolean isAvailable;
-    private final int x;
-    private final int y;
+    private final int combinePositionX;
+    private final int combinePositionY;
 
     static public AvatarBodyDto create(AvatarResource avatarResource) {
         return AvatarBodyDto.builder()
@@ -31,8 +31,8 @@ public class AvatarBodyDto {
                 .isDefaultSetting(avatarResource.isDefaultSetting())
                 // BASIC 타입인 경우 isAvailable 한 것으로 처리
                 .isAvailable(avatarResource.getObtainableType().equals(ObtainmentType.BASIC))
-                .x(avatarResource.getX())
-                .y(avatarResource.getY())
+                .combinePositionX(avatarResource.getCombinePositionX())
+                .combinePositionY(avatarResource.getCombinePositionY())
                 .build();
     }
 }

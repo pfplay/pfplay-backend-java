@@ -14,4 +14,6 @@ public interface AvatarResourceRepository extends JpaRepository<AvatarResourceDa
 
     @Query("SELECT a FROM AvatarResourceData a")
     Optional<List<AvatarResourceData>> findAllAvatarResources();
+
+    AvatarResourceData findOneAvatarResourceByResourceUri(String resourceUri);
 }
