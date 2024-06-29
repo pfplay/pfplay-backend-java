@@ -7,6 +7,7 @@ import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyComman
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarResourceData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
@@ -65,10 +66,11 @@ public class UserAvatarService {
     }
 
     @Transactional
-    public void updateAvatarBodyUri(UpdateAvatarBodyCommand avatarBodyCommand) {
+    public void updateAvatarBodyUri(UpdateAvatarBodyCommand command) {
         UserContext userContext = (UserContext) ThreadLocalContext.getContext();
         Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
-        Member updatedMember = member.updateAvatarBody(new AvatarBodyUri(avatarBodyCommand.getAvatarBodyUri()));
+        AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(command.getAvatarBodyUri());
+        Member updatedMember = member.updateAvatarBody(command.getAvatarBodyUri(), avatarBodyDto);
         memberRepository.save(updatedMember.toData());
     }
 

@@ -9,6 +9,7 @@ import com.pfplaybackend.api.user.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.presentation.api.UserAvatarApi;
 import com.pfplaybackend.api.user.presentation.api.UserProfileApi;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyAvatarBodyRequest;
@@ -47,9 +48,9 @@ public class UserAvatarController implements UserAvatarApi {
 
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @PutMapping("/me/profile/avatar/body")
-    public ResponseEntity<?> updateMyAvatarBody(@RequestBody UpdateMyAvatarBodyRequest updateMyAvatarBodyRequest) {
-        UpdateAvatarBodyCommand updateAvatarBodyCommand = new UpdateAvatarBodyCommand(updateMyAvatarBodyRequest.getAvatarBodyUri());
-        userAvatarService.updateAvatarBodyUri(updateAvatarBodyCommand);
+    public ResponseEntity<?> updateMyAvatarBody(@RequestBody UpdateMyAvatarBodyRequest request) {
+        UpdateAvatarBodyCommand command = new UpdateAvatarBodyCommand(new AvatarBodyUri(request.getAvatarBodyUri()));
+        userAvatarService.updateAvatarBodyUri(command);
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 
