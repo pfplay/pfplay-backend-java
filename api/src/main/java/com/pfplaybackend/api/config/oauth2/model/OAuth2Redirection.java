@@ -14,13 +14,13 @@ public class OAuth2Redirection {
     public OAuth2Redirection(Map<String, OAuth2ProviderConfig.Environment> providers, String oauth2Provider, String redirectLocation) {
         try {
             ProviderType.valueOf(oauth2Provider.toUpperCase());
-            RedirectionableLocation.valueOf(redirectLocation.toUpperCase());
+            // RedirectionableLocation.valueOf(redirectLocation.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw e;
         }
         this.providers = providers;
         this.oauth2Provider = oauth2Provider;
-        this.redirectLocation = redirectLocation;
+        this.redirectLocation = "oauth-redirect";
     }
 
     public String getUrl() {
