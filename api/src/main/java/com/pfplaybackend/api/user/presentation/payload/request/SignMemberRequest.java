@@ -11,12 +11,8 @@ public class SignMemberRequest {
 
     @NotNull(message = "Name cannot be null")
     private final String oauth2Provider;
-    @NotNull(message = "Name cannot be null")
-    private final String redirectLocation;
 
-    SignMemberRequest(@BindParam("oauth2_provider") String oauth2Provider,
-                      @BindParam("redirect_location") String redirectLocation) {
+    SignMemberRequest(@BindParam("oauth2Provider") String oauth2Provider) {
         this.oauth2Provider = oauth2Provider;
-        this.redirectLocation = redirectLocation;
     }
 }

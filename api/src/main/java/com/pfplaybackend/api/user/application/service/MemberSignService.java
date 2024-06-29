@@ -29,8 +29,8 @@ public class MemberSignService {
     private final UserActivityService userActivityService;
     private final PlaylistCommandService playlistCommandService;
 
-    public String getOAuth2RedirectUri(SignMemberRequest request) {
-        OAuth2Redirection oauth2Redirection = OAuth2Redirection.create(oauth2ProviderConfig.getProviders(), request.getOauth2Provider(), request.getRedirectLocation());
+    public String getOAuth2RedirectUri(SignMemberRequest request, String redirectLocation) {
+        OAuth2Redirection oauth2Redirection = OAuth2Redirection.create(oauth2ProviderConfig.getProviders(), request.getOauth2Provider(), redirectLocation);
         return oauth2Redirection.getUrl();
     }
 
