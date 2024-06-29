@@ -3,6 +3,7 @@ package com.pfplaybackend.api.user.domain.entity.domainmodel;
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
@@ -107,9 +108,11 @@ public class Member extends User {
                 .build();
     }
 
-    public Member updateAvatarBody(AvatarBodyUri avatarBodyUri) {
+    public Member updateAvatarBody(AvatarBodyUri avatarBodyUri, AvatarBodyDto avatarBodyDto) {
         Profile newProfile = this.profile
-                .withAvatarBodyUri(avatarBodyUri);
+                .withAvatarBodyUri(avatarBodyUri)
+                .withCombinePositionX(avatarBodyDto.getCombinePositionX())
+                .withCombinePositionY(avatarBodyDto.getCombinePositionY());
 
         return this.toBuilder()
                 .profile(newProfile)

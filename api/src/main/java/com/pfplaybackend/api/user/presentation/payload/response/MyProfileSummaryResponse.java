@@ -13,6 +13,8 @@ public class MyProfileSummaryResponse {
     private String nickname;
     private String introduction;
     private String avatarBodyUri;
+    private int combinePositionX;
+    private int combinePositionY;
     private String avatarFaceUri;
     private String walletAddress;
     private List<ActivitySummaryDto> activitySummaries;
