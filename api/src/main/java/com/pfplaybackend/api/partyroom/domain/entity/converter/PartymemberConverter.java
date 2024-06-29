@@ -10,16 +10,24 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PartymemberConverter {
     public Partymember toDomain(PartymemberData partymemberData) {
-        return new Partymember();
+        return Partymember.builder()
+                .id(partymemberData.getId())
+                .userId(partymemberData.getUserId())
+                .authorityTier(partymemberData.getAuthorityTier())
+                .gradeType(partymemberData.getGradeType())
+                .isActive(partymemberData.isActive())
+                .isBanned(partymemberData.isBanned())
+                .build();
     }
 
-    public PartymemberData toData(Partymember partymember, PartyroomData partyroomData) {
-        return new PartymemberData();
-        //        return PartymemberData.builder()
-//                .id(partymember.getId())
-//                .partyroomData(partyroomData)
-//                .authorityTier(partymember.getAuthorityTier())
-//                .userId(partymember.getUserId())
-//                .build();
+    public PartymemberData toData(Partymember partymember) {
+        return PartymemberData.builder()
+                .id(partymember.getId())
+                .userId(partymember.getUserId())
+                .authorityTier(partymember.getAuthorityTier())
+                .gradeType(partymember.getGradeType())
+                .isActive(partymember.isActive())
+                .isBanned(partymember.isBanned())
+                .build();
     }
 }

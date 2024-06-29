@@ -1,9 +1,11 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
-import com.pfplaybackend.api.partyroom.application.service.dj.DjPlaybackService;
+import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.partyroom.application.service.dj.PlaybackService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,17 +19,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor
-public class DjPlaybackController {
+public class PlaybackController {
 
-    private DjPlaybackService djPlaybackService;
+    private final PlaybackService playbackService;
 
     /**
      * 현재 DJ의 곡 재생에 대한 완료 동작을 트리거 한다.
      * @param partyroomId
      */
-    @PostMapping("/{partyroomId}/dj/playback/complete")
-    void playBackComplete(@PathVariable Long partyroomId) {
-        djPlaybackService.complete(new PartyroomId(partyroomId));
+    @PostMapping("/{partyroomId}/playback/complete")
+    public ResponseEntity<?> playBackComplete(@PathVariable Long partyroomId) {
+        playbackService.complete(new PartyroomId(partyroomId));
+        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 
     /**
@@ -35,8 +38,9 @@ public class DjPlaybackController {
      * 현재 DJ의 곡 재생에 대한 중단 동작을 트리거 한다.
      * @param partyroomId
      */
-    @PostMapping("/{partyroomId}/dj/playback/skip")
-    void playBackStop(@PathVariable Long partyroomId) {
-
+    @PostMapping("/{partyroomId}/playback/skip")
+    public ResponseEntity<?> playBackSkip(@PathVariable Long partyroomId) {
+        playbackService.skip(new PartyroomId(partyroomId));
+        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 }

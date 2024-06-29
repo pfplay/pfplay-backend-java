@@ -3,27 +3,26 @@ package com.pfplaybackend.api.partyroom.application.service.dj;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomManagementService;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.service.DjDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;
+import com.pfplaybackend.api.playlist.application.PlaylistMusicService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
-public class DjPlaybackService {
+public class PlaybackService {
 
     private final DjDomainService djDomainService;
     private final PartyroomManagementService partyroomManagementService;
     private final PlaybackRepository playbackRepository;
 
-    // TODO
+    // TODO Problem: Call method outside of bounded context
+    private final PlaylistMusicService playlistMusicService;
     private final UserActivityService userActivityService;
 
 
@@ -42,10 +41,11 @@ public class DjPlaybackService {
         }
     }
 
-    public void stop() {
+    public void skip(PartyroomId partyroomId) {
         // Partyroom partyroom = new Partyroom();
         // 다음 DJ 존재하면 start();
         // 없으면 파티룸 비활성화
+        partyroomManagementService.updatePlaybackActivationStatus(partyroomId, false);
     }
 
 
@@ -54,6 +54,9 @@ public class DjPlaybackService {
     }
 
     public Playback getNextPlayback() {
-        return null;
+        // 1. Dj 대기열 내 Dj 들의 orderNumber 일괄 변환
+        // 2. Playback 객체 생성
+        Playback playback = new Playback();
+        return playback;
     }
 }

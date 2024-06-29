@@ -20,4 +20,8 @@ public class Playback {
     private LocalTime endTime;
 
     public Playback() {}
+
+    public static Playback create() {
+        return new Playback();
+    }
 }

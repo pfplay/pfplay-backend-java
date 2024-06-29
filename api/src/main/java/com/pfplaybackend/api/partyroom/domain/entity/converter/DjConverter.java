@@ -8,10 +8,20 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DjConverter {
-    public Dj toDomain(DjData data) {
-        return new Dj();
+    public Dj toDomain(DjData djData) {
+        return Dj.builder()
+                .id(djData.getId())
+                .playlistId(djData.getPlaylistId())
+                .orderNumber(djData.getOrderNumber())
+                .isDeleted(djData.isDeleted())
+                .build();
     }
     public DjData toData(Dj dj) {
-        return new DjData();
+        return DjData.builder()
+                .id(dj.getId())
+                .playlistId(dj.getPlaylistId())
+                .orderNumber(dj.getOrderNumber())
+                .isDeleted(dj.isDeleted())
+                .build();
     }
 }

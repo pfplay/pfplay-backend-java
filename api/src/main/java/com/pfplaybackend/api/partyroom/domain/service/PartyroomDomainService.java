@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.service;
 
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -19,17 +20,19 @@ public class PartyroomDomainService {
 
     // 현재 유저가 해당 파티룸에 존재하는지 확인
     public void checkIsNotInPartyroom() {
-        
+
     }
 
     // DJ 대기열에 존재하는지 여부 확인
-    public boolean isExistInDJQueue() {
+    public boolean isExistInDjQueue() {
         return true;
     }
 
     // 파티룸을 생성할 수 있는 권한을 보유했는지 확인
-    public void checkIsQualifiedToCreate() {
-
+    public void checkIsQualifiedToCreate(AuthorityTier authorityTier) throws Exception {
+        if(!authorityTier.equals(AuthorityTier.FM)) {
+            throw new Exception();
+        }
     }
 
     // 링크 주소가 중복되었는지 확인

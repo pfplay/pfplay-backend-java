@@ -16,7 +16,6 @@ public class RedisMessagePublisher {
      * @param object
      */
     public void publish(MessageTopic topicType, Object object) {
-        //
         redisTemplate.convertAndSend(topicType.toString().toLowerCase(), object);
     }
 }

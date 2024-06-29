@@ -22,11 +22,15 @@ public class Partymember {
     public Partymember() {}
 
     @Builder
-    public Partymember(long id, PartyroomId partyroomId, UserId userId, AuthorityTier authorityTier) {
+    public Partymember(long id, PartyroomId partyroomId, UserId userId, AuthorityTier authorityTier,
+                       GradeType gradeType, boolean isActive, boolean isBanned) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
         this.authorityTier = authorityTier;
+        this.gradeType = gradeType;
+        this.isActive = isActive;
+        this.isBanned = isBanned;
     }
 
     public static Partymember create(UserId userId, AuthorityTier authorityTier) {
@@ -34,5 +38,10 @@ public class Partymember {
                 .userId(userId)
                 .authorityTier(authorityTier)
                 .build();
+    }
+
+    public Partymember assignPartyroomId(PartyroomId partyroomId) {
+        this.partyroomId = partyroomId;
+        return this;
     }
 }

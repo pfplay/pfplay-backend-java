@@ -14,7 +14,7 @@ public class DJManagementService {
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomDomainService partyroomDomainService;
-    private final DjPlaybackService djPlaybackService;
+    private final PlaybackService playbackService;
 
     @Transactional
     public void enqueueDj(PartyroomId partyroomId) {

@@ -13,14 +13,21 @@ public class Dj {
     private PartyroomId partyroomId;
     private PlaylistId playlistId;
     private int orderNumber;
+    private boolean isDeleted;
 
     public Dj() {}
 
     @Builder
-    public Dj(long id, PartyroomId partyroomId, PlaylistId playlistId, int orderNumber) {
+    public Dj(long id, PartyroomId partyroomId, PlaylistId playlistId, int orderNumber, boolean isDeleted) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.playlistId = playlistId;
         this.orderNumber = orderNumber;
+        this.isDeleted = isDeleted;
+    }
+
+    public Dj assignPartyroomId(PartyroomId partyroomId) {
+        this.partyroomId = partyroomId;
+        return this;
     }
 }

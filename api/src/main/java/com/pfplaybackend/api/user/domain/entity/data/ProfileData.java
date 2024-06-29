@@ -17,7 +17,7 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicUpdate
 @Table(name = "USER_PROFILE",
         indexes = {
-                @Index(name = "user_profile_uid_IDX", columnList = "uid")
+                @Index(name = "user_profile_user_id_IDX", columnList = "user_id")
         })
 @Entity
 public class ProfileData extends BaseEntity {
@@ -28,6 +28,9 @@ public class ProfileData extends BaseEntity {
     private Long id;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "uid", column = @Column(name = "user_id")),
+    })
     private UserId userId;
 
     @Column(length = 20)

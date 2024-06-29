@@ -5,6 +5,7 @@ import com.pfplaybackend.api.partyroom.application.service.dj.DJManagementServic
 import com.pfplaybackend.api.partyroom.domain.value.DjId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.AddDjRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.response.CreatePartyroomResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
