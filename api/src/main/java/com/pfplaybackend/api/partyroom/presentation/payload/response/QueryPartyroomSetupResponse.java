@@ -4,13 +4,12 @@ import com.pfplaybackend.api.partyroom.application.dto.DisplayDto;
 import com.pfplaybackend.api.partyroom.application.dto.PartymemberDto;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 
 import java.util.List;
 
 @Builder
 @Data
-public class QueryDisplayInfoResponse {
+public class QueryPartyroomSetupResponse {
     List<PartymemberDto> members;
     DisplayDto display;
 }

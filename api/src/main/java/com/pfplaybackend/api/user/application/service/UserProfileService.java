@@ -5,8 +5,10 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
@@ -17,14 +19,17 @@ import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.service.UserDomainService;
 import com.pfplaybackend.api.user.repository.GuestRepository;
 import com.pfplaybackend.api.user.repository.MemberRepository;
+import com.pfplaybackend.api.user.repository.UserProfileRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
-
+    final private UserProfileRepository userProfileRepository;
     final private GuestRepository guestRepository;
     final private MemberRepository memberRepository;
     private final UserDomainService userDomainService;
@@ -74,5 +79,24 @@ public class UserProfileService {
             MemberData memberData = memberRepository.findByUserId(otherUserId).orElseThrow();
             return memberData.toDomain().getProfileSummary();
         }
+    }
+
+    // 다수 사용자에 대한 프로필 설정 정보 조회
+    @Transactional
+    public List<ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds) {
+        return userProfileRepository.findByUserIdIn(userIds).stream().map(profileData ->
+                new ProfileSettingDto(profileData.getNickname(),
+                        profileData.getAvatarBodyUri().toString(),
+                        profileData.getAvatarFaceUri().toString())
+        ).toList();
+    }
+
+    // 특정 사용자에 대한 프로필 설정 정보 조회
+    @Transactional
+    public ProfileSettingDto getUserProfileSetting(UserId userId) {
+        ProfileData profileData = userProfileRepository.findByUserId(userId);
+        return new ProfileSettingDto(profileData.getNickname(),
+                profileData.getAvatarBodyUri().toString(),
+                profileData.getAvatarFaceUri().toString());
     }
 }

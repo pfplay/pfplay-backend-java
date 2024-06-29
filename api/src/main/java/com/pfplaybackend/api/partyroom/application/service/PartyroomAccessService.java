@@ -22,13 +22,14 @@ public class PartyroomAccessService {
     private final RedisMessagePublisher redisMessagePublisher;
 
     // TODO Publish event only when the transaction is successful
+    // AccessMessage message = new AccessMessage(new PartyroomId(50L));
+    // redisMessagePublisher.publish(MessageTopic.ACCESS, message);
     @Transactional
     public void tryEnter() {
-        // AccessMessage message = new AccessMessage(new TmpUser(50L));
-        AccessMessage message = new AccessMessage(new PartyroomId(50L));
-
-        redisMessagePublisher.publish(MessageTopic.ACCESS, message);
-        // TODO 사용자가 이미 다른 파티룸에 위치 중이라면 실패 처리
+        // 1. 해당 파티룸의 폐쇄 여부 확인
+        // 2. 사용자가 이미 다른 파티룸에서의 활동중 여부 확인
+        // 3. 해당 파티룸의 허용 가능 인원 수 초과 확인
+        // 4. 해당 파티룸에서의 영구 페널티 여부 확인
 //        Partymember partymember = new Partymember();
 //        if(partyroomDomainService.isNotInPartyroom()) {
 //            //
@@ -51,16 +52,17 @@ public class PartyroomAccessService {
     @Transactional
     public void exit() {
         // TODO 퇴장 대상이 DJQueue 에 존재하는지 여부 확인
-        if(partyroomDomainService.isExistInDJQueue()) {
-            // DJQueue에서 제거
+        if(partyroomDomainService.isExistInDjQueue()) {
+            // Dj 대기열에서 강제 제거
         }
+        // isActive: false
         // eventPublisher.publish(MessageTopic.PARTYROOM_ACCESS, updatedPartyroom);
     }
 
     @Transactional
     public void forceOut() {
-        if(partyroomDomainService.isExistInDJQueue()) {
-            // DJQueue에서 제거
+        if(partyroomDomainService.isExistInDjQueue()) {
+            // Dj 대기열에서 강제 제거
         }
         // TODO 퇴장 대상이 DJQueue 에 존재하는지 여부 확인
         // eventPublisher.publish(MessageTopic.PARTYROOM_ACCESS, updatedPartyroom);

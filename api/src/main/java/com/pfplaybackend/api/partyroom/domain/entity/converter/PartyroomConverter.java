@@ -1,12 +1,15 @@
 package com.pfplaybackend.api.partyroom.domain.entity.converter;
 
+import com.pfplaybackend.api.partyroom.domain.entity.data.DjData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,45 +20,66 @@ public class PartyroomConverter {
     private final DjConverter djConverter;
 
     public Partyroom toDomain(PartyroomData partyroomData) {
-        return new Partyroom();
-//        Partyroom partyroom = Partyroom.builder()
-//                .partyroomId(partyroomData.getPartyroomId())
-//                .hostId(partyroomData.getHostId())
-//                .isPlaybackActivated(partyroomData.isPlaybackActivated())
-//                .build();
-//
-//        partyroom.getPartymembers().clear();
-//        partyroom.getPartymembers().addAll(partyroomData.getPartymembers().stream()
-//                .map(partymemberData -> {
-//                    Partymember partymember = partymemberConverter.toDomain(partymemberData);
-//                    partymember.setPartyroomId(partyroomData.getPartyroomId());
-//                    return partymember;
-//                }).toList());
-//        return partyroom;
+        Partyroom partyroom = Partyroom.builder()
+                .partyroomId(partyroomData.getPartyroomId())
+                .stageType(partyroomData.getStageType())
+                .hostId(partyroomData.getHostId())
+                .title(partyroomData.getTitle())
+                .introduction(partyroomData.getIntroduction())
+                .linkDomain(partyroomData.getLinkDomain())
+                .playbackTimeLimit(partyroomData.getPlaybackTimeLimit())
+                .noticeContent(partyroomData.getNoticeContent())
+                .isPlaybackActivated(partyroomData.isPlaybackActivated())
+                .currentPlaybackId(partyroomData.getCurrentPlaybackId())
+                .isQueueClosed(partyroomData.isQueueClosed())
+                .isTerminated(partyroomData.isTerminated())
+                .build();
+
+        // PartymemberData to Partymember
+        List<Partymember> partymembers = partyroomData.getPartymemberDataList().stream()
+                .map(partymemberConverter::toDomain)
+                .map(partymember -> partymember.assignPartyroomId(partyroom.getPartyroomId()))
+                .toList();
+        // DjData to Dj
+        List<Dj> djs = partyroomData.getDjDataList().stream()
+                .map(djConverter::toDomain)
+                .map(dj -> dj.assignPartyroomId(partyroom.getPartyroomId()))
+                .toList();
+
+        return partyroom
+                .assignPartymembers(partymembers)
+                .assignDjs(djs);
     }
 
     public PartyroomData toData(Partyroom partyroom) {
-        return new PartyroomData();
-//        Long id = partyroom.getPartyroomId() == null ? null : partyroom.getPartyroomId().getId();
-//        PartyroomData partyroomData = PartyroomData.builder()
-//                .id(id)
-//                .hostId(partyroom.getHostId())
-//                .noticeContent(partyroom.getNoticeContent())
-//                .isQueueClosed(partyroom.isQueueClosed())
-//                .isPlaybackActivated(partyroom.isPlaybackActivated())
-//                .isTerminated(partyroom.isTerminated())
-//                .build();
-//
-//        // Replace Partymembers Collection
-//        List<PartymemberData> partymembers = partyroom.getPartymembers().stream()
-//                .map(partymember -> partymemberConverter.toData(partymember, partyroomData))
-//                .toList();
-//        partyroomData.getPartymembers().clear();
-//        partyroomData.getPartymembers().addAll(partymembers);
-////        partyroomData.getPartymembers().addAll(partyroom.getPartymembers().stream()
-////                .map(partymember -> partymemberConverter.toData(partymember, partyroomData)).toList());
-//
-//        // return new PartyroomData(partyroom.getHostId());
-//        return partyroomData;
+        PartyroomData partyroomData = PartyroomData.builder()
+                .id(partyroom.getPartyroomId() == null ? null : partyroom.getPartyroomId().getId())
+                .partyroomId(partyroom.getPartyroomId())
+                .stageType(partyroom.getStageType())
+                .hostId(partyroom.getHostId())
+                .title(partyroom.getTitle())
+                .introduction(partyroom.getIntroduction())
+                .linkDomain(partyroom.getLinkDomain())
+                .playbackTimeLimit(partyroom.getPlaybackTimeLimit())
+                .currentPlaybackId(partyroom.getCurrentPlaybackId())
+                .isPlaybackActivated(partyroom.isPlaybackActivated())
+                .isQueueClosed(partyroom.isQueueClosed())
+                .isTerminated(partyroom.isTerminated())
+                .build();
+
+        // Partymember to PartymemberData
+        List<PartymemberData> partymemberDataList = partyroom.getPartymembers().stream()
+                .map(partymemberConverter::toData)
+                .map(partymemberData -> partymemberData.assignPartyroomData(partyroomData))
+                .toList();
+        // Dj to DjData
+        List<DjData> djDataList = partyroom.getDjs().stream()
+                .map(djConverter::toData)
+                .map(djData -> djData.assignPartyroomData(partyroomData))
+                .toList();
+
+        return partyroomData
+                .assignPartymemberListData(partymemberDataList)
+                .assignDjListData(djDataList);
     }
 }

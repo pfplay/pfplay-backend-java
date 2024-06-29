@@ -2,10 +2,8 @@ package com.pfplaybackend.api.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.config.websocket.SimpMessageSender;
-import com.pfplaybackend.api.partyroom.application.service.chat.RedisChatSubscriberService;
 import com.pfplaybackend.api.partyroom.event.listener.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,9 +13,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
@@ -67,7 +63,8 @@ public class RedisConfig {
         container.addMessageListener(new PartyroomAccessTopicListener(simpMessageSender, objectMapper), new ChannelTopic("access"));
         container.addMessageListener(new PartyroomNoticeTopicListener(simpMessageSender, objectMapper), new ChannelTopic("regulation"));
         container.addMessageListener(new PartyroomRegulationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("notice"));
-        container.addMessageListener(new DJPlaybackTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback"));
+        container.addMessageListener(new PlaybackTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback"));
+        container.addMessageListener(new DeactivationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("deactivation"));
         return container;
     }
 }

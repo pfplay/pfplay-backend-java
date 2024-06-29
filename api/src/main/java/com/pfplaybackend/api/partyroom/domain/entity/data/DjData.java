@@ -2,6 +2,7 @@ package com.pfplaybackend.api.partyroom.domain.entity.data;
 
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -31,4 +32,17 @@ public class DjData {
 
     // 데이터 엔티티 생성자
     public DjData() {}
+
+    @Builder
+    public DjData(Long id, PartyroomData partyroomData, PlaylistId playlistId, int orderNumber, boolean isDeleted) {
+        this.id = id;
+        this.playlistId = playlistId;
+        this.orderNumber = orderNumber;
+        this.isDeleted = isDeleted;
+    }
+
+    public DjData assignPartyroomData(PartyroomData partyroomData) {
+        this.partyroomData = partyroomData;
+        return this;
+    }
 }

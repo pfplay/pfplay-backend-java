@@ -5,6 +5,5 @@ import lombok.Getter;
 
 @Getter
 @Data
-public class CreatePartyroomRequest {
-
+public class QueryPartymemberListResponse {
 }

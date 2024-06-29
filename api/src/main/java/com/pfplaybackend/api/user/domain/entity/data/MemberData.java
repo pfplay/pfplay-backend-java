@@ -30,8 +30,10 @@ import java.util.stream.Collectors;
 @Setter
 @Entity
 public class MemberData extends BaseEntity {
-
     @EmbeddedId
+    @AttributeOverrides({
+            @AttributeOverride(name = "uid", column = @Column(name = "user_id")),
+    })
     private UserId userId;
 
     @Column(nullable = false)
@@ -45,6 +47,7 @@ public class MemberData extends BaseEntity {
     private ProviderType providerType;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
     private ProfileData profileData;
 
     @Column(nullable = false)

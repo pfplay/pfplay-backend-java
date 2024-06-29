@@ -10,9 +10,8 @@ public class SimpMessageSender {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public void sendToGroup(String topic, Object object) {
-        System.out.println(topic + ": " + object);
-        simpMessagingTemplate.convertAndSend(topic, object);
+    public void sendToGroup(long groupId, Object object) {
+        simpMessagingTemplate.convertAndSend("/sub/partyrooms/" + groupId, object);
     }
 
     public void sendToOne(String sessionId, String message) {
