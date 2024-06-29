@@ -25,8 +25,8 @@ public class AvatarResourceService {
     public List<AvatarFaceDto> findAllAvatarFaces() {
         return new ArrayList<>(Collections.singletonList(AvatarFaceDto.builder()
                 .id(1)
-                .name("기본 Face")
-                .resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/avatar_body_1.png?alt=media")
+                .name("ava_face_001")
+                .resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_face%2Fava_face_001.png?alt=media")
                 .isAvailable(true)
                 .build())
         );
