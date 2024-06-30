@@ -2,6 +2,7 @@ package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,6 +12,7 @@ import lombok.Setter;
 public class Dj {
     private long id;
     private PartyroomId partyroomId;
+    private UserId userId;
     private PlaylistId playlistId;
     private int orderNumber;
     private boolean isDeleted;
@@ -18,9 +20,10 @@ public class Dj {
     public Dj() {}
 
     @Builder
-    public Dj(long id, PartyroomId partyroomId, PlaylistId playlistId, int orderNumber, boolean isDeleted) {
+    public Dj(long id, PartyroomId partyroomId, UserId userId, PlaylistId playlistId, int orderNumber, boolean isDeleted) {
         this.id = id;
         this.partyroomId = partyroomId;
+        this.userId = userId;
         this.playlistId = playlistId;
         this.orderNumber = orderNumber;
         this.isDeleted = isDeleted;

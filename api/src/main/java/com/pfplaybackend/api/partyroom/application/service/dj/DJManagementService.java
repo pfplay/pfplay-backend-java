@@ -1,8 +1,10 @@
 package com.pfplaybackend.api.partyroom.application.service.dj;
 
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.DjId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,5 +45,9 @@ public class DJManagementService {
     @Transactional
     public void dequeueDj(PartyroomId partyroomId, DjId djId) {
         // TODO 관리자 등급 여부를 체크
+    }
+
+    public Dj getDjByPlayback(PlaybackId playbackId) {
+        return new Dj();
     }
 }

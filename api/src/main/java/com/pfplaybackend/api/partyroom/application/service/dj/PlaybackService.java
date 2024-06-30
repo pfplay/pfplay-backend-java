@@ -2,10 +2,13 @@ package com.pfplaybackend.api.partyroom.application.service.dj;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
+import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomManagementService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.service.DjDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;
 import com.pfplaybackend.api.playlist.application.PlaylistMusicService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
@@ -17,14 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class PlaybackService {
 
-    private final DjDomainService djDomainService;
-    private final PartyroomManagementService partyroomManagementService;
+    //
     private final PlaybackRepository playbackRepository;
+    //
+    private final DjDomainService djDomainService;
+    //
+    private final PartyroomManagementService partyroomManagementService;
+    private final PartyroomInfoService partyroomInfoService;
 
     // TODO Problem: Call method outside of bounded context
     private final PlaylistMusicService playlistMusicService;
     private final UserActivityService userActivityService;
-
 
     @Transactional
     public void complete(PartyroomId partyroomId) {
@@ -58,5 +64,14 @@ public class PlaybackService {
         // 2. Playback 객체 생성
         Playback playback = new Playback();
         return playback;
+    }
+
+    public PlaybackId getCurrentPlaybackId() {
+        return partyroomInfoService.getActivePartyroom().getCurrentPlaybackId();
+    }
+
+    public Playback updateLikeCount(PlaybackId playbackId) {
+        // TODO How to increment '1'
+        return new Playback();
     }
 }

@@ -24,13 +24,14 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPlaylistData qPlaylistData = QPlaylistData.playlistData;
         QPlaylistMusicData qPlaylistMusicData = QPlaylistMusicData.playlistMusicData;
+
         return queryFactory
                 .select(Projections.constructor(PlaylistSummary.class,
                         qPlaylistData.id,
                         qPlaylistData.name,
                         qPlaylistData.orderNumber,
                         qPlaylistData.type,
-                        qPlaylistMusicData.id.count().as("musicCount")
+                        qPlaylistMusicData.id.count().as("memberCount")
                         )
                 )
                 .from(qPlaylistData)

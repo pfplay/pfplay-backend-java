@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +22,12 @@ public class DjData {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "partyroom_id")
     private PartyroomData partyroomData;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "uid", column = @Column(name = "user_id")),
+    })
+    private UserId userId;
 
     @Embedded
     private PlaylistId playlistId;
