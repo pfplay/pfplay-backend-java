@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 public class PlaybackMessage {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
+    private long memberId;
     private PlaybackDto playbackDto;
-    private DjDto dj;
 }

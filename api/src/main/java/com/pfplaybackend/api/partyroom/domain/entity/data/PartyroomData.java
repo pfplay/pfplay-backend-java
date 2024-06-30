@@ -125,4 +125,9 @@ public class PartyroomData {
         this.djDataList.addAll(djDataList);
         return this;
     }
+
+    public PartyroomData applyActivation() {
+        this.isPlaybackActivated = true;
+        return this;
+    }
 }

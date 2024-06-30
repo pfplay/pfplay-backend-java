@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.partyroom.application.service.dj.PlaybackService;
+import com.pfplaybackend.api.partyroom.application.service.PlaybackService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

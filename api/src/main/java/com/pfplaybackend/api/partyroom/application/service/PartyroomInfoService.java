@@ -27,8 +27,7 @@ public class PartyroomInfoService {
     private final UserProfilePeerService userProfileService;
 
     public List<PartyroomDto> getAllPartyrooms() {
-        List<PartyroomDto> partyrooms = partyroomRepository.getAllPartyrooms();
-        return partyrooms;
+        return partyroomRepository.getAllPartyrooms();
     }
 
     public void getSummaryInfo(PartyroomId partyroomId) {
@@ -49,8 +48,8 @@ public class PartyroomInfoService {
         //
     }
 
-    public ActivePartyroomDto getActivePartyroom() {
+    public ActivePartyroomDto getMyActivePartyroom() {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        return partyroomRepository.getActivePartyroom(partyContext.getUserId()).orElseThrow();
+        return partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId()).orElseThrow();
     }
 }

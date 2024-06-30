@@ -11,6 +11,7 @@ public class DjConverter {
     public Dj toDomain(DjData djData) {
         return Dj.builder()
                 .id(djData.getId())
+                .userId(djData.getUserId())
                 .playlistId(djData.getPlaylistId())
                 .orderNumber(djData.getOrderNumber())
                 .isDeleted(djData.isDeleted())
@@ -19,6 +20,7 @@ public class DjConverter {
     public DjData toData(Dj dj) {
         return DjData.builder()
                 .id(dj.getId())
+                .userId(dj.getUserId())
                 .playlistId(dj.getPlaylistId())
                 .orderNumber(dj.getOrderNumber())
                 .isDeleted(dj.isDeleted())

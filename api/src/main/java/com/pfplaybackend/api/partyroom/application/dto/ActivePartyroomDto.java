@@ -6,5 +6,7 @@ import lombok.Getter;
 @Getter
 public class ActivePartyroomDto {
     private Long id;
+    private boolean isPlaybackActivated;
+    private boolean isQueueClosed;
     private PlaybackId currentPlaybackId;
 }

@@ -1,11 +1,11 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.partyroom.application.service.dj.DJManagementService;
+import com.pfplaybackend.api.partyroom.application.service.DJManagementService;
 import com.pfplaybackend.api.partyroom.domain.value.DjId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.AddDjRequest;
-import com.pfplaybackend.api.partyroom.presentation.payload.response.CreatePartyroomResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +30,7 @@ public class DjManagementController {
     @PostMapping("/{partyroomId}/djs")
     public ResponseEntity<?> enqueueDj(@PathVariable Long partyroomId,
                                        @RequestBody AddDjRequest request) {
-        djManagementService.enqueueDj(new PartyroomId(partyroomId));
+        djManagementService.enqueueDj(new PartyroomId(partyroomId), new PlaylistId(request.getPlaylistId()));
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));
     }

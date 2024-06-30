@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
+import com.google.common.collect.ImmutableList;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
@@ -95,15 +96,59 @@ public class Partyroom {
         return this;
     }
 
-    public Partyroom addNewPartymember(UserId userId, AuthorityTier authorityTier) {
-        Partymember partymember = Partymember.create(userId, authorityTier);
-        this.partymembers.add(partymember);
-        System.out.println(this.partymembers);
+    public Partyroom createAndAddPartymember(UserId userId, AuthorityTier authorityTier) {
+        this.partymembers = new ImmutableList.Builder<Partymember>()
+                .addAll(this.partymembers)
+                .add( Partymember.create(userId, authorityTier))
+                .build();
         return this;
     }
 
-    public Partyroom addPartymember(Partymember partymember) {
-        this.partymembers.add(partymember);
+    public Partyroom addExistingPartymember(Partymember partymember) {
+        this.partymembers = new ImmutableList.Builder<Partymember>()
+                .addAll(this.partymembers)
+                .add(partymember)
+                .build();
         return this;
     }
+
+    public Partyroom createAndAddDj(PlaylistId playlistId, UserId userId) {
+        this.djs = new ImmutableList.Builder<Dj>()
+                .addAll(this.djs)
+                .add(Dj.create(partyroomId, playlistId, userId, this.djs.size() + 1))
+                .build();
+        return this;
+    }
+
+    public Partyroom addExistingDj(Dj dj) {
+        this.djs = new ImmutableList.Builder<Dj>()
+                .addAll(this.djs)
+                .add(dj)
+                .build();
+        return this;
+    }
+
+    public Partyroom applyActivation() {
+        this.isPlaybackActivated = true;
+        return this;
+    }
+
+    public Partyroom rotateDjs() {
+        int totalElements = this.djs.size();
+        this.djs = new ImmutableList.Builder<Dj>()
+                .addAll(this.djs)
+                .build().stream().peek(dj -> {
+                    if(dj.getOrderNumber() == 1) {
+                        dj.setOrderNumber(totalElements);
+                    }else {
+                        dj.setOrderNumber(totalElements - 1);
+                    }
+                }).toList();
+        return this;
+    }
+
+
+
+
+
 }

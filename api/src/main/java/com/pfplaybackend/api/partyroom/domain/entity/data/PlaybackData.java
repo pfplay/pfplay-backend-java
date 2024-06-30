@@ -3,6 +3,7 @@ package com.pfplaybackend.api.partyroom.domain.entity.data;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalTime;
@@ -48,4 +49,19 @@ public class PlaybackData {
     private LocalTime endTime;
 
     public PlaybackData() {}
-}
+
+    @Builder
+    public PlaybackData(Long id, PartyroomId partyroomId,
+                        UserId userId, String name, String linkId, String duration, String thumbnailImage, int grabCount, int likeCount, int dislikeCount) {
+        this.id = id;
+        this.partyroomId = partyroomId;
+        this.userId = userId;
+        this.name = name;
+        this.linkId = linkId;
+        this.duration = duration;
+        this.thumbnailImage = thumbnailImage;
+        this.grabCount = grabCount;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
+    }
+ }

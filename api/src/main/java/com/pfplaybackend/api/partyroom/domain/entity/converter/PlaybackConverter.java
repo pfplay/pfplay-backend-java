@@ -12,7 +12,18 @@ public class PlaybackConverter {
         return new Playback();
     }
 
-    public PlaybackData toDomain(Playback playback) {
-        return new PlaybackData();
+    public PlaybackData toData(Playback playback) {
+        return PlaybackData.builder()
+                .id(playback.getId())
+                .partyroomId(playback.getPartyroomId())
+                .userId(playback.getUserId())
+                .linkId(playback.getLinkId())
+                .name(playback.getName())
+                .duration(playback.getDuration())
+                .thumbnailImage(playback.getThumbnailImage())
+                .likeCount(playback.getLikeCount())
+                .dislikeCount(playback.getDislikeCount())
+                .grabCount(playback.getGrabCount())
+                .build();
     }
 }

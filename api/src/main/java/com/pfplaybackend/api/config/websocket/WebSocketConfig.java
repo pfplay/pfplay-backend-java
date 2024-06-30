@@ -24,7 +24,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry endpointRegistry) {
         endpointRegistry
                 .addEndpoint("/ws")
-                .setAllowedOriginPatterns("*"); // TODO: update to pfplay client url
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 
     @Override
