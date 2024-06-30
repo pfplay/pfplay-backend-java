@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.time.LocalTime;
 
+@AllArgsConstructor
 @Data
 public class PlaybackDto {
     private long id;

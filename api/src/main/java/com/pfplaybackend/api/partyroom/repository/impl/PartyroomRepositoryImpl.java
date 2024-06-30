@@ -45,7 +45,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         qPartyroomData.introduction,
                         qPartyroomData.isPlaybackActivated,
                         qPartyroomData.isQueueClosed,
-                        qPartymemberData.id.count().as("musicCount"),
+                        qPartymemberData.id.count().as("memberCount"),
                         Projections.constructor(PlaybackDto.class,
                                 qPlaybackData.id,
                                 qPlaybackData.linkId,
@@ -56,19 +56,19 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 ))
                 .from(qPartyroomData)
                 .leftJoin(qPartymemberData)
-                .on(qPartyroomData.eq(qPartymemberData.partyroomData))
+                .on(qPartyroomData.eq(qPartymemberData.partyroomData)
+                        .and(qPartymemberData.isActive.eq(true))
+                        .and(qPartymemberData.isBanned.eq(false))
+                )
                 .leftJoin(qPlaybackData)
                 .on(qPlaybackData.id.eq(qPartyroomData.currentPlaybackId.id))
-                .where(qPartyroomData.isTerminated.eq(false)
-//                        .and(qPartymemberData.partyroomData.eq(qPartyroomData))
-//                        .and(qPartymemberData.isActive.eq(true))
-                )
+                .where(qPartyroomData.isTerminated.eq(false))
                 .groupBy(qPartyroomData.id)
                 .fetch();
     }
 
     @Override
-    public Optional<ActivePartyroomDto> getActivePartyroom(UserId userId) {
+    public Optional<ActivePartyroomDto> getActivePartyroomByUserId(UserId userId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
@@ -77,6 +77,8 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 .select(Projections.constructor(
                         ActivePartyroomDto.class,
                         qPartyroomData.id,
+                        qPartyroomData.isPlaybackActivated,
+                        qPartyroomData.isQueueClosed,
                         qPartyroomData.currentPlaybackId
                 ))
                 .from(qPartymemberData)

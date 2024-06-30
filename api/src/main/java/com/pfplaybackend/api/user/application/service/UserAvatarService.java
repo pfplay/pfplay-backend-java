@@ -69,6 +69,7 @@ public class UserAvatarService {
         UserContext userContext = (UserContext) ThreadLocalContext.getContext();
         Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
         AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(command.getAvatarBodyUri());
+        // TODO Clear face if not combined body (24.06.30)
         Member updatedMember = member.updateAvatarBody(command.getAvatarBodyUri(), avatarBodyDto);
         memberRepository.save(updatedMember.toData());
     }

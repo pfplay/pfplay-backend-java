@@ -29,6 +29,7 @@ public class PartyContextAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
             PartyContext partyContext = PartyContext.create((UserCredentials)authentication.getPrincipal());
+            System.out.println(partyContext);
             ThreadLocalContext.setContext(partyContext);
         }
     }

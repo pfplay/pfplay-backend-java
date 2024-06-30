@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application.service.dj;
+package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
@@ -6,10 +6,7 @@ import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.application.dto.AggregationDto;
 import com.pfplaybackend.api.partyroom.application.peer.GrabMusicPeerService;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
-import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.history.PlaybackReactionHistoryData;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.enums.MotionType;
@@ -20,7 +17,6 @@ import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.AggregationMessage;
 import com.pfplaybackend.api.partyroom.event.message.MotionMessage;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.ReactCurrentPlaybackRequest;
-import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.partyroom.repository.history.PlaybackReactionHistoryRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.transaction.Transactional;
@@ -47,8 +43,8 @@ public class PlaybackReactionService {
     @Transactional
     public void reactToCurrentPlayback(PartyroomId partyroomId, ReactCurrentPlaybackRequest request) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        ActivePartyroomDto activePartyroom = partyroomInfoService.getActivePartyroom();
-        // TODO activePartyroom.getId() == partyroomId
+        ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom();
+        // TODO [Check] activePartyroom.getId() == partyroomId
         PlaybackId currPlaybackId = activePartyroom.getCurrentPlaybackId();
         PlaybackReactionHistoryData historyData = findPrevHistoryData(currPlaybackId, partyContext.getUserId());
         boolean isExistHistory = historyData == null;
@@ -83,8 +79,8 @@ public class PlaybackReactionService {
         // TODO Get Aggregation of Current Playback ?
         // TODO Or Get Aggregation By Playback
         AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
-        redisMessagePublisher.publish(MessageTopic.MOTION,
-                new AggregationMessage(partyroomId, MessageTopic.MOTION, aggregationDto));
+        redisMessagePublisher.publish(MessageTopic.AGGREGATION,
+                new AggregationMessage(partyroomId, MessageTopic.AGGREGATION, aggregationDto));
     }
 
     private void updateDjActivityScore(UserId djUserId, int score) {

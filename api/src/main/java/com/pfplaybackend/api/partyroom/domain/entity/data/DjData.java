@@ -30,6 +30,9 @@ public class DjData {
     private UserId userId;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "playlist_id")),
+    })
     private PlaylistId playlistId;
 
     private int orderNumber;
@@ -41,8 +44,9 @@ public class DjData {
     public DjData() {}
 
     @Builder
-    public DjData(Long id, PartyroomData partyroomData, PlaylistId playlistId, int orderNumber, boolean isDeleted) {
+    public DjData(Long id, UserId userId, PartyroomData partyroomData, PlaylistId playlistId, int orderNumber, boolean isDeleted) {
         this.id = id;
+        this.userId = userId;
         this.playlistId = playlistId;
         this.orderNumber = orderNumber;
         this.isDeleted = isDeleted;

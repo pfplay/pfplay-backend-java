@@ -10,5 +10,5 @@ import java.util.Optional;
 
 public interface PartyroomRepositoryCustom {
     List<PartyroomDto> getAllPartyrooms();
-    Optional<ActivePartyroomDto> getActivePartyroom(UserId userId);
+    Optional<ActivePartyroomDto> getActivePartyroomByUserId(UserId userId);
 }
