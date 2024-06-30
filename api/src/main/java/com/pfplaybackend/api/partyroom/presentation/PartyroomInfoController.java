@@ -26,9 +26,8 @@ public class PartyroomInfoController {
      * → 대기실에서의 목록 조회 API
      */
     @GetMapping
-    public ResponseEntity<QueryPartyroomListResponse> getPartyrooms() {
-        partyroomInfoService.getAllPartyrooms();
-        return null;
+    public ResponseEntity<?> getPartyrooms() {
+        return ResponseEntity.ok().body(QueryPartyroomListResponse.from(partyroomInfoService.getAllPartyrooms()));
     }
 
     /**

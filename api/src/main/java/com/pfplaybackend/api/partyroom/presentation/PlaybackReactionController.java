@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.partyroom.application.service.dj.PlaybackReactionService;
+import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.ReactCurrentPlaybackRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,14 +20,15 @@ public class PlaybackReactionController {
     public ResponseEntity<Void> reactToPlayback(
             @PathVariable Long partyroomId,
             @RequestBody ReactCurrentPlaybackRequest request) {
-        playbackReactionService.reactToCurrentPlayback(request);
+        // TODO 24.06.30 기준으로 (철회 불가능한) '좋아요'만 호출 가능
+        playbackReactionService.reactToCurrentPlayback(new PartyroomId(partyroomId), request);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/{partyroomId}/playback/grab")
-    public ResponseEntity<Void> grabPlayback(
-            @PathVariable Long partyroomId) {
-        playbackReactionService.grabCurrentPlayback();
-        return ResponseEntity.ok().build();
-    }
+//    @PostMapping("/{partyroomId}/playback/grab")
+//    public ResponseEntity<Void> grabPlayback(
+//            @PathVariable Long partyroomId) {
+//        playbackReactionService.grabCurrentPlayback();
+//        return ResponseEntity.ok().build();
+//    }
 }

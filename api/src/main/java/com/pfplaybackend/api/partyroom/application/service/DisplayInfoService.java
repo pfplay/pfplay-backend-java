@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;
-import com.pfplaybackend.api.partyroom.repository.history.PlaybackReactionHistory;
+import com.pfplaybackend.api.partyroom.repository.history.PlaybackReactionHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class DisplayInfoService {
 
     private final PlaybackRepository playbackRepository;
-    private final PlaybackReactionHistory playbackReactionHistory;
+    private final PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
 
 
     public void getDisplayInfo() {

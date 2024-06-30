@@ -1,8 +1,12 @@
 package com.pfplaybackend.api.partyroom.repository.impl;
 
 import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
+import com.pfplaybackend.api.partyroom.application.dto.PartyroomDto;
+import com.pfplaybackend.api.partyroom.application.dto.PlaybackDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.QPartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.QPartyroomData;
+import com.pfplaybackend.api.partyroom.domain.entity.data.QPlaybackData;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.repository.custom.PartyroomRepositoryCustom;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
 import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistMusicData;
@@ -16,12 +20,52 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+import java.util.List;
 import java.util.Optional;
 
 public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     @PersistenceContext
     private EntityManager em;
+
+    @Override
+    public List<PartyroomDto> getAllPartyrooms() {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
+        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
+        QPlaybackData qPlaybackData = QPlaybackData.playbackData;
+
+        return queryFactory
+                .select(Projections.constructor(
+                        PartyroomDto.class,
+                        qPartyroomData.id,
+                        qPartyroomData.stageType,
+                        qPartyroomData.hostId,
+                        qPartyroomData.title,
+                        qPartyroomData.introduction,
+                        qPartyroomData.isPlaybackActivated,
+                        qPartyroomData.isQueueClosed,
+                        qPartymemberData.id.count().as("musicCount"),
+                        Projections.constructor(PlaybackDto.class,
+                                qPlaybackData.id,
+                                qPlaybackData.linkId,
+                                qPlaybackData.name,
+                                qPlaybackData.duration,
+                                qPlaybackData.thumbnailImage
+                        )
+                ))
+                .from(qPartyroomData)
+                .leftJoin(qPartymemberData)
+                .on(qPartyroomData.eq(qPartymemberData.partyroomData))
+                .leftJoin(qPlaybackData)
+                .on(qPlaybackData.id.eq(qPartyroomData.currentPlaybackId.id))
+                .where(qPartyroomData.isTerminated.eq(false)
+//                        .and(qPartymemberData.partyroomData.eq(qPartyroomData))
+//                        .and(qPartymemberData.isActive.eq(true))
+                )
+                .groupBy(qPartyroomData.id)
+                .fetch();
+    }
 
     @Override
     public Optional<ActivePartyroomDto> getActivePartyroom(UserId userId) {
