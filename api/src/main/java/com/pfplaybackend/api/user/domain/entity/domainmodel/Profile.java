@@ -24,6 +24,10 @@ public class Profile {
     private AvatarBodyUri avatarBodyUri;
     @With
     private WalletAddress walletAddress;
+    @With
+    private int combinePositionX;
+    @With
+    private int combinePositionY;
 
     public Profile(UserId userId) {
         this.userId = userId;
@@ -32,10 +36,14 @@ public class Profile {
         this.avatarFaceUri = null;
         this.avatarBodyUri = null;
         this.walletAddress = null;
+        this.combinePositionX = 0;
+        this.combinePositionY = 0;
     }
 
     @Builder
-    public Profile(Long id, UserId userId, String nickname, String introduction, AvatarFaceUri avatarFaceUrl, AvatarBodyUri avatarBodyUri, WalletAddress walletAddress) {
+    public Profile(Long id, UserId userId, String nickname, String introduction,
+                   AvatarFaceUri avatarFaceUrl, AvatarBodyUri avatarBodyUri, WalletAddress walletAddress,
+                   int combinePositionX, int combinePositionY) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -43,6 +51,8 @@ public class Profile {
         this.avatarBodyUri = avatarBodyUri;
         this.avatarFaceUri = avatarFaceUrl;
         this.walletAddress = walletAddress;
+        this.combinePositionX = combinePositionX;
+        this.combinePositionY = combinePositionY;
     }
 
     ProfileData toData() {
@@ -54,6 +64,8 @@ public class Profile {
                 .avatarBodyUri(this.avatarBodyUri)
                 .avatarFaceUri(this.avatarFaceUri)
                 .walletAddress(this.walletAddress)
+                .combinePositionX(this.combinePositionX)
+                .combinePositionY(this.combinePositionY)
                 .build();
     }
 }

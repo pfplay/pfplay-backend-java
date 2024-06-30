@@ -48,10 +48,15 @@ public class ProfileData extends BaseEntity {
     @Embedded
     private AvatarBodyUri avatarBodyUri;
 
+    private int combinePositionX;
+    private int combinePositionY;
+
     protected ProfileData() {}
 
     @Builder
-    public ProfileData(Long id, UserId userId, String nickname, String introduction, AvatarFaceUri avatarFaceUri, AvatarBodyUri avatarBodyUri, WalletAddress walletAddress) {
+    public ProfileData(Long id, UserId userId, String nickname, String introduction, AvatarFaceUri avatarFaceUri,
+                       AvatarBodyUri avatarBodyUri, WalletAddress walletAddress,
+                       int combinePositionX, int combinePositionY) {
         this.id = id;
         this.userId = userId;
         this.nickname = nickname;
@@ -59,6 +64,8 @@ public class ProfileData extends BaseEntity {
         this.avatarBodyUri = avatarBodyUri;
         this.avatarFaceUri = avatarFaceUri;
         this.walletAddress = walletAddress;
+        this.combinePositionX = combinePositionX;
+        this.combinePositionY = combinePositionY;
     }
 
     @PrePersist
@@ -84,6 +91,8 @@ public class ProfileData extends BaseEntity {
                 .avatarBodyUri(this.avatarBodyUri)
                 .avatarFaceUrl(this.avatarFaceUri)
                 .walletAddress(this.walletAddress)
+                .combinePositionX(this.combinePositionX)
+                .combinePositionY(this.combinePositionY)
                 .build();
     }
 }
