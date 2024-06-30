@@ -70,6 +70,7 @@ public class UserAvatarService {
         UserContext userContext = (UserContext) ThreadLocalContext.getContext();
         Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
         AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(command.getAvatarBodyUri());
+        // TODO Check if the score is actually configurable
         Member updatedMember = member.updateAvatarBody(command.getAvatarBodyUri(), avatarBodyDto);
         memberRepository.save(updatedMember.toData());
     }
