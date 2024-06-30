@@ -109,10 +109,14 @@ public class Member extends User {
     }
 
     public Member updateAvatarBody(AvatarBodyUri avatarBodyUri, AvatarBodyDto avatarBodyDto) {
+        // Check is Required to Clear
+        AvatarFaceUri avatarFaceUri = avatarBodyDto.isCombinable() ? this.profile.getAvatarFaceUri() : new AvatarFaceUri();
+
         Profile newProfile = this.profile
                 .withAvatarBodyUri(avatarBodyUri)
                 .withCombinePositionX(avatarBodyDto.getCombinePositionX())
-                .withCombinePositionY(avatarBodyDto.getCombinePositionY());
+                .withCombinePositionY(avatarBodyDto.getCombinePositionY())
+                .withAvatarFaceUri(avatarFaceUri);
 
         return this.toBuilder()
                 .profile(newProfile)
@@ -151,6 +155,8 @@ public class Member extends User {
                 .nickname(this.profile.getNickname())
                 .introduction(this.profile.getIntroduction())
                 .avatarBodyUri(this.profile.getAvatarBodyUri().getAvatarBodyUri())
+                .combinePositionX(this.profile.getCombinePositionX())
+                .combinePositionY(this.profile.getCombinePositionY())
                 .avatarFaceUri(this.profile.getAvatarFaceUri().getAvatarFaceUri())
                 .walletAddress(this.profile.getWalletAddress().getWalletAddress())
                 .activitySummaries(activitySummaries)
