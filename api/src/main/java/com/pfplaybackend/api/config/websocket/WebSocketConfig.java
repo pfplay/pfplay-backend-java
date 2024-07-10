@@ -14,9 +14,20 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final PartyroomChannelInterceptor partyroomChannelInterceptor;
 
+    @Bean
+    public TaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(1);
+        scheduler.setThreadNamePrefix("heartbeat-scheduler-");
+        scheduler.initialize();
+        return scheduler;
+    }
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry brokerRegistry) {
-        brokerRegistry.enableSimpleBroker("/sub");
+        brokerRegistry.enableSimpleBroker("/sub")
+                .setHeartbeatValue(new long[]{10000, 10000})
+                .setTaskScheduler(taskScheduler());
         brokerRegistry.setApplicationDestinationPrefixes("/pub");
     }
 
@@ -24,12 +35,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry endpointRegistry) {
         endpointRegistry
                 .addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
-                .withSockJS();
+                .setAllowedOriginPatterns("*"); // TODO: update to pfplay client url
     }
 
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(partyroomChannelInterceptor);
-    }
+//    @Override
+//    public void configureClientInboundChannel(ChannelRegistration registration) {
+//        registration.interceptors(partyroomChannelInterceptor);
+//    }
 }
