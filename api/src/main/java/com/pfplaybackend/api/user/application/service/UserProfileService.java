@@ -2,14 +2,12 @@ package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;

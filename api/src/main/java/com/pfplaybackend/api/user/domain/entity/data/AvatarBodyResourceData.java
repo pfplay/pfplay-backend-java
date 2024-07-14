@@ -1,15 +1,15 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Table(name = "AVATAR_RESOURCE")
+@Table(name = "AVATAR_BODY_RESOURCE")
 @Entity
-public class AvatarResourceData {
+public class AvatarBodyResourceData {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(updatable = false)
@@ -37,13 +37,12 @@ public class AvatarResourceData {
     private int combinePositionX;;
     private int combinePositionY;
 
-
-    public AvatarResourceData() {}
+    public AvatarBodyResourceData() {}
 
     @Builder
-    public AvatarResourceData(Long id, String name, String resourceUri,
-                              ObtainmentType obtainableType, int obtainableScore,
-                              boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
+    public AvatarBodyResourceData(Long id, String name, String resourceUri,
+                                  ObtainmentType obtainableType, int obtainableScore,
+                                  boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
         this.id = id;
         this.name = name;
         this.resourceUri = resourceUri;
@@ -55,8 +54,8 @@ public class AvatarResourceData {
         this.combinePositionY = combinePositionY;
     }
 
-    public AvatarResource toDomain() {
-        return AvatarResource.builder()
+    public AvatarBodyResource toDomain() {
+        return AvatarBodyResource.builder()
                 .id(this.id)
                 .name(this.name)
                 .resourceUri(this.resourceUri)

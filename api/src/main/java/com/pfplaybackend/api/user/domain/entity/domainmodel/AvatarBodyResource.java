@@ -1,12 +1,12 @@
 package com.pfplaybackend.api.user.domain.entity.domainmodel;
 
-import com.pfplaybackend.api.user.domain.entity.data.AvatarResourceData;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-public class AvatarResource {
+public class AvatarBodyResource {
 
     private Long id;
     private final String name;
@@ -20,8 +20,8 @@ public class AvatarResource {
     private final int combinePositionY;
 
 
-    AvatarResource(String name, String resourceUri, ObtainmentType obtainableType,
-                   int obtainableScore, boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
+    AvatarBodyResource(String name, String resourceUri, ObtainmentType obtainableType,
+                       int obtainableScore, boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
         this.name = name;
         this.resourceUri = resourceUri;
         this.obtainableType = obtainableType;
@@ -33,8 +33,8 @@ public class AvatarResource {
     }
 
     @Builder
-    AvatarResource(Long id, String name, String resourceUri, ObtainmentType obtainableType,
-                   int obtainableScore, boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
+    public AvatarBodyResource(Long id, String name, String resourceUri, ObtainmentType obtainableType,
+                       int obtainableScore, boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
         this.id = id;
         this.name = name;
         this.resourceUri = resourceUri;
@@ -46,13 +46,13 @@ public class AvatarResource {
         this.combinePositionY = combinePositionY;
     }
 
-    static public AvatarResource create(String name, String resourceUri, ObtainmentType obtainableType,
-                                        int obtainableScore, boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
-        return new AvatarResource(name, resourceUri, obtainableType, obtainableScore, isCombinable, isDefaultSetting, combinePositionX, combinePositionY);
+    static public AvatarBodyResource create(String name, String resourceUri, ObtainmentType obtainableType,
+                                            int obtainableScore, boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
+        return new AvatarBodyResource(name, resourceUri, obtainableType, obtainableScore, isCombinable, isDefaultSetting, combinePositionX, combinePositionY);
     }
 
-    public AvatarResourceData toData() {
-        return AvatarResourceData.builder()
+    public AvatarBodyResourceData toData() {
+        return AvatarBodyResourceData.builder()
                 .id(this.id)
                 .name(this.name)
                 .resourceUri(this.resourceUri)
