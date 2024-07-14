@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.user.application.service.temporary;
+package com.pfplaybackend.api.user.application.service.initialize;
 
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class TemporaryUserService {
+public class TemporaryUserInitializeService {
 
     private final GuestRepository guestRepository;
     private final MemberRepository memberRepository;

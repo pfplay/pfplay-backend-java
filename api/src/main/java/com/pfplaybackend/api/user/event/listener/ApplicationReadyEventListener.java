@@ -1,9 +1,11 @@
 package com.pfplaybackend.api.user.event.listener;
 
-import com.pfplaybackend.api.user.application.service.temporary.TemporaryAvatarResourceService;
-import com.pfplaybackend.api.user.application.service.temporary.TemporaryUserService;
+import com.pfplaybackend.api.user.application.service.initialize.AdminUserInitializeService;
+import com.pfplaybackend.api.user.application.service.initialize.AvatarResourceInitializeService;
+import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -13,8 +15,9 @@ import org.springframework.stereotype.Component;
 public class ApplicationReadyEventListener {
 
     private final Environment environment;
-    private final TemporaryAvatarResourceService temporaryAvatarResourceService;
-    private final TemporaryUserService temporaryUserService;
+    private final AvatarResourceInitializeService avatarResourceInitializeService;
+    private final TemporaryUserInitializeService temporaryUserInitializeService;
+    private final AdminUserInitializeService adminUserInitializeService;
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationEvent() {
@@ -27,12 +30,16 @@ public class ApplicationReadyEventListener {
                 break;
             }
         }
-
-        temporaryAvatarResourceService.addTemporaryAvatarBodies();
+        // Add AdminUser
+        adminUserInitializeService.addAdminUser();
+        // Add AvatarResources
+        avatarResourceInitializeService.addAvatarBodies();
+        avatarResourceInitializeService.addAvatarFaces();
+        avatarResourceInitializeService.addAvatarIcons();
 
         if (isLocalProfileActive) {
             System.out.println("Local profile is active");
-            temporaryUserService.addTemporaryUsers();
+            temporaryUserInitializeService.addTemporaryUsers();
         } else {
             System.out.println("Local profile is not active");
         }

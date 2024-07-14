@@ -1,14 +1,13 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
@@ -35,8 +34,8 @@ public class UserAvatarService {
 
     @Transactional(readOnly = true)
     public AvatarBodyUri getDefaultAvatarBodyUri() {
-        AvatarResource avatarResource = avatarResourceService.getDefaultSettingResourceAvatarBody();
-        return new AvatarBodyUri(avatarResource.getResourceUri());
+        AvatarBodyResource avatarBodyResource = avatarResourceService.getDefaultSettingResourceAvatarBody();
+        return new AvatarBodyUri(avatarBodyResource.getResourceUri());
     }
 
     public AvatarFaceUri getDefaultAvatarFaceUri() {

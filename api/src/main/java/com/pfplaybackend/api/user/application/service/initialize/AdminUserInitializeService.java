@@ -1,8 +1,10 @@
-package com.pfplaybackend.api.user.application.service;
+package com.pfplaybackend.api.user.application.service.initialize;
 
 import com.pfplaybackend.api.config.jwt.JwtProvider;
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
+import com.pfplaybackend.api.user.application.service.UserActivityService;
+import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
@@ -20,7 +22,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class AdminUserService {
+public class AdminUserInitializeService {
 
     private final JwtProvider jwtProvider;
     private final MemberRepository memberRepository;
@@ -34,7 +36,7 @@ public class AdminUserService {
     }
 
     private Member addAssociateMember(UserId userId) {
-        Member member = Member.createWithFixedUserId(userId, "", ProviderType.GOOGLE);
+        Member member = Member.createWithFixedUserId(userId, "N/A", ProviderType.GOOGLE);
         Profile profile = userProfileService.createProfileForMember(member);
         Map<ActivityType, Activity> activityMap = userActivityService.createUserActivities(member);
         Member updatedMember = member

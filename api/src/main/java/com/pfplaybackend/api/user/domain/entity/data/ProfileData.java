@@ -2,10 +2,7 @@ package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
-import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
-import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.user.domain.value.WalletAddress;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,10 +40,13 @@ public class ProfileData extends BaseEntity {
     private WalletAddress walletAddress;
 
     @Embedded
+    private AvatarBodyUri avatarBodyUri;
+
+    @Embedded
     private AvatarFaceUri avatarFaceUri;
 
     @Embedded
-    private AvatarBodyUri avatarBodyUri;
+    private AvatarIconUri avatarIconUri;
 
     private int combinePositionX;
     private int combinePositionY;
@@ -54,8 +54,11 @@ public class ProfileData extends BaseEntity {
     protected ProfileData() {}
 
     @Builder
-    public ProfileData(Long id, UserId userId, String nickname, String introduction, AvatarFaceUri avatarFaceUri,
-                       AvatarBodyUri avatarBodyUri, WalletAddress walletAddress,
+    public ProfileData(Long id, UserId userId, String nickname, String introduction,
+                       AvatarBodyUri avatarBodyUri,
+                       AvatarFaceUri avatarFaceUri,
+                       AvatarIconUri avatarIconUri,
+                       WalletAddress walletAddress,
                        int combinePositionX, int combinePositionY) {
         this.id = id;
         this.userId = userId;
@@ -63,6 +66,7 @@ public class ProfileData extends BaseEntity {
         this.introduction = introduction;
         this.avatarBodyUri = avatarBodyUri;
         this.avatarFaceUri = avatarFaceUri;
+        this.avatarIconUri = avatarIconUri;
         this.walletAddress = walletAddress;
         this.combinePositionX = combinePositionX;
         this.combinePositionY = combinePositionY;
@@ -77,6 +81,9 @@ public class ProfileData extends BaseEntity {
         if (this.avatarFaceUri == null) {
             this.avatarFaceUri = new AvatarFaceUri("");
         }
+        if (this.avatarIconUri == null) {
+            this.avatarIconUri = new AvatarIconUri("");
+        }
         if (this.walletAddress == null) {
             this.walletAddress = new WalletAddress("");
         }
@@ -90,6 +97,7 @@ public class ProfileData extends BaseEntity {
                 .introduction(this.introduction)
                 .avatarBodyUri(this.avatarBodyUri)
                 .avatarFaceUrl(this.avatarFaceUri)
+                .avatarIconUri(this.avatarIconUri)
                 .walletAddress(this.walletAddress)
                 .combinePositionX(this.combinePositionX)
                 .combinePositionY(this.combinePositionY)
