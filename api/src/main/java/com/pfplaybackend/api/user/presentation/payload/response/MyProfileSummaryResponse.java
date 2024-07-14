@@ -24,6 +24,8 @@ public class MyProfileSummaryResponse {
                 .nickname(profileSummaryDto.getNickname())
                 .introduction(profileSummaryDto.getIntroduction())
                 .avatarBodyUri(profileSummaryDto.getAvatarBodyUri())
+                .combinePositionX(profileSummaryDto.getCombinePositionX())
+                .combinePositionY(profileSummaryDto.getCombinePositionY())
                 .avatarFaceUri(profileSummaryDto.getAvatarFaceUri())
                 .walletAddress(profileSummaryDto.getWalletAddress())
                 .activitySummaries(profileSummaryDto.getActivitySummaries())
