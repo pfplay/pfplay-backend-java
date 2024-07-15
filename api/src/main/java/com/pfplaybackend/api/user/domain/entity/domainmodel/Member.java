@@ -9,10 +9,7 @@ import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
-import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.user.domain.value.UserId;
-import com.pfplaybackend.api.user.domain.value.WalletAddress;
+import com.pfplaybackend.api.user.domain.value.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -108,16 +105,11 @@ public class Member extends User {
                 .build();
     }
 
-    public Member updateAvatarBody(AvatarBodyUri avatarBodyUri, AvatarBodyDto avatarBodyDto) {
-        // Check is Required to Clear
-        AvatarFaceUri avatarFaceUri = avatarBodyDto.isCombinable() ? this.profile.getAvatarFaceUri() : new AvatarFaceUri();
-
+    public Member updateAvatarBody(AvatarBodyDto avatarBodyDto) {
         Profile newProfile = this.profile
-                .withAvatarBodyUri(avatarBodyUri)
+                .withAvatarBodyUri(new AvatarBodyUri(avatarBodyDto.getResourceUri()))
                 .withCombinePositionX(avatarBodyDto.getCombinePositionX())
-                .withCombinePositionY(avatarBodyDto.getCombinePositionY())
-                .withAvatarFaceUri(avatarFaceUri);
-
+                .withCombinePositionY(avatarBodyDto.getCombinePositionY());
         return this.toBuilder()
                 .profile(newProfile)
                 .build();
@@ -126,11 +118,19 @@ public class Member extends User {
     public Member updateAvatarFace(AvatarFaceUri avatarFaceUri) {
         Profile newProfile = this.profile
                 .withAvatarFaceUri(avatarFaceUri);
-
         return this.toBuilder()
                 .profile(newProfile)
                 .build();
     }
+
+    public Member updateAvatarIcon(AvatarIconUri avatarIconUri) {
+        Profile newProfile = this.profile
+                .withAvatarIconUri(avatarIconUri);
+        return this.toBuilder()
+                .profile(newProfile)
+                .build();
+    }
+
 
     public Member updateWalletAddress(WalletAddress walletAddress) {
         Profile newProfile = this.profile
