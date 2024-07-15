@@ -31,7 +31,7 @@ import java.util.Set;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final Set<String> skipableURIs = new HashSet<>(Set.of(
-//            "/ws",
+            "/ws",
             "/error",
             "/v3/api-docs",
             "/spec/swagger-ui",

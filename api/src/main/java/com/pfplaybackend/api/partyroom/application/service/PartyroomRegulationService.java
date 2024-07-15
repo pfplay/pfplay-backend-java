@@ -5,6 +5,7 @@ import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateMemberGradeRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateMemberPenaltyRequest;
+import com.pfplaybackend.api.partyroom.repository.history.UserPenaltyHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PartyroomRegulationService {
 
+    private final UserPenaltyHistoryRepository userPenaltyHistoryRepository;
     private final PartyroomDomainService partyroomDomainService;
     private final PartyroomAccessService partyroomAccessService;
 

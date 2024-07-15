@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.config.websocket;
 
+import com.pfplaybackend.api.config.websocket.intercaptor.JwtHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,11 +39,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry endpointRegistry) {
         endpointRegistry
                 .addEndpoint("/ws")
-                .setAllowedOriginPatterns("*"); // TODO: update to pfplay client url
+                .setAllowedOriginPatterns("*")
+                .addInterceptors(new JwtHandshakeInterceptor());
     }
-
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(partyroomChannelInterceptor);
-//    }
 }
