@@ -39,7 +39,8 @@ public class UserProfileService {
         return profile
                 .withNickname(guestDomainService.generateRandomNickname())
                 .withAvatarBodyUri(userAvatarService.getDefaultAvatarBodyUri())
-                .withAvatarFaceUri(userAvatarService.getDefaultAvatarFaceUri());
+                .withAvatarFaceUri(userAvatarService.getDefaultAvatarFaceUri())
+                .withAvatarIconUri(userAvatarService.getDefaultAvatarIconUri());
     }
 
     public Profile createProfileForMember(Member member) {
