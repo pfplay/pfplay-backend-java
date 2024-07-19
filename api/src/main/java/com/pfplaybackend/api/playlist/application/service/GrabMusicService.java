@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class GrabMusicService {
-    public void grabThisMusic() {
-
+    public void grabMusic() {
     }
 }

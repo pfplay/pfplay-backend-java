@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data.history;
 
+import com.pfplaybackend.api.partyroom.domain.model.ReactionState;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.presentation.PlaybackReactionController;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -41,11 +42,6 @@ public class PlaybackReactionHistoryData {
     @Column(name = "grabbed")
     private boolean grabbed;
 
-    // 그랩 호출 시 playlist_music 테이블의 식별자를 저장
-    // 그랩 취소 시 해당 값을 이용하여, 레코드 삭제 가능
-    @Column(name = "grabbed_music_id")
-    private Long grabbedMusicId;
-
     public PlaybackReactionHistoryData() {}
 
     public PlaybackReactionHistoryData(UserId userId, PlaybackId playbackId) {
@@ -54,27 +50,12 @@ public class PlaybackReactionHistoryData {
         this.liked = false;
         this.disliked = false;
         this.grabbed = false;
-        this.grabbedMusicId = null;
     }
 
-    public PlaybackReactionHistoryData applyLikedReaction() {
-        this.liked = true;
-        this.disliked = false;
-        return this;
-    }
-
-    public PlaybackReactionHistoryData applyDislikedReaction() {
-        this.liked = false;
-        this.disliked = true;
-        this.grabbed = false;
-        this.grabbedMusicId = null;
-        return this;
-    }
-
-    public PlaybackReactionHistoryData applyGrabbedReaction(long grabbedMusicId) {
-        this.disliked = false;
-        this.grabbed = true;
-        this.grabbedMusicId = grabbedMusicId;
+    public PlaybackReactionHistoryData applyReactionState(ReactionState reactionState) {
+        this.liked = reactionState.isLiked();
+        this.disliked = reactionState.isDisliked();
+        this.grabbed = reactionState.isGrabbed();
         return this;
     }
 }

@@ -105,8 +105,7 @@ public class PlaybackService {
         return partyroomInfoService.getMyActivePartyroom().getCurrentPlaybackId();
     }
 
-    public Playback updateLikeCount(PlaybackId playbackId) {
-        // TODO How to increment '1'
-        return new Playback();
+    public void updateAggregation(Playback playback) {
+        playbackRepository.save(playbackConverter.toData(playback));
     }
 }

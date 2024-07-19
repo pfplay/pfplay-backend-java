@@ -1,7 +1,5 @@
 package com.pfplaybackend.api.partyroom.presentation.dto;
 
-import com.pfplaybackend.api.partyroom.domain.entity.data.deprecated.PartyroomUser;
-import jakarta.persistence.Embedded;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,8 +9,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ChatDto {
+public class IncomingGroupChatMessage {
     private String message;
-    @Embedded
-    private PartyroomUser fromUser;
 }

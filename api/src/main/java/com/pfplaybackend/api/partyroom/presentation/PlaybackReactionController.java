@@ -16,19 +16,11 @@ public class PlaybackReactionController {
 
     private final PlaybackReactionService playbackReactionService;
 
-    @PutMapping("/{partyroomId}/playback/reaction")
+    @PostMapping("/{partyroomId}/playback/reaction")
     public ResponseEntity<Void> reactToPlayback(
             @PathVariable Long partyroomId,
             @RequestBody ReactCurrentPlaybackRequest request) {
-        // TODO 24.06.30 기준으로 (철회 불가능한) '좋아요'만 호출 가능
-        playbackReactionService.reactToCurrentPlayback(new PartyroomId(partyroomId), request);
+        playbackReactionService.reactToCurrentPlayback(new PartyroomId(partyroomId), request.getReactionType());
         return ResponseEntity.ok().build();
     }
-
-//    @PostMapping("/{partyroomId}/playback/grab")
-//    public ResponseEntity<Void> grabPlayback(
-//            @PathVariable Long partyroomId) {
-//        playbackReactionService.grabCurrentPlayback();
-//        return ResponseEntity.ok().build();
-//    }
 }
