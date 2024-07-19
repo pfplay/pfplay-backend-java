@@ -4,12 +4,15 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.application.dto.AggregationDto;
+import com.pfplaybackend.api.partyroom.application.dto.ReactionPostProcessDto;
 import com.pfplaybackend.api.partyroom.application.peer.GrabMusicPeerService;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.enums.MotionType;
+import com.pfplaybackend.api.partyroom.domain.enums.ReactionType;
+import com.pfplaybackend.api.partyroom.domain.model.ReactionState;
 import com.pfplaybackend.api.partyroom.domain.service.PlaybackReactionDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
@@ -23,6 +26,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class PlaybackReactionService {
@@ -31,78 +36,46 @@ public class PlaybackReactionService {
     // Using Domain Services
     private final PlaybackReactionDomainService playbackReactionDomainService;
     // Using Application Services
-    private final DJManagementService djManagementService;
-    private final PlaybackService playbackService;
     private final PartyroomInfoService partyroomInfoService;
-    // Using RedisMessagePublisher
-    private final RedisMessagePublisher redisMessagePublisher;
-    // Using Proxy Services
-    private final GrabMusicPeerService grabMusicService;
-    private final UserActivityPeerService userActivityService;
+    private final PlaybackReactionPostProcessService playbackReactionPostProcessService;
 
     @Transactional
-    public void reactToCurrentPlayback(PartyroomId partyroomId, ReactCurrentPlaybackRequest request) {
+    public void reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom();
-        // TODO [Check] activePartyroom.getId() == partyroomId
-        PlaybackId currPlaybackId = activePartyroom.getCurrentPlaybackId();
-        PlaybackReactionHistoryData historyData = findPrevHistoryData(currPlaybackId, partyContext.getUserId());
-        boolean isExistHistory = historyData == null;
-        if(isExistHistory) {
-            return;
-        }else {
-            PlaybackReactionHistoryData newHistoryData = new PlaybackReactionHistoryData(partyContext.getUserId(), currPlaybackId);
-            playbackReactionHistoryRepository.save(newHistoryData.applyLikedReaction());
-            // Post Process...
-            updateDjActivityScore(djManagementService.getDjByPlayback(currPlaybackId).getUserId(), 1);
-            Playback updatedPlayback = updatePlaybackAggregation(currPlaybackId);
-            publishAggregationChangedEvent(partyroomId, updatedPlayback);
-            publishMotionChangedEvent(partyroomId);
-        }
-        // TODO 모션 변동 이벤트 발행 필요 여부 (웹소켓 토픽)
-        // TODO 이펙트 변동 이벤트 발행 필요 여부 (웹소켓 토픽)
-        // TODO 통계값 변동 이벤트 발행 여부 (웹소켓 토픽)
-        // TODO Dj 점수 수정 처리 발생 여부 (피어 서비스)
-        // TODO Grab 처리 발생 여부 (피어 서비스)
+        ActivePartyroomDto myActivePartyroom = partyroomInfoService.getMyActivePartyroom();
+        // TODO [Check] MyActivePartyroom.getId() == partyroomId
+        PlaybackId playbackId = myActivePartyroom.getCurrentPlaybackId();
+        // Find whether existing history exists
+        ReactionPostProcessDto reactionPostProcessDto = getReactionPostProcess(partyContext, playbackId, reactionType);
+        playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId);
     }
 
-    private PlaybackReactionHistoryData findPrevHistoryData(PlaybackId playbackId, UserId userId) {
+    // FIXME Change Method Name
+    private ReactionPostProcessDto getReactionPostProcess(PartyContext partyContext, PlaybackId playbackId, ReactionType reactionType) {
+        Optional<PlaybackReactionHistoryData> optional = findPrevHistoryData(playbackId, partyContext.getUserId());
+        if(optional.isPresent()) {
+            PlaybackReactionHistoryData historyData = optional.orElseThrow();
+            ReactionState existingState = playbackReactionDomainService.getReactionStateByHistory(historyData);
+            return executeProcess(historyData, existingState, reactionType);
+        }else {
+            PlaybackReactionHistoryData newHistoryData = new PlaybackReactionHistoryData(partyContext.getUserId(), playbackId);
+            ReactionState existingState = ReactionState.createBaseState();
+            return executeProcess(newHistoryData, existingState, reactionType);
+        }
+    }
+
+    // FIXME Change Method Name
+    private ReactionPostProcessDto executeProcess(PlaybackReactionHistoryData historyData, ReactionState existingState, ReactionType reactionType) {
+        // Calculate to get TargetState
+        ReactionState targetState = playbackReactionDomainService.getTargetReactionState(existingState, reactionType);
+        // Determine 'ReactionPostProcessDto' by diff existingState with targetState
+        // Save(Update) History Record
+        playbackReactionHistoryRepository.save(historyData.applyReactionState(targetState));
+        // Delegate Post Processor
+        return playbackReactionDomainService.determinePostProcessing(existingState, targetState);
+    }
+
+    private Optional<PlaybackReactionHistoryData> findPrevHistoryData(PlaybackId playbackId, UserId userId) {
         return playbackReactionHistoryRepository.findByPlaybackIdAndUserId(playbackId, userId);
     }
-
-    private void publishMotionChangedEvent(PartyroomId partyroomId) {
-        redisMessagePublisher.publish(MessageTopic.MOTION,
-                new MotionMessage(partyroomId, MessageTopic.MOTION, MotionType.MOVE));
-    }
-
-    private void publishAggregationChangedEvent(PartyroomId partyroomId, Playback playback) {
-        // TODO Get Aggregation of Current Playback ?
-        // TODO Or Get Aggregation By Playback
-        AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
-        redisMessagePublisher.publish(MessageTopic.AGGREGATION,
-                new AggregationMessage(partyroomId, MessageTopic.AGGREGATION, aggregationDto));
-    }
-
-    private void updateDjActivityScore(UserId djUserId, int score) {
-        userActivityService.updateDjPointScore(djUserId, score);
-    }
-
-    private Playback updatePlaybackAggregation(PlaybackId playbackId) {
-        return playbackService.updateLikeCount(playbackId);
-    }
-
-//    @Transactional
-//    public void grabCurrentPlayback() {
-//        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-//        /// 1. Reaction 이력 저장
-//        // TODO Grabbed 토글로 동작해야 한다.
-//        PlaybackReactionHistoryData historyData = new PlaybackReactionHistoryData();
-//        playbackReactionHistory.save(historyData);
-//        // 2. Reaction 행위 결과를 Dj 에게 점수 반영
-//        // TODO (수정) Dj의 UserId 정보 조회
-//        userActivityService.updateDjPointScore(new UserId(), 2);
-//        // 3. 요청자의 Grab 플레이리스트에 현재 곡 정보를 저장
-//        // TODO 현재 곡 정보 조회
-//        grabMusicService.grabThisMusic();
-//    }
 }

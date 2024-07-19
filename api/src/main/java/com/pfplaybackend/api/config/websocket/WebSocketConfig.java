@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.config.websocket;
 
-import com.pfplaybackend.api.config.websocket.intercaptor.JwtHandshakeInterceptor;
+import com.pfplaybackend.api.config.websocket.interceptor.JwtHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -12,7 +12,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    private final PartyroomChannelInterceptor partyroomChannelInterceptor;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry brokerRegistry) {

@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.config.websocket.intercaptor;
+package com.pfplaybackend.api.config.websocket.interceptor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
