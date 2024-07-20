@@ -24,6 +24,9 @@ import java.util.NoSuchElementException;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    // FIXME 세부 클래스를 이곳에 직접 명시해서는 안된다.
+    // 1. 각 도메인별로 추상화된 예외 클래스만을 등록한다.
+
     // @TODO custom exception 모듈화 리팩토링 필요
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<?> handleNoSuchElementFoundException(NoSuchElementException e) {

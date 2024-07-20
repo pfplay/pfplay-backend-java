@@ -1,14 +1,18 @@
 package com.pfplaybackend.api.partyroom.domain.value;
 
-import lombok.NoArgsConstructor;
 
+import jakarta.persistence.Embeddable;
+import lombok.Getter;
+
+import java.io.Serializable;
 import java.util.Objects;
 
-@NoArgsConstructor
-public class PartyroomId {
-    private Long id;
-
-    public PartyroomId(Long id) {
+@Getter
+@Embeddable
+public class PartyroomId implements Serializable {
+    private long id;
+    public PartyroomId() {}
+    public PartyroomId(long id) {
         this.id = id;
     }
 
@@ -17,16 +21,12 @@ public class PartyroomId {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PartyroomId partyroomId = (PartyroomId) o;
-        return Objects.equals(id, partyroomId.id);
+        return id == partyroomId.id;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
-
-    @Override
-    public String toString() {
-        return String.valueOf(id);
-    }
 }
+
