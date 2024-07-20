@@ -16,6 +16,8 @@ public interface PlaylistMusicRepository extends JpaRepository<PlaylistMusicData
     List<PlaylistMusicData> findAllByPlaylistDataId(Long playlistDataId);
     double countByPlaylistDataId(Long playlistDataId);
 
+    PlaylistMusicData findByLinkId(String linkId);
+
     @Modifying
     @Query("UPDATE PlaylistMusicData pm SET pm.orderNumber = CASE " +
             "WHEN pm.orderNumber = 1 THEN :totalElements " +

@@ -67,7 +67,6 @@ public class Member extends User {
                         Map.Entry::getKey,
                         entry -> entry.getValue().toData()
                 ));
-
         return MemberData.builder()
                 .userId(this.userId)
                 .authorityTier(this.authorityTier)
@@ -98,7 +97,6 @@ public class Member extends User {
         Profile newProfile = this.profile
                 .withNickname(updateBioCommand.getNickName())
                 .withIntroduction(updateBioCommand.getIntroduction());
-
         return this.toBuilder()
                 .profile(newProfile)
                 .isProfileUpdated(true)
@@ -135,10 +133,23 @@ public class Member extends User {
     public Member updateWalletAddress(WalletAddress walletAddress) {
         Profile newProfile = this.profile
                 .withWalletAddress(walletAddress);
-
         return this.toBuilder()
                 .profile(newProfile)
                 .authorityTier(AuthorityTier.FM)
+                .build();
+    }
+
+    public Member updateDjScore(int deltaScore) {
+        Map<ActivityType, Activity> activityMap = this.activityMap;
+        activityMap.put(ActivityType.DJ_PNT, Activity.builder()
+                        .id(this.activityMap.get(ActivityType.DJ_PNT).getId())
+                        .score(this.activityMap.get(ActivityType.DJ_PNT).getScore() + deltaScore)
+                        .activityType(ActivityType.DJ_PNT)
+                        .userId(this.activityMap.get(ActivityType.DJ_PNT).getUserId())
+                .build());
+
+        return this.toBuilder()
+                .activityMap(activityMap)
                 .build();
     }
 

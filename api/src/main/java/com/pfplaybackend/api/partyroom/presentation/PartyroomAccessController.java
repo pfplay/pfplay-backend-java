@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.partyroom.application.service.PartyroomAccessService;
+import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.response.EnterPartyroomResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -27,14 +28,14 @@ public class PartyroomAccessController {
     @PostMapping("/{partyroomId}/enter")
     public ResponseEntity<EnterPartyroomResponse> enterPartyroom(
             @PathVariable Long partyroomId) {
-        partyroomAccessService.tryEnter();
+        partyroomAccessService.tryEnter(new PartyroomId(partyroomId));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{partyroomId}/exit")
     public ResponseEntity<?> exitPartyroom(
             @PathVariable Long partyroomId) {
-        partyroomAccessService.exit();
+        partyroomAccessService.exit(new PartyroomId(partyroomId));
         return ResponseEntity.ok().build();
     }
 

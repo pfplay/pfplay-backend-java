@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface UserProfileRepository extends JpaRepository<ProfileData, Long> {
-    List<ProfileData> findByUserIdIn(List<UserId> userIds);
+    List<ProfileData> findAllByUserIdIn(List<UserId> userIds);
     ProfileData findByUserId(UserId userIds);
+
 }

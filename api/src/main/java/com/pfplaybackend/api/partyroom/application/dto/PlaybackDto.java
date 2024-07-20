@@ -3,10 +3,12 @@ package com.pfplaybackend.api.partyroom.application.dto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class PlaybackDto {
     private long id;

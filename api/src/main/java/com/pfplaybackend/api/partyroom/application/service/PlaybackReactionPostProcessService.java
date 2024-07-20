@@ -1,5 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
+import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.AggregationDto;
 import com.pfplaybackend.api.partyroom.application.dto.ReactionPostProcessDto;
 import com.pfplaybackend.api.partyroom.application.peer.GrabMusicPeerService;
@@ -16,10 +18,12 @@ import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class PlaybackReactionPostProcessService {
-    private final PlaybackService playbackService;
+    private final PlaybackInfoService playbackInfoService;
     // Using RedisMessagePublisher
     private final RedisMessagePublisher redisMessagePublisher;
     // Using Proxy Services
@@ -27,23 +31,21 @@ public class PlaybackReactionPostProcessService {
     private final UserActivityPeerService userActivityService;
 
     public void postProcess(ReactionPostProcessDto postProcessDto, PartyroomId partyroomId, PlaybackId playbackId) {
-        // TODO Get Playback Object By PlaybackId
-        Playback playback = new Playback();
-
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        Playback playback = playbackInfoService.getPlaybackById(playbackId);
         if(postProcessDto.isMotionChanged()) {
             publishMotionChangedEvent(partyroomId, postProcessDto.getDeterminedMotionType());
         }
         if(postProcessDto.isDjActivityScoreChanged()) {
-            UserId djUserId = new UserId();
-            updateDjActivityScore(djUserId, postProcessDto.getDeltaScore());
+            updateDjActivityScore(playback.getUserId(), postProcessDto.getDeltaScore());
         }
         if(postProcessDto.isAggregationChanged()) {
             // TODO Get Playback's Count information
-            updatePlaybackAggregation(playback);
+            updatePlaybackAggregation(playback, postProcessDto.getDeltaRecord());
             publishAggregationChangedEvent(partyroomId, playback);
         }
         if(postProcessDto.isGrabStatusChanged()) {
-            grabMusic(playback);
+            grabMusic(partyContext.getUserId(), playback);
         }
     }
 
@@ -57,8 +59,8 @@ public class PlaybackReactionPostProcessService {
         userActivityService.updateDjPointScore(djUserId, deltaScore);
     }
 
-    public void updatePlaybackAggregation(Playback playback) {
-        playbackService.updateAggregation(playback);
+    public void updatePlaybackAggregation(Playback playback, List<Integer> deltaRecord) {
+        playbackInfoService.updatePlaybackAggregation(playback, deltaRecord);
     }
 
     public void publishAggregationChangedEvent(PartyroomId partyroomId, Playback playback) {
@@ -67,8 +69,7 @@ public class PlaybackReactionPostProcessService {
                 new AggregationMessage(partyroomId, MessageTopic.AGGREGATION, aggregationDto));
     }
 
-    public void grabMusic(Playback playback) {
-        // TODO Need Music's linkId
-        grabMusicService.grabMusic(playback.getLinkId());
+    public void grabMusic(UserId userId, Playback playback) {
+        grabMusicService.grabMusic(userId, playback.getLinkId());
     }
 }

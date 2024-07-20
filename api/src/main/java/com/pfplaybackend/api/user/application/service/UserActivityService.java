@@ -1,9 +1,11 @@
 package com.pfplaybackend.api.user.application.service;
 
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserActivityService {
 
+    private final MemberRepository memberRepository;
+
     public Map<ActivityType, Activity> createUserActivities(Member member) {
         Map<ActivityType, Activity> activityDomains = new HashMap<>();
         for (ActivityType activityType : ActivityType.values()) {
@@ -25,7 +29,10 @@ public class UserActivityService {
     }
 
     public void updateDjPointScore(UserId userId, int point) {
-        // TODO 취소가 가능하기 때문에 마이너스가 될 수도 있다.
+        MemberData memberData = memberRepository.findByUserId(userId).orElseThrow();
+        Member member = memberData.toDomain();
+        Member updatedMember = member.updateDjScore(point);
+        memberRepository.save(updatedMember.toData());
     }
 
     public void updateRefererLinkScore(UserId userId) {

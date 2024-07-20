@@ -4,6 +4,7 @@ import com.pfplaybackend.api.partyroom.application.service.initialize.PartyroomI
 import com.pfplaybackend.api.user.application.service.initialize.AdminUserInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.AvatarResourceInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
@@ -33,15 +34,15 @@ public class ApplicationReadyEventListener {
         }
 
         // TODO Prod 이상 환경에서는 동작 '불필요'
-        // Add AdminUser
-        adminUserInitializeService.addAdminUser();
         // Add AvatarResources
         avatarResourceInitializeService.addAvatarBodies();
         avatarResourceInitializeService.addAvatarFaces();
         avatarResourceInitializeService.addAvatarIcons();
         // FIXME 서비스 간 '구동 순서에 대한 의존 문제'를 해소
+        // Add AdminUser
+        UserId adminId = adminUserInitializeService.addAdminUser();
         // Add Main Partyroom
-        partyroomInitializeService.addPartyroomByAdmin();
+        partyroomInitializeService.addPartyroomByAdmin(adminId);
 
         if (isLocalProfileActive) {
             System.out.println("Local profile is active");

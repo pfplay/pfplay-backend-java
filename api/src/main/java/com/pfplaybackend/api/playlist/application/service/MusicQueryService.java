@@ -30,13 +30,24 @@ public class MusicQueryService {
 
     @Transactional
     public MusicDto getFirstMusic(Long playlistId) {
-        // List<PlaylistMusicData> list  = playlistMusicRepository.findAllByPlaylistId(playlistId);
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.ASC, "orderNumber"));
         Page<PlaylistMusicDto> page = playlistMusicRepository.getMusicsWithPagination(playlistId, pageable);
-        System.out.println(page.getTotalElements());
         updateRotateOrderNumber(playlistId, page.getTotalElements());
-        return new MusicDto();
-        // TODO Rotate Order Number
+        PlaylistMusicDto dto = page.getContent().get(0);
+        return new MusicDto(
+                dto.getLinkId(),
+                dto.getName(),
+                dto.getThumbnailImage(),
+                dto.getDuration(),
+                dto.getOrderNumber()
+        );
+    }
+
+    @Transactional
+    public boolean isEmptyPlaylist(Long playlistId) {
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.ASC, "orderNumber"));
+        Page<PlaylistMusicDto> page = playlistMusicRepository.getMusicsWithPagination(playlistId, pageable);
+        return page.getTotalElements() == 0;
     }
 
     public void updateRotateOrderNumber(Long playlistId, long totalCount) {

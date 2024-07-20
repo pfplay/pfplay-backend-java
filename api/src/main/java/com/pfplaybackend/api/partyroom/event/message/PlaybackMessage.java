@@ -15,5 +15,5 @@ public class PlaybackMessage {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
     private long memberId;
-    private PlaybackDto playbackDto;
+    private PlaybackDto playback;
 }

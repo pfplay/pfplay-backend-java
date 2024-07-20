@@ -4,19 +4,13 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class PartymemberDto {
-    // User
-    private String uid;
-    private AuthorityTier authorityTier;
-    private String nickname;
-    // Partymember
-    private long memberId;
-    private GradeType gradeType;
-    // Avatar
-    private String avatarBodyUri;
-    private String avatarFaceUri;
+    Long memberId;
+    UserId userId;
+    AuthorityTier authorityTier;
+    GradeType gradeType;
 }

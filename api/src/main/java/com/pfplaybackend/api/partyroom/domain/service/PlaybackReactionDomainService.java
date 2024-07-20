@@ -48,7 +48,7 @@ public class PlaybackReactionDomainService {
 
         if(isDifferentAggregation) {
             int likeCountDelta = convertBooleanToInt(targetState.isLiked()) - convertBooleanToInt(existingState.isLiked());
-            int dislikeCountDelta = convertBooleanToInt(targetState.isLiked()) - convertBooleanToInt(existingState.isLiked());
+            int dislikeCountDelta = convertBooleanToInt(targetState.isDisliked()) - convertBooleanToInt(existingState.isDisliked());
             int grabCountDelta = convertBooleanToInt(targetState.isGrabbed()) - convertBooleanToInt(existingState.isGrabbed());
             reactionPostProcessDto.setDeltaRecord(List.of(likeCountDelta, dislikeCountDelta, grabCountDelta));
         }
