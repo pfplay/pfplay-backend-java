@@ -1,10 +1,7 @@
 package com.pfplaybackend.api.user.domain.entity.domainmodel;
 
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
-import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.user.domain.value.UserId;
-import com.pfplaybackend.api.user.domain.value.WalletAddress;
+import com.pfplaybackend.api.user.domain.value.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.With;
@@ -19,9 +16,11 @@ public class Profile {
     @With
     private final String introduction;
     @With
+    private AvatarBodyUri avatarBodyUri;
+    @With
     private AvatarFaceUri avatarFaceUri;
     @With
-    private AvatarBodyUri avatarBodyUri;
+    private AvatarIconUri avatarIconUri;
     @With
     private WalletAddress walletAddress;
     @With
@@ -33,8 +32,9 @@ public class Profile {
         this.userId = userId;
         this.nickname = null;
         this.introduction = null;
-        this.avatarFaceUri = null;
         this.avatarBodyUri = null;
+        this.avatarFaceUri = null;
+        this.avatarIconUri = null;
         this.walletAddress = null;
         this.combinePositionX = 0;
         this.combinePositionY = 0;
@@ -42,7 +42,7 @@ public class Profile {
 
     @Builder
     public Profile(Long id, UserId userId, String nickname, String introduction,
-                   AvatarFaceUri avatarFaceUrl, AvatarBodyUri avatarBodyUri, WalletAddress walletAddress,
+                   AvatarBodyUri avatarBodyUri, AvatarFaceUri avatarFaceUrl, AvatarIconUri avatarIconUri, WalletAddress walletAddress,
                    int combinePositionX, int combinePositionY) {
         this.id = id;
         this.userId = userId;
@@ -50,6 +50,7 @@ public class Profile {
         this.introduction = introduction;
         this.avatarBodyUri = avatarBodyUri;
         this.avatarFaceUri = avatarFaceUrl;
+        this.avatarIconUri = avatarIconUri;
         this.walletAddress = walletAddress;
         this.combinePositionX = combinePositionX;
         this.combinePositionY = combinePositionY;
@@ -63,6 +64,7 @@ public class Profile {
                 .introduction(this.introduction)
                 .avatarBodyUri(this.avatarBodyUri)
                 .avatarFaceUri(this.avatarFaceUri)
+                .avatarIconUri(this.avatarIconUri)
                 .walletAddress(this.walletAddress)
                 .combinePositionX(this.combinePositionX)
                 .combinePositionY(this.combinePositionY)
