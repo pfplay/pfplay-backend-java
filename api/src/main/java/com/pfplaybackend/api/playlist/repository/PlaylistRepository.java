@@ -12,4 +12,5 @@ import java.util.List;
 public interface PlaylistRepository extends JpaRepository<PlaylistData, Long>, PlaylistRepositoryCustom {
     List<PlaylistData> findAllByOwnerId(UserId userId);
     List<PlaylistData> findByOwnerIdAndTypeOrderByOrderNumberDesc(UserId userId, PlaylistType type);
+    PlaylistData findByOwnerIdAndType(UserId userId, PlaylistType type);
 }

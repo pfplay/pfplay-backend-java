@@ -1,16 +1,31 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.partyroom.application.dto.DisplayDto;
+import com.pfplaybackend.api.partyroom.application.dto.DjWithProfileDto;
+import com.pfplaybackend.api.partyroom.application.dto.PartymemberSetupDto;
+import com.pfplaybackend.api.partyroom.application.dto.PartyroomWithMemberDto;
 import com.pfplaybackend.api.partyroom.application.service.DisplayInfoService;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
+import com.pfplaybackend.api.partyroom.application.service.PlaybackInfoService;
+import com.pfplaybackend.api.partyroom.application.service.PlaybackReactionService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
+import com.pfplaybackend.api.partyroom.domain.enums.QueueStatus;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.presentation.dto.PartyroomElement;
 import com.pfplaybackend.api.partyroom.presentation.payload.response.*;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Tag(name = "Partyroom API")
 @RequestMapping("/api/v1/partyrooms")
@@ -20,6 +35,9 @@ public class PartyroomInfoController {
 
     private final PartyroomInfoService partyroomInfoService;
     private final DisplayInfoService displayInfoService;
+    private final PlaybackInfoService playbackInfoService;
+    private final PlaybackReactionService playbackReactionService;
+
 
     /**
      * 모든 파티룸의 정보를 조회한다.
@@ -27,7 +45,9 @@ public class PartyroomInfoController {
      */
     @GetMapping
     public ResponseEntity<?> getPartyrooms() {
-        return ResponseEntity.ok().body(QueryPartyroomListResponse.from(partyroomInfoService.getAllPartyrooms()));
+        List<PartyroomWithMemberDto> partyrooms = partyroomInfoService.getAllPartyrooms();
+        Map<UserId, ProfileSettingDto> avatarSettings = partyroomInfoService.getPrimariesAvatarSettings(partyrooms);
+        return ResponseEntity.ok().body( QueryPartyroomListResponse.from(partyrooms, avatarSettings));
     }
 
     /**
@@ -53,8 +73,12 @@ public class PartyroomInfoController {
     }
 
     @GetMapping("/{partyroomId}/setup")
-    public void getSetupInfo(@PathVariable Long partyroomId) {
-        displayInfoService.getDisplayInfo();
+    public ResponseEntity<?> getSetupInfo(@PathVariable Long partyroomId) {
+        // 1.
+        List<PartymemberSetupDto> memberDto = partyroomInfoService.getPartymembersForSetup(new PartyroomId(partyroomId));
+        // 2.
+        DisplayDto displayDto = displayInfoService.getDisplayInfo();
+        return ResponseEntity.ok().body(QueryPartyroomSetupResponse.from(memberDto, displayDto));
     }
 
     @GetMapping("/{partyroomId}/playback/latest")
@@ -63,9 +87,16 @@ public class PartyroomInfoController {
     }
 
     @GetMapping("/{partyroomId}/dj-queue")
-    public ResponseEntity<QueryDjQueueResponse> getDjQueueInfo(@PathVariable Long partyroomId) {
-        // Grade 별로 그루핑할 수 있는 옵션을 제공한다.
-        partyroomInfoService.getDjQueueInfo(new PartyroomId(partyroomId));
-        return null;
+    public ResponseEntity<?> getDjQueueInfo(@PathVariable Long partyroomId) {
+        Partyroom partyroom = partyroomInfoService.getById(new PartyroomId(partyroomId));
+        boolean isPlaybackActivated = partyroom.isPlaybackActivated();
+        QueueStatus queueStatus = partyroom.isQueueClosed() ? QueueStatus.CLOSE :  QueueStatus.OPEN;
+        boolean isRegistered = partyroomInfoService.isAlreadyRegistered(partyroom);
+        Playback playback = null;
+        if(isPlaybackActivated) {
+            playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
+        }
+        List<DjWithProfileDto> djWithProfiles = partyroomInfoService.getDjs(partyroom);
+        return ResponseEntity.ok().body(QueryDjQueueResponse.from(isPlaybackActivated, queueStatus, isRegistered, playback, djWithProfiles));
     }
 }

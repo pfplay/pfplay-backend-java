@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +18,7 @@ public class UserProfileProxyService implements UserProfilePeerService {
     private final UserProfileService userProfileService;
 
     @Override
-    public List<ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds) {
+    public Map<UserId, ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds) {
         return userProfileService.getUsersProfileSetting(userIds);
     }
 }

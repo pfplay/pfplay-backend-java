@@ -2,6 +2,7 @@ package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.partyroom.application.peer.MusicQueryPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
@@ -11,6 +12,7 @@ import com.pfplaybackend.api.partyroom.domain.value.DjId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
+import com.pfplaybackend.api.partyroom.exception.InvalidDjException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,15 +23,13 @@ import java.util.Arrays;
 @Service
 @RequiredArgsConstructor
 public class DJManagementService {
-    // Using Repositories
+
     private final PartyroomRepository partyroomRepository;
-    // Using Entity Converters
     private final PartyroomConverter partyroomConverter;
-    // Using Domain Services
     private final PartyroomDomainService partyroomDomainService;
-    // Using Application Services
     private final PartyroomInfoService partyroomInfoService;
-    private final PlaybackService playbackService;
+    private final PlaybackManagementService playbackManagementService;
+    private final MusicQueryPeerService musicQueryService;
 
     @Transactional
     public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
@@ -46,13 +46,15 @@ public class DJManagementService {
             System.out.println(Arrays.toString(e.getStackTrace()));
         }
 
+        // TODO Check is Empty Playlist!!! 24.07.20 Exception!
+        if(musicQueryService.isEmptyPlaylist(playlistId.getId())) throw new InvalidDjException("Empty playlist is not allowed");
+
         // FIXME Direct Add DjData to PartyroomData
-        partyroom.createAndAddDj(playlistId, partyContext.getUserId());
-        partyroom.applyActivation();
-        partyroomRepository.save(partyroomConverter.toData(partyroom));
+        Partyroom updatedPartyroom = partyroom.createAndAddDj(playlistId, partyContext.getUserId()).applyActivation();
+        PartyroomData updatedPartyroomData = partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
 
         if(isPostActivationProcessingRequired) {
-            playbackService.start(partyroom);
+            playbackManagementService.start(partyroomConverter.toDomain(updatedPartyroomData));
         }
     }
 

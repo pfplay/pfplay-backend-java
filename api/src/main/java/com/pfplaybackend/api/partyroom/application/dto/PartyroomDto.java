@@ -1,8 +1,6 @@
 package com.pfplaybackend.api.partyroom.application.dto;
 
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
-import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,5 +16,5 @@ public class PartyroomDto {
     private boolean isPlaybackActivated;
     private boolean isQueueClosed;
     private long memberCount;
-    private PlaybackDto PlaybackDto;
+    private PlaybackDto playbackDto;
 }

@@ -9,7 +9,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PlaybackConverter {
     public Playback toDomain(PlaybackData playbackData) {
-        return new Playback();
+        return Playback.builder()
+                .id(playbackData.getId())
+                .partyroomId(playbackData.getPartyroomId())
+                .userId(playbackData.getUserId())
+                .linkId(playbackData.getLinkId())
+                .name(playbackData.getName())
+                .duration(playbackData.getDuration())
+                .thumbnailImage(playbackData.getThumbnailImage())
+                .likeCount(playbackData.getLikeCount())
+                .dislikeCount(playbackData.getDislikeCount())
+                .grabCount(playbackData.getGrabCount())
+                .build();
     }
 
     public PlaybackData toData(Playback playback) {

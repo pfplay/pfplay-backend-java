@@ -23,6 +23,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -82,12 +84,20 @@ public class UserProfileService {
 
     // 다수 사용자에 대한 프로필 설정 정보 조회
     @Transactional
-    public List<ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds) {
-        return userProfileRepository.findByUserIdIn(userIds).stream().map(profileData ->
-                new ProfileSettingDto(profileData.getNickname(),
-                        profileData.getAvatarBodyUri().toString(),
-                        profileData.getAvatarFaceUri().toString())
-        ).toList();
+    public Map<UserId, ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds) {
+        // FIXME 쿼리 결과가 예상과 다르다.
+        List<ProfileData> list = userProfileRepository.findAllByUserIdIn(userIds);
+        return userProfileRepository.findAllByUserIdIn(userIds).stream()
+                .collect(Collectors.toMap(ProfileData::getUserId, profileData ->
+                        //
+                        new ProfileSettingDto(profileData.getNickname(),
+                                profileData.getAvatarBodyUri().getAvatarBodyUri(),
+                                profileData.getAvatarFaceUri().getAvatarFaceUri(),
+                                profileData.getAvatarIconUri().getAvatarIconUri(),
+                                profileData.getCombinePositionX(),
+                                profileData.getCombinePositionY()
+                        )
+                ));
     }
 
     // 특정 사용자에 대한 프로필 설정 정보 조회
@@ -95,7 +105,11 @@ public class UserProfileService {
     public ProfileSettingDto getUserProfileSetting(UserId userId) {
         ProfileData profileData = userProfileRepository.findByUserId(userId);
         return new ProfileSettingDto(profileData.getNickname(),
-                profileData.getAvatarBodyUri().toString(),
-                profileData.getAvatarFaceUri().toString());
+                profileData.getAvatarBodyUri().getAvatarBodyUri(),
+                profileData.getAvatarFaceUri().getAvatarFaceUri(),
+                profileData.getAvatarIconUri().getAvatarIconUri(),
+                profileData.getCombinePositionX(),
+                profileData.getCombinePositionY()
+        );
     }
 }

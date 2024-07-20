@@ -27,9 +27,9 @@ public class PartyContextAspect {
     @Before("contextRequiredMethods()")
     public void beforeServiceMethods(JoinPoint joinPoint) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println();
         if(authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
             PartyContext partyContext = PartyContext.create((UserCredentials)authentication.getPrincipal());
-            System.out.println(partyContext);
             ThreadLocalContext.setContext(partyContext);
         }
     }

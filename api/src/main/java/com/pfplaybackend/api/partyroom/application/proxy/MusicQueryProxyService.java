@@ -16,4 +16,9 @@ public class MusicQueryProxyService implements MusicQueryPeerService {
     public MusicDto getFirstMusic(PlaylistId playlistId) {
         return musicQueryService.getFirstMusic(playlistId.getId());
     }
+
+    @Override
+    public boolean isEmptyPlaylist(Long playlistId) {
+        return musicQueryService.isEmptyPlaylist(playlistId);
+    }
 }

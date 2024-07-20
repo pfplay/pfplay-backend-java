@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.partyroom.application.service.PlaybackService;
+import com.pfplaybackend.api.partyroom.application.service.PlaybackManagementService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PlaybackController {
 
-    private final PlaybackService playbackService;
+    private final PlaybackManagementService playbackManagementService;
 
     /**
      * 현재 DJ의 곡 재생에 대한 완료 동작을 트리거 한다.
@@ -29,7 +29,7 @@ public class PlaybackController {
      */
     @PostMapping("/{partyroomId}/playback/complete")
     public ResponseEntity<?> playBackComplete(@PathVariable Long partyroomId) {
-        playbackService.complete(new PartyroomId(partyroomId));
+        playbackManagementService.complete(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 
@@ -40,7 +40,7 @@ public class PlaybackController {
      */
     @PostMapping("/{partyroomId}/playback/skip")
     public ResponseEntity<?> playBackSkip(@PathVariable Long partyroomId) {
-        playbackService.skip(new PartyroomId(partyroomId));
+        playbackManagementService.skip(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 }

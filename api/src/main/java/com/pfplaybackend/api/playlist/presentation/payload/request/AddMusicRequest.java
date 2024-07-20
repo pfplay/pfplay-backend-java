@@ -1,11 +1,14 @@
 package com.pfplaybackend.api.playlist.presentation.payload.request;
 
-import com.pfplaybackend.api.user.domain.value.UserId;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Schema(description = "Music list")
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AddMusicRequest {
     @Schema(description = "곡 이름", example = "BLACKPINK - ‘Shut Down’ M/V", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String name;

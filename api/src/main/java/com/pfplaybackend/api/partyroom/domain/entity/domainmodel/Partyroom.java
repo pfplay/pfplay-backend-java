@@ -2,6 +2,7 @@ package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
 import com.google.common.collect.ImmutableList;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
@@ -96,10 +97,10 @@ public class Partyroom {
         return this;
     }
 
-    public Partyroom createAndAddPartymember(UserId userId, AuthorityTier authorityTier) {
+    public Partyroom createAndAddPartymember(UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
         this.partymembers = new ImmutableList.Builder<Partymember>()
                 .addAll(this.partymembers)
-                .add( Partymember.create(userId, authorityTier))
+                .add(Partymember.create(userId, this.partyroomId, authorityTier, gradeType))
                 .build();
         return this;
     }
@@ -128,6 +129,11 @@ public class Partyroom {
         return this;
     }
 
+    public Partyroom updatePlaybackId(PlaybackId playbackId) {
+        this.currentPlaybackId = playbackId;
+        return this;
+    }
+
     public Partyroom applyActivation() {
         this.isPlaybackActivated = true;
         return this;
@@ -141,7 +147,7 @@ public class Partyroom {
                     if(dj.getOrderNumber() == 1) {
                         dj.setOrderNumber(totalElements);
                     }else {
-                        dj.setOrderNumber(totalElements - 1);
+                        dj.setOrderNumber(dj.getOrderNumber() - 1);
                     }
                 }).toList();
         return this;

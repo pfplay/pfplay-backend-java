@@ -33,10 +33,14 @@ public class Partymember {
         this.isBanned = isBanned;
     }
 
-    public static Partymember create(UserId userId, AuthorityTier authorityTier) {
+    public static Partymember create(UserId userId, PartyroomId partyroomId, AuthorityTier authorityTier, GradeType gradeType) {
         return Partymember.builder()
                 .userId(userId)
                 .authorityTier(authorityTier)
+                .gradeType(gradeType)
+                .isActive(true)
+                .isBanned(false)
+                .partyroomId(partyroomId)
                 .build();
     }
 
