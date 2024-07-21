@@ -35,7 +35,7 @@ public class AvatarResourceInitializeService {
         addAvatarBody("ava_body_djing_006", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_006.png?alt=media", ObtainmentType.DJ_PNT, 200, true, false, 53, 37);
         addAvatarBody("ava_body_djing_007", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_007.png?alt=media", ObtainmentType.DJ_PNT, 500, true, false, 60, 12);
         addAvatarBody("ava_body_djing_008", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_008.png?alt=media", ObtainmentType.DJ_PNT, 1000, true, false, 60, 26);
-        addAvatarBody("ava_body_djing_009", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_009.png?alt=media", ObtainmentType.DJ_PNT, 2000, true, false, 100, 100);
+        addAvatarBody("ava_body_djing_009", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_009.png?alt=media", ObtainmentType.DJ_PNT, 2000, true, false, 60, 31);
         addAvatarBody("ava_body_djing_010", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_010.png?alt=media", ObtainmentType.DJ_PNT, 4000, true, false, 58, 23);
         addAvatarBody("ava_body_djing_011", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_011.png?alt=media", ObtainmentType.DJ_PNT, 7000, true, false, 60, 34);
         addAvatarBody("ava_body_djing_012", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_012.png?alt=media", ObtainmentType.DJ_PNT, 10000, true, false, 57, 11);
@@ -48,11 +48,11 @@ public class AvatarResourceInitializeService {
 
     @Transactional
     public void addAvatarIcons() {
-        addAvatarIcon("ava_icon_face_basic_001", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_guest.png?alt=media", PairType.FACE);
-        addAvatarIcon("ava_icon_body_basic_002", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_basic_002.png?alt=media", PairType.BODY);
-        addAvatarIcon("ava_icon_body_basic_003", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_basic_003.png?alt=media", PairType.BODY);
-        addAvatarIcon("ava_icon_body_djing_001", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_djing_001.png?alt=media", PairType.BODY);
-        addAvatarIcon("ava_icon_body_djing_002", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_djing_002.png?alt=media", PairType.BODY);
+        addAvatarIcon("ava_icon_face_basic_001", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_face_basic_001.png?alt=media", PairType.FACE);
+        addAvatarIcon("ava_icon_body_basic_002", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_body_basic_002.png?alt=media", PairType.BODY);
+        addAvatarIcon("ava_icon_body_basic_003", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_body_basic_003.png?alt=media", PairType.BODY);
+        addAvatarIcon("ava_icon_body_djing_001", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_body_djing_001.png?alt=media", PairType.BODY);
+        addAvatarIcon("ava_icon_body_djing_002", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_body_djing_002.png?alt=media", PairType.BODY);
     }
 
     private void addAvatarBody(String name, String resourceUri, ObtainmentType obtainableType,
