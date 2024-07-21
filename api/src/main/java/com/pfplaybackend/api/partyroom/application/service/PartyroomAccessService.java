@@ -43,6 +43,7 @@ public class PartyroomAccessService {
     // redisMessagePublisher.publish(MessageTopic.ACCESS, message);
     @Transactional
     public void tryEnter(PartyroomId partyroomId) {
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         // 1. 해당 파티룸의 폐쇄 여부 확인
         // 2. 사용자가 '이미 다른 파티룸에서의 활동중' 여부 확인
         // 3. 해당 파티룸의 허용 가능 인원 수 초과 확인
@@ -50,12 +51,10 @@ public class PartyroomAccessService {
         // 5. 해당 파티룸에서의 영구 페널티 여부 확인
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         // Add Party Members through Party Rooms
         UserId userId = partyContext.getUserId();
-        Partyroom updatedPartyroom = partyroom.addNewPartymember(userId, AuthorityTier.FM, GradeType.LISTENER);
+        Partyroom updatedPartyroom = partyroom.addNewPartymember(userId, partyContext.getAuthorityTier(), GradeType.LISTENER);
         PartyroomData data = partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
-
 
         // Added Partymember who has id after transaction
         Partyroom partyroomUpdated = partyroomConverter.toDomain(data);

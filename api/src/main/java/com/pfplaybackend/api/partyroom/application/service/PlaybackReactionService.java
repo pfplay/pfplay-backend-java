@@ -5,10 +5,12 @@ import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.application.dto.ReactionPostProcessDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.history.PlaybackReactionHistoryData;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.ReactionType;
 import com.pfplaybackend.api.partyroom.domain.model.ReactionState;
 import com.pfplaybackend.api.partyroom.domain.service.PlaybackReactionDomainService;
+import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.repository.history.PlaybackReactionHistoryRepository;
@@ -36,8 +38,9 @@ public class PlaybackReactionService {
         PlaybackId playbackId = myActivePartyroom.getCurrentPlaybackId();
         // Find whether existing history exists
         ReactionPostProcessDto reactionPostProcessDto = getReactionPostProcess(partyContext, playbackId, reactionType);
-        // Get Playback Object from PlaybackId;
-        playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId);
+        // Get PartymemberId for Event Propagation
+        Partymember partymember = partyroomInfoService.getPartymemberByUserId(partyroomId, partyContext.getUserId());
+        playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId, new PartymemberId(partymember.getId()));
     }
 
     // FIXME Change Method Name

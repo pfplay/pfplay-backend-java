@@ -13,5 +13,5 @@ import lombok.NoArgsConstructor;
 public class AggregationMessage {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
-    private AggregationDto aggregationDto;
+    private AggregationDto aggregation;
 }

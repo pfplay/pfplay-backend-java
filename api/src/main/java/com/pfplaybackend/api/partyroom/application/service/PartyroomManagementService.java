@@ -70,7 +70,6 @@ public class PartyroomManagementService {
 
     @Transactional
     public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
-
     }
 
     @Transactional
