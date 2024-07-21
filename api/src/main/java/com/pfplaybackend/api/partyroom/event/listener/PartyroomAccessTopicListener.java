@@ -17,8 +17,8 @@ public class PartyroomAccessTopicListener implements MessageListener {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
-            AccessMessage deserialized = objectMapper.readValue(new String(message.getBody()), AccessMessage.class);
-            messageSender.sendToGroup(deserialized.getPartyroomId().getId(), deserialized);
+            AccessMessage accessMessage = objectMapper.readValue(new String(message.getBody()), AccessMessage.class);
+            messageSender.sendToGroup(accessMessage.getPartyroomId().getId(), accessMessage);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

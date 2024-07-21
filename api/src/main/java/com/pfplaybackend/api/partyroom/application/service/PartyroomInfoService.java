@@ -20,6 +20,7 @@ import com.pfplaybackend.api.partyroom.repository.impl.PartyroomRepositoryImpl;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -83,9 +84,6 @@ public class PartyroomInfoService {
         // TODO Filter Deleted Djs
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-
-
-
     }
 
     @Transactional
@@ -122,6 +120,10 @@ public class PartyroomInfoService {
         return partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId()).orElseThrow();
     }
 
+    public ActivePartyroomWithMemberDto getMyActivePartyroomWithMemberId(UserId userId) {
+        return partyroomRepository.getMyActivePartyroomWithMemberIdByUserId(userId).orElseThrow();
+    }
+
     public void getPartymembers(PartyroomId partyroomId) {}
 
     public void getSummaryInfo(PartyroomId partyroomId) {
@@ -131,5 +133,12 @@ public class PartyroomInfoService {
         List<UserId> partymemberUserIds = partyroomData.getPartymemberDataList().stream().map(PartymemberData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettings = userProfileService.getUsersProfileSetting(partymemberUserIds);
         // TODO Combine Map
+    }
+
+    @Transactional
+    public Partymember getPartymemberByUserId(PartyroomId partyroomId, UserId userId) {
+        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        return partyroom.getPartymemberByUserId(userId);
     }
 }

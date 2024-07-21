@@ -9,6 +9,7 @@ import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.enums.MotionType;
+import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
@@ -30,19 +31,18 @@ public class PlaybackReactionPostProcessService {
     private final GrabMusicPeerService grabMusicService;
     private final UserActivityPeerService userActivityService;
 
-    public void postProcess(ReactionPostProcessDto postProcessDto, PartyroomId partyroomId, PlaybackId playbackId) {
+    public void postProcess(ReactionPostProcessDto postProcessDto, PartyroomId partyroomId, PlaybackId playbackId, PartymemberId partymemberId) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         Playback playback = playbackInfoService.getPlaybackById(playbackId);
-        if(postProcessDto.isMotionChanged()) {
-            publishMotionChangedEvent(partyroomId, postProcessDto.getDeterminedMotionType());
-        }
         if(postProcessDto.isDjActivityScoreChanged()) {
             updateDjActivityScore(playback.getUserId(), postProcessDto.getDeltaScore());
         }
         if(postProcessDto.isAggregationChanged()) {
-            // TODO Get Playback's Count information
             updatePlaybackAggregation(playback, postProcessDto.getDeltaRecord());
             publishAggregationChangedEvent(partyroomId, playback);
+        }
+        if(postProcessDto.isMotionChanged()) {
+            publishMotionChangedEvent(partyroomId, postProcessDto.getDeterminedMotionType(), partymemberId);
         }
         if(postProcessDto.isGrabStatusChanged()) {
             grabMusic(partyContext.getUserId(), playback);
@@ -50,9 +50,9 @@ public class PlaybackReactionPostProcessService {
     }
 
     // PostProcess After Playback Reaction
-    public void publishMotionChangedEvent(PartyroomId partyroomId, MotionType motionType) {
-        redisMessagePublisher.publish(MessageTopic.MOTION,
-                new MotionMessage(partyroomId, MessageTopic.MOTION, motionType));
+    public void publishMotionChangedEvent(PartyroomId partyroomId, MotionType motionType, PartymemberId partymemberId) {
+        MotionMessage motionMessage = MotionMessage.from(partyroomId, motionType, partymemberId);
+        redisMessagePublisher.publish(MessageTopic.MOTION, motionMessage);
     }
 
     public void updateDjActivityScore(UserId djUserId, int deltaScore) {
@@ -65,8 +65,7 @@ public class PlaybackReactionPostProcessService {
 
     public void publishAggregationChangedEvent(PartyroomId partyroomId, Playback playback) {
         AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
-        redisMessagePublisher.publish(MessageTopic.AGGREGATION,
-                new AggregationMessage(partyroomId, MessageTopic.AGGREGATION, aggregationDto));
+        redisMessagePublisher.publish(MessageTopic.AGGREGATION, new AggregationMessage(partyroomId, MessageTopic.AGGREGATION, aggregationDto));
     }
 
     public void grabMusic(UserId userId, Playback playback) {

@@ -104,6 +104,30 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
     }
 
     @Override
+    public Optional<ActivePartyroomWithMemberDto> getMyActivePartyroomWithMemberIdByUserId(UserId userId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
+        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
+
+        ActivePartyroomWithMemberDto activePartyroomWithMemberDto = queryFactory
+                .select(Projections.constructor(
+                        ActivePartyroomWithMemberDto.class,
+                        qPartyroomData.id,
+                        qPartyroomData.isPlaybackActivated,
+                        qPartyroomData.isQueueClosed,
+                        qPartyroomData.currentPlaybackId,
+                        qPartymemberData.id.as("memberId")
+                ))
+                .from(qPartymemberData)
+                .join(qPartymemberData.partyroomData, qPartyroomData)
+                .where(qPartymemberData.userId.eq(userId)
+                        .and(qPartymemberData.isActive.eq(true)))
+                .fetchOne();
+
+        return Optional.ofNullable(activePartyroomWithMemberDto);
+    }
+
+    @Override
     public List<PartyroomWithMemberDto> getMemberDataByPartyroomId() {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 

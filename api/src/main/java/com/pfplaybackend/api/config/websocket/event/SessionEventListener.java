@@ -19,7 +19,6 @@ public class SessionEventListener {
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
-        Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
         logger.info("Received a new web socket connection: " + sessionId);
     }
 
