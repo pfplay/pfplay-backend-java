@@ -33,6 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final Set<String> skipableURIs = new HashSet<>(Set.of(
             "/ws",
             "/error",
+            "/error/**",
             "/v3/api-docs",
             "/spec/swagger-ui",
             "/swagger-ui",
@@ -44,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
-        // System.out.println(request.getRequestURI());
         if(isNotSkipableURI(request.getRequestURI())) {
             try {
                 final String accessToken = jwtValidator.extractAccessTokenFromCookie(request).orElseThrow(() -> new AuthenticationServiceException("Token does not exist"));

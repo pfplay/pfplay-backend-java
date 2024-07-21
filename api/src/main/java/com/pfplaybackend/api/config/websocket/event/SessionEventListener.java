@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.util.Map;
+
 @Component
 public class SessionEventListener {
 
@@ -17,6 +19,7 @@ public class SessionEventListener {
     public void handleWebSocketConnectListener(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
+        Map<String, Object> sessionAttributes = headerAccessor.getSessionAttributes();
         logger.info("Received a new web socket connection: " + sessionId);
     }
 
