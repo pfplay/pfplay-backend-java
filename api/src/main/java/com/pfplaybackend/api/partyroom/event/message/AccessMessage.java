@@ -17,5 +17,5 @@ public class AccessMessage implements Serializable {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
     private AccessType accessType;
-    private PartymemberSummaryDto partymember;
+    private PartymemberSummaryDto member;
 }
