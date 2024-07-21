@@ -57,10 +57,10 @@ public class RedisConfig {
                                                         SimpMessageSender simpMessageSender, ObjectMapper objectMapper) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        // TODO
-        container.addMessageListener(new SampleTopicListener(simpMessageSender, objectMapper), new ChannelTopic("sample"));
         container.addMessageListener(new ChatTopicListener(simpMessageSender, objectMapper), new ChannelTopic("chat"));
         container.addMessageListener(new PartyroomAccessTopicListener(simpMessageSender, objectMapper), new ChannelTopic("access"));
+        container.addMessageListener(new MotionTopicListener(simpMessageSender, objectMapper), new ChannelTopic("motion"));
+        container.addMessageListener(new AggregationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("aggregation"));
         container.addMessageListener(new PartyroomNoticeTopicListener(simpMessageSender, objectMapper), new ChannelTopic("regulation"));
         container.addMessageListener(new PartyroomRegulationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("notice"));
         container.addMessageListener(new PlaybackTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback"));

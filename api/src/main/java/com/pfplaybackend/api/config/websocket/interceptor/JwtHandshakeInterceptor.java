@@ -37,6 +37,7 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             if(jwtValidator.isTokenValid(accessToken)) {
                 DecodedJWT decodedJWT = jwtValidator.getDecodedJWT(accessToken);
                 String extractedUid = decodedJWT.getClaim(TokenClaim.UID.getValue()).asString();
+                System.out.println(extractedUid);
                 attributes.put("uid", extractedUid);
             }else {
                 return false;

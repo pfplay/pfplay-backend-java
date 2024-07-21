@@ -97,7 +97,11 @@ public class Partyroom {
         return this;
     }
 
-    public Partyroom createAndAddPartymember(UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
+    public Partymember getPartymemberByUserId(UserId userId) {
+        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findFirst().orElse(null);
+    }
+
+    public Partyroom addNewPartymember(UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
         this.partymembers = new ImmutableList.Builder<Partymember>()
                 .addAll(this.partymembers)
                 .add(Partymember.create(userId, this.partyroomId, authorityTier, gradeType))
@@ -153,8 +157,16 @@ public class Partyroom {
         return this;
     }
 
-
-
-
-
+    public Partymember deactivatePartymemberAndGet(UserId userId) {
+        this.partymembers = new ImmutableList.Builder<Partymember>()
+                .addAll(this.partymembers)
+                .build().stream().map(partymember -> {
+                    if(partymember.getUserId().equals(userId)) {
+                        return partymember.applyDeactivation();
+                    }else {
+                        return partymember;
+                    }
+                }).toList();
+        return this.partymembers.stream().filter(partymember -> !partymember.isActive()).findAny().orElseThrow();
+    }
 }

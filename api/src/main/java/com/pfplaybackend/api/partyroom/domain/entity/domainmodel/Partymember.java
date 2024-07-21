@@ -48,4 +48,9 @@ public class Partymember {
         this.partyroomId = partyroomId;
         return this;
     }
+
+    public Partymember applyDeactivation() {
+        this.isActive = false;
+        return this;
+    }
 }
