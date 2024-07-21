@@ -14,9 +14,7 @@ public class SimpMessageSender {
         simpMessagingTemplate.convertAndSend("/sub/partyrooms/" + groupId, object);
     }
 
-    public void sendToOne(String sessionId, String message) {
-        System.out.println(sessionId + ": " + message);
-        // TODO 특정 사용자에게만 호출
-        // simpMessagingTemplate.convertAndSendToUser();
+    public void sendToOne(String user, String message) {
+        simpMessagingTemplate.convertAndSendToUser(user, "/sub/heartbeat", message);
     }
 }
