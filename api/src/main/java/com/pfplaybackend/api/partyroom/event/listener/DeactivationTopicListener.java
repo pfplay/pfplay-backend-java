@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.config.websocket.SimpMessageSender;
 import com.pfplaybackend.api.partyroom.event.message.DeactivationMessage;
-import com.pfplaybackend.api.partyroom.event.message.SampleMessage;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;

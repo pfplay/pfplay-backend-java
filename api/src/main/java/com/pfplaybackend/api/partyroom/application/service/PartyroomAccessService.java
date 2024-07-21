@@ -3,20 +3,22 @@ package com.pfplaybackend.api.partyroom.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.partyroom.application.dto.PartymemberSummaryDto;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartymemberConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.enums.AccessType;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.AccessMessage;
-import com.pfplaybackend.api.partyroom.event.message.TmpUser;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -49,26 +51,50 @@ public class PartyroomAccessService {
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        // Partymember partymember = Partymember.create(partyContext.getUserId(), partyroomId, partyContext.getAuthorityTier(), GradeType.LISTENER);
-        Partyroom updatedPartyroom = partyroom.createAndAddPartymember(partyContext.getUserId(), AuthorityTier.FM, GradeType.LISTENER);
-        partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
+        // Add Party Members through Party Rooms
+        UserId userId = partyContext.getUserId();
+        Partyroom updatedPartyroom = partyroom.addNewPartymember(userId, AuthorityTier.FM, GradeType.LISTENER);
+        PartyroomData data = partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
+
+
+        // Added Partymember who has id after transaction
+        Partyroom partyroomUpdated = partyroomConverter.toDomain(data);
+        Partymember partymember = partyroomUpdated.getPartymemberByUserId(userId);
+        ProfileSettingDto dto = userProfileService.getUserProfileSetting(userId);
+
+        PartymemberSummaryDto partymemberSummaryDto = PartymemberSummaryDto.from(partymember, dto);
+        AccessMessage accessMessage = new AccessMessage(
+                partyroom.getPartyroomId(),
+                MessageTopic.ACCESS,
+                AccessType.ENTER,
+                partymemberSummaryDto);
+        redisMessagePublisher.publish(MessageTopic.ACCESS, accessMessage);
     }
 
     public void enterByHost(UserId hostId, Partyroom partyroom) {
-        // TODO Require Partyroom Object
-        Partyroom updatedPartyroom = partyroom.createAndAddPartymember(hostId, AuthorityTier.FM, GradeType.HOST);
+        Partyroom updatedPartyroom = partyroom.addNewPartymember(hostId, AuthorityTier.FM, GradeType.HOST);
         PartyroomData partyroomData = partyroomConverter.toData(updatedPartyroom);
         partyroomRepository.save(partyroomData);
     }
 
     @Transactional
     public void exit(PartyroomId partyroomId) {
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         // TODO 퇴장 대상이 DJQueue 에 존재하는지 여부 확인
-        if(partyroomDomainService.isExistInDjQueue()) {
-            // Dj 대기열에서 강제 제거
-        }
-        // isActive: false
-        // eventPublisher.publish(MessageTopic.PARTYROOM_ACCESS, updatedPartyroom);
+        // TODO 존재할 시 'Dj 대기열'에서 강제 제거
+        //
+        Partymember partymember = partyroom.deactivatePartymemberAndGet(partyContext.getUserId());
+        partyroomRepository.save(partyroomConverter.toData(partyroom));
+
+        PartymemberSummaryDto partymemberSummaryDto = new PartymemberSummaryDto(partymember.getId());
+        AccessMessage accessMessage = new AccessMessage(
+                partyroom.getPartyroomId(),
+                MessageTopic.ACCESS,
+                AccessType.EXIT,
+                partymemberSummaryDto);
+        redisMessagePublisher.publish(MessageTopic.ACCESS, accessMessage);
     }
 
     @Transactional

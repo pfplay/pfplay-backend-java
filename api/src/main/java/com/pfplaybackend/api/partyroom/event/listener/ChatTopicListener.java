@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 
-
 @AllArgsConstructor
 public class ChatTopicListener implements MessageListener {
 

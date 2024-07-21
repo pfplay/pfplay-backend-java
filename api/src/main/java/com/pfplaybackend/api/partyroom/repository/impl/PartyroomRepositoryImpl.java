@@ -114,7 +114,10 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
         JPQLQuery<Long> memberCountSubquery = JPAExpressions
                 .select(partymember.count())
                 .from(partymember)
-                .where(partymember.partyroomData.id.eq(partyroom.id));
+                .where(partymember.partyroomData.id.eq(partyroom.id)
+                        .and(partymember.isActive.eq(true))
+                        .and(partymember.isBanned.eq(false))
+                );
 
         ConstructorExpression<PlaybackDto> playbackDto = Projections.constructor(PlaybackDto.class,
                 playback.id,
@@ -168,27 +171,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         )
                 ));
 
-//        return tuples.stream()
-//                .map(tuple -> {
-//                    PlaybackDto playbackDto1 = tuple.get(8, PlaybackDto.class);
-//                    List<PartymemberDto> members = membersByPartyroomId.getOrDefault(tuple.get(partyroom.id), List.of());
-//
-//                    return new PartyroomWithMemberDto(
-//                            tuple.get(partyroom.id),
-//                            tuple.get(partyroom.stageType),
-//                            tuple.get(partyroom.hostId),
-//                            tuple.get(partyroom.title),
-//                            tuple.get(partyroom.introduction),
-//                            Boolean.TRUE.equals(tuple.get(partyroom.isPlaybackActivated)),
-//                            Boolean.TRUE.equals(tuple.get(partyroom.isQueueClosed)),
-//                            tuple.get(memberCountSubquery),
-//                            playbackDto1,
-//                            members
-//                    );
-//                })
-//                .distinct()
-//                .collect(Collectors.toList());
-        // Map partyroom data to PartyroomWithMembersDTO
         return new ArrayList<>(tuples.stream()
                 .collect(Collectors.toMap(
                         tuple -> tuple.get(partyroom.id),
