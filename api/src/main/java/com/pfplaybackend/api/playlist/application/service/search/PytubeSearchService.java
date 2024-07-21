@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+
 @Service
 @RequiredArgsConstructor
 public class PytubeSearchService implements YoutubeSearchService {
@@ -28,18 +31,22 @@ public class PytubeSearchService implements YoutubeSearchService {
     public SearchMusicResultDto searchByWord(String query, int rows) {
         String prefix = "/api/v1/video/search";
         String url = BASE_URI + prefix;
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("query", query)
-                .queryParam("rows", rows);
+                .queryParam("rows", rows)
+                .build()
+                .encode(StandardCharsets.UTF_8)
+                .toUri();
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("API_KEY", API_KEY);
         headers.set("API_SECRET", API_SECRET);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
-
         ResponseEntity<SearchMusicResultDto> response = restTemplate.exchange(
-                builder.toUriString(), HttpMethod.GET, entity, SearchMusicResultDto.class);
+                uri, HttpMethod.GET, entity, SearchMusicResultDto.class);
+
         return response.getBody();
     }
 }
