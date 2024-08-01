@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.application.dto.shared;
 
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import lombok.*;
 
@@ -17,17 +17,22 @@ public class AvatarBodyDto {
     private final boolean isCombinable;
     private final boolean isDefaultSetting;
     private final boolean isAvailable;
+    private final int combinePositionX;
+    private final int combinePositionY;
 
-    static public AvatarBodyDto create(AvatarResource avatarResource) {
+    static public AvatarBodyDto create(AvatarBodyResource avatarBodyResource) {
         return AvatarBodyDto.builder()
-                .id(avatarResource.getId())
-                .name(avatarResource.getName())
-                .resourceUri(avatarResource.getResourceUri())
-                .obtainableType(avatarResource.getObtainableType())
-                .obtainableScore(avatarResource.getObtainableScore())
-                .isCombinable(avatarResource.isCombinable())
-                .isDefaultSetting(avatarResource.isDefaultSetting())
-                .isAvailable(avatarResource.getObtainableType().equals(ObtainmentType.BASIC))
+                .id(avatarBodyResource.getId())
+                .name(avatarBodyResource.getName())
+                .resourceUri(avatarBodyResource.getResourceUri())
+                .obtainableType(avatarBodyResource.getObtainableType())
+                .obtainableScore(avatarBodyResource.getObtainableScore())
+                .isCombinable(avatarBodyResource.isCombinable())
+                .isDefaultSetting(avatarBodyResource.isDefaultSetting())
+                // BASIC 타입인 경우 isAvailable 한 것으로 처리
+                .isAvailable(avatarBodyResource.getObtainableType().equals(ObtainmentType.BASIC))
+                .combinePositionX(avatarBodyResource.getCombinePositionX())
+                .combinePositionY(avatarBodyResource.getCombinePositionY())
                 .build();
     }
 }

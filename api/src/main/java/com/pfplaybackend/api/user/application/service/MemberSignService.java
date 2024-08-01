@@ -22,15 +22,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MemberSignService {
-
     private final OAuth2ProviderConfig oauth2ProviderConfig;
     private final MemberRepository memberRepository;
     private final UserProfileService userProfileService;
     private final UserActivityService userActivityService;
+    // Using Peer Services
     private final PlaylistCommandService playlistCommandService;
 
-    public String getOAuth2RedirectUri(SignMemberRequest request) {
-        OAuth2Redirection oauth2Redirection = OAuth2Redirection.create(oauth2ProviderConfig.getProviders(), request.getOauth2Provider(), request.getRedirectLocation());
+    public String getOAuth2RedirectUri(SignMemberRequest request, String redirectLocation) {
+        OAuth2Redirection oauth2Redirection = OAuth2Redirection.create(oauth2ProviderConfig.getProviders(), request.getOauth2Provider(), redirectLocation);
         return oauth2Redirection.getUrl();
     }
 
@@ -52,6 +52,7 @@ public class MemberSignService {
                 .initializeProfile(profile)
                 .initializeActivityMap(activityMap);
 
+        // FIXME Use to Peer Interface
         playlistCommandService.createDefaultPlaylist(updatedMember.getUserId());
 
         return memberRepository.save(updatedMember.toData());

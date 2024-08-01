@@ -20,8 +20,10 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 public class GuestData extends BaseEntity {
-
     @EmbeddedId
+    @AttributeOverrides({
+            @AttributeOverride(name = "uid", column = @Column(name = "user_id")),
+    })
     private UserId userId;
 
     private String agent;
@@ -31,12 +33,13 @@ public class GuestData extends BaseEntity {
     private AuthorityTier authorityTier;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
     private ProfileData profileData;
 
     @Column(nullable = false)
     private boolean isProfileUpdated;
 
-    public GuestData() { }
+    public GuestData() {}
 
     @Builder
     public GuestData(UserId userId, AuthorityTier authorityTier, String agent, ProfileData profileData, boolean isProfileUpdated,

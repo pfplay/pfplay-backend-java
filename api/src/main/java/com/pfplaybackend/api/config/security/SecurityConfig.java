@@ -54,7 +54,9 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(
+                                "/ws/**",
                                 "/error",
+                                "/error/**",
                                 "/v3/api-docs/**",
                                 "/spec/swagger-ui/**",
                                 "/swagger-ui/**",

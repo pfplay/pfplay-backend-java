@@ -13,6 +13,8 @@ public class MyProfileSummaryResponse {
     private String nickname;
     private String introduction;
     private String avatarBodyUri;
+    private int combinePositionX;
+    private int combinePositionY;
     private String avatarFaceUri;
     private String walletAddress;
     private List<ActivitySummaryDto> activitySummaries;
@@ -22,6 +24,8 @@ public class MyProfileSummaryResponse {
                 .nickname(profileSummaryDto.getNickname())
                 .introduction(profileSummaryDto.getIntroduction())
                 .avatarBodyUri(profileSummaryDto.getAvatarBodyUri())
+                .combinePositionX(profileSummaryDto.getCombinePositionX())
+                .combinePositionY(profileSummaryDto.getCombinePositionY())
                 .avatarFaceUri(profileSummaryDto.getAvatarFaceUri())
                 .walletAddress(profileSummaryDto.getWalletAddress())
                 .activitySummaries(profileSummaryDto.getActivitySummaries())
