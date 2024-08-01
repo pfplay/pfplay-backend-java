@@ -7,14 +7,16 @@ import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyComman
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarResource;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
 import com.pfplaybackend.api.user.domain.service.UserDomainService;
+import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
 import com.pfplaybackend.api.user.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,16 +33,22 @@ public class UserAvatarService {
     private final MemberRepository memberRepository;
     private final UserDomainService userDomainService;
     private final UserAvatarDomainService userAvatarDomainService;
+    // Using Peer Service
     private final AvatarResourceService avatarResourceService;
 
     @Transactional(readOnly = true)
     public AvatarBodyUri getDefaultAvatarBodyUri() {
-        AvatarResource avatarResource = avatarResourceService.getDefaultSettingResourceAvatarBody();
-        return new AvatarBodyUri(avatarResource.getResourceUri());
+        AvatarBodyResource avatarBodyResource = avatarResourceService.getDefaultSettingResourceAvatarBody();
+        return new AvatarBodyUri(avatarBodyResource.getResourceUri());
     }
 
     public AvatarFaceUri getDefaultAvatarFaceUri() {
         return new AvatarFaceUri(avatarResourceService.findAllAvatarFaces().get(0).getResourceUri());
+    }
+
+    public AvatarIconUri getDefaultAvatarIconUri() {
+        AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByFaceUri(this.getDefaultAvatarFaceUri());
+        return new AvatarIconUri(avatarIconDto.getResourceUri());
     }
 
     public List<AvatarFaceDto> findMyAvatarFaces() {
@@ -65,10 +73,16 @@ public class UserAvatarService {
     }
 
     @Transactional
-    public void updateAvatarBodyUri(UpdateAvatarBodyCommand avatarBodyCommand) {
+    public void updateAvatarBodyUri(UpdateAvatarBodyCommand command) {
         UserContext userContext = (UserContext) ThreadLocalContext.getContext();
         Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
-        Member updatedMember = member.updateAvatarBody(new AvatarBodyUri(avatarBodyCommand.getAvatarBodyUri()));
+        AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(command.getAvatarBodyUri());
+        AvatarFaceUri avatarFaceUri = userAvatarDomainService.updateFaceUriOnBodyUriChange(member, avatarBodyDto);
+        AvatarIconUri avatarIconUri = userAvatarDomainService.updateIconUriOnBodyUriChange(member, avatarBodyDto);
+        // TODO Check if the score is actually configurable in Domain Service
+        Member updatedMember = member.updateAvatarBody(avatarBodyDto)
+                .updateAvatarFace(avatarFaceUri)
+                .updateAvatarIcon(avatarIconUri);
         memberRepository.save(updatedMember.toData());
     }
 
@@ -76,7 +90,10 @@ public class UserAvatarService {
     public void updateAvatarFaceUri(UpdateAvatarFaceCommand avatarFaceCommand) {
         UserContext userContext = (UserContext) ThreadLocalContext.getContext();
         Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
-        Member updatedMember = member.updateAvatarFace(new AvatarFaceUri(avatarFaceCommand.getAvatarFaceUri()));
+        AvatarFaceUri avatarFaceUri = new AvatarFaceUri(avatarFaceCommand.getAvatarFaceUri());
+        AvatarIconUri avatarIconUri = userAvatarDomainService.updateIconUriOnFaceUriChange(member, avatarFaceUri);
+        Member updatedMember = member.updateAvatarFace(avatarFaceUri)
+                .updateAvatarIcon(avatarIconUri);
         memberRepository.save(updatedMember.toData());
     }
 }

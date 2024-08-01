@@ -3,15 +3,13 @@ package com.pfplaybackend.api.user.domain.entity.domainmodel;
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
-import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.user.domain.value.UserId;
-import com.pfplaybackend.api.user.domain.value.WalletAddress;
+import com.pfplaybackend.api.user.domain.value.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -69,7 +67,6 @@ public class Member extends User {
                         Map.Entry::getKey,
                         entry -> entry.getValue().toData()
                 ));
-
         return MemberData.builder()
                 .userId(this.userId)
                 .authorityTier(this.authorityTier)
@@ -100,17 +97,17 @@ public class Member extends User {
         Profile newProfile = this.profile
                 .withNickname(updateBioCommand.getNickName())
                 .withIntroduction(updateBioCommand.getIntroduction());
-
         return this.toBuilder()
                 .profile(newProfile)
                 .isProfileUpdated(true)
                 .build();
     }
 
-    public Member updateAvatarBody(AvatarBodyUri avatarBodyUri) {
+    public Member updateAvatarBody(AvatarBodyDto avatarBodyDto) {
         Profile newProfile = this.profile
-                .withAvatarBodyUri(avatarBodyUri);
-
+                .withAvatarBodyUri(new AvatarBodyUri(avatarBodyDto.getResourceUri()))
+                .withCombinePositionX(avatarBodyDto.getCombinePositionX())
+                .withCombinePositionY(avatarBodyDto.getCombinePositionY());
         return this.toBuilder()
                 .profile(newProfile)
                 .build();
@@ -119,19 +116,40 @@ public class Member extends User {
     public Member updateAvatarFace(AvatarFaceUri avatarFaceUri) {
         Profile newProfile = this.profile
                 .withAvatarFaceUri(avatarFaceUri);
-
         return this.toBuilder()
                 .profile(newProfile)
                 .build();
     }
 
+    public Member updateAvatarIcon(AvatarIconUri avatarIconUri) {
+        Profile newProfile = this.profile
+                .withAvatarIconUri(avatarIconUri);
+        return this.toBuilder()
+                .profile(newProfile)
+                .build();
+    }
+
+
     public Member updateWalletAddress(WalletAddress walletAddress) {
         Profile newProfile = this.profile
                 .withWalletAddress(walletAddress);
-
         return this.toBuilder()
                 .profile(newProfile)
                 .authorityTier(AuthorityTier.FM)
+                .build();
+    }
+
+    public Member updateDjScore(int deltaScore) {
+        Map<ActivityType, Activity> activityMap = this.activityMap;
+        activityMap.put(ActivityType.DJ_PNT, Activity.builder()
+                        .id(this.activityMap.get(ActivityType.DJ_PNT).getId())
+                        .score(this.activityMap.get(ActivityType.DJ_PNT).getScore() + deltaScore)
+                        .activityType(ActivityType.DJ_PNT)
+                        .userId(this.activityMap.get(ActivityType.DJ_PNT).getUserId())
+                .build());
+
+        return this.toBuilder()
+                .activityMap(activityMap)
                 .build();
     }
 
@@ -148,6 +166,8 @@ public class Member extends User {
                 .nickname(this.profile.getNickname())
                 .introduction(this.profile.getIntroduction())
                 .avatarBodyUri(this.profile.getAvatarBodyUri().getAvatarBodyUri())
+                .combinePositionX(this.profile.getCombinePositionX())
+                .combinePositionY(this.profile.getCombinePositionY())
                 .avatarFaceUri(this.profile.getAvatarFaceUri().getAvatarFaceUri())
                 .walletAddress(this.profile.getWalletAddress().getWalletAddress())
                 .activitySummaries(activitySummaries)

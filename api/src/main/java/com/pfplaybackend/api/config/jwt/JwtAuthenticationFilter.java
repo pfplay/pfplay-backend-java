@@ -31,13 +31,14 @@ import java.util.Set;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final Set<String> skipableURIs = new HashSet<>(Set.of(
+            "/ws",
             "/error",
+            "/error/**",
             "/v3/api-docs",
             "/spec/swagger-ui",
             "/swagger-ui",
-            "/api/v1/users/members/sign/",
+            "/api/v1/users/members/sign",
             "/api/v1/users/guests/sign"
-
     ));
     private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler = new JwtAuthenticationFailureHandler();
     private final JwtValidator jwtValidator;

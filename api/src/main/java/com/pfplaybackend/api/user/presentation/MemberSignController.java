@@ -25,6 +25,6 @@ public class MemberSignController {
 
     @GetMapping("/members/sign")
     public String memberSign(@ModelAttribute @Valid SignMemberRequest request) {
-        return memberSignService.getOAuth2RedirectUri(request);
+        return memberSignService.getOAuth2RedirectUri(request, "oauth-redirect");
     }
 }

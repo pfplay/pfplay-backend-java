@@ -1,22 +1,26 @@
 package com.pfplaybackend.api.partyroom.event.listener;
 
-import com.pfplaybackend.api.partyroom.event.EventBroadcaster;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfplaybackend.api.config.websocket.SimpMessageSender;
+import com.pfplaybackend.api.partyroom.event.message.OutgoingGroupChatMessage;
+import lombok.AllArgsConstructor;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
 
+@AllArgsConstructor
+public class ChatTopicListener implements MessageListener {
 
-@Component
-@RequiredArgsConstructor
-public class ChatTopicListener extends AbstractTopicListener {
-
-    private final EventBroadcaster eventBroadcaster;
+    private SimpMessageSender messageSender;
+    private ObjectMapper objectMapper;
 
     @Override
-    public void handleMessage(String message) {
-        System.out.println("Received message: " + message);
-        // Convert Logic
-        // ...
-
-        // Call Bridge Message
+    public void onMessage(Message message, byte[] pattern) {
+        try {
+            OutgoingGroupChatMessage deserialized = objectMapper.readValue(new String(message.getBody()), OutgoingGroupChatMessage.class);
+            messageSender.sendToGroup(deserialized.getPartyroomId().getId(), deserialized);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

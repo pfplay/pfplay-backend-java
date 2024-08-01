@@ -6,8 +6,8 @@ import lombok.Getter;
 import java.util.Objects;
 import java.util.UUID;
 
-@Embeddable
 @Getter
+@Embeddable
 public class UserId {
 
     private UUID uid;

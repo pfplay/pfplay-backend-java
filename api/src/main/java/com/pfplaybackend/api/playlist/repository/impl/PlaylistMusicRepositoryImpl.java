@@ -34,6 +34,7 @@ public class PlaylistMusicRepositoryImpl implements PlaylistMusicRepositoryCusto
                         qPlaylistMusicData.thumbnailImage))
                 .from(qPlaylistMusicData)
                 .where(qPlaylistMusicData.playlistData.id.eq(playlistId))
+                .orderBy(qPlaylistMusicData.orderNumber.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
