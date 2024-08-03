@@ -10,7 +10,6 @@ import lombok.Setter;
 
 import java.time.LocalTime;
 
-@Setter
 @Getter
 public class Playback {
 

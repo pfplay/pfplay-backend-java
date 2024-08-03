@@ -26,10 +26,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.swing.text.html.Option;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -115,13 +113,13 @@ public class PartyroomInfoService {
         }).toList();
     }
 
-    public ActivePartyroomDto getMyActivePartyroom() {
+    public Optional<ActivePartyroomDto> getMyActivePartyroom() {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        return partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId()).orElseThrow();
+        return partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId());
     }
 
-    public ActivePartyroomWithMemberDto getMyActivePartyroomWithMemberId(UserId userId) {
-        return partyroomRepository.getMyActivePartyroomWithMemberIdByUserId(userId).orElseThrow();
+    public Optional<ActivePartyroomWithMemberDto> getMyActivePartyroomWithMemberId(UserId userId) {
+        return partyroomRepository.getMyActivePartyroomWithMemberIdByUserId(userId);
     }
 
     public void getPartymembers(PartyroomId partyroomId) {}
@@ -136,9 +134,14 @@ public class PartyroomInfoService {
     }
 
     @Transactional
-    public Partymember getPartymemberByUserId(PartyroomId partyroomId, UserId userId) {
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-        return partyroom.getPartymemberByUserId(userId);
+    public Optional<Partymember> getPartymemberByUserId(PartyroomId partyroomId, UserId userId) {
+        Optional<PartyroomData> optional = partyroomRepository.findById(partyroomId.getId());
+        if(optional.isPresent()) {
+            PartyroomData partyroomData = optional.get();
+            Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+            return partyroom.getPartymemberByUserId(userId);
+        }else {
+            return Optional.empty();
+        }
     }
 }

@@ -3,10 +3,9 @@ package com.pfplaybackend.api.partyroom.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomWithMemberDto;
 import com.pfplaybackend.api.partyroom.application.dto.PartymemberSummaryDto;
-import com.pfplaybackend.api.partyroom.domain.entity.converter.PartymemberConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
@@ -14,18 +13,23 @@ import com.pfplaybackend.api.partyroom.domain.enums.AccessType;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
+import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.AccessMessage;
+import com.pfplaybackend.api.partyroom.exception.PartyroomException;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.partyroom.exception.PenaltyException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,43 +37,65 @@ public class PartyroomAccessService {
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
-    private final PartymemberConverter partymemberConverter;
     private final PartyroomDomainService partyroomDomainService;
     private final RedisMessagePublisher redisMessagePublisher;
     private final UserProfileService userProfileService;
+    private final PartyroomInfoService partyroomInfoService;
 
-    // TODO Publish event only when the transaction is successful
-    // AccessMessage message = new AccessMessage(new PartyroomId(50L));
-    // redisMessagePublisher.publish(MessageTopic.ACCESS, message);
     @Transactional
-    public void tryEnter(PartyroomId partyroomId) {
+    public Partymember tryEnter(PartyroomId partyroomId) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        // 1. 해당 파티룸의 폐쇄 여부 확인
-        // 2. 사용자가 '이미 다른 파티룸에서의 활동중' 여부 확인
-        // 3. 해당 파티룸의 허용 가능 인원 수 초과 확인
-        // 4. 해당 파티룸에 대한 '기존 참여 이력' 여부 확인
-        // 5. 해당 파티룸에서의 영구 페널티 여부 확인
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-        // Add Party Members through Party Rooms
         UserId userId = partyContext.getUserId();
-        Partyroom updatedPartyroom = partyroom.addNewPartymember(userId, partyContext.getAuthorityTier(), GradeType.LISTENER);
-        PartyroomData data = partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
+        AuthorityTier authorityTier = partyContext.getAuthorityTier();
+        // Validate Partyroom Condition
+        // Include Inactive Members
+        Optional<PartyroomData> optPartyroomData = partyroomRepository.findById(partyroomId.getId());
+        if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomData partyroomData = optPartyroomData.get();
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        if(partyroom.isTerminated()) throw ExceptionCreator.create(PartyroomException.ALREADY_TERMINATED);
+        if(partyroom.isExceededLimit()) throw ExceptionCreator.create(PartyroomException.EXCEEDED_LIMIT);
 
-        // Added Partymember who has id after transaction
-        Partyroom partyroomUpdated = partyroomConverter.toDomain(data);
-        Partymember partymember = partyroomUpdated.getPartymemberByUserId(userId);
-        ProfileSettingDto dto = userProfileService.getUserProfileSetting(userId);
+        // Validate Crew(Partymember) Condition
+        Optional<ActivePartyroomWithMemberDto> optActiveRoomInfo = partyroomInfoService.getMyActivePartyroomWithMemberId(userId);
+        if (optActiveRoomInfo.isPresent()) {
+            ActivePartyroomWithMemberDto activeRoomInfo = optActiveRoomInfo.get();
+            if(partyroomDomainService.isActiveInAnotherRoom(partyroomId, new PartyroomId(activeRoomInfo.getId())))
+                throw ExceptionCreator.create(PartyroomException.ACTIVE_ANOTHER_ROOM);
+            return partyroom.getPartymemberByUserId(userId).orElseThrow();
+        }
 
-        PartymemberSummaryDto partymemberSummaryDto = PartymemberSummaryDto.from(partymember, dto);
-        AccessMessage accessMessage = new AccessMessage(
-                partyroom.getPartyroomId(),
-                MessageTopic.ACCESS,
-                AccessType.ENTER,
-                partymemberSummaryDto);
-        redisMessagePublisher.publish(MessageTopic.ACCESS, accessMessage);
+        Partyroom updPartyRoom = addOrActivateMember(partyroom, userId, authorityTier);
+        PartyroomData savedPartyRoomData = partyroomRepository.save(partyroomConverter.toData(updPartyRoom));
+        // Publish Changed Event
+        Partymember partymember = partyroomConverter.toDomain(savedPartyRoomData).getPartymemberByUserId(userId).orElseThrow();
+        publishAccessChangedEvent(partymember, userId);
+        return partymember;
     }
 
+    private Partyroom addOrActivateMember(Partyroom partyroom, UserId userId, AuthorityTier authorityTier) {
+        if (partyroom.isUserInactiveMember(userId)) {
+            // Restore Existing Record
+            if(partyroom.isUserBannedMember(userId)) throw ExceptionCreator.create(PenaltyException.PERMANENT_EXPULSION);
+            return partyroom.activatePartymember(userId);
+        }else {
+            // Create New Record
+            return partyroom.addNewPartymember(userId, authorityTier, GradeType.LISTENER);
+        }
+    }
+
+    private void publishAccessChangedEvent(Partymember partymember, UserId userId) {
+        ProfileSettingDto profileSettingDto = userProfileService.getUserProfileSetting(userId);
+        redisMessagePublisher.publish(MessageTopic.ACCESS,
+                AccessMessage.create(
+                        partymember.getPartyroomId(),
+                        AccessType.ENTER,
+                        PartymemberSummaryDto.from(partymember, profileSettingDto)
+                )
+        );
+    }
+
+    @Transactional
     public void enterByHost(UserId hostId, Partyroom partyroom) {
         Partyroom updatedPartyroom = partyroom.addNewPartymember(hostId, AuthorityTier.FM, GradeType.HOST);
         PartyroomData partyroomData = partyroomConverter.toData(updatedPartyroom);

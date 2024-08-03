@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data.history;
 
+import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.partyroom.domain.model.ReactionState;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.presentation.PlaybackReactionController;
@@ -16,7 +17,7 @@ import org.hibernate.annotations.DynamicUpdate;
         name = "PLAYBACK_REACTION_HISTORY"
 )
 @Entity
-public class PlaybackReactionHistoryData {
+public class PlaybackReactionHistoryData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

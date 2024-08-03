@@ -1,14 +1,11 @@
 package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
-import com.pfplaybackend.api.partyroom.domain.entity.data.DjData;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-@Setter
 @Getter
 public class Dj {
     private long id;
@@ -45,5 +42,10 @@ public class Dj {
 
     public static Dj create(PartyroomId partyroomId, PlaylistId playlistId, UserId userId, int orderNumber) {
         return new Dj(partyroomId, userId, playlistId, orderNumber, false);
+    }
+
+    public Dj updateOrderNumber(int orderNumber) {
+        this.orderNumber = orderNumber;
+        return this;
     }
 }

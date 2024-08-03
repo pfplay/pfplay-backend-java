@@ -33,13 +33,14 @@ public class PlaybackReactionService {
     @Transactional
     public void reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        ActivePartyroomDto myActivePartyroom = partyroomInfoService.getMyActivePartyroom();
+        ActivePartyroomDto myActivePartyroom = partyroomInfoService.getMyActivePartyroom().orElseThrow();
         // TODO [Check] MyActivePartyroom.getId() == partyroomId
         PlaybackId playbackId = myActivePartyroom.getCurrentPlaybackId();
         // Find whether existing history exists
         ReactionPostProcessDto reactionPostProcessDto = getReactionPostProcess(partyContext, playbackId, reactionType);
         // Get PartymemberId for Event Propagation
-        Partymember partymember = partyroomInfoService.getPartymemberByUserId(partyroomId, partyContext.getUserId());
+        Optional<Partymember> optional  = partyroomInfoService.getPartymemberByUserId(partyroomId, partyContext.getUserId());
+        Partymember partymember = optional.orElseThrow();
         playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId, new PartymemberId(partymember.getId()));
     }
 

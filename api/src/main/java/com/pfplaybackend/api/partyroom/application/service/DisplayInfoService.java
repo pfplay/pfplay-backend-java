@@ -26,7 +26,7 @@ public class DisplayInfoService {
 
     public DisplayDto getDisplayInfo() {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom();
+        ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom().orElseThrow();
         boolean isPlaybackActivated = activePartyroom.isPlaybackActivated();
         Playback playback = playbackInfoService.getPlaybackById(activePartyroom.getCurrentPlaybackId());
 

@@ -6,9 +6,9 @@ import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
-@Setter
+import java.time.LocalDateTime;
+
 @Getter
 public class Partymember {
     private long id;
@@ -18,12 +18,14 @@ public class Partymember {
     private GradeType gradeType;
     private boolean isActive;
     private boolean isBanned;
+    private LocalDateTime enteredAt;
+    private LocalDateTime exitedAt;
 
     public Partymember() {}
 
     @Builder
     public Partymember(long id, PartyroomId partyroomId, UserId userId, AuthorityTier authorityTier,
-                       GradeType gradeType, boolean isActive, boolean isBanned) {
+                       GradeType gradeType, boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
@@ -31,6 +33,8 @@ public class Partymember {
         this.gradeType = gradeType;
         this.isActive = isActive;
         this.isBanned = isBanned;
+        this.enteredAt = enteredAt;
+        this.exitedAt = exitedAt;
     }
 
     public static Partymember create(UserId userId, PartyroomId partyroomId, AuthorityTier authorityTier, GradeType gradeType) {
@@ -41,6 +45,7 @@ public class Partymember {
                 .isActive(true)
                 .isBanned(false)
                 .partyroomId(partyroomId)
+                .enteredAt(LocalDateTime.now())
                 .build();
     }
 
@@ -51,6 +56,12 @@ public class Partymember {
 
     public Partymember applyDeactivation() {
         this.isActive = false;
+        return this;
+    }
+
+    public Partymember applyActivation() {
+        this.isActive = true;
+        this.enteredAt = LocalDateTime.now();
         return this;
     }
 }
