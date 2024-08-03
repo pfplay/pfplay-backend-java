@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
+import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import lombok.Getter;
                 @Index(name = "dj_partyroom_id_IDX", columnList = "partyroom_id")
         })
 @Entity
-public class DjData {
+public class DjData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "dj_id")

@@ -1,10 +1,17 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
+import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,5 +36,13 @@ public class PartyroomNoticeService {
 //
 //        //
 //        eventPublisher.publish("notice", "수정된 공지사항 내용");
+    }
+
+    @Transactional
+    public String getNotice(PartyroomId partyroomId) {
+        Optional<PartyroomData> optPartyroomData = partyroomRepository.findById(partyroomId.getId());
+        if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomData partyroomData = optPartyroomData.get();
+        return partyroomData.getNoticeContent();
     }
 }

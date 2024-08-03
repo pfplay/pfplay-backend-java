@@ -3,7 +3,6 @@ package com.pfplaybackend.api.partyroom.presentation;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.partyroom.application.service.chat.PartyroomChatService;
 
-import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
 import com.pfplaybackend.api.partyroom.presentation.api.PartyroomChatApi;
 import com.pfplaybackend.api.partyroom.presentation.dto.IncomingGroupChatMessage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,13 +24,8 @@ public class PartyroomChatController implements PartyroomChatApi {
     @MessageMapping("/groups/{chatroomId}/send")
     public ResponseEntity<?> sendGroupMessage(@Header("simpSessionId") String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) {
         // chatroomId == partyroomId
-        try {
-            //
-            partyroomSocketService.sendMessage(sessionId, incomingGroupChatMessage);
-            return ResponseEntity.ok(ApiCommonResponse.success("OK"));
-        } catch (UnsupportedSocketRequestException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        partyroomSocketService.sendMessage(sessionId, incomingGroupChatMessage);
+        return ResponseEntity.ok(ApiCommonResponse.success("OK"));
     }
 
     @Operation(summary = "Send a message to WebSocket topic")

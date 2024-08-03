@@ -1,15 +1,19 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
+import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.user.domain.value.UserId;
+import com.sun.jdi.BooleanType;
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +28,7 @@ import java.util.List;
         }
 )
 @Entity
-public class PartyroomData {
+public class PartyroomData extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

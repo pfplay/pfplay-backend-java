@@ -1,12 +1,10 @@
 package com.pfplaybackend.api.partyroom.application.service.chat;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.OutgoingGroupChatMessage;
-import com.pfplaybackend.api.partyroom.exception.UnsupportedSocketRequestException;
 import com.pfplaybackend.api.partyroom.presentation.dto.IncomingGroupChatMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -46,7 +44,7 @@ public class PartyroomChatService {
 //        return false;
 //    }
 
-    public void sendMessage(String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) throws UnsupportedSocketRequestException {
+    public void sendMessage(String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) {
 //        String userIdUid = chatDto.getFromUser().getUserId().getUid().toString();
 //        String partyroomId = chatDto.getFromUser().getPartyroomId();
 //        if (isProhibitedSendChatUser(userIdUid, partyroomId)) {

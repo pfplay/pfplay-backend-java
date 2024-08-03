@@ -17,6 +17,8 @@ public class PartymemberConverter {
                 .gradeType(partymemberData.getGradeType())
                 .isActive(partymemberData.isActive())
                 .isBanned(partymemberData.isBanned())
+                .enteredAt(partymemberData.getEnteredAt())
+                .exitedAt(partymemberData.getExitedAt())
                 .build();
     }
 
@@ -28,6 +30,8 @@ public class PartymemberConverter {
                 .gradeType(partymember.getGradeType())
                 .isActive(partymember.isActive())
                 .isBanned(partymember.isBanned())
+                .enteredAt(partymember.getEnteredAt())
+                .exitedAt(partymember.getExitedAt())
                 .build();
     }
 }
