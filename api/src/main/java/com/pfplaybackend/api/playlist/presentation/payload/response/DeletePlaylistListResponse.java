@@ -11,4 +11,10 @@ import java.util.List;
 @Builder
 public class DeletePlaylistListResponse {
     private final List<Long> listIds;
+
+    public static DeletePlaylistListResponse from(List<Long> listIds) {
+        return DeletePlaylistListResponse.builder()
+                .listIds(listIds)
+                .build();
+    }
 }

@@ -40,4 +40,14 @@ public class Playlist {
                 .orderNumber(orderNumber)
                 .build();
     }
+
+    public Playlist rename(String name) {
+        return Playlist.builder()
+                .id(this.id)
+                .name(name)
+                .ownerId(this.ownerId)
+                .type(this.type)
+                .orderNumber(this.orderNumber)
+                .build();
+    }
 }

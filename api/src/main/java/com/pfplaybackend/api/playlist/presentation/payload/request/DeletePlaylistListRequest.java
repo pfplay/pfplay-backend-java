@@ -9,5 +9,5 @@ import java.util.List;
 @Getter
 public class DeletePlaylistListRequest {
     @Schema(description = "list Id", example = "[1,2,3]", requiredMode = Schema.RequiredMode.REQUIRED)
-    private List<Long> listIds;
+    private List<Long> playlistIds;
 }
