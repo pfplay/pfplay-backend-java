@@ -33,7 +33,7 @@ public class SubscriptionEventListener implements ApplicationListener<SessionSub
         Principal user = headerAccessor.getUser();
         assert user != null;
         UserId userId = UserId.create(UUID.fromString(user.getName()));
-        ActivePartyroomWithMemberDto dto = partyroomInfoService.getMyActivePartyroomWithMemberId(userId);
+        ActivePartyroomWithMemberDto dto = partyroomInfoService.getMyActivePartyroomWithMemberId(userId).orElseThrow();
         Map<String, Object> sessionData = new HashMap<>();
         sessionData.put("partyroomId", dto.getId());
         sessionData.put("uid", user.getName());

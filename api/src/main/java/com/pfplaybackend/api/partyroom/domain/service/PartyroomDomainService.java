@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.domain.service;
 
 import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -13,15 +14,17 @@ public class PartyroomDomainService {
 
     private final PartyroomRepository partyroomRepository;
 
+    public boolean isActiveInAnotherRoom(PartyroomId targetRoomId, PartyroomId activeRoomId) {
+        return !targetRoomId.equals(activeRoomId);
+    }
+
     // 파티룸이 재생 활성화 되었는지 여부 확인
     public boolean isChangedToActivation() {
         return true;
     }
 
     // 현재 유저가 해당 파티룸에 존재하는지 확인
-    public void checkIsNotInPartyroom() {
-
-    }
+    public void checkIsNotInPartyroom() {}
 
     // DJ 대기열에 존재하는지 여부 확인
     public boolean isExistInDjQueue() {

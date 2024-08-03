@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
+import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -11,7 +12,7 @@ import java.time.LocalTime;
 @Getter
 @Table(name = "PLAYBACK")
 @Entity
-public class PlaybackData {
+public class PlaybackData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -13,9 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PartymemberSummaryDto {
-    // User
-    //    private UserId userId;
-    //    private AuthorityTier authorityTier;
     // Partymember
     private long memberId;
     private GradeType gradeType;

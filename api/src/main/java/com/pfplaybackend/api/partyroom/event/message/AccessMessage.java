@@ -18,4 +18,12 @@ public class AccessMessage implements Serializable {
     private MessageTopic eventType;
     private AccessType accessType;
     private PartymemberSummaryDto member;
+
+    public static AccessMessage create(PartyroomId partyroomId, AccessType accessType, PartymemberSummaryDto partymemberSummaryDto) {
+        return new AccessMessage(
+                partyroomId,
+                MessageTopic.ACCESS,
+                accessType,
+                partymemberSummaryDto);
+    }
 }
