@@ -1,14 +1,12 @@
 package com.pfplaybackend.api.playlist.application.service;
 
-import ch.qos.logback.core.encoder.EchoEncoder;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.service.PlaylistDomainService;
-import com.pfplaybackend.api.playlist.exception.PlaylistLimitExceededException;
-import com.pfplaybackend.api.playlist.exception.PlaylistNoWalletException;
+import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.transaction.Transactional;
@@ -16,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -49,32 +48,42 @@ public class PlaylistCommandService {
         return playlistData.toDomain();
     }
 
-//    public void renamePlaylist(UserId ownerId, Long playlistId, String name) {
-////        Playlist playlist = playlistRepository.findByIdAndOwnerIdAndType(playlistId, ownerId, PlaylistType.PLAYLIST);
-////        if(playlist == null) {
-////            throw new NoSuchElementException("존재하지 않는 플레이리스트");
-////        }
-////        playlist.rename(name);
-////        playlistRepository.save(playlist);
-//    }
-//
-//    @Transactional
-//    public void deletePlaylist(UserId ownerId, List<Long> listIds) {
-////        List<Long> ids = playlistClassRepository.findByOwnerIdAndListIdAndType(ownerId, listIds, PlaylistType.PLAYLIST);
-////        if (ids.size() != listIds.size()) {
-////            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 플레이리스트");
-////        }
-////        try {
-////            musicListClassRepository.deleteByPlaylistIds(ids);
-////            Long count = playlistClassRepository.deleteByListIds(ids);
-////            if (count != ids.size()) {
-////                throw new InvalidDeleteRequestException("비정상적인 삭제 요청");
-////            }
-////        } catch (Exception e) {
-////            if (e instanceof InvalidDeleteRequestException) {
-////                throw e;
-////            }
-////            throw new RuntimeException(e);
-////        }
-//    }
+    @Transactional
+    public Playlist renamePlaylist(Long playlistId, String name) {
+        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+        UserId userId = playlistContext.getUserId();
+
+        PlaylistData playlistData = playlistRepository.findByIdAndOwnerIdAndType(playlistId, userId, PlaylistType.PLAYLIST)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 플레이리스트"));
+
+        Playlist playlist = playlistData.toDomain();
+
+        Playlist updatedPlaylist = playlist.rename(name);
+        playlistRepository.save(updatedPlaylist.toData());
+        return updatedPlaylist;
+    }
+
+    @Transactional
+    public void deletePlaylist(List<Long> playlistIds) {
+        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+        UserId userId = playlistContext.getUserId();
+        List<PlaylistData> playlistDataList = playlistRepository.findAllByOwnerId(userId);
+
+        Set<Long> userPlaylistIdSet = playlistDataList.stream().map(PlaylistData::getId).collect(Collectors.toSet());
+        if (!userPlaylistIdSet.containsAll(playlistIds)) {
+            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 플레이리스트");
+        }
+
+        try {
+            Long count = playlistRepository.deleteByListIds(playlistIds);
+            if (count != playlistIds.size()) {
+                throw new InvalidDeleteRequestException("비정상적인 삭제 요청");
+            }
+        } catch (Exception e) {
+            if (e instanceof InvalidDeleteRequestException) {
+                throw e;
+            }
+            throw new RuntimeException(e);
+        }
+    }
 }
