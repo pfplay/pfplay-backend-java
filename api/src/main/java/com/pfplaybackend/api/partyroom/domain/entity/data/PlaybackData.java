@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.Instant;
 import java.time.LocalTime;
 
 @Getter
@@ -47,13 +48,13 @@ public class PlaybackData extends BaseEntity {
     private int dislikeCount;
 
     // 재생 종료 시각
-    private LocalTime endTime;
+    private Instant endTime;
 
     public PlaybackData() {}
 
     @Builder
     public PlaybackData(Long id, PartyroomId partyroomId,
-                        UserId userId, String name, String linkId, String duration, String thumbnailImage, int grabCount, int likeCount, int dislikeCount) {
+                        UserId userId, String name, String linkId, String duration, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, Instant endTime) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
@@ -64,5 +65,6 @@ public class PlaybackData extends BaseEntity {
         this.grabCount = grabCount;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
+        this.endTime = endTime;
     }
  }
