@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data.history;
 
+import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
         name = "USER_PENALTY_HISTORY"
 )
 @Entity
-public class UserPenaltyHistoryData {
+public class UserPenaltyHistoryData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

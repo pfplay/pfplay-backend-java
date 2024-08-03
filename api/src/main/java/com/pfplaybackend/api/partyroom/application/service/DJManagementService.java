@@ -12,7 +12,6 @@ import com.pfplaybackend.api.partyroom.domain.value.DjId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
-import com.pfplaybackend.api.partyroom.exception.InvalidDjException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class DJManagementService {
         }
 
         // TODO Check is Empty Playlist!!! 24.07.20 Exception!
-        if(musicQueryService.isEmptyPlaylist(playlistId.getId())) throw new InvalidDjException("Empty playlist is not allowed");
+        if(musicQueryService.isEmptyPlaylist(playlistId.getId())) return ;
 
         // FIXME Direct Add DjData to PartyroomData
         Partyroom updatedPartyroom = partyroom.createAndAddDj(playlistId, partyContext.getUserId()).applyActivation();
@@ -64,6 +63,8 @@ public class DJManagementService {
      */
     @Transactional
     public void dequeueDj(PartyroomId partyroomId) {
+        // 자신을 삭제시키려면, 자신의 dj 번호를 조회해야 한다.
+        // userId → deleted_yn == 0 인 dj 레코드를 deleted_yn == 1로 갱신
     }
 
     /**

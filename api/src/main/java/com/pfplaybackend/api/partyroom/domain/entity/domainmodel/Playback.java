@@ -8,9 +8,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 
-@Setter
 @Getter
 public class Playback {
 
@@ -24,12 +26,12 @@ public class Playback {
     private int grabCount;
     private int likeCount;
     private int dislikeCount;
-    private LocalTime endTime;
+    private Instant endTime;
 
     public Playback() {}
 
     public Playback(PartyroomId partyroomId, UserId userId, String name,
-                    String duration, String linkId, String thumbnailImage) {
+                    String duration, String linkId, String thumbnailImage, Instant endTime) {
         this.partyroomId = partyroomId;
         this.userId = userId;
         this.name = name;
@@ -39,10 +41,11 @@ public class Playback {
         this.grabCount = 0;
         this.likeCount = 0;
         this.dislikeCount = 0;
+        this.endTime = endTime;
     }
 
     @Builder
-    public Playback(Long id, PartyroomId partyroomId, UserId userId, String name, String duration, String linkId, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, LocalTime endTime) {
+    public Playback(Long id, PartyroomId partyroomId, UserId userId, String name, String duration, String linkId, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, Instant endTime) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
@@ -58,9 +61,27 @@ public class Playback {
 
     public static Playback create(PartyroomId partyroomId, UserId userId,
                                   MusicDto musicDto) {
+
         return new Playback(partyroomId, userId,
                 musicDto.getName(), musicDto.getDuration(),
-                musicDto.getLinkId(), musicDto.getThumbnailImage());
+                musicDto.getLinkId(), musicDto.getThumbnailImage(),
+                calculateEndTime(musicDto.getDuration()));
+    }
+
+    private static Instant calculateEndTime(String duration) {
+        Instant now = Instant.now();
+        Duration parsed = parseDuration(duration);
+        return now.plus(parsed);
+    }
+
+    private static Duration parseDuration(String durationStr) {
+        String[] parts = durationStr.split(":");
+        if (parts.length != 2) {
+            throw new DateTimeParseException("Invalid duration format", durationStr, 0);
+        }
+        int minutes = Integer.parseInt(parts[0]);
+        int seconds = Integer.parseInt(parts[1]);
+        return Duration.ofMinutes(minutes).plusSeconds(seconds);
     }
 
     public Playback updateAggregation(int deltaLikeCount, int deltaDislikeCount, int deltaGrabCount) {

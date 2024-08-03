@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.common;
+package com.pfplaybackend.api.common.exception;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,6 +15,6 @@ public class ExceptionResult {
     @Schema(implementation = HttpStatus.class)
     private HttpStatus status;
     private int code;
+    private String errorCode;
     private String message;
-    private String errorCode; // private int code를 안쓴다면 errorCode 이름을 code로 변경 예정
 }

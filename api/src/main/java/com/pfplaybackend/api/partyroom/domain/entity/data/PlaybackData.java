@@ -1,17 +1,19 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
+import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.Instant;
 import java.time.LocalTime;
 
 @Getter
 @Table(name = "PLAYBACK")
 @Entity
-public class PlaybackData {
+public class PlaybackData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,13 +48,13 @@ public class PlaybackData {
     private int dislikeCount;
 
     // 재생 종료 시각
-    private LocalTime endTime;
+    private Instant endTime;
 
     public PlaybackData() {}
 
     @Builder
     public PlaybackData(Long id, PartyroomId partyroomId,
-                        UserId userId, String name, String linkId, String duration, String thumbnailImage, int grabCount, int likeCount, int dislikeCount) {
+                        UserId userId, String name, String linkId, String duration, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, Instant endTime) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
@@ -63,5 +65,6 @@ public class PlaybackData {
         this.grabCount = grabCount;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
+        this.endTime = endTime;
     }
  }

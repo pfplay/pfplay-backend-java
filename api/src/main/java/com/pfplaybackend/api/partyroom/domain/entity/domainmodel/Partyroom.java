@@ -11,13 +11,12 @@ import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyr
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-@Setter
 @Getter
 @SuperBuilder(toBuilder = true)
 public class Partyroom {
@@ -87,6 +86,10 @@ public class Partyroom {
                 request.getLinkDomain(), request.getPlaybackTimeLimit());
     }
 
+    public boolean isExceededLimit() {
+        return this.getPartymembers().size() > 49;
+    }
+
     public Partyroom assignPartymembers(List<Partymember> partymembers) {
         this.partymembers = partymembers;
         return this;
@@ -97,8 +100,8 @@ public class Partyroom {
         return this;
     }
 
-    public Partymember getPartymemberByUserId(UserId userId) {
-        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findFirst().orElse(null);
+    public Optional<Partymember> getPartymemberByUserId(UserId userId) {
+        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findFirst();
     }
 
     public Partyroom addNewPartymember(UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
@@ -112,7 +115,7 @@ public class Partyroom {
     public Partyroom addExistingPartymember(Partymember partymember) {
         this.partymembers = new ImmutableList.Builder<Partymember>()
                 .addAll(this.partymembers)
-                .add(partymember)
+                .add(partymember.applyActivation())
                 .build();
         return this;
     }
@@ -149,9 +152,9 @@ public class Partyroom {
                 .addAll(this.djs)
                 .build().stream().peek(dj -> {
                     if(dj.getOrderNumber() == 1) {
-                        dj.setOrderNumber(totalElements);
+                        dj.updateOrderNumber(totalElements);
                     }else {
-                        dj.setOrderNumber(dj.getOrderNumber() - 1);
+                        dj.updateOrderNumber(dj.getOrderNumber() - 1);
                     }
                 }).toList();
         return this;
@@ -168,5 +171,25 @@ public class Partyroom {
                     }
                 }).toList();
         return this.partymembers.stream().filter(partymember -> !partymember.isActive()).findAny().orElseThrow();
+    }
+
+    public boolean isUserInactiveMember(UserId userId) {
+        return this.partymembers.stream().anyMatch(partymember -> partymember.getUserId().equals(userId)  && !partymember.isActive());
+    }
+
+    public boolean isUserBannedMember(UserId userId) {
+        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findAny().orElseThrow().isBanned();
+    }
+
+    public Partyroom activatePartymember(UserId userId) {
+        this.partymembers = new ImmutableList.Builder<Partymember>()
+                .addAll(this.partymembers.stream()
+                        .peek(partymember -> {
+                            if (partymember.getUserId().equals(userId)) {
+                                partymember.applyActivation();
+                            }
+                        }).toList()
+                ).build();
+        return this;
     }
 }
