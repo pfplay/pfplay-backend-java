@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalTime;
 
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class PlaybackDto {
     private String name;
     private String duration;
     private String thumbnailImage;
-    private LocalTime endTime;
+    private Instant endTime;
 
     @QueryProjection
     public PlaybackDto(long id, String linkId, String name, String duration, String thumbnailImage) {

@@ -20,6 +20,7 @@ public class PlaybackConverter {
                 .likeCount(playbackData.getLikeCount())
                 .dislikeCount(playbackData.getDislikeCount())
                 .grabCount(playbackData.getGrabCount())
+                .endTime(playbackData.getEndTime())
                 .build();
     }
 
@@ -35,6 +36,7 @@ public class PlaybackConverter {
                 .likeCount(playback.getLikeCount())
                 .dislikeCount(playback.getDislikeCount())
                 .grabCount(playback.getGrabCount())
+                .endTime(playback.getEndTime())
                 .build();
     }
 }

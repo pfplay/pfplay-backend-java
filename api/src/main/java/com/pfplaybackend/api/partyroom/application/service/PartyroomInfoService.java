@@ -62,7 +62,8 @@ public class PartyroomInfoService {
 
     // 초기화를 위한 파티멤버 목록 조회
     public List<PartymemberSetupDto> getPartymembersForSetup(PartyroomId partyroomId) {
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+        // Find Active Members
+        PartyroomData partyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId()).orElseThrow();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
         // Has uid, authorityTier
