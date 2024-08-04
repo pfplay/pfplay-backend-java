@@ -26,12 +26,12 @@ public class Playback {
     private int grabCount;
     private int likeCount;
     private int dislikeCount;
-    private Instant endTime;
+    private Long endTime;
 
     public Playback() {}
 
     public Playback(PartyroomId partyroomId, UserId userId, String name,
-                    String duration, String linkId, String thumbnailImage, Instant endTime) {
+                    String duration, String linkId, String thumbnailImage, Long endTime) {
         this.partyroomId = partyroomId;
         this.userId = userId;
         this.name = name;
@@ -45,7 +45,7 @@ public class Playback {
     }
 
     @Builder
-    public Playback(Long id, PartyroomId partyroomId, UserId userId, String name, String duration, String linkId, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, Instant endTime) {
+    public Playback(Long id, PartyroomId partyroomId, UserId userId, String name, String duration, String linkId, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, Long endTime) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
@@ -68,10 +68,10 @@ public class Playback {
                 calculateEndTime(musicDto.getDuration()));
     }
 
-    private static Instant calculateEndTime(String duration) {
+    private static long calculateEndTime(String duration) {
         Instant now = Instant.now();
         Duration parsed = parseDuration(duration);
-        return now.plus(parsed);
+        return now.plus(parsed).toEpochMilli();
     }
 
     private static Duration parseDuration(String durationStr) {

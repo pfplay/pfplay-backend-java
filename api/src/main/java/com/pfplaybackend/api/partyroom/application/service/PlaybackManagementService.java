@@ -71,7 +71,6 @@ public class PlaybackManagementService {
         Dj nextDj = updataedPartyroom.getDjs().stream().min(Comparator.comparingInt(Dj::getOrderNumber)).orElseThrow();
         Partymember djMember = updataedPartyroom.getPartymembers().stream().filter(partymember -> partymember.getUserId().equals(nextDj.getUserId())).toList().get(0);
         Playback nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(updataedPartyroom.getPartyroomId(), nextDj.getPlaylistId());
-        System.out.println();
         PlaybackData playbackData = playbackRepository.save(playbackConverter.toData(nextPlayback));
         // Update 'CurrentPlaybackId'
         partyroomRepository.save(partyroomConverter.toData(partyroom.updatePlaybackId(new PlaybackId(playbackData.getId()))));
