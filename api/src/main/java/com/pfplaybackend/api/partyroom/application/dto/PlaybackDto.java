@@ -17,7 +17,7 @@ public class PlaybackDto {
     private String name;
     private String duration;
     private String thumbnailImage;
-    private Instant endTime;
+    private long endTime;
 
     @QueryProjection
     public PlaybackDto(long id, String linkId, String name, String duration, String thumbnailImage) {
