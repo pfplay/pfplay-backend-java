@@ -4,6 +4,6 @@ import org.springframework.http.HttpStatus;
 
 public class NotFoundException extends AbstractHTTPException {
     public NotFoundException(String errorCode, String message) {
-        super(HttpStatus.FORBIDDEN, errorCode, message);
+        super(HttpStatus.NOT_FOUND, errorCode, message);
     }
 }
