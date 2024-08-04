@@ -1,12 +1,10 @@
 package com.pfplaybackend.api.partyroom.repository.impl;
 
 import com.pfplaybackend.api.partyroom.application.dto.*;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.QPartymemberData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.QPartyroomData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.QPlaybackData;
+import com.pfplaybackend.api.partyroom.domain.entity.data.*;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.domain.value.QPartyroomId;
 import com.pfplaybackend.api.partyroom.repository.custom.PartyroomRepositoryCustom;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
 import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistMusicData;
@@ -27,16 +25,15 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.data.redis.core.RedisTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
 public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
+    private RedisTemplate<String, Object> redisTemplate;
 
     @PersistenceContext
     private EntityManager em;
@@ -213,5 +210,37 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         (dto1, dto2) -> dto1
                 ))
                 .values());
+    }
+
+    @Override
+    public Optional<PartyroomIdDto> getPartyroomDataWithUserId(UserId userId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
+        PartyroomData partyroomData = queryFactory
+                .select(qPartymemberData.partyroomData)
+                .from(qPartymemberData)
+                .where(qPartymemberData.isActive.eq(true)
+                        .and(qPartymemberData.userId.eq(userId)))
+                .fetchOne();
+
+        PartyroomIdDto partyroomIdDto = null;
+        if (partyroomData != null) {
+            partyroomIdDto = new PartyroomIdDto(partyroomData.getPartyroomId());
+        }
+
+        return Optional.ofNullable(partyroomIdDto);
+    }
+
+    @Override
+    public PartyroomSessionDto savePartyroomSession(PartyroomSessionDto partyroomSessionDto) {
+        PartyroomSessionData partyroomSessionData = PartyroomSessionData.create(
+                partyroomSessionDto.getSessionId(),
+                partyroomSessionDto.getUserId(),
+                partyroomSessionDto.getPartyroomId()
+        );
+        String sessionId = partyroomSessionData.getSessionId();
+        redisTemplate.opsForValue().set(sessionId, partyroomSessionData);
+
+        return partyroomSessionDto;
     }
 }
