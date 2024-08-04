@@ -79,8 +79,9 @@ public class PlaybackManagementService {
 
     // FIXME PartymemberId
     private void publishPlaybackChangedEvent(PartyroomId partyroomId, long partymemberId, PlaybackData playbackData ) {
+
         redisMessagePublisher.publish(MessageTopic.PLAYBACK,
                 new PlaybackMessage(partyroomId, MessageTopic.PLAYBACK, partymemberId,
-                        new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(), playbackData.getDuration(), playbackData.getThumbnailImage())));
+                        new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(), playbackData.getDuration(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
     }
 }
