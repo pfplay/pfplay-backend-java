@@ -32,7 +32,6 @@ public class DisplayInfoService {
         PartyroomId partyroomId = new PartyroomId(activePartyroom.getId());
         boolean isPlaybackActivated = activePartyroom.isPlaybackActivated();
 
-
         if(isPlaybackActivated) {
             Playback playback = playbackInfoService.getPlaybackById(activePartyroom.getCurrentPlaybackId());
             Partymember djInfo = getCurrentDjInfo(partyroomId, playback);
