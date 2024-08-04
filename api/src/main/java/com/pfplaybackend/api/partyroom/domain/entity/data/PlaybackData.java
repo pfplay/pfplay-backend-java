@@ -48,13 +48,13 @@ public class PlaybackData extends BaseEntity {
     private int dislikeCount;
 
     // 재생 종료 시각
-    private Instant endTime;
+    private Long endTime;
 
     public PlaybackData() {}
 
     @Builder
     public PlaybackData(Long id, PartyroomId partyroomId,
-                        UserId userId, String name, String linkId, String duration, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, Instant endTime) {
+                        UserId userId, String name, String linkId, String duration, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, Long endTime) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
