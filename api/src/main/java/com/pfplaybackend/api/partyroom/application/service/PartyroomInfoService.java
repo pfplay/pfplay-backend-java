@@ -8,28 +8,19 @@ import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomSessionData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
-import com.pfplaybackend.api.partyroom.domain.enums.QueueStatus;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
-import com.pfplaybackend.api.partyroom.repository.impl.PartyroomRepositoryImpl;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import com.pfplaybackend.api.user.application.service.UserAvatarService;
-import com.pfplaybackend.api.user.application.service.UserProfileService;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -156,17 +147,5 @@ public class PartyroomInfoService {
         } else {
             return Optional.empty();
         }
-    }
-
-    @Transactional
-    public PartyroomSessionDto saveSession(String sessionId, UUID uid, PartyroomId partyroomId) {
-        UserId userId = UserId.create(uid);
-        return partyroomRepository.savePartyroomSession(
-                new PartyroomSessionDto(
-                        sessionId,
-                        userId,
-                        partyroomId
-                )
-        );
     }
 }

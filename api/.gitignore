@@ -37,4 +37,4 @@ out/
 .vscode/
 
 /src/test/resources/key/**
-api/src/main/resources/*
+/src/main/resources/**

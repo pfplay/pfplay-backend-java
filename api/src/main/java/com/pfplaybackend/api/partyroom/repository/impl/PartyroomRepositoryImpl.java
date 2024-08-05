@@ -2,38 +2,21 @@ package com.pfplaybackend.api.partyroom.repository.impl;
 
 import com.pfplaybackend.api.partyroom.application.dto.*;
 import com.pfplaybackend.api.partyroom.domain.entity.data.*;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
-import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.domain.value.QPartyroomId;
 import com.pfplaybackend.api.partyroom.repository.custom.PartyroomRepositoryCustom;
-import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
-import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistMusicData;
-import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.data.QActivityData;
-import com.pfplaybackend.api.user.domain.entity.data.QMemberData;
-import com.pfplaybackend.api.user.domain.entity.data.QProfileData;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
-
 public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
-    private RedisTemplate<String, Object> redisTemplate;
 
     @PersistenceContext
     private EntityManager em;
@@ -229,18 +212,5 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
         }
 
         return Optional.ofNullable(partyroomIdDto);
-    }
-
-    @Override
-    public PartyroomSessionDto savePartyroomSession(PartyroomSessionDto partyroomSessionDto) {
-        PartyroomSessionData partyroomSessionData = PartyroomSessionData.create(
-                partyroomSessionDto.getSessionId(),
-                partyroomSessionDto.getUserId(),
-                partyroomSessionDto.getPartyroomId()
-        );
-        String sessionId = partyroomSessionData.getSessionId();
-        redisTemplate.opsForValue().set(sessionId, partyroomSessionData);
-
-        return partyroomSessionDto;
     }
 }
