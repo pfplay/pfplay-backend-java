@@ -11,50 +11,28 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
-import java.util.Optional;
+import java.security.Principal;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
 public class SubscriptionEventListener implements ApplicationListener<SessionSubscribeEvent> {
-    //
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionEventListener.class);
-    private final SessionEventService sessionEventService;
-    private final PartyroomInfoService partyroomInfoService;
+    private final SessionEventHandler sessionEventHandler;
 
     @Override
     public void onApplicationEvent(SessionSubscribeEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
-
-        CustomAuthentication authentication = (CustomAuthentication) headerAccessor.getUser();
-        if (authentication == null) {
+        String destination = headerAccessor.getDestination();
+        Principal principal = headerAccessor.getUser();
+        if (principal == null) {
             logger.error("Invalid Partymember, UserId is null" + " Session ID: " + sessionId);
             throw new InvalidPartymemberException();
         }
+        UserId userId = UserId.create(UUID.fromString(principal.getName()));
 
-        UserCredentials userCredentials = (UserCredentials) authentication.getPrincipal();
-        UUID uid = userCredentials.getUid();
-        UserId userId = UserId.create(uid);
-
-        Optional<PartyroomId> optional = partyroomInfoService.getPartyroomId(userId);
-        if (optional.isPresent()) {
-            PartyroomId partyroomId = optional.get();
-            sessionEventService.saveSession(sessionId, userId, partyroomId);
-            logger.info(
-                    "Session ID: " + sessionId
-                            + " UserID: " + uid
-                            + " Partyroom ID: " + partyroomId
-                            + "has subscribed"
-            );
-            return;
-        }
-
-        logger.error(
-                "Invalid Partymember, PartyroomId is null, "
-                        + "Session ID: " + sessionId
-                        + " UserID: " + uid
-        );
-        throw new InvalidPartymemberException();
+        sessionEventHandler.saveSessionCache(sessionId, userId, destination);
+        logger.info("Session has subscribed, sessionId : " + sessionId + ", userId : " + userId + ", destination : " + destination);
     }
 }
