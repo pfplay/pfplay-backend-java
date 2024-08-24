@@ -1,10 +1,6 @@
 package com.pfplaybackend.api.config.websocket.event;
 
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
-import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
-import com.pfplaybackend.api.config.websocket.application.service.SessionEventService;
-import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
-import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.config.websocket.event.handler.SessionEventHandler;
 import com.pfplaybackend.api.partyroom.exception.InvalidPartymemberException;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
