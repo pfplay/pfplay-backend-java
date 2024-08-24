@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 
+@Component
 public class ConnectionEventListener implements ApplicationListener<SessionConnectEvent> {
     private final static Logger logger = LoggerFactory.getLogger(ConnectionEventListener.class);
 
