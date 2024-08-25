@@ -1,7 +1,7 @@
-package com.pfplaybackend.api.partyroom.event.handler;
+package com.pfplaybackend.api.partyroom.event;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.event.handler.SessionEventHandler;
+import com.pfplaybackend.api.config.websocket.event.handler.SessionCacheManager;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomSessionData;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class PartyroomSessionEventHandler implements SessionEventHandler {
+public class PartyroomSessionCacheManager implements SessionCacheManager {
     private final RedisTemplate<String, Object> redisTemplate;
     private final PartymemberRepository partymemberRepository;
 
