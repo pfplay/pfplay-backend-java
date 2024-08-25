@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.config.websocket.event;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.event.handler.SessionEventHandler;
+import com.pfplaybackend.api.config.websocket.event.handler.SessionCacheManager;
 import com.pfplaybackend.api.config.websocket.exception.SessionException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class UnsubscriptionEventListener implements ApplicationListener<SessionUnsubscribeEvent> {
     private final static Logger logger = LoggerFactory.getLogger(UnsubscriptionEventListener.class);
-    private final SessionEventHandler sessionEventHandler;
+    private final SessionCacheManager sessionCacheManager;
 
     @Override
     public void onApplicationEvent(SessionUnsubscribeEvent event) {
@@ -28,7 +28,7 @@ public class UnsubscriptionEventListener implements ApplicationListener<SessionU
             logger.warn("Unauthorized session requested, UserId is null" + " Session ID: " + sessionId);
             throw ExceptionCreator.create(SessionException.UNAUTHORIZED_SESSION);
         }
-        sessionEventHandler.deleteSessionCache(sessionId);
+        sessionCacheManager.deleteSessionCache(sessionId);
 
         logger.info("Session has unsubscribed, sessionId : " + sessionId);
     }
