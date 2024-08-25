@@ -1,10 +1,11 @@
 package com.pfplaybackend.api.partyroom.event.handler;
 
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.config.websocket.event.handler.SessionEventHandler;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomSessionData;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.exception.InvalidPartymemberException;
+import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.repository.PartymemberRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class PartyroomSessionEventHandler implements SessionEventHandler {
         if (destination.contains("partyroom")) {
             Optional<PartyroomSessionData> partyroomSessionData = createSessionData(sessionId, userId);
             if (partyroomSessionData.isEmpty()) {
-                throw new InvalidPartymemberException();
+                throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
             }
 
             PartyroomSessionData sessionData = partyroomSessionData.get();
