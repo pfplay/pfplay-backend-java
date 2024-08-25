@@ -1,7 +1,8 @@
 package com.pfplaybackend.api.config.websocket.event;
 
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.config.websocket.event.handler.SessionEventHandler;
-import com.pfplaybackend.api.partyroom.exception.InvalidPartymemberException;
+import com.pfplaybackend.api.config.websocket.exception.SessionException;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -27,12 +28,13 @@ public class SubscriptionEventListener implements ApplicationListener<SessionSub
         String destination = headerAccessor.getDestination();
         Principal principal = headerAccessor.getUser();
         if (principal == null) {
-            logger.error("Invalid Partymember, UserId is null" + " Session ID: " + sessionId);
-            throw new InvalidPartymemberException();
+            logger.warn("Unauthorized session requested, UserId is null" + " Session ID: " + sessionId);
+            throw ExceptionCreator.create(SessionException.UNAUTHORIZED_SESSION);
         }
         UserId userId = UserId.create(UUID.fromString(principal.getName()));
 
         sessionEventHandler.saveSessionCache(sessionId, userId, destination);
+
         logger.info("Session has subscribed, sessionId : " + sessionId + ", userId : " + userId + ", destination : " + destination);
     }
 }
