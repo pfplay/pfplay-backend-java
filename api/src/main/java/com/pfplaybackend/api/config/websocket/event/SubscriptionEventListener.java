@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.config.websocket.event;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.event.handler.SessionEventHandler;
+import com.pfplaybackend.api.config.websocket.event.handler.SessionCacheManager;
 import com.pfplaybackend.api.config.websocket.exception.SessionException;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SubscriptionEventListener implements ApplicationListener<SessionSubscribeEvent> {
     private final static Logger logger = LoggerFactory.getLogger(SubscriptionEventListener.class);
-    private final SessionEventHandler sessionEventHandler;
+    private final SessionCacheManager sessionCacheManager;
 
     @Override
     public void onApplicationEvent(SessionSubscribeEvent event) {
@@ -33,7 +33,7 @@ public class SubscriptionEventListener implements ApplicationListener<SessionSub
         }
         UserId userId = UserId.create(UUID.fromString(principal.getName()));
 
-        sessionEventHandler.saveSessionCache(sessionId, userId, destination);
+        sessionCacheManager.saveSessionCache(sessionId, userId, destination);
 
         logger.info("Session has subscribed, sessionId : " + sessionId + ", userId : " + userId + ", destination : " + destination);
     }
