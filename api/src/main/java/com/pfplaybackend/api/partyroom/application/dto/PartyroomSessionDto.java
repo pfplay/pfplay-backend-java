@@ -4,11 +4,9 @@ import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 
 @Data
-@RequiredArgsConstructor
 public class PartyroomSessionDto {
     private String sessionId;
     private UserId userId;
