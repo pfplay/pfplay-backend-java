@@ -34,6 +34,11 @@ public class PartyroomSessionEventHandler implements SessionEventHandler {
         }
     }
 
+    @Transactional
+    public void deleteSessionCache(String sessionId){
+        redisTemplate.delete(sessionId);
+    }
+
     private Optional<PartyroomSessionData> createSessionData(String sessionId, UserId userId) {
         Optional<PartymemberData> data = partymemberRepository.findByUserId(userId);
         if (data.isPresent()) {
