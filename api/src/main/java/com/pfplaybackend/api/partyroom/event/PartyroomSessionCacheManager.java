@@ -3,7 +3,7 @@ package com.pfplaybackend.api.partyroom.event;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.config.websocket.event.handler.SessionCacheManager;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomSessionData;
+import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.repository.PartymemberRepository;
@@ -24,12 +24,12 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
     @Transactional
     public void saveSessionCache(String sessionId, UserId userId, String destination) {
         if (destination.contains("partyroom")) {
-            Optional<PartyroomSessionData> partyroomSessionData = createSessionData(sessionId, userId);
+            Optional<PartyroomSessionDto> partyroomSessionData = createSessionData(sessionId, userId);
             if (partyroomSessionData.isEmpty()) {
                 throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
             }
 
-            PartyroomSessionData sessionData = partyroomSessionData.get();
+            PartyroomSessionDto sessionData = partyroomSessionData.get();
             redisTemplate.opsForValue().set(sessionId, sessionData);
         }
     }
@@ -39,11 +39,12 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
         redisTemplate.delete(sessionId);
     }
 
-    private Optional<PartyroomSessionData> createSessionData(String sessionId, UserId userId) {
+    private Optional<PartyroomSessionDto> createSessionData(String sessionId, UserId userId) {
         Optional<PartymemberData> data = partymemberRepository.findByUserId(userId);
         if (data.isPresent()) {
             PartyroomId partyroomId = data.get().getPartyroomData().getPartyroomId();
-            return Optional.of(PartyroomSessionData.create(sessionId, userId, partyroomId));
+            long memberId = data.get().getId();
+            return Optional.of(PartyroomSessionDto.create(sessionId, userId, partyroomId, memberId));
         }
         return Optional.empty();
     }
