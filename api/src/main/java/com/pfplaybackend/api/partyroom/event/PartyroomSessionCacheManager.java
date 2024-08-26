@@ -24,12 +24,12 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
     @Transactional
     public void saveSessionCache(String sessionId, UserId userId, String destination) {
         if (destination.contains("partyroom")) {
-            Optional<PartyroomSessionDto> partyroomSessionData = createSessionData(sessionId, userId);
-            if (partyroomSessionData.isEmpty()) {
+            Optional<PartyroomSessionDto> PartyroomSessionDto = createSessionData(sessionId, userId);
+            if (PartyroomSessionDto.isEmpty()) {
                 throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
             }
 
-            PartyroomSessionDto sessionData = partyroomSessionData.get();
+            PartyroomSessionDto sessionData = PartyroomSessionDto.get();
             redisTemplate.opsForValue().set(sessionId, sessionData);
         }
     }
