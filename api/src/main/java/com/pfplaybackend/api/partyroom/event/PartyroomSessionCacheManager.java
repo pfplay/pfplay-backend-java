@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.event;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.event.handler.SessionCacheManager;
+import com.pfplaybackend.api.config.websocket.event.manager.SessionCacheManager;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
