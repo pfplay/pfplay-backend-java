@@ -39,7 +39,7 @@ public class PartyroomSharedLinkService {
     @Transactional(readOnly = true)
     public URI getRedirectUri(String linkDomain) {
         PartyroomData partyroomData = partyroomRepository.findByLinkDomain(linkDomain)
-                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));;
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         return URI.create(WEB_SERVER_ADDRESS + "/" + partyroomData.getPartyroomId());
     }
 }
