@@ -44,7 +44,7 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
         if (data.isPresent()) {
             PartyroomId partyroomId = data.get().getPartyroomData().getPartyroomId();
             long memberId = data.get().getId();
-            return Optional.of(PartyroomSessionDto.create(sessionId, userId, partyroomId, memberId));
+            return Optional.of(new PartyroomSessionDto(sessionId, userId, partyroomId, memberId));
         }
         return Optional.empty();
     }
