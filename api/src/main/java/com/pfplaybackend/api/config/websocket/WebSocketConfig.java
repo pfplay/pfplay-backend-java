@@ -2,9 +2,11 @@ package com.pfplaybackend.api.config.websocket;
 
 import com.pfplaybackend.api.config.websocket.interceptor.JwtHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -24,7 +26,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry brokerRegistry) {
-        brokerRegistry.enableSimpleBroker("/sub");
+
+        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+        taskScheduler.setPoolSize(1);
+        taskScheduler.initialize();
+
+        brokerRegistry.enableSimpleBroker("/sub")
+                .setHeartbeatValue(new long[]{3000, 3000})
+                .setTaskScheduler(taskScheduler);
         brokerRegistry.setApplicationDestinationPrefixes("/pub");
         brokerRegistry.setUserDestinationPrefix("/user");
     }

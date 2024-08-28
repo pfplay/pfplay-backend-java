@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.PartyContextAspect;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.*;
@@ -15,6 +16,7 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.QueueStatus;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.partyroom.repository.impl.PartyroomRepositoryImpl;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
@@ -63,7 +65,9 @@ public class PartyroomInfoService {
     // 초기화를 위한 파티멤버 목록 조회
     public List<PartymemberSetupDto> getPartymembersForSetup(PartyroomId partyroomId) {
         // Find Active Members
-        PartyroomData partyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId()).orElseThrow();
+        Optional<PartyroomData> optPartyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId());
+        if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomData partyroomData = optPartyroomData.get();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
         // Has uid, authorityTier
