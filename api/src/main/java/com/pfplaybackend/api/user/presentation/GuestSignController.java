@@ -7,6 +7,7 @@ import com.pfplaybackend.api.user.application.service.GuestSignService;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
 import com.pfplaybackend.api.user.presentation.payload.request.SignGuestRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +24,12 @@ public class GuestSignController {
 
     @PostMapping("/guests/sign")
     public ResponseEntity<?> createGuest(
-            @RequestBody SignGuestRequest request
+            @RequestBody SignGuestRequest request,
+            HttpServletResponse response
     ) {
+
+        // 401로 들어온다.
+        System.out.println(response.getStatus());
         Guest guest = guestSignService.getGuestOrCreate(request.getUserAgent());
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, CookieUtil.getCookieWithToken("AccessToken",

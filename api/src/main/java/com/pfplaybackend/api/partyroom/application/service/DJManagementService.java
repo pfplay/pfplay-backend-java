@@ -32,7 +32,6 @@ public class DJManagementService {
 
     @Transactional
     public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
-        System.out.println("EnqueueDj");
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         // ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom();
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
