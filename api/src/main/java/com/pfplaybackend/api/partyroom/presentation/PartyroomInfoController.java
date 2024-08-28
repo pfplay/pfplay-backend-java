@@ -75,7 +75,9 @@ public class PartyroomInfoController {
     @GetMapping("/{partyroomId}/setup")
     public ResponseEntity<?> getSetupInfo(@PathVariable Long partyroomId) {
         List<PartymemberSetupDto> memberDto = partyroomInfoService.getPartymembersForSetup(new PartyroomId(partyroomId));
+
         DisplayDto displayDto = displayInfoService.getDisplayInfo();
+
         return ResponseEntity.ok().body(QueryPartyroomSetupResponse.from(memberDto, displayDto));
     }
 
