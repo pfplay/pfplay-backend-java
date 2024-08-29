@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.config.websocket.event.listener;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.event.manager.SessionCacheManager;
+import com.pfplaybackend.api.config.websocket.manager.SessionCacheManager;
 import com.pfplaybackend.api.config.websocket.exception.SessionException;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.config.websocket.event.manager;
+package com.pfplaybackend.api.config.websocket.manager;
 import com.pfplaybackend.api.user.domain.value.UserId;
 
 public interface SessionCacheManager {
