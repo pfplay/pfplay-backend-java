@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.partyroom.application.service.chat;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.config.websocket.event.manager.SessionCacheManager;
 import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
@@ -12,12 +12,10 @@ import com.pfplaybackend.api.partyroom.presentation.dto.IncomingGroupChatMessage
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -25,19 +23,19 @@ public class PartyroomChatService {
 
     private static final Logger logger = LoggerFactory.getLogger(PartyroomChatService.class);
 
-    private final RedisTemplate<String, Object> redisTemplate;
     private final RedisMessagePublisher messagePublisher;
+    private final SessionCacheManager sessionCacheManager;
 
     private final ObjectMapper objectMapper;
 
     public void sendMessage(String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) {
-        // TODO Get sender's information from DBMS or Cache By sessionId(String)
-        // TODO Create OutgoingChatMessage for publish
-        Object object = redisTemplate.opsForValue().get(sessionId);
-        if (object == null) {
-            throw ExceptionCreator.create(PartyroomException.NOT_FOUND_SESSION);
+        Optional<Object> optional = sessionCacheManager.getSessionCache(sessionId);
+
+        if (optional.isEmpty()) {
+            throw ExceptionCreator.create(PartyroomException.CACHE_MISSED_SESSION);
         }
 
+        final Object object = optional.get();
         if (object instanceof Map) {
             try {
                 PartyroomSessionDto sessionDto = objectMapper.convertValue(object, PartyroomSessionDto.class);
