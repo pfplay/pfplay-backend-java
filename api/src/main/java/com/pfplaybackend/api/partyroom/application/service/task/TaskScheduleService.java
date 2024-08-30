@@ -11,10 +11,16 @@ import java.util.concurrent.TimeUnit;
 public class TaskScheduleService {
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public void setKeyWithExpiration(String key, Object value, long timeout, TimeUnit timeUnit) {
-        // For Expiration Event
-        redisTemplate.opsForValue().set("TASK:WAIT:" + key, "", timeout, timeUnit);
-        // For Task Arguments
-        redisTemplate.opsForValue().set("WAIT:ARGS:" + key, value);
+    private final String TASK_PREFIX = "TASK:WAIT:";
+    private final String ARGS_PREFIX = "WAIT:ARGS:";
+
+    public void setKeyWithExpiration(String suffix, Object value, long timeout, TimeUnit timeUnit) {
+        redisTemplate.opsForValue().set(TASK_PREFIX + suffix, "", timeout, timeUnit);
+        redisTemplate.opsForValue().set(ARGS_PREFIX + suffix, value);
+    }
+
+    public void deleteKey(String suffix) {
+        redisTemplate.delete(TASK_PREFIX + suffix);
+        redisTemplate.delete(ARGS_PREFIX  + suffix);
     }
 }
