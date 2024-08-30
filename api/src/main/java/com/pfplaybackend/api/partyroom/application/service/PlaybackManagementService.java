@@ -53,7 +53,11 @@ public class PlaybackManagementService {
         PartyroomId partyroomId = playback.getPartyroomId();
         UserId userId = playback.getUserId();
         TaskWaitMessage taskWaitMessage = new TaskWaitMessage(partyroomId, userId);
-        scheduleService.setKeyWithExpiration(UUID.randomUUID().toString(), taskWaitMessage, seconds, TimeUnit.SECONDS);
+        scheduleService.setKeyWithExpiration(String.valueOf(partyroomId.getId()), taskWaitMessage, seconds, TimeUnit.SECONDS);
+    }
+
+    private void cancelTask(PartyroomId partyroomId) {
+        scheduleService.deleteKey(String.valueOf(partyroomId.getId()));
     }
 
     @Transactional
@@ -64,6 +68,7 @@ public class PlaybackManagementService {
 
     @Transactional
     public void skip(PartyroomId partyroomId) {
+        cancelTask(partyroomId);
         tryProceed(partyroomId);
     }
 

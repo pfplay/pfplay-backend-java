@@ -18,7 +18,9 @@ public class PartyroomRegulationService {
     private final PartyroomAccessService partyroomAccessService;
 
     public void updateGrade(PartyroomId partyroomId, PartymemberId partymemberId, UpdateMemberGradeRequest request) {
-
+        // TODO
+        // Exception 1. 타겟 멤버의 Grade 보다 높은가?
+        // Exception 2. 호츨 멤버의 Grade 를 초과했는가?
     }
 
     public void updatePenalty(PartyroomId partyroomId, PartymemberId partymemberId, UpdateMemberPenaltyRequest request) {
