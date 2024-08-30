@@ -9,6 +9,7 @@ import com.pfplaybackend.api.partyroom.presentation.payload.request.AddDjRequest
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -28,6 +29,7 @@ public class DjManagementController {
      * @param request
      */
     @PostMapping("/{partyroomId}/djs")
+    @PreAuthorize("hasAnyRole('ROLE_MEMBER')")
     public ResponseEntity<?> enqueueDj(@PathVariable Long partyroomId,
                                        @RequestBody AddDjRequest request) {
         djManagementService.enqueueDj(new PartyroomId(partyroomId), new PlaylistId(request.getPlaylistId()));

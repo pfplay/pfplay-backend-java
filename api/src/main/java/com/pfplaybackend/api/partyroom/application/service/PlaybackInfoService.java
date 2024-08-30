@@ -6,6 +6,7 @@ import com.pfplaybackend.api.partyroom.application.dto.MusicDto;
 import com.pfplaybackend.api.partyroom.application.peer.MusicQueryPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PlaybackConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PlaybackData;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
@@ -24,10 +25,9 @@ public class PlaybackInfoService {
     private final PlaybackConverter playbackConverter;
     private final MusicQueryPeerService musicQueryService;
 
-    public Playback getNextPlaybackInPlaylist(PartyroomId partyroomId, PlaylistId playlistId) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        MusicDto musicDto = musicQueryService.getFirstMusic(playlistId);
-        return Playback.create(partyroomId , partyContext.getUserId(), musicDto);
+    public Playback getNextPlaybackInPlaylist(PartyroomId partyroomId, Dj dj) {
+        MusicDto musicDto = musicQueryService.getFirstMusic(dj.getPlaylistId());
+        return Playback.create(partyroomId , dj.getUserId(), musicDto);
     }
 
     public void updatePlaybackAggregation(Playback playback, List<Integer> deltaRecord) {

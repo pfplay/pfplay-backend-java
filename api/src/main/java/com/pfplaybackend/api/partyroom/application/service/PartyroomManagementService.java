@@ -73,15 +73,9 @@ public class PartyroomManagementService {
     }
 
     @Transactional
-    public void updatePlaybackActivationStatus(PartyroomId partyroomId, boolean isPlaybackActivated) {
-        // TODO
-
-        if(isPlaybackActivated) {
-
-        }else {
-            // Publish Message
-            messagePublisher.publish(MessageTopic.DEACTIVATION, new DeactivationMessage(partyroomId, MessageTopic.DEACTIVATION));
-        }
+    public void updatePlaybackDeactivation(PartyroomId partyroomId) {
+        // TODO Update PartyroomData
+        messagePublisher.publish(MessageTopic.DEACTIVATION, new DeactivationMessage(partyroomId, MessageTopic.DEACTIVATION));
     }
 
     @Transactional

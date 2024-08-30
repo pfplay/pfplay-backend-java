@@ -39,6 +39,7 @@ public class DJManagementService {
 
         boolean isPostActivationProcessingRequired = !partyroom.isPlaybackActivated();
         try {
+            // TODO Change Specific Exception
             if(partyroom.isQueueClosed()) throw new Exception();
         }catch (Exception e) {
             System.out.println(Arrays.toString(e.getStackTrace()));

@@ -27,9 +27,6 @@ public class GuestSignController {
             @RequestBody SignGuestRequest request,
             HttpServletResponse response
     ) {
-
-        // 401로 들어온다.
-        System.out.println(response.getStatus());
         Guest guest = guestSignService.getGuestOrCreate(request.getUserAgent());
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, CookieUtil.getCookieWithToken("AccessToken",
