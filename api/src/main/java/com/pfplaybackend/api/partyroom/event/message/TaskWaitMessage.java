@@ -1,8 +1,7 @@
 package com.pfplaybackend.api.partyroom.event.message;
 
-import com.pfplaybackend.api.partyroom.application.dto.PlaybackDto;
-import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlaybackMessage {
+public class TaskWaitMessage {
     private PartyroomId partyroomId;
-    private MessageTopic eventType;
-    private long memberId;
-    private PlaybackDto playback;
+    private UserId userId;
 }

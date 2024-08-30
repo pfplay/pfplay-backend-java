@@ -20,7 +20,6 @@ public class AggregationTopicListener implements MessageListener {
         String jsonstring = new String(message.getBody());
         try {
             AggregationMessage aggregationMessage = objectMapper.readValue(jsonstring, AggregationMessage.class);
-            System.out.println(aggregationMessage);
             messageSender.sendToGroup(aggregationMessage.getPartyroomId().getId(), aggregationMessage);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
