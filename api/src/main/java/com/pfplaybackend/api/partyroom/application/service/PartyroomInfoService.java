@@ -131,7 +131,6 @@ public class PartyroomInfoService {
 
     public void getSummaryInfo(PartyroomId partyroomId) {
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-        System.out.println(partyroomData);
         // 파티원의 UserId 추출
         List<UserId> partymemberUserIds = partyroomData.getPartymemberDataList().stream().map(PartymemberData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettings = userProfileService.getUsersProfileSetting(partymemberUserIds);
