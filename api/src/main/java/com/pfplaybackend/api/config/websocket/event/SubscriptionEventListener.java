@@ -40,6 +40,5 @@ public class SubscriptionEventListener implements ApplicationListener<SessionSub
         sessionData.put("memberId", dto.getMemberId());
         assert sessionId != null;
         redisTemplate.opsForValue().set(sessionId, sessionData);
-        System.out.println("Session ID: " + sessionId + " has subscribed to " + destination);
     }
 }
