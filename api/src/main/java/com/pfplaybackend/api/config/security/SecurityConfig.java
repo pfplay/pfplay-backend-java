@@ -62,7 +62,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/api/v1/users/members/sign/**",
                                 "/api/v1/users/guests/sign/**",
-                                "/api/v1/partyrooms/shared-link/redirect/**").permitAll()
+                                "/api/v1/partyrooms/link/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
