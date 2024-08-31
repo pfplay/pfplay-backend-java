@@ -24,13 +24,13 @@ public class PartyroomRegulationController {
     @PutMapping("/{partyroomId}/partymembers/{partymemberId}/grade")
     public void updateMemberGrade(@PathVariable("partyroomId") long partyroomId,
                             @PathVariable("partymemberId") long partymemberId,
-                            UpdateMemberGradeRequest request) {
+                            @RequestBody UpdateMemberGradeRequest request) {
         partyroomRegulationService.updateGrade(new PartyroomId(partyroomId), new PartymemberId(partymemberId), request);
     }
 
     @PutMapping("/{partyroomId}/partymembers/{partymemberId}/penalties")
     public void updateMemberPenalty(@PathVariable("partyroomId") long partyroomId, @PathVariable("partymemberId") long partymemberId,
-                             UpdateMemberPenaltyRequest request) {
+                                    @RequestBody UpdateMemberPenaltyRequest request) {
         partyroomRegulationService.updatePenalty(new PartyroomId(partyroomId), new PartymemberId(partymemberId), request);
     }
 }

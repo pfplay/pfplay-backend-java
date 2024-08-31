@@ -6,11 +6,15 @@ import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.Instant;
 import java.time.LocalTime;
 
 @Getter
+@DynamicInsert
+@DynamicUpdate
 @Table(name = "PLAYBACK")
 @Entity
 public class PlaybackData extends BaseEntity {

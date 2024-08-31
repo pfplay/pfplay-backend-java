@@ -5,15 +5,18 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
+import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 
+
 @Getter
+@DynamicInsert
+@DynamicUpdate
 @Table(
         name = "PARTYMEMBER",
         indexes = {
