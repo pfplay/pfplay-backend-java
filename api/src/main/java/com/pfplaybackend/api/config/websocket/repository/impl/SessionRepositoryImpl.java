@@ -1,7 +1,7 @@
-package com.pfplaybackend.api.partyroom.repository.impl;
+package com.pfplaybackend.api.config.websocket.repository.impl;
 
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomSessionData;
-import com.pfplaybackend.api.partyroom.repository.custom.SessionRepository;
+import com.pfplaybackend.api.config.websocket.domain.entity.data.PartyroomSessionData;
+import com.pfplaybackend.api.config.websocket.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -17,8 +17,7 @@ public class SessionRepositoryImpl implements SessionRepository {
         return Optional.ofNullable((PartyroomSessionData) redisTemplate.opsForValue().get(sessionId));
     }
 
-    public PartyroomSessionData savePartyroomSessionData(PartyroomSessionData partyroomSessionData) {
-        String sessionId = partyroomSessionData.getSessionId();
+    public PartyroomSessionData savePartyroomSessionData(String sessionId, PartyroomSessionData partyroomSessionData) {
         redisTemplate.opsForValue().set(sessionId, partyroomSessionData);
         return partyroomSessionData;
     }
