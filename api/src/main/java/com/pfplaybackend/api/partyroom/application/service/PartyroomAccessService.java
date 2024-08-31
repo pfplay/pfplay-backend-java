@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Optional;
@@ -34,8 +35,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PartyroomAccessService {
-    @Value("${shared-link.partyroom.web-uri}")
-    private String WEB_SERVER_ADDRESS;
+    @Value("${shared-link.partyroom.web-page-url}")
+    private String WEB_PAGE_URL;
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
@@ -137,6 +138,9 @@ public class PartyroomAccessService {
     public URI getRedirectUri(String linkDomain) {
         PartyroomData partyroomData = partyroomRepository.findByLinkDomain(linkDomain)
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        return URI.create(WEB_SERVER_ADDRESS + "/" + partyroomData.getPartyroomId());
+        return UriComponentsBuilder
+                .fromHttpUrl(WEB_PAGE_URL)
+                .queryParam("partyroomId", partyroomData.getId())
+                .build().toUri();
     }
 }
