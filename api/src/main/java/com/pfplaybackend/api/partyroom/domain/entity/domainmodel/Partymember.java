@@ -64,4 +64,9 @@ public class Partymember {
         this.enteredAt = LocalDateTime.now();
         return this;
     }
+
+    public Partymember updateGrade(GradeType gradeType) {
+        this.gradeType = gradeType;
+        return this;
+    }
 }

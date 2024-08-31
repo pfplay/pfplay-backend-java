@@ -51,6 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if(jwtValidator.isTokenValid(accessToken)) {
                     checkAccessTokenAndAuthentication(accessToken);
                 }else {
+                    // TODO 401 리턴일 때, '토큰 만료'인지 '토큰 부재(또는 부적합)'인지 여부를 판단할 수 있어야 한다.
                     throw new AuthenticationServiceException("Token is not Valid");
                 }
             }catch (AuthenticationException e) {
