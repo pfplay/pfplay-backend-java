@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class PartyroomChatController implements PartyroomChatApi {
-    private final PartyroomChatService partyroomSocketService;
+    private final PartyroomChatService partyroomChatService;
 
     @Operation(summary = "Send a message to WebSocket topic")
     @MessageMapping("/groups/{chatroomId}/send")
     public ResponseEntity<?> sendGroupMessage(@Header("simpSessionId") String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) {
         // chatroomId == partyroomId
-        partyroomSocketService.sendMessage(sessionId, incomingGroupChatMessage);
+        partyroomChatService.sendMessage(sessionId, incomingGroupChatMessage);
         return ResponseEntity.ok(ApiCommonResponse.success("OK"));
     }
 

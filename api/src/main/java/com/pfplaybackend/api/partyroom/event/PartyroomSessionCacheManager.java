@@ -39,12 +39,22 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
         redisTemplate.delete(sessionId);
     }
 
+    @Transactional(readOnly = true)
+    public Optional<Object> getSessionCache(String sessionId) {
+        Object object =  redisTemplate.opsForValue().get(sessionId);
+        if (object == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(object);
+    }
+
     private Optional<PartyroomSessionDto> createSessionData(String sessionId, UserId userId) {
         Optional<PartymemberData> data = partymemberRepository.findByUserId(userId);
         if (data.isPresent()) {
             PartyroomId partyroomId = data.get().getPartyroomData().getPartyroomId();
             long memberId = data.get().getId();
-            return Optional.of(PartyroomSessionDto.create(sessionId, userId, partyroomId, memberId));
+            return Optional.of(new PartyroomSessionDto(sessionId, userId, partyroomId, memberId));
         }
         return Optional.empty();
     }
