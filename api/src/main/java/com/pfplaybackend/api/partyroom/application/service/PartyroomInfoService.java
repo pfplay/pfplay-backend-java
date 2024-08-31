@@ -9,6 +9,7 @@ import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomSessionData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
@@ -147,5 +148,28 @@ public class PartyroomInfoService {
         }else {
             return Optional.empty();
         }
+    }
+
+    @Transactional
+    public Optional<PartyroomId> getPartyroomId(UserId userId) {
+        Optional<PartyroomIdDto> optional = partyroomRepository.getPartyroomDataWithUserId(userId);
+        if(optional.isPresent()) {
+            PartyroomId partyroomId = optional.get().getPartyroomId();
+            return Optional.of(partyroomId);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Transactional
+    public PartyroomSessionDto saveSession(String sessionId, UUID uid, PartyroomId partyroomId) {
+        UserId userId = UserId.create(uid);
+        return partyroomRepository.savePartyroomSession(
+                new PartyroomSessionDto(
+                        sessionId,
+                        userId,
+                        partyroomId
+                )
+        );
     }
 }

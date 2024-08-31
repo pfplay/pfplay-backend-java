@@ -6,9 +6,13 @@ import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.OutgoingGroupChatMessage;
 import com.pfplaybackend.api.partyroom.presentation.dto.IncomingGroupChatMessage;
+import jakarta.persistence.Cacheable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 import java.util.Map;
 
