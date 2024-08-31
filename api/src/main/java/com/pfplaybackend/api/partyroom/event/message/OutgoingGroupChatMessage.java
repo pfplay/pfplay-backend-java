@@ -1,8 +1,7 @@
 package com.pfplaybackend.api.partyroom.event.message;
 
+import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
-import com.pfplaybackend.api.partyroom.domain.enums.MotionType;
-import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,12 +19,11 @@ public class OutgoingGroupChatMessage {
     private Map<String, Object> member;
     private String message;
 
-    public static OutgoingGroupChatMessage from(Map<String, Object> map, String message) {
-        Integer partyroomId = (Integer) map.get("partyroomId");
+    public static OutgoingGroupChatMessage from(PartyroomSessionDto sessionDto, String message) {
         Map<String, Object> member = new HashMap<>();
-        member.put("memberId", map.get("memberId"));
+        member.put("memberId", sessionDto.getMemberId());
         return new OutgoingGroupChatMessage(
-                new PartyroomId(partyroomId),
+                sessionDto.getPartyroomId(),
                 MessageTopic.CHAT,
                 member,
                 message
