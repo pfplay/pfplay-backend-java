@@ -192,8 +192,4 @@ public class Partyroom {
                 ).build();
         return this;
     }
-
-    public String getSharedLink(String prefix) {
-        return prefix + "/" + this.linkDomain;
-    }
 }
