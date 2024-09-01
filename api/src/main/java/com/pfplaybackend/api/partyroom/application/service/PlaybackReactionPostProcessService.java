@@ -34,6 +34,9 @@ public class PlaybackReactionPostProcessService {
     public void postProcess(ReactionPostProcessDto postProcessDto, PartyroomId partyroomId, PlaybackId playbackId, PartymemberId partymemberId) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         Playback playback = playbackInfoService.getPlaybackById(playbackId);
+        if(postProcessDto.isGrabStatusChanged()) {
+            grabMusic(partyContext.getUserId(), playback);
+        }
         if(postProcessDto.isDjActivityScoreChanged()) {
             updateDjActivityScore(playback.getUserId(), postProcessDto.getDeltaScore());
         }
@@ -43,9 +46,6 @@ public class PlaybackReactionPostProcessService {
         }
         if(postProcessDto.isMotionChanged()) {
             publishMotionChangedEvent(partyroomId, postProcessDto.getDeterminedMotionType(), partymemberId);
-        }
-        if(postProcessDto.isGrabStatusChanged()) {
-            grabMusic(partyContext.getUserId(), playback);
         }
     }
 
@@ -69,6 +69,7 @@ public class PlaybackReactionPostProcessService {
     }
 
     public void grabMusic(UserId userId, Playback playback) {
+        // TODO 이미 동일한 LinkId를 보유하고 있다면 예외 발생
         grabMusicService.grabMusic(userId, playback.getLinkId());
     }
 }
