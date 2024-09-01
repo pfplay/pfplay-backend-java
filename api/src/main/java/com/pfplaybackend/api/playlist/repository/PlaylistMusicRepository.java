@@ -10,12 +10,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlaylistMusicRepository extends JpaRepository<PlaylistMusicData, Long>, PlaylistMusicRepositoryCustom {
     Page<PlaylistMusicData> findByPlaylistDataIdOrderByOrderNumber(Pageable pageable, Long playlistDataId);
     List<PlaylistMusicData> findAllByPlaylistDataId(Long playlistDataId);
     double countByPlaylistDataId(Long playlistDataId);
 
+    Optional<PlaylistMusicData> findByPlaylistDataIdAndLinkId(Long playlistDataId, String linkId);
     PlaylistMusicData findFirstByLinkId(String linkId);
 
     @Modifying
