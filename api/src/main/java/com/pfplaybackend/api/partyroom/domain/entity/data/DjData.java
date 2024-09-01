@@ -6,8 +6,12 @@ import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
+@DynamicInsert
+@DynamicUpdate
 @Table(
         name = "DJ",
         indexes = {
