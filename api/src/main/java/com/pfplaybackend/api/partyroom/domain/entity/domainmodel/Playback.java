@@ -2,7 +2,6 @@ package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
 import com.pfplaybackend.api.partyroom.application.dto.MusicDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
 import lombok.Getter;
