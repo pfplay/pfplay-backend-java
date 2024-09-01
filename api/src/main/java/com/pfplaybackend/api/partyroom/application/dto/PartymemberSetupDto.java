@@ -11,13 +11,16 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class PartymemberSetupDto {
+    // FIXME To be deprecated
     private String uid;
+    // FIXME To be deprecated
     private AuthorityTier authorityTier;
     private long memberId;
     private GradeType gradeType;
     private String nickname;
     private String avatarBodyUri;
     private String avatarFaceUri;
+    private String avatarIconUri;
     private int combinePositionX;
     private int combinePositionY;
 
@@ -30,6 +33,7 @@ public class PartymemberSetupDto {
                 profileSettingDto.getNickname(),
                 profileSettingDto.getAvatarBodyUri(),
                 profileSettingDto.getAvatarFaceUri(),
+                profileSettingDto.getAvatarIconUri(),
                 profileSettingDto.getCombinePositionX(),
                 profileSettingDto.getCombinePositionY()
         );

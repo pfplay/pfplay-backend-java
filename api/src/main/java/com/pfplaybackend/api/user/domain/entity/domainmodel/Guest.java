@@ -58,6 +58,7 @@ public class Guest extends User {
                 .introduction(this.profile.getIntroduction())
                 .avatarBodyUri(this.profile.getAvatarBodyUri().getAvatarBodyUri())
                 .avatarFaceUri(this.profile.getAvatarFaceUri().getAvatarFaceUri())
+                .avatarIconUri(this.profile.getAvatarIconUri().getAvatarIconUri())
                 .walletAddress(this.profile.getWalletAddress().getWalletAddress())
                 .build();
     }

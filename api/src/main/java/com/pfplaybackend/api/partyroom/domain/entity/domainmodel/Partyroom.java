@@ -171,7 +171,7 @@ public class Partyroom {
                         return partymember;
                     }
                 }).toList();
-        return this.partymembers.stream().filter(partymember -> !partymember.isActive()).findAny().orElseThrow();
+        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findAny().orElseThrow();
     }
 
     public boolean isUserInactiveMember(UserId userId) {
@@ -206,5 +206,9 @@ public class Partyroom {
                     }
                 }).toList();
         return this;
+    }
+
+    public Partymember getPartymember(PartymemberId partymemberId) {
+        return this.partymembers.stream().filter(partymember -> partymember.getId() == partymemberId.getId()).findAny().orElseThrow();
     }
 }
