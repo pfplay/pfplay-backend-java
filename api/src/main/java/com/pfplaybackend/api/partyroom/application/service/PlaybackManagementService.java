@@ -1,5 +1,9 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
+import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.application.dto.PlaybackDto;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.partyroom.application.service.task.TaskScheduleService;
@@ -12,13 +16,16 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
+import com.pfplaybackend.api.partyroom.domain.service.CrewDomainService;
 import com.pfplaybackend.api.partyroom.domain.service.DjDomainService;
+import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.TaskWaitMessage;
 import com.pfplaybackend.api.partyroom.event.message.PlaybackMessage;
+import com.pfplaybackend.api.partyroom.exception.GradeException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -47,6 +54,8 @@ public class PlaybackManagementService {
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final TaskScheduleService scheduleService;
+    private final CrewDomainService domainService;
+    private final CrewDomainService crewDomainService;
 
     private void scheduleTask(Playback playback) {
         long seconds = playbackDomainService.convertToSeconds(playback.getDuration());
@@ -68,6 +77,12 @@ public class PlaybackManagementService {
 
     @Transactional
     public void skip(PartyroomId partyroomId) {
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        ActivePartyroomDto activePartyroomDto = partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId()).orElseThrow();
+        PartyroomData partyroomData = partyroomRepository.findById(activePartyroomDto.getId()).orElseThrow();
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        if(crewDomainService.isBelowManagerGrade(partyroom, partyContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
+
         cancelTask(partyroomId);
         tryProceed(partyroomId);
     }

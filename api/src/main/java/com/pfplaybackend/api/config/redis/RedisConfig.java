@@ -69,8 +69,8 @@ public class RedisConfig {
         container.addMessageListener(new PartyroomAccessTopicListener(simpMessageSender, objectMapper), new ChannelTopic("access"));
         container.addMessageListener(new MotionTopicListener(simpMessageSender, objectMapper), new ChannelTopic("motion"));
         container.addMessageListener(new AggregationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("aggregation"));
-        container.addMessageListener(new PartyroomNoticeTopicListener(simpMessageSender, objectMapper), new ChannelTopic("regulation"));
-        container.addMessageListener(new PartyroomRegulationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("notice"));
+        container.addMessageListener(new PartyroomNoticeTopicListener(simpMessageSender, objectMapper), new ChannelTopic("notice"));
+        container.addMessageListener(new PartyroomRegulationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("regulation"));
         container.addMessageListener(new PlaybackTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback"));
         container.addMessageListener(new DeactivationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("deactivation"));
         // Key Expiration Event
