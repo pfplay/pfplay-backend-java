@@ -37,35 +37,49 @@ public class PlaybackReactionService {
         // TODO [Check] MyActivePartyroom.getId() == partyroomId
         PlaybackId playbackId = myActivePartyroom.getCurrentPlaybackId();
         // Find whether existing history exists
-        ReactionPostProcessDto reactionPostProcessDto = getReactionPostProcess(partyContext, playbackId, reactionType);
+        PlaybackReactionHistoryData historyData = getValidReactionHistoryData(partyContext, playbackId);
+        ReactionState existingState = getExistingState(historyData);
+        ReactionState targetState = getTargetState(existingState, reactionType);
+
+        ReactionPostProcessDto reactionPostProcessDto = executeProcess(historyData, existingState, targetState);
         // Get PartymemberId for Event Propagation
         Optional<Partymember> optional  = partyroomInfoService.getPartymemberByUserId(partyroomId, partyContext.getUserId());
         Partymember partymember = optional.orElseThrow();
         playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId, new PartymemberId(partymember.getId()));
+
+        // TODO
+//        System.out.println(targetState.isLiked());
+//        System.out.println(targetState.isDisliked());
+//        System.out.println(targetState.isGrabbed());
     }
 
-    // FIXME Change Method Name
-    private ReactionPostProcessDto getReactionPostProcess(PartyContext partyContext, PlaybackId playbackId, ReactionType reactionType) {
+    private PlaybackReactionHistoryData getValidReactionHistoryData(PartyContext partyContext, PlaybackId playbackId) {
         Optional<PlaybackReactionHistoryData> optional = findPrevHistoryData(playbackId, partyContext.getUserId());
         if(optional.isPresent()) {
-            PlaybackReactionHistoryData historyData = optional.orElseThrow();
-            ReactionState existingState = playbackReactionDomainService.getReactionStateByHistory(historyData);
-            return executeProcess(historyData, existingState, reactionType);
+            return optional.orElseThrow();
         }else {
-            PlaybackReactionHistoryData newHistoryData = new PlaybackReactionHistoryData(partyContext.getUserId(), playbackId);
-            ReactionState existingState = ReactionState.createBaseState();
-            return executeProcess(newHistoryData, existingState, reactionType);
+            return new PlaybackReactionHistoryData(partyContext.getUserId(), playbackId);
         }
     }
 
+    private ReactionState getExistingState(PlaybackReactionHistoryData historyData) {
+        Optional<Long> optional = Optional.ofNullable(historyData.getId());
+        if(optional.isPresent()) {
+            return playbackReactionDomainService.getReactionStateByHistory(historyData);
+        }else {
+            return ReactionState.createBaseState();
+        }
+    }
+
+    private ReactionState getTargetState(ReactionState existingState, ReactionType reactionType) {
+        return playbackReactionDomainService.getTargetReactionState(existingState, reactionType);
+    }
+
     // FIXME Change Method Name
-    private ReactionPostProcessDto executeProcess(PlaybackReactionHistoryData historyData, ReactionState existingState, ReactionType reactionType) {
-        // Calculate to get TargetState
-        ReactionState targetState = playbackReactionDomainService.getTargetReactionState(existingState, reactionType);
-        // Determine 'ReactionPostProcessDto' by diff existingState with targetState
-        // Save(Update) History Record
+    private ReactionPostProcessDto executeProcess(PlaybackReactionHistoryData historyData,
+                                                  ReactionState existingState,
+                                                  ReactionState targetState) {
         playbackReactionHistoryRepository.save(historyData.applyReactionState(targetState));
-        // Delegate Post Processor
         return playbackReactionDomainService.determinePostProcessing(existingState, targetState);
     }
 
