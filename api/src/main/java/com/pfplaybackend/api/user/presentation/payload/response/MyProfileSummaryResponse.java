@@ -16,6 +16,7 @@ public class MyProfileSummaryResponse {
     private int combinePositionX;
     private int combinePositionY;
     private String avatarFaceUri;
+    private String avatarIconUri;
     private String walletAddress;
     private List<ActivitySummaryDto> activitySummaries;
 
@@ -27,6 +28,7 @@ public class MyProfileSummaryResponse {
                 .combinePositionX(profileSummaryDto.getCombinePositionX())
                 .combinePositionY(profileSummaryDto.getCombinePositionY())
                 .avatarFaceUri(profileSummaryDto.getAvatarFaceUri())
+                .avatarIconUri(profileSummaryDto.getAvatarIconUri())
                 .walletAddress(profileSummaryDto.getWalletAddress())
                 .activitySummaries(profileSummaryDto.getActivitySummaries())
                 .build();

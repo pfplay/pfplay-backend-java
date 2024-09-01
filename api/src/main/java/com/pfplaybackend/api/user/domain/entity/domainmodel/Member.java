@@ -166,9 +166,10 @@ public class Member extends User {
                 .nickname(this.profile.getNickname())
                 .introduction(this.profile.getIntroduction())
                 .avatarBodyUri(this.profile.getAvatarBodyUri().getAvatarBodyUri())
+                .avatarFaceUri(this.profile.getAvatarFaceUri().getAvatarFaceUri())
+                .avatarIconUri(this.profile.getAvatarIconUri().getAvatarIconUri())
                 .combinePositionX(this.profile.getCombinePositionX())
                 .combinePositionY(this.profile.getCombinePositionY())
-                .avatarFaceUri(this.profile.getAvatarFaceUri().getAvatarFaceUri())
                 .walletAddress(this.profile.getWalletAddress().getWalletAddress())
                 .activitySummaries(activitySummaries)
                 .build();

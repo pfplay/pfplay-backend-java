@@ -14,6 +14,7 @@ public class ProfileSummaryDto {
     private int combinePositionX;
     private int combinePositionY;
     private String avatarFaceUri;
+    private String avatarIconUri;
     private String walletAddress;
     private List<ActivitySummaryDto> activitySummaries;
 }

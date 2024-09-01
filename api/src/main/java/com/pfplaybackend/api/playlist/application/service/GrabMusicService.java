@@ -25,7 +25,7 @@ public class GrabMusicService {
     @Transactional
     public void grabMusic(UserId userId, String linkId) {
         // LinkId cannot be duplicated.
-        PlaylistMusicData targetPlaylistMusicData = playlistMusicRepository.findByLinkId(linkId);
+        PlaylistMusicData targetPlaylistMusicData = playlistMusicRepository.findFirstByLinkId(linkId);
         PlaylistData playlistData = playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST);
         AddMusicRequest request = new AddMusicRequest(
                 targetPlaylistMusicData.getName(),

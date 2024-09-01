@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
+import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
@@ -170,11 +171,11 @@ public class Partyroom {
                         return partymember;
                     }
                 }).toList();
-        return this.partymembers.stream().filter(partymember -> !partymember.isActive()).findAny().orElseThrow();
+        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findAny().orElseThrow();
     }
 
     public boolean isUserInactiveMember(UserId userId) {
-        return this.partymembers.stream().anyMatch(partymember -> partymember.getUserId().equals(userId)  && !partymember.isActive());
+        return this.partymembers.stream().anyMatch(partymember -> partymember.getUserId().equals(userId) && !partymember.isActive());
     }
 
     public boolean isUserBannedMember(UserId userId) {
@@ -191,5 +192,23 @@ public class Partyroom {
                         }).toList()
                 ).build();
         return this;
+    }
+
+    public Partyroom updateMemberGrade(PartymemberId partymemberId, GradeType gradeType) {
+        this.partymembers = new ImmutableList.Builder<Partymember>()
+                .addAll(this.partymembers)
+                .build()
+                .stream().map(partymember -> {
+                    if(partymember.getId() == (partymemberId.getId())) {
+                        return partymember.updateGrade(gradeType);
+                    }else {
+                        return partymember;
+                    }
+                }).toList();
+        return this;
+    }
+
+    public Partymember getPartymember(PartymemberId partymemberId) {
+        return this.partymembers.stream().filter(partymember -> partymember.getId() == partymemberId.getId()).findAny().orElseThrow();
     }
 }
