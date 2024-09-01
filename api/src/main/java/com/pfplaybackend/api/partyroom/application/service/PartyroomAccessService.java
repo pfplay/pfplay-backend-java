@@ -13,7 +13,6 @@ import com.pfplaybackend.api.partyroom.domain.enums.AccessType;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
-import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.AccessMessage;

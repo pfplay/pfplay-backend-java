@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public enum PenaltyException implements DomainException {
-    PERMANENT_EXPULSION("PNT-001", "Banned User",ForbiddenException .class);
+    PERMANENT_EXPULSION("PNT-001", "Banned User",ForbiddenException.class);
 
     private final String errorCode;
     private final String message;
