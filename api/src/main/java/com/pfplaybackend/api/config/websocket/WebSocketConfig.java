@@ -26,14 +26,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry brokerRegistry) {
-
-//        ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-//        taskScheduler.setPoolSize(1);
-//        taskScheduler.initialize();
-//
-//        brokerRegistry.enableSimpleBroker("/sub")
-//                .setHeartbeatValue(new long[]{3000, 3000})
-//                .setTaskScheduler(taskScheduler);
         brokerRegistry.enableSimpleBroker("/sub");
         brokerRegistry.setApplicationDestinationPrefixes("/pub");
         brokerRegistry.setUserDestinationPrefix("/user");
