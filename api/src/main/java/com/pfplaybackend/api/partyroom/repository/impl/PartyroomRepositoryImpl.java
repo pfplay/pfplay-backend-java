@@ -1,40 +1,20 @@
 package com.pfplaybackend.api.partyroom.repository.impl;
 
 import com.pfplaybackend.api.partyroom.application.dto.*;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.QPartymemberData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.QPartyroomData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.QPlaybackData;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
-import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
+import com.pfplaybackend.api.partyroom.domain.entity.data.*;
 import com.pfplaybackend.api.partyroom.repository.custom.PartyroomRepositoryCustom;
-import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
-import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistMusicData;
-import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.data.QActivityData;
-import com.pfplaybackend.api.user.domain.entity.data.QMemberData;
-import com.pfplaybackend.api.user.domain.entity.data.QProfileData;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
 
 public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
@@ -213,5 +193,24 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         (dto1, dto2) -> dto1
                 ))
                 .values());
+    }
+
+    @Override
+    public Optional<PartyroomIdDto> getPartyroomDataWithUserId(UserId userId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
+        PartyroomData partyroomData = queryFactory
+                .select(qPartymemberData.partyroomData)
+                .from(qPartymemberData)
+                .where(qPartymemberData.isActive.eq(true)
+                        .and(qPartymemberData.userId.eq(userId)))
+                .fetchOne();
+
+        PartyroomIdDto partyroomIdDto = null;
+        if (partyroomData != null) {
+            partyroomIdDto = new PartyroomIdDto(partyroomData.getPartyroomId());
+        }
+
+        return Optional.ofNullable(partyroomIdDto);
     }
 }

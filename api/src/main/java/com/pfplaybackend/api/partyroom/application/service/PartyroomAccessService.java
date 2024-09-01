@@ -22,17 +22,21 @@ import com.pfplaybackend.api.partyroom.exception.PenaltyException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PartyroomAccessService {
+    @Value("${shared-link.partyroom.web-page-url}")
+    private String WEB_PAGE_URL;
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
@@ -128,5 +132,15 @@ public class PartyroomAccessService {
         }
         // TODO 퇴장 대상이 DJQueue 에 존재하는지 여부 확인
         // eventPublisher.publish(MessageTopic.PARTYROOM_ACCESS, updatedPartyroom);
+    }
+
+    @Transactional(readOnly = true)
+    public URI getRedirectUri(String linkDomain) {
+        PartyroomData partyroomData = partyroomRepository.findByLinkDomain(linkDomain)
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        return UriComponentsBuilder
+                .fromHttpUrl(WEB_PAGE_URL)
+                .queryParam("partyroomId", partyroomData.getId())
+                .build().toUri();
     }
 }
