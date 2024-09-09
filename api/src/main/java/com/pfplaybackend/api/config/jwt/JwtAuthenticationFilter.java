@@ -1,7 +1,9 @@
 package com.pfplaybackend.api.config.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.config.jwt.enums.TokenClaim;
+import com.pfplaybackend.api.config.jwt.exception.JwtAuthenticationException;
 import com.pfplaybackend.api.config.jwt.handler.JwtAuthenticationFailureHandler;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
@@ -12,12 +14,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -46,17 +45,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         if(isNotSkipableURI(request.getRequestURI())) {
-            try {
-                final String accessToken = jwtValidator.extractAccessTokenFromCookie(request).orElseThrow(() -> new AuthenticationServiceException("Token does not exist"));
-                if(jwtValidator.isTokenValid(accessToken)) {
-                    checkAccessTokenAndAuthentication(accessToken);
-                }else {
-                    // TODO 401 리턴일 때, '토큰 만료'인지 '토큰 부재(또는 부적합)'인지 여부를 판단할 수 있어야 한다.
-                    throw new AuthenticationServiceException("Token is not Valid");
-                }
-            }catch (AuthenticationException e) {
-                jwtAuthenticationFailureHandler.onAuthenticationFailure(request, response, e);
+            final String accessToken = jwtValidator.extractAccessTokenFromCookie(request)
+                    .orElseThrow(() -> ExceptionCreator.create(JwtAuthenticationException.ACCESS_TOKEN_NOT_FOUND));
+
+            if (!jwtValidator.isTokenValid(accessToken)) {
+                throw ExceptionCreator.create(JwtAuthenticationException.ACCESS_TOKEN_INVALID);
             }
+
+            checkAccessTokenAndAuthentication(accessToken);
         }
         filterChain.doFilter(request, response);
     }
