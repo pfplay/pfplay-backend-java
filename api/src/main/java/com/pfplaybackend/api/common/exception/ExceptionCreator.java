@@ -10,4 +10,10 @@ ExceptionCreator {
         String message = domainException.getMessage();
         return (AbstractHTTPException) InstanceCreator.createInstance(domainException.getAClass(), errorCode, message);
     }
+
+    public static AbstractHTTPException create(SecurityException domainException) {
+        String errorCode = domainException.getErrorCode();
+        String message = domainException.getMessage();
+        return (AbstractHTTPException) InstanceCreator.createInstance(domainException.getAClass(), errorCode, message);
+    }
 }
