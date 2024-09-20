@@ -1,10 +1,9 @@
 package com.pfplaybackend.api.config.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.common.exception.ResponseHandler;
 import com.pfplaybackend.api.config.jwt.enums.TokenClaim;
 import com.pfplaybackend.api.config.jwt.exception.JwtAuthenticationException;
-import com.pfplaybackend.api.config.jwt.handler.JwtAuthenticationFailureHandler;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
 import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import jakarta.servlet.FilterChain;
@@ -20,10 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,30 +35,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/v1/users/members/sign",
             "/api/v1/users/guests/sign"
     ));
-    private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler = new JwtAuthenticationFailureHandler();
+
     private final JwtValidator jwtValidator;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
         if(isNotSkipableURI(request.getRequestURI())) {
-            final String accessToken = jwtValidator.extractAccessTokenFromCookie(request)
-                    .orElseThrow(() -> ExceptionCreator.create(JwtAuthenticationException.ACCESS_TOKEN_NOT_FOUND));
+            Optional<String> accessTokenOptional = jwtValidator.extractAccessTokenFromCookie(request);
+            if (accessTokenOptional.isEmpty()) {
+                ResponseHandler.setByException(response, JwtAuthenticationException.ACCESS_TOKEN_NOT_FOUND);
+                return;
+            }
+            final String accessToken = accessTokenOptional.get();
 
             if (!jwtValidator.isTokenValid(accessToken)) {
-                throw ExceptionCreator.create(JwtAuthenticationException.ACCESS_TOKEN_INVALID);
+                ResponseHandler.setByException(response, JwtAuthenticationException.ACCESS_TOKEN_INVALID);
+                return;
             }
-
-            checkAccessTokenAndAuthentication(accessToken);
+            saveAuthentication(jwtValidator.getDecodedJWT(accessToken));
         }
         filterChain.doFilter(request, response);
     }
 
     private boolean isNotSkipableURI(String requestURI) {
         return skipableURIs.stream().noneMatch(requestURI::startsWith);
-    }
-
-    private void checkAccessTokenAndAuthentication(String accessToken) throws ServletException, IOException {
-        saveAuthentication(jwtValidator.getDecodedJWT(accessToken));
     }
 
     private void saveAuthentication(DecodedJWT decodedJWT) {
