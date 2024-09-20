@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.config.jwt;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.pfplaybackend.api.common.exception.ResponseHandler;
+import com.pfplaybackend.api.common.HttpServletResponseHandler;
 import com.pfplaybackend.api.config.jwt.enums.TokenClaim;
 import com.pfplaybackend.api.config.jwt.exception.JwtAuthenticationException;
 import com.pfplaybackend.api.config.oauth2.dto.CustomAuthentication;
@@ -43,13 +43,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if(isNotSkipableURI(request.getRequestURI())) {
             Optional<String> accessTokenOptional = jwtValidator.extractAccessTokenFromCookie(request);
             if (accessTokenOptional.isEmpty()) {
-                ResponseHandler.setByException(response, JwtAuthenticationException.ACCESS_TOKEN_NOT_FOUND);
+                HttpServletResponseHandler.setByException(response, JwtAuthenticationException.ACCESS_TOKEN_NOT_FOUND);
                 return;
             }
             final String accessToken = accessTokenOptional.get();
 
             if (!jwtValidator.isTokenValid(accessToken)) {
-                ResponseHandler.setByException(response, JwtAuthenticationException.ACCESS_TOKEN_INVALID);
+                HttpServletResponseHandler.setByException(response, JwtAuthenticationException.ACCESS_TOKEN_INVALID);
                 return;
             }
             saveAuthentication(jwtValidator.getDecodedJWT(accessToken));

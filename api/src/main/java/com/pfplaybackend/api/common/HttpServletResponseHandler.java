@@ -1,7 +1,10 @@
-package com.pfplaybackend.api.common.exception;
+package com.pfplaybackend.api.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.common.exception.DomainException;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.common.exception.ExceptionResult;
+import com.pfplaybackend.api.common.exception.SecurityException;
 import com.pfplaybackend.api.common.exception.http.AbstractHTTPException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 @Slf4j
-public class ResponseHandler {
+public class HttpServletResponseHandler {
     private static void HttpExceptionToHttpResponse(HttpServletResponse response, AbstractHTTPException e) {
         log.error(e.getMessage());
 
