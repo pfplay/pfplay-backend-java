@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.config.security;
 
-import com.pfplaybackend.api.common.exception.GlobalExceptionHandlerFilter;
 import com.pfplaybackend.api.config.jwt.JwtAuthenticationEntryPoint;
 import com.pfplaybackend.api.config.jwt.JwtAuthenticationFilter;
 import com.pfplaybackend.api.config.jwt.JwtProvider;
@@ -77,7 +76,6 @@ public class SecurityConfig {
                         .failureHandler(oauth2LoginFaHandler())
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(globalExceptionHandlerFilter(), JwtAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 );
@@ -90,10 +88,6 @@ public class SecurityConfig {
 
     private JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(jwtValidator);
-    }
-
-    private GlobalExceptionHandlerFilter globalExceptionHandlerFilter() {
-        return new GlobalExceptionHandlerFilter();
     }
 
     private AuthenticationSuccessHandler oauth2LoginSuccessHandler() {
