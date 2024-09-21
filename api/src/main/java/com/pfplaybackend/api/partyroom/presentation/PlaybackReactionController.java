@@ -16,7 +16,7 @@ public class PlaybackReactionController {
 
     private final PlaybackReactionService playbackReactionService;
 
-    @PostMapping("/{partyroomId}/playback/reaction")
+    @PostMapping("/{partyroomId}/playbacks/reaction")
     public ResponseEntity<Void> reactToPlayback(
             @PathVariable Long partyroomId,
             @RequestBody ReactCurrentPlaybackRequest request) {
