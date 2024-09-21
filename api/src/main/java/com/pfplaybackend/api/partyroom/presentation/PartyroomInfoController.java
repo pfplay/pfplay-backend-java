@@ -40,7 +40,7 @@ public class PartyroomInfoController {
     public ResponseEntity<?> getPartyrooms() {
         List<PartyroomWithCrewDto> partyrooms = partyroomInfoService.getAllPartyrooms();
         Map<UserId, ProfileSettingDto> avatarSettings = partyroomInfoService.getPrimariesAvatarSettings(partyrooms);
-        return ResponseEntity.ok().body( QueryPartyroomListResponse.from(partyrooms, avatarSettings));
+        return ResponseEntity.ok().body(QueryPartyroomListResponse.from(partyrooms, avatarSettings));
     }
 
     /**

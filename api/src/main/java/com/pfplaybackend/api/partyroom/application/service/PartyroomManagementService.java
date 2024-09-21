@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
@@ -11,8 +12,10 @@ import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.DeactivationMessage;
+import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateDjQueueStatusRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +47,7 @@ public class PartyroomManagementService {
             // Create Partyroom
             PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
             partyroomDomainService.checkIsQualifiedToCreate(partyContext.getAuthorityTier());
+            // TODO 구현 필요
             partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
             Partyroom createdPartyroom = createPartyroom(request, StageType.GENERAL, partyContext.getUserId());
             // Enter Partyroom
@@ -61,6 +65,17 @@ public class PartyroomManagementService {
         PartyroomData savedPartyroomData = partyroomRepository.save(partyroomData);
         // Enter Partyroom
         return partyroomConverter.toDomain(savedPartyroomData);
+    }
+
+    @Transactional
+    public void updatePartyroom(PartyroomId partyroomId, UpdatePartyroomRequest request) {
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        PartyroomData partyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId()).orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        partyroomDomainService.checkIsHost(partyroom, partyContext.getUserId());
+        // TODO 구현 필요
+        partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
+        partyroomRepository.save(partyroomConverter.toData(partyroom.updateBaseInfo(request)));
     }
 
     @Transactional
