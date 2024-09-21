@@ -134,12 +134,16 @@ public class PartyroomInfoService {
     public QueryPartyroomSummaryResponse getSummaryInfo(PartyroomId partyroomId) {
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-        // Extract Current Djs
-        Playback playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
-        Crew djCrew = partyroom.getCrewByUserId(playback.getUserId()).orElseThrow();
-        UserId djUserId = djCrew.getUserId();
-        ProfileSettingDto profileSettingDto = userProfileService.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
-        return QueryPartyroomSummaryResponse.from(partyroom, djCrew, profileSettingDto);
+        if(partyroom.isPlaybackActivated()) {
+            // Extract Current Djs
+            Playback playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
+            Crew djCrew = partyroom.getCrewByUserId(playback.getUserId()).orElseThrow();
+            UserId djUserId = djCrew.getUserId();
+            ProfileSettingDto profileSettingDto = userProfileService.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
+            return QueryPartyroomSummaryResponse.from(partyroom, djCrew, profileSettingDto);
+        }else {
+            return QueryPartyroomSummaryResponse.from(partyroom, null, null);
+        }
     }
 
     @Transactional
