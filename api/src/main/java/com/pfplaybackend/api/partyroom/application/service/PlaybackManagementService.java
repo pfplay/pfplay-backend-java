@@ -87,6 +87,7 @@ public class PlaybackManagementService {
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         // FIXME Remove DjDomainService in Here!!!
         if(djDomainService.isExistDj(partyroom)) {
+            System.out.println("Dj 대기열이 비어있지 않음!");
             start(partyroom);
         }else{
             partyroomManagementService.updatePlaybackDeactivation(partyroomId);

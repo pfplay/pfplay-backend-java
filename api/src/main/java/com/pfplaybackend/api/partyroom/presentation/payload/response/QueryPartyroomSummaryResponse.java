@@ -29,7 +29,5 @@ public class QueryPartyroomSummaryResponse {
             return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
                     partyroom.getLinkDomain(), partyroom.getPlaybackTimeLimit(), null);
         }
-
-
     }
 }
