@@ -18,15 +18,15 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @DynamicUpdate
 @Table(
-        name = "PARTYMEMBER",
+        name = "CREW",
         indexes = {
-                @Index(name = "paytymember_partroom_id_IDX", columnList = "partyroom_id")
+                @Index(name = "crew_partroom_id_IDX", columnList = "partyroom_id")
         })
 @Entity
-public class PartymemberData extends BaseEntity {
+public class CrewData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "partymember_id")
+    @Column(name = "crew_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,15 +56,15 @@ public class PartymemberData extends BaseEntity {
     private LocalDateTime exitedAt;
 
     // 데이터 엔티티 생성자
-    public PartymemberData() {}
-    public PartymemberData(UserId userId, AuthorityTier authorityTier) {
+    public CrewData() {}
+    public CrewData(UserId userId, AuthorityTier authorityTier) {
         this.userId = userId;
         this.authorityTier = authorityTier;
     }
 
     @Builder
-    public PartymemberData(Long id, UserId userId, AuthorityTier authorityTier, GradeType gradeType,
-                           boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt) {
+    public CrewData(Long id, UserId userId, AuthorityTier authorityTier, GradeType gradeType,
+                    boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt) {
         this.id = id;
         this.userId = userId;
         this.authorityTier = authorityTier;
@@ -75,7 +75,7 @@ public class PartymemberData extends BaseEntity {
         this.exitedAt = exitedAt;
     }
 
-    public PartymemberData assignPartyroomData(PartyroomData partyroomData) {
+    public CrewData assignPartyroomData(PartyroomData partyroomData) {
         this.partyroomData = partyroomData;
         return this;
     }

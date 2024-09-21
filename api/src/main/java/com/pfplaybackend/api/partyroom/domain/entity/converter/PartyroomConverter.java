@@ -1,22 +1,21 @@
 package com.pfplaybackend.api.partyroom.domain.entity.converter;
 
 import com.pfplaybackend.api.partyroom.domain.entity.data.DjData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
+import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PartyroomConverter {
 
-    private final PartymemberConverter partymemberConverter;
+    private final CrewConverter crewConverter;
     private final DjConverter djConverter;
 
     public Partyroom toDomain(PartyroomData partyroomData) {
@@ -36,8 +35,8 @@ public class PartyroomConverter {
                 .build();
 
         // PartymemberData to Partymember
-        List<Partymember> partymembers = partyroomData.getPartymemberDataList().stream()
-                .map(partymemberConverter::toDomain)
+        List<Crew> crews = partyroomData.getCrewDataList().stream()
+                .map(crewConverter::toDomain)
                 .map(partymember -> partymember.assignPartyroomId(partyroom.getPartyroomId()))
                 .toList();
         // DjData to Dj
@@ -47,7 +46,7 @@ public class PartyroomConverter {
                 .toList();
 
         return partyroom
-                .assignPartymembers(partymembers)
+                .assignCrews(crews)
                 .assignDjs(djs);
     }
 
@@ -68,8 +67,8 @@ public class PartyroomConverter {
                 .build();
 
         // Partymember to PartymemberData
-        List<PartymemberData> partymemberDataList = partyroom.getPartymembers().stream()
-                .map(partymemberConverter::toData)
+        List<CrewData> crewDataList = partyroom.getCrews().stream()
+                .map(crewConverter::toData)
                 .map(partymemberData -> partymemberData.assignPartyroomData(partyroomData))
                 .toList();
         // Dj to DjData
@@ -79,7 +78,7 @@ public class PartyroomConverter {
                 .toList();
 
         return partyroomData
-                .assignPartymemberListData(partymemberDataList)
-                .assignDjListData(djDataList);
+                .assignCrewDataList(crewDataList)
+                .assignDjDataList(djDataList);
     }
 }

@@ -8,8 +8,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PartymemberDto {
-    Long memberId;
+public class CrewDto {
+    Long crewId;
     UserId userId;
     AuthorityTier authorityTier;
     GradeType gradeType;

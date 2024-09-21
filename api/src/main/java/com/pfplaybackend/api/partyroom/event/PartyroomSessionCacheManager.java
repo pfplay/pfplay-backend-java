@@ -2,11 +2,11 @@ package com.pfplaybackend.api.partyroom.event;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.config.websocket.manager.SessionCacheManager;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
+import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
 import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
-import com.pfplaybackend.api.partyroom.repository.PartymemberRepository;
+import com.pfplaybackend.api.partyroom.repository.CrewRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PartyroomSessionCacheManager implements SessionCacheManager {
     private final RedisTemplate<String, Object> redisTemplate;
-    private final PartymemberRepository partymemberRepository;
+    private final CrewRepository crewRepository;
 
     @Transactional
     public void saveSessionCache(String sessionId, UserId userId, String destination) {
@@ -45,16 +45,15 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
         if (object == null) {
             return Optional.empty();
         }
-
         return Optional.of(object);
     }
 
     private Optional<PartyroomSessionDto> createSessionData(String sessionId, UserId userId) {
-        Optional<PartymemberData> data = partymemberRepository.findByUserId(userId);
+        Optional<CrewData> data = crewRepository.findByUserId(userId);
         if (data.isPresent()) {
             PartyroomId partyroomId = data.get().getPartyroomData().getPartyroomId();
-            long memberId = data.get().getId();
-            return Optional.of(new PartyroomSessionDto(sessionId, userId, partyroomId, memberId));
+            long crewId = data.get().getId();
+            return Optional.of(new PartyroomSessionDto(sessionId, userId, partyroomId, crewId));
         }
         return Optional.empty();
     }

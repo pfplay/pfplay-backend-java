@@ -16,5 +16,5 @@ public class PartyroomSessionDto implements Serializable {
     private String sessionId;
     private UserId userId;
     private PartyroomId partyroomId;
-    private long memberId;
+    private long crewId;
 }

@@ -5,12 +5,11 @@ import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.application.dto.ReactionPostProcessDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.history.PlaybackReactionHistoryData;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.enums.ReactionType;
 import com.pfplaybackend.api.partyroom.domain.model.ReactionState;
 import com.pfplaybackend.api.partyroom.domain.service.PlaybackReactionDomainService;
-import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.repository.history.PlaybackReactionHistoryRepository;
@@ -42,10 +41,10 @@ public class PlaybackReactionService {
         ReactionState targetState = getTargetState(existingState, reactionType);
 
         ReactionPostProcessDto reactionPostProcessDto = executeProcess(historyData, existingState, targetState);
-        // Get PartymemberId for Event Propagation
-        Optional<Partymember> optional  = partyroomInfoService.getPartymemberByUserId(partyroomId, partyContext.getUserId());
-        Partymember partymember = optional.orElseThrow();
-        playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId, new PartymemberId(partymember.getId()));
+        // Get CrewId for Event Propagation
+        Optional<Crew> optional  = partyroomInfoService.getCrewByUserId(partyroomId, partyContext.getUserId());
+        Crew crew = optional.orElseThrow();
+        playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId, new CrewId(crew.getId()));
 
         // TODO
 //        System.out.println(targetState.isLiked());

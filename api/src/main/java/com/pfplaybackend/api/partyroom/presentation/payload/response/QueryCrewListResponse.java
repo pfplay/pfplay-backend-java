@@ -5,5 +5,5 @@ import lombok.Getter;
 
 @Getter
 @Data
-public class QueryPartymemberListResponse {
+public class QueryCrewListResponse {
 }

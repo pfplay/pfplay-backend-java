@@ -24,8 +24,8 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
     @Override
     public List<PartyroomDto> getAllPartyrooms() {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
+        QCrewData qCrewData = QCrewData.crewData;
         QPlaybackData qPlaybackData = QPlaybackData.playbackData;
 
         return queryFactory
@@ -38,7 +38,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         qPartyroomData.introduction,
                         qPartyroomData.isPlaybackActivated,
                         qPartyroomData.isQueueClosed,
-                        qPartymemberData.id.count().as("memberCount"),
+                        qCrewData.id.count().as("crewCount"),
                         Projections.constructor(PlaybackDto.class,
                                 qPlaybackData.id,
                                 qPlaybackData.linkId,
@@ -48,10 +48,10 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         )
                 ))
                 .from(qPartyroomData)
-                .leftJoin(qPartymemberData)
-                .on(qPartyroomData.eq(qPartymemberData.partyroomData)
-                        .and(qPartymemberData.isActive.eq(true))
-                        .and(qPartymemberData.isBanned.eq(false))
+                .leftJoin(qCrewData)
+                .on(qPartyroomData.eq(qCrewData.partyroomData)
+                        .and(qCrewData.isActive.eq(true))
+                        .and(qCrewData.isBanned.eq(false))
                 )
                 .leftJoin(qPlaybackData)
                 .on(qPlaybackData.id.eq(qPartyroomData.currentPlaybackId.id))
@@ -63,8 +63,8 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
     @Override
     public Optional<ActivePartyroomDto> getActivePartyroomByUserId(UserId userId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
+        QCrewData qCrewData = QCrewData.crewData;
 
         ActivePartyroomDto activePartyroomDto = queryFactory
                 .select(Projections.constructor(
@@ -74,102 +74,101 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         qPartyroomData.isQueueClosed,
                         qPartyroomData.currentPlaybackId
                 ))
-                .from(qPartymemberData)
-                .join(qPartymemberData.partyroomData, qPartyroomData)
-                .where(qPartymemberData.userId.eq(userId)
-                        .and(qPartymemberData.isActive.eq(true)))
+                .from(qCrewData)
+                .join(qCrewData.partyroomData, qPartyroomData)
+                .where(qCrewData.userId.eq(userId)
+                        .and(qCrewData.isActive.eq(true)))
                 .fetchOne();
 
         return Optional.ofNullable(activePartyroomDto);
     }
 
     @Override
-    public Optional<ActivePartyroomWithMemberDto> getMyActivePartyroomWithMemberIdByUserId(UserId userId) {
+    public Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewIdByUserId(UserId userId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
+        QCrewData qCrewData = QCrewData.crewData;
 
-        ActivePartyroomWithMemberDto activePartyroomWithMemberDto = queryFactory
+        ActivePartyroomWithCrewDto activePartyroomWithCrewDto = queryFactory
                 .select(Projections.constructor(
-                        ActivePartyroomWithMemberDto.class,
+                        ActivePartyroomWithCrewDto.class,
                         qPartyroomData.id,
                         qPartyroomData.isPlaybackActivated,
                         qPartyroomData.isQueueClosed,
                         qPartyroomData.currentPlaybackId,
-                        qPartymemberData.id.as("memberId")
+                        qCrewData.id.as("crewId")
                 ))
-                .from(qPartymemberData)
-                .join(qPartymemberData.partyroomData, qPartyroomData)
-                .where(qPartymemberData.userId.eq(userId)
-                        .and(qPartymemberData.isActive.eq(true)))
+                .from(qCrewData)
+                .join(qCrewData.partyroomData, qPartyroomData)
+                .where(qCrewData.userId.eq(userId)
+                        .and(qCrewData.isActive.eq(true)))
                 .fetchOne();
 
-        return Optional.ofNullable(activePartyroomWithMemberDto);
+        return Optional.ofNullable(activePartyroomWithCrewDto);
     }
 
     @Override
-    public List<PartyroomWithMemberDto> getMemberDataByPartyroomId() {
+    public List<PartyroomWithCrewDto> getCrewDataByPartyroomId() {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
+        QCrewData qCrewData = QCrewData.crewData;
+        QPlaybackData qPlaybackData = QPlaybackData.playbackData;
 
-        QPartyroomData partyroom = QPartyroomData.partyroomData;
-        QPartymemberData partymember = QPartymemberData.partymemberData;
-        QPlaybackData playback = QPlaybackData.playbackData;
-
-        JPQLQuery<Long> memberCountSubquery = JPAExpressions
-                .select(partymember.count())
-                .from(partymember)
-                .where(partymember.partyroomData.id.eq(partyroom.id)
-                        .and(partymember.isActive.eq(true))
-                        .and(partymember.isBanned.eq(false))
+        JPQLQuery<Long> crewCountSubquery = JPAExpressions
+                .select(qCrewData.count())
+                .from(qCrewData)
+                .where(qCrewData.partyroomData.id.eq(qPartyroomData.id)
+                        .and(qCrewData.isActive.eq(true))
+                        .and(qCrewData.isBanned.eq(false))
                 );
 
         ConstructorExpression<PlaybackDto> playbackDto = Projections.constructor(PlaybackDto.class,
-                playback.id,
-                playback.linkId,
-                playback.name,
-                playback.duration,
-                playback.thumbnailImage
+                qPlaybackData.id,
+                qPlaybackData.linkId,
+                qPlaybackData.name,
+                qPlaybackData.duration,
+                qPlaybackData.thumbnailImage
         );
 
-        // Fetch partyroom and member data with member count in a single query
+        // Fetch partyroom and crew data with crew count in a single query
         List<Tuple> tuples = queryFactory
-                .select(partyroom.id,
-                        partyroom.stageType,
-                        partyroom.hostId,
-                        partyroom.title,
-                        partyroom.introduction,
-                        partyroom.isPlaybackActivated,
-                        partyroom.isQueueClosed,
-                        memberCountSubquery,
+                .select(qPartyroomData.id,
+                        qPartyroomData.stageType,
+                        qPartyroomData.hostId,
+                        qPartyroomData.title,
+                        qPartyroomData.introduction,
+                        qPartyroomData.isPlaybackActivated,
+                        qPartyroomData.isQueueClosed,
+                        crewCountSubquery,
                         playbackDto,
-                        partymember.id,
-                        partymember.userId,
-                        partymember.authorityTier,
-                        partymember.gradeType
+                        qCrewData.id,
+                        qCrewData.userId,
+                        qCrewData.authorityTier,
+                        qCrewData.gradeType
                 )
-                .from(partyroom)
-                .leftJoin(partymember)
-                .on(partyroom.eq(partymember.partyroomData)
-                        .and(partymember.isActive.eq(true))
-                        .and(partymember.isBanned.eq(false))
+                .from(qPartyroomData)
+                .leftJoin(qCrewData)
+                .on(qPartyroomData.eq(qCrewData.partyroomData)
+                        .and(qCrewData.isActive.eq(true))
+                        .and(qCrewData.isBanned.eq(false))
                 )
-                .leftJoin(playback)
-                .on(playback.id.eq(partyroom.currentPlaybackId.id))
-                .where(partyroom.isTerminated.eq(false))
-                .orderBy(partyroom.id.asc(), partymember.gradeType.asc())
+                .leftJoin(qPlaybackData)
+                .on(qPlaybackData.id.eq(qPartyroomData.currentPlaybackId.id))
+                .where(qPartyroomData.isTerminated.eq(false))
+                .orderBy(qPartyroomData.id.asc(), qCrewData.gradeType.asc())
                 .fetch();
 
-        // Group member data by partyroom id
-        Map<Long, List<PartymemberDto>> membersByPartyroomId = tuples.stream()
-                .filter(tuple -> Optional.ofNullable(tuple.get(partymember.id)).isPresent())
+        // Group crew data by partyroom id
+        Map<Long, List<CrewDto>> crewsByPartyroomId = tuples.stream()
+                .filter(tuple -> Optional.ofNullable(tuple.get(qCrewData.id)).isPresent())
                 .collect(Collectors.groupingBy(
-                        tuple -> Optional.ofNullable(tuple.get(partyroom.id)).orElseThrow(IllegalStateException::new),
+                        tuple -> Optional.ofNullable(tuple.get(qPartyroomData.id)).orElseThrow(IllegalStateException::new),
                         Collectors.mapping(tuple ->
-                                new PartymemberDto(
-                                        tuple.get(partymember.id),
-                                        tuple.get(partymember.userId),
-                                        tuple.get(partymember.authorityTier),
-                                        tuple.get(partymember.gradeType)
+                                new CrewDto(
+                                        tuple.get(qCrewData.id),
+                                        tuple.get(qCrewData.userId),
+                                        tuple.get(qCrewData.authorityTier),
+                                        tuple.get(qCrewData.gradeType)
                                 ),
                                 Collectors.toList()
                         )
@@ -177,18 +176,18 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
         return new ArrayList<>(tuples.stream()
                 .collect(Collectors.toMap(
-                        tuple -> tuple.get(partyroom.id),
-                        tuple -> new PartyroomWithMemberDto(
-                                tuple.get(partyroom.id),
-                                tuple.get(partyroom.stageType),
-                                tuple.get(partyroom.hostId),
-                                tuple.get(partyroom.title),
-                                tuple.get(partyroom.introduction),
-                                Boolean.TRUE.equals(tuple.get(partyroom.isPlaybackActivated)),
-                                Boolean.TRUE.equals(tuple.get(partyroom.isQueueClosed)),
-                                tuple.get(memberCountSubquery),
+                        tuple -> tuple.get(qPartyroomData.id),
+                        tuple -> new PartyroomWithCrewDto(
+                                tuple.get(qPartyroomData.id),
+                                tuple.get(qPartyroomData.stageType),
+                                tuple.get(qPartyroomData.hostId),
+                                tuple.get(qPartyroomData.title),
+                                tuple.get(qPartyroomData.introduction),
+                                Boolean.TRUE.equals(tuple.get(qPartyroomData.isPlaybackActivated)),
+                                Boolean.TRUE.equals(tuple.get(qPartyroomData.isQueueClosed)),
+                                tuple.get(crewCountSubquery),
                                 tuple.get(8, PlaybackDto.class),
-                                membersByPartyroomId.getOrDefault(tuple.get(partyroom.id), List.of())
+                                crewsByPartyroomId.getOrDefault(tuple.get(qPartyroomData.id), List.of())
                         ),
                         (dto1, dto2) -> dto1
                 ))
@@ -198,12 +197,12 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
     @Override
     public Optional<PartyroomIdDto> getPartyroomDataWithUserId(UserId userId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPartymemberData qPartymemberData = QPartymemberData.partymemberData;
+        QCrewData qCrewData = QCrewData.crewData;
         PartyroomData partyroomData = queryFactory
-                .select(qPartymemberData.partyroomData)
-                .from(qPartymemberData)
-                .where(qPartymemberData.isActive.eq(true)
-                        .and(qPartymemberData.userId.eq(userId)))
+                .select(qCrewData.partyroomData)
+                .from(qCrewData)
+                .where(qCrewData.isActive.eq(true)
+                        .and(qCrewData.userId.eq(userId)))
                 .fetchOne();
 
         PartyroomIdDto partyroomIdDto = null;

@@ -12,13 +12,12 @@ import com.pfplaybackend.api.partyroom.domain.entity.converter.PlaybackConverter
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.service.CrewDomainService;
 import com.pfplaybackend.api.partyroom.domain.service.DjDomainService;
-import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
@@ -29,14 +28,11 @@ import com.pfplaybackend.api.partyroom.exception.GradeException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
-import io.lettuce.core.ScriptOutputType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.format.DateTimeParseException;
 import java.util.Comparator;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -102,7 +98,7 @@ public class PlaybackManagementService {
         // FIXME All Dj 'orderNumber' bulk update
         Partyroom updataedPartyroom = partyroomManagementService.rotateDjQueue(partyroom);
         Dj nextDj = updataedPartyroom.getDjs().stream().min(Comparator.comparingInt(Dj::getOrderNumber)).orElseThrow();
-        Partymember djMember = updataedPartyroom.getPartymembers().stream().filter(partymember -> partymember.getUserId().equals(nextDj.getUserId())).toList().get(0);
+        Crew djCrew = updataedPartyroom.getCrews().stream().filter(crew -> crew.getUserId().equals(nextDj.getUserId())).toList().get(0);
         Playback nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(updataedPartyroom.getPartyroomId(), nextDj);
         PlaybackData playbackData = playbackRepository.save(playbackConverter.toData(nextPlayback));
         // Update 'CurrentPlaybackId'
@@ -112,13 +108,13 @@ public class PlaybackManagementService {
         scheduleTask(nextPlayback);
 
         // Propagation Websocket Event
-        publishPlaybackChangedEvent(updataedPartyroom.getPartyroomId(), djMember.getId(), playbackData);
+        publishPlaybackChangedEvent(updataedPartyroom.getPartyroomId(), djCrew.getId(), playbackData);
     }
 
-    // FIXME PartymemberId
-    private void publishPlaybackChangedEvent(PartyroomId partyroomId, long partymemberId, PlaybackData playbackData ) {
+    // FIXME CrewId
+    private void publishPlaybackChangedEvent(PartyroomId partyroomId, long crewId, PlaybackData playbackData ) {
         redisMessagePublisher.publish(MessageTopic.PLAYBACK,
-                new PlaybackMessage(partyroomId, MessageTopic.PLAYBACK, partymemberId,
+                new PlaybackMessage(partyroomId, MessageTopic.PLAYBACK, crewId,
                         new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(), playbackData.getDuration(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
     }
 }

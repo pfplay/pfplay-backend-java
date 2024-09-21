@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation.payload.response;
 
-import com.pfplaybackend.api.partyroom.application.dto.PartyroomDto;
-import com.pfplaybackend.api.partyroom.application.dto.PartyroomWithMemberDto;
+import com.pfplaybackend.api.partyroom.application.dto.PartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyroomElement;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -17,27 +16,27 @@ import java.util.Map;
 @Getter
 @Data
 public class QueryPartyroomListResponse {
-    public static List<PartyroomElement> from(List<PartyroomWithMemberDto> partyrooms, Map<UserId, ProfileSettingDto> profileSettings) {
-        return partyrooms.stream().map(partyroomWithMemberDto -> {
+    public static List<PartyroomElement> from(List<PartyroomWithCrewDto> partyrooms, Map<UserId, ProfileSettingDto> profileSettings) {
+        return partyrooms.stream().map(partyroomWithCrewDto -> {
             Map<String, Object> playback = null;
-            if(partyroomWithMemberDto.isPlaybackActivated()) {
+            if(partyroomWithCrewDto.isPlaybackActivated()) {
                 playback = new HashMap<>();
-                playback.put("name", partyroomWithMemberDto.getPlaybackDto().getName());
-                playback.put("thumbnailImage", partyroomWithMemberDto.getPlaybackDto().getThumbnailImage());
+                playback.put("name", partyroomWithCrewDto.getPlaybackDto().getName());
+                playback.put("thumbnailImage", partyroomWithCrewDto.getPlaybackDto().getThumbnailImage());
             }
-            List<Map<String, Object>> primaryIcons = partyroomWithMemberDto.getMembers().stream().map(partymemberDto -> profileSettings.get(partymemberDto.getUserId()))
+            List<Map<String, Object>> primaryIcons = partyroomWithCrewDto.getCrews().stream().map(crewDto -> profileSettings.get(crewDto.getUserId()))
                     .map(profileSettingDto -> {
                         Map<String, Object> primaryAvatar = new HashMap<>();
                         primaryAvatar.put("avatarIconUri", profileSettingDto.getAvatarIconUri());
                         return primaryAvatar;
                     }).toList();
             return PartyroomElement.builder()
-                    .partyroomId(partyroomWithMemberDto.getPartyroomId())
-                    .stageType(partyroomWithMemberDto.getStageType())
-                    .title(partyroomWithMemberDto.getTitle())
-                    .introduction(partyroomWithMemberDto.getIntroduction())
-                    .memberCount(partyroomWithMemberDto.getMemberCount())
-                    .isPlaybackActivated(partyroomWithMemberDto.isPlaybackActivated())
+                    .partyroomId(partyroomWithCrewDto.getPartyroomId())
+                    .stageType(partyroomWithCrewDto.getStageType())
+                    .title(partyroomWithCrewDto.getTitle())
+                    .introduction(partyroomWithCrewDto.getIntroduction())
+                    .crewCount(partyroomWithCrewDto.getCrewCount())
+                    .isPlaybackActivated(partyroomWithCrewDto.isPlaybackActivated())
                     .playback(playback)
                     .primaryIcons(primaryIcons)
                     .build();

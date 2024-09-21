@@ -10,7 +10,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class Partymember {
+public class Crew {
     private long id;
     private PartyroomId partyroomId;
     private UserId userId;
@@ -21,11 +21,11 @@ public class Partymember {
     private LocalDateTime enteredAt;
     private LocalDateTime exitedAt;
 
-    public Partymember() {}
+    public Crew() {}
 
     @Builder
-    public Partymember(long id, PartyroomId partyroomId, UserId userId, AuthorityTier authorityTier,
-                       GradeType gradeType, boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt) {
+    public Crew(long id, PartyroomId partyroomId, UserId userId, AuthorityTier authorityTier,
+                GradeType gradeType, boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
@@ -37,8 +37,8 @@ public class Partymember {
         this.exitedAt = exitedAt;
     }
 
-    public static Partymember create(UserId userId, PartyroomId partyroomId, AuthorityTier authorityTier, GradeType gradeType) {
-        return Partymember.builder()
+    public static Crew create(UserId userId, PartyroomId partyroomId, AuthorityTier authorityTier, GradeType gradeType) {
+        return Crew.builder()
                 .userId(userId)
                 .authorityTier(authorityTier)
                 .gradeType(gradeType)
@@ -49,23 +49,23 @@ public class Partymember {
                 .build();
     }
 
-    public Partymember assignPartyroomId(PartyroomId partyroomId) {
+    public Crew assignPartyroomId(PartyroomId partyroomId) {
         this.partyroomId = partyroomId;
         return this;
     }
 
-    public Partymember applyDeactivation() {
+    public Crew applyDeactivation() {
         this.isActive = false;
         return this;
     }
 
-    public Partymember applyActivation() {
+    public Crew applyActivation() {
         this.isActive = true;
         this.enteredAt = LocalDateTime.now();
         return this;
     }
 
-    public Partymember updateGrade(GradeType gradeType) {
+    public Crew updateGrade(GradeType gradeType) {
         this.gradeType = gradeType;
         return this;
     }

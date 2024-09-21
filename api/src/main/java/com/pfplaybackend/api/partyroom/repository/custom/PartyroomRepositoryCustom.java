@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface PartyroomRepositoryCustom {
     List<PartyroomDto> getAllPartyrooms();
     Optional<ActivePartyroomDto> getActivePartyroomByUserId(UserId userId);
-    Optional<ActivePartyroomWithMemberDto> getMyActivePartyroomWithMemberIdByUserId(UserId userId);
-    List<PartyroomWithMemberDto> getMemberDataByPartyroomId();
+    Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewIdByUserId(UserId userId);
+    List<PartyroomWithCrewDto> getCrewDataByPartyroomId();
     Optional<PartyroomIdDto> getPartyroomDataWithUserId(UserId userId);
 }
