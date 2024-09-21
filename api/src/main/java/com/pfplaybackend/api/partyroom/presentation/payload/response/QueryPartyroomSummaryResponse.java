@@ -21,8 +21,15 @@ public class QueryPartyroomSummaryResponse {
     private CurrentDjWithProfileDto currentDj;
 
     public static QueryPartyroomSummaryResponse from(Partyroom partyroom, Crew crew, ProfileSettingDto profileSettingDto) {
-        return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
-                partyroom.getLinkDomain(), partyroom.getPlaybackTimeLimit(),
-                new CurrentDjWithProfileDto(crew.getId(), profileSettingDto.getNickname(), profileSettingDto.getAvatarIconUri()));
+        if(crew != null) {
+            return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
+                    partyroom.getLinkDomain(), partyroom.getPlaybackTimeLimit(),
+                    new CurrentDjWithProfileDto(crew.getId(), profileSettingDto.getNickname(), profileSettingDto.getAvatarIconUri()));
+        } else {
+            return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
+                    partyroom.getLinkDomain(), partyroom.getPlaybackTimeLimit(), null);
+        }
+
+
     }
 }
