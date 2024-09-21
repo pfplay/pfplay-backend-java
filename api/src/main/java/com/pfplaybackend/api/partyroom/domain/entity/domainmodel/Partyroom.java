@@ -9,6 +9,7 @@ import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdatePartyroomRequest;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
 import lombok.Getter;
@@ -194,5 +195,13 @@ public class Partyroom {
 
     public Crew getCrew(CrewId crewId) {
         return this.crews.stream().filter(partymember -> partymember.getId() == crewId.getId()).findAny().orElseThrow();
+    }
+
+    public Partyroom updateBaseInfo(UpdatePartyroomRequest request) {
+        this.title = request.getTitle();
+        this.introduction = request.getIntroduction();
+        this.linkDomain = request.getLinkDomain();
+        this.playbackTimeLimit = request.getPlaybackTimeLimit();
+        return this;
     }
 }
