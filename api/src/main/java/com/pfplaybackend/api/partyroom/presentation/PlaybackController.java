@@ -35,7 +35,7 @@ public class PlaybackController {
      * 현재 DJ의 곡 재생에 대한 중단 동작을 트리거 한다.
      * @param partyroomId
      */
-    @PostMapping("/{partyroomId}/playback/skip")
+    @PostMapping("/{partyroomId}/playbacks/skip")
     public ResponseEntity<?> playBackSkip(@PathVariable Long partyroomId) {
         playbackManagementService.skip(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
@@ -47,7 +47,7 @@ public class PlaybackController {
      * @param partyroomId
      * @return List<PlaybackHistory>
      */
-    @GetMapping("/{partyroomId}/playback/history")
+    @GetMapping("/{partyroomId}/playbacks/histories")
     public ResponseEntity<?> playBackHistory(@PathVariable Long partyroomId) {
         return ResponseEntity.ok().body(ApiCommonResponse.success(
                 playbackInfoService.getRecentPlaybackHistory(new PartyroomId(partyroomId)))
