@@ -29,6 +29,13 @@ public class PartyroomManagementController {
         return ResponseEntity.ok().body(CreatePartyroomResponse.from(partyRoom));
     }
 
+    @PutMapping("/{partyroomId}")
+    public ResponseEntity<?> updatePartyroom(@PathVariable Long partyroomId, @RequestBody UpdateDjQueueStatusRequest request) {
+        partyRoomManagementService.updateDjQueueStatus(new PartyroomId(partyroomId), request);
+        return ResponseEntity.ok()
+                .body(ApiCommonResponse.success("OK"));
+    }
+
     @DeleteMapping("/{partyroomId}")
     public void deletePartyroom(@PathVariable Long partyroomId) {
         partyRoomManagementService.deletePartyRoom(new PartyroomId(partyroomId));

@@ -32,7 +32,6 @@ public class PartyroomInfoController {
     private final DisplayInfoService displayInfoService;
     private final PlaybackInfoService playbackInfoService;
 
-
     /**
      * 모든 파티룸의 정보를 조회한다.
      * → 대기실에서의 목록 조회 API

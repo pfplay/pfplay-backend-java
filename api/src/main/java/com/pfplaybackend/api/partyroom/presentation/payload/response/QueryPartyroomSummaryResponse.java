@@ -14,12 +14,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueryPartyroomSummaryResponse {
-    String title;
-    String introduction;
-    CurrentDjWithProfileDto currentDj;
+    private String title;
+    private String introduction;
+    private String linkDomain;
+    private int playbackTimeLimit;
+    private CurrentDjWithProfileDto currentDj;
 
     public static QueryPartyroomSummaryResponse from(Partyroom partyroom, Crew crew, ProfileSettingDto profileSettingDto) {
         return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
+                partyroom.getLinkDomain(), partyroom.getPlaybackTimeLimit(),
                 new CurrentDjWithProfileDto(crew.getId(), profileSettingDto.getNickname(), profileSettingDto.getAvatarIconUri()));
     }
 }
