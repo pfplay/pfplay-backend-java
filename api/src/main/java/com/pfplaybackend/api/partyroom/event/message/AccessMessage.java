@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.event.message;
 
-import com.pfplaybackend.api.partyroom.application.dto.PartymemberSummaryDto;
+import com.pfplaybackend.api.partyroom.application.dto.CrewSummaryDto;
 import com.pfplaybackend.api.partyroom.domain.enums.AccessType;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
@@ -17,13 +17,13 @@ public class AccessMessage implements Serializable {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
     private AccessType accessType;
-    private PartymemberSummaryDto member;
+    private CrewSummaryDto crew;
 
-    public static AccessMessage create(PartyroomId partyroomId, AccessType accessType, PartymemberSummaryDto partymemberSummaryDto) {
+    public static AccessMessage create(PartyroomId partyroomId, AccessType accessType, CrewSummaryDto crewSummaryDto) {
         return new AccessMessage(
                 partyroomId,
                 MessageTopic.ACCESS,
                 accessType,
-                partymemberSummaryDto);
+                crewSummaryDto);
     }
 }

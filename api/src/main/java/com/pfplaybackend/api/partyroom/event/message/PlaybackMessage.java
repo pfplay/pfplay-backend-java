@@ -13,6 +13,6 @@ import lombok.NoArgsConstructor;
 public class PlaybackMessage {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
-    private long memberId;
+    private long crewId;
     private PlaybackDto playback;
 }

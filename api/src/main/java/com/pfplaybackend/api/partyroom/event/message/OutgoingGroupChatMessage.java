@@ -16,16 +16,16 @@ import java.util.Map;
 public class OutgoingGroupChatMessage {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
-    private Map<String, Object> member;
+    private Map<String, Object> crew;
     private String message;
 
     public static OutgoingGroupChatMessage from(PartyroomSessionDto sessionDto, String message) {
-        Map<String, Object> member = new HashMap<>();
-        member.put("memberId", sessionDto.getMemberId());
+        Map<String, Object> crew = new HashMap<>();
+        crew.put("crewId", sessionDto.getCrewId());
         return new OutgoingGroupChatMessage(
                 sessionDto.getPartyroomId(),
                 MessageTopic.CHAT,
-                member,
+                crew,
                 message
         );
     }

@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.partyroom.application.service.PartyroomRegulationService;
-import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateMemberGradeRequest;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateMemberPenaltyRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewGradeRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewPenaltyRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,16 +21,16 @@ public class PartyroomRegulationController {
 
     final private PartyroomRegulationService partyroomRegulationService;
 
-    @PutMapping("/{partyroomId}/partymembers/{partymemberId}/grade")
-    public void updateMemberGrade(@PathVariable("partyroomId") long partyroomId,
-                            @PathVariable("partymemberId") long partymemberId,
-                            @RequestBody UpdateMemberGradeRequest request) {
-        partyroomRegulationService.updateGrade(new PartyroomId(partyroomId), new PartymemberId(partymemberId), request);
+    @PutMapping("/{partyroomId}/crews/{crewId}/grade")
+    public void updateCrewGrade(@PathVariable("partyroomId") long partyroomId,
+                            @PathVariable("crewId") long crewId,
+                            @RequestBody UpdateCrewGradeRequest request) {
+        partyroomRegulationService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId), request);
     }
 
-    @PutMapping("/{partyroomId}/partymembers/{partymemberId}/penalties")
-    public void updateMemberPenalty(@PathVariable("partyroomId") long partyroomId, @PathVariable("partymemberId") long partymemberId,
-                                    @RequestBody UpdateMemberPenaltyRequest request) {
-        partyroomRegulationService.updatePenalty(new PartyroomId(partyroomId), new PartymemberId(partymemberId), request);
+    @PutMapping("/{partyroomId}/crews/{crewId}/penalties")
+    public void updateCrewPenalty(@PathVariable("partyroomId") long partyroomId, @PathVariable("crewId") long crewId,
+                                    @RequestBody UpdateCrewPenaltyRequest request) {
+        partyroomRegulationService.updatePenalty(new PartyroomId(partyroomId), new CrewId(crewId), request);
     }
 }

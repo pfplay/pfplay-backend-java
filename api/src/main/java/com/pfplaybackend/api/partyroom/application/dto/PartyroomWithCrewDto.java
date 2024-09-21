@@ -1,17 +1,13 @@
 package com.pfplaybackend.api.partyroom.application.dto;
 
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.user.domain.value.UserId;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-public class PartyroomWithMemberDto {
+public class PartyroomWithCrewDto {
     private final long partyroomId;
     private final StageType stageType;
     private final UserId hostId;
@@ -19,11 +15,12 @@ public class PartyroomWithMemberDto {
     private final String introduction;
     private final boolean isPlaybackActivated;
     private final boolean isQueueClosed;
-    private final Long memberCount;
+    private final Long crewCount;
     private final PlaybackDto playbackDto;
-    private final List<PartymemberDto> members;
+    private final List<CrewDto> crews;
 
-    public PartyroomWithMemberDto(Long partyroomId, StageType stageType, UserId hostId, String title, String introduction, boolean isPlaybackActivated, boolean isQueueClosed, Long memberCount, PlaybackDto playbackDto, List<PartymemberDto> members) {
+    public PartyroomWithCrewDto(Long partyroomId, StageType stageType, UserId hostId, String title, String introduction,
+                                boolean isPlaybackActivated, boolean isQueueClosed, Long crewCount, PlaybackDto playbackDto, List<CrewDto> crews) {
         this.partyroomId = partyroomId;
         this.stageType = stageType;
         this.hostId = hostId;
@@ -31,13 +28,13 @@ public class PartyroomWithMemberDto {
         this.introduction = introduction;
         this.isPlaybackActivated = isPlaybackActivated;
         this.isQueueClosed = isQueueClosed;
-        this.memberCount = memberCount;
+        this.crewCount = crewCount;
         this.playbackDto = playbackDto;
-        this.members = members;
+        this.crews = crews;
     }
 
-    static public PartyroomWithMemberDto from(PartyroomWithMemberDto dto, List<PartymemberDto> members) {
-        return new PartyroomWithMemberDto(
+    static public PartyroomWithCrewDto from(PartyroomWithCrewDto dto, List<CrewDto> members) {
+        return new PartyroomWithCrewDto(
                 dto.getPartyroomId(),
                 dto.getStageType(),
                 dto.getHostId(),
@@ -45,7 +42,7 @@ public class PartyroomWithMemberDto {
                 dto.getIntroduction(),
                 dto.isPlaybackActivated(),
                 dto.isQueueClosed(),
-                dto.getMemberCount(),
+                dto.getCrewCount(),
                 dto.getPlaybackDto(),
                 members
         );

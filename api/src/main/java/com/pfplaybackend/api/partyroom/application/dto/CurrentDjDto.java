@@ -6,5 +6,5 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class CurrentDjDto {
-    long memberId;
+    long crewId;
 }

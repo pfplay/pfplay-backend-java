@@ -7,10 +7,10 @@ import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.*;
 import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
-import com.pfplaybackend.api.partyroom.domain.entity.data.PartymemberData;
+import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
@@ -34,43 +34,42 @@ public class PartyroomInfoService {
     private final UserProfilePeerService userProfileService;
     private final PartyContextAspect partyContextAspect;
 
-    public List<PartyroomWithMemberDto> getAllPartyrooms() {
-        return partyroomRepository.getMemberDataByPartyroomId().stream().map(partyroomWithMemberDto -> {
-            List<PartymemberDto> filteredMembers = partyroomWithMemberDto.getMembers().stream()
-                                .filter(partymemberDto -> partymemberDto.getGradeType().isEqualOrHigherThan(GradeType.MODERATOR))
+    public List<PartyroomWithCrewDto> getAllPartyrooms() {
+        return partyroomRepository.getCrewDataByPartyroomId().stream().map(partyroomWithCrewDto -> {
+            List<CrewDto> filteredCrews = partyroomWithCrewDto.getCrews().stream()
+                                .filter(crewDto -> crewDto.getGradeType().isEqualOrHigherThan(GradeType.MODERATOR))
                                 .limit(3)
                                 .toList();
-            return PartyroomWithMemberDto.from(partyroomWithMemberDto, filteredMembers);
+            return PartyroomWithCrewDto.from(partyroomWithCrewDto, filteredCrews);
         }).toList();
     }
 
-    public Map<UserId, ProfileSettingDto> getPrimariesAvatarSettings(List<PartyroomWithMemberDto> partyrooms) {
+    public Map<UserId, ProfileSettingDto> getPrimariesAvatarSettings(List<PartyroomWithCrewDto> partyrooms) {
         List<UserId> primaryUserIds = partyrooms.stream().collect(Collectors.toMap(
-                        PartyroomWithMemberDto::getPartyroomId,
-                        partyroomWithMemberDto -> partyroomWithMemberDto.getMembers().stream().toList()
+                        PartyroomWithCrewDto::getPartyroomId,
+                        partyroomWithCrewDto -> partyroomWithCrewDto.getCrews().stream().toList()
                 )).values().stream()
                 .flatMap(List::stream)
-                .map(PartymemberDto::getUserId).toList();
+                .map(CrewDto::getUserId).toList();
         return userProfileService.getUsersProfileSetting(primaryUserIds);
     }
 
     // 초기화를 위한 파티멤버 목록 조회
-    public List<PartymemberSetupDto> getPartymembersForSetup(PartyroomId partyroomId) {
-        // Find Active Members
+    public List<CrewSetupDto> getCrewsForSetup(PartyroomId partyroomId) {
         Optional<PartyroomData> optPartyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId());
         if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
         PartyroomData partyroomData = optPartyroomData.get();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
         // Has uid, authorityTier
-        List<Partymember> partymembers = partyroom.getPartymembers();
-        List<UserId> userIds = partymembers.stream().map(Partymember::getUserId).toList();
+        List<Crew> crews = partyroom.getCrews();
+        List<UserId> userIds = crews.stream().map(Crew::getUserId).toList();
 
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileService.getUsersProfileSetting(userIds);
 
-        return partymembers.stream().map(partymember -> {
-            UserId userId = partymember.getUserId();
-            return PartymemberSetupDto.from(partymember, profileSettingMap.get(userId));
+        return crews.stream().map(crew -> {
+            UserId userId = crew.getUserId();
+            return CrewSetupDto.from(crew, profileSettingMap.get(userId));
         }).toList();
     }
 
@@ -115,27 +114,27 @@ public class PartyroomInfoService {
         return partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId());
     }
 
-    public Optional<ActivePartyroomWithMemberDto> getMyActivePartyroomWithMemberId(UserId userId) {
-        return partyroomRepository.getMyActivePartyroomWithMemberIdByUserId(userId);
+    public Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewId(UserId userId) {
+        return partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(userId);
     }
 
-    public void getPartymembers(PartyroomId partyroomId) {}
+    public void getCrews(PartyroomId partyroomId) {}
 
     public void getSummaryInfo(PartyroomId partyroomId) {
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         // 파티원의 UserId 추출
-        List<UserId> partymemberUserIds = partyroomData.getPartymemberDataList().stream().map(PartymemberData::getUserId).toList();
-        Map<UserId, ProfileSettingDto> profileSettings = userProfileService.getUsersProfileSetting(partymemberUserIds);
+        List<UserId> crewUserIds = partyroomData.getCrewDataList().stream().map(CrewData::getUserId).toList();
+        Map<UserId, ProfileSettingDto> profileSettings = userProfileService.getUsersProfileSetting(crewUserIds);
         // TODO Combine Map
     }
 
     @Transactional
-    public Optional<Partymember> getPartymemberByUserId(PartyroomId partyroomId, UserId userId) {
+    public Optional<Crew> getCrewByUserId(PartyroomId partyroomId, UserId userId) {
         Optional<PartyroomData> optional = partyroomRepository.findById(partyroomId.getId());
         if(optional.isPresent()) {
             PartyroomData partyroomData = optional.get();
             Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-            return partyroom.getPartymemberByUserId(userId);
+            return partyroom.getCrewByUserId(userId);
         }else {
             return Optional.empty();
         }

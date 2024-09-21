@@ -9,7 +9,7 @@ import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.enums.MotionType;
-import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
@@ -31,7 +31,7 @@ public class PlaybackReactionPostProcessService {
     private final GrabMusicPeerService grabMusicService;
     private final UserActivityPeerService userActivityService;
 
-    public void postProcess(ReactionPostProcessDto postProcessDto, PartyroomId partyroomId, PlaybackId playbackId, PartymemberId partymemberId) {
+    public void postProcess(ReactionPostProcessDto postProcessDto, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         Playback playback = playbackInfoService.getPlaybackById(playbackId);
         if(postProcessDto.isGrabStatusChanged()) {
@@ -45,13 +45,13 @@ public class PlaybackReactionPostProcessService {
             publishAggregationChangedEvent(partyroomId, playback);
         }
         if(postProcessDto.isMotionChanged()) {
-            publishMotionChangedEvent(partyroomId, postProcessDto.getDeterminedMotionType(), partymemberId);
+            publishMotionChangedEvent(partyroomId, postProcessDto.getDeterminedMotionType(), crewId);
         }
     }
 
     // PostProcess After Playback Reaction
-    public void publishMotionChangedEvent(PartyroomId partyroomId, MotionType motionType, PartymemberId partymemberId) {
-        MotionMessage motionMessage = MotionMessage.from(partyroomId, motionType, partymemberId);
+    public void publishMotionChangedEvent(PartyroomId partyroomId, MotionType motionType, CrewId crewId) {
+        MotionMessage motionMessage = MotionMessage.from(partyroomId, motionType, crewId);
         redisMessagePublisher.publish(MessageTopic.MOTION, motionMessage);
     }
 

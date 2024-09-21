@@ -8,10 +8,10 @@ import java.util.Objects;
 
 @Getter
 @Embeddable
-public class PartymemberId implements Serializable {
+public class CrewId implements Serializable {
     private long id;
-    public PartymemberId() {}
-    public PartymemberId(long id) {
+    public CrewId() {}
+    public CrewId(long id) {
         this.id = id;
     }
 
@@ -19,8 +19,8 @@ public class PartymemberId implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PartymemberId partymemberId = (PartymemberId) o;
-        return id == partymemberId.id;
+        CrewId crewId = (CrewId) o;
+        return id == crewId.id;
     }
 
     @Override

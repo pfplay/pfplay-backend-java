@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
-import com.pfplaybackend.api.partyroom.domain.value.PartymemberId;
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
@@ -29,7 +29,7 @@ public class Partyroom {
     private int playbackTimeLimit;
     private UserId hostId;
     private String noticeContent;
-    private List<Partymember> partymembers;
+    private List<Crew> crews;
     private List<Dj> djs;
     private PlaybackId currentPlaybackId;
     private boolean isPlaybackActivated;
@@ -50,7 +50,7 @@ public class Partyroom {
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
         // Assign Default Values
-        this.partymembers = new ArrayList<>();
+        this.crews = new ArrayList<>();
         this.djs = new ArrayList<>();
         this.noticeContent = "";
         this.currentPlaybackId = null;
@@ -60,10 +60,10 @@ public class Partyroom {
     }
 
     @Builder
-    public Partyroom(PartyroomId partyroomId,  StageType stageType, String title, String introduction,
+    public Partyroom(PartyroomId partyroomId, StageType stageType, String title, String introduction,
                      String linkDomain, int playbackTimeLimit,
                      UserId hostId, String noticeContent,
-                     List<Partymember> partymembers, List<Dj> djs,
+                     List<Crew> crews, List<Dj> djs,
                      PlaybackId currentPlaybackId,
                      boolean isPlaybackActivated, boolean isQueueClosed, boolean isTerminated) {
         this.partyroomId = partyroomId;
@@ -71,7 +71,7 @@ public class Partyroom {
         this.introduction = introduction;
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
-        this.partymembers = new ArrayList<>();
+        this.crews = new ArrayList<>();
         this.djs = new ArrayList<>();
         this.stageType = stageType;
         this.hostId = hostId;
@@ -88,11 +88,11 @@ public class Partyroom {
     }
 
     public boolean isExceededLimit() {
-        return this.getPartymembers().size() > 49;
+        return this.getCrews().size() > 49;
     }
 
-    public Partyroom assignPartymembers(List<Partymember> partymembers) {
-        this.partymembers = partymembers;
+    public Partyroom assignCrews(List<Crew> crews) {
+        this.crews = crews;
         return this;
     }
 
@@ -101,22 +101,14 @@ public class Partyroom {
         return this;
     }
 
-    public Optional<Partymember> getPartymemberByUserId(UserId userId) {
-        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findFirst();
+    public Optional<Crew> getCrewByUserId(UserId userId) {
+        return this.crews.stream().filter(crew -> crew.getUserId().equals(userId)).findFirst();
     }
 
-    public Partyroom addNewPartymember(UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
-        this.partymembers = new ImmutableList.Builder<Partymember>()
-                .addAll(this.partymembers)
-                .add(Partymember.create(userId, this.partyroomId, authorityTier, gradeType))
-                .build();
-        return this;
-    }
-
-    public Partyroom addExistingPartymember(Partymember partymember) {
-        this.partymembers = new ImmutableList.Builder<Partymember>()
-                .addAll(this.partymembers)
-                .add(partymember.applyActivation())
+    public Partyroom addNewCrew(UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
+        this.crews = new ImmutableList.Builder<Crew>()
+                .addAll(this.crews)
+                .add(Crew.create(userId, this.partyroomId, authorityTier, gradeType))
                 .build();
         return this;
     }
@@ -125,14 +117,6 @@ public class Partyroom {
         this.djs = new ImmutableList.Builder<Dj>()
                 .addAll(this.djs)
                 .add(Dj.create(partyroomId, playlistId, userId, this.djs.size() + 1))
-                .build();
-        return this;
-    }
-
-    public Partyroom addExistingDj(Dj dj) {
-        this.djs = new ImmutableList.Builder<Dj>()
-                .addAll(this.djs)
-                .add(dj)
                 .build();
         return this;
     }
@@ -161,54 +145,54 @@ public class Partyroom {
         return this;
     }
 
-    public Partymember deactivatePartymemberAndGet(UserId userId) {
-        this.partymembers = new ImmutableList.Builder<Partymember>()
-                .addAll(this.partymembers)
-                .build().stream().map(partymember -> {
-                    if(partymember.getUserId().equals(userId)) {
-                        return partymember.applyDeactivation();
+    public Crew deactivateCrewAndGet(UserId userId) {
+        this.crews = new ImmutableList.Builder<Crew>()
+                .addAll(this.crews)
+                .build().stream().map(crew -> {
+                    if(crew.getUserId().equals(userId)) {
+                        return crew.applyDeactivation();
                     }else {
-                        return partymember;
+                        return crew;
                     }
                 }).toList();
-        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findAny().orElseThrow();
+        return this.crews.stream().filter(crew -> crew.getUserId().equals(userId)).findAny().orElseThrow();
     }
 
-    public boolean isUserInactiveMember(UserId userId) {
-        return this.partymembers.stream().anyMatch(partymember -> partymember.getUserId().equals(userId) && !partymember.isActive());
+    public boolean isUserInactiveCrew(UserId userId) {
+        return this.crews.stream().anyMatch(crew -> crew.getUserId().equals(userId) && !crew.isActive());
     }
 
-    public boolean isUserBannedMember(UserId userId) {
-        return this.partymembers.stream().filter(partymember -> partymember.getUserId().equals(userId)).findAny().orElseThrow().isBanned();
+    public boolean isUserBannedCrew(UserId userId) {
+        return this.crews.stream().filter(crew -> crew.getUserId().equals(userId)).findAny().orElseThrow().isBanned();
     }
 
-    public Partyroom activatePartymember(UserId userId) {
-        this.partymembers = new ImmutableList.Builder<Partymember>()
-                .addAll(this.partymembers.stream()
-                        .peek(partymember -> {
-                            if (partymember.getUserId().equals(userId)) {
-                                partymember.applyActivation();
+    public Partyroom activateCrew(UserId userId) {
+        this.crews = new ImmutableList.Builder<Crew>()
+                .addAll(this.crews.stream()
+                        .peek(crew -> {
+                            if (crew.getUserId().equals(userId)) {
+                                crew.applyActivation();
                             }
                         }).toList()
                 ).build();
         return this;
     }
 
-    public Partyroom updateMemberGrade(PartymemberId partymemberId, GradeType gradeType) {
-        this.partymembers = new ImmutableList.Builder<Partymember>()
-                .addAll(this.partymembers)
+    public Partyroom updateCrewGrade(CrewId crewId, GradeType gradeType) {
+        this.crews = new ImmutableList.Builder<Crew>()
+                .addAll(this.crews)
                 .build()
-                .stream().map(partymember -> {
-                    if(partymember.getId() == (partymemberId.getId())) {
-                        return partymember.updateGrade(gradeType);
+                .stream().map(crew -> {
+                    if(crew.getId() == (crewId.getId())) {
+                        return crew.updateGrade(gradeType);
                     }else {
-                        return partymember;
+                        return crew;
                     }
                 }).toList();
         return this;
     }
 
-    public Partymember getPartymember(PartymemberId partymemberId) {
-        return this.partymembers.stream().filter(partymember -> partymember.getId() == partymemberId.getId()).findAny().orElseThrow();
+    public Crew getCrew(CrewId crewId) {
+        return this.crews.stream().filter(partymember -> partymember.getId() == crewId.getId()).findAny().orElseThrow();
     }
 }

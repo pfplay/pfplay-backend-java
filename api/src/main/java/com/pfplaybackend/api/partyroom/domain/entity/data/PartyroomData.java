@@ -1,12 +1,10 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.user.domain.value.UserId;
-import com.sun.jdi.BooleanType;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Index;
@@ -57,7 +55,7 @@ public class PartyroomData extends BaseEntity {
     private int playbackTimeLimit;
     
     @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PartymemberData> partymemberDataList = new ArrayList<>();
+    private List<CrewData> crewDataList = new ArrayList<>();
 
     @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DjData> djDataList = new ArrayList<>();
@@ -108,7 +106,7 @@ public class PartyroomData extends BaseEntity {
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
         // Assign Empty Collection
-        this.partymemberDataList = new ArrayList<>();
+        this.crewDataList = new ArrayList<>();
         this.djDataList = new ArrayList<>();
         //
         this.noticeContent = noticeContent;
@@ -118,13 +116,13 @@ public class PartyroomData extends BaseEntity {
         this.isTerminated = isTerminated;
     }
 
-    public PartyroomData assignPartymemberListData(List<PartymemberData> partymemberDataList) {
-        this.partymemberDataList.clear();
-        this.partymemberDataList.addAll(partymemberDataList);
+    public PartyroomData assignCrewDataList(List<CrewData> crewDataList) {
+        this.crewDataList.clear();
+        this.crewDataList.addAll(crewDataList);
         return this;
     }
 
-    public PartyroomData assignDjListData(List<DjData> djDataList) {
+    public PartyroomData assignDjDataList(List<DjData> djDataList) {
         this.djDataList.clear();
         this.djDataList.addAll(djDataList);
         return this;

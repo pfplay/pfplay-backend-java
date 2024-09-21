@@ -8,10 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ActivePartyroomWithMemberDto {
+public class ActivePartyroomWithCrewDto {
     private Long id;
     private boolean isPlaybackActivated;
     private boolean isQueueClosed;
     private PlaybackId currentPlaybackId;
-    private Long memberId;
+    private Long crewId;
 }

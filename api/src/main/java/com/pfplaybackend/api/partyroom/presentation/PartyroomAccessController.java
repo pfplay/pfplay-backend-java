@@ -2,7 +2,7 @@ package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomAccessService;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.response.EnterPartyroomResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,8 +30,8 @@ public class PartyroomAccessController {
     @PostMapping("/{partyroomId}/enter")
     public ResponseEntity<?> enterPartyroom(
             @PathVariable Long partyroomId) {
-        Partymember partymember = partyroomAccessService.tryEnter(new PartyroomId(partyroomId));
-        return ResponseEntity.ok().body(ApiCommonResponse.success(EnterPartyroomResponse.from(partymember)));
+        Crew crew = partyroomAccessService.tryEnter(new PartyroomId(partyroomId));
+        return ResponseEntity.ok().body(ApiCommonResponse.success(EnterPartyroomResponse.from(crew)));
     }
 
     @PostMapping("/{partyroomId}/exit")

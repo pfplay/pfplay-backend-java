@@ -5,14 +5,11 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.*;
 import com.pfplaybackend.api.partyroom.domain.entity.data.history.PlaybackReactionHistoryData;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partymember;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
-import com.pfplaybackend.api.partyroom.exception.PartymemberException;
-import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;
-import com.pfplaybackend.api.partyroom.repository.history.PlaybackReactionHistoryRepository;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.partyroom.exception.CrewException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +29,7 @@ public class DisplayInfoService {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         Optional<ActivePartyroomDto> optActivePartyroom = partyroomInfoService.getMyActivePartyroom();
         // Throw Exception
-        if(optActivePartyroom.isEmpty()) throw ExceptionCreator.create(PartymemberException.NOT_FOUND_ACTIVE_ROOM);
+        if(optActivePartyroom.isEmpty()) throw ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM);
 
         ActivePartyroomDto activePartyroom = optActivePartyroom.get();
         PartyroomId partyroomId = new PartyroomId(activePartyroom.getId());
@@ -40,7 +37,7 @@ public class DisplayInfoService {
 
         if(isPlaybackActivated) {
             Playback playback = playbackInfoService.getPlaybackById(activePartyroom.getCurrentPlaybackId());
-            Partymember djInfo = getCurrentDjInfo(partyroomId, playback);
+            Crew djInfo = getCurrentDjInfo(partyroomId, playback);
             CurrentDjDto currentDjDto = new CurrentDjDto(djInfo.getId());
             //
             Optional<PlaybackReactionHistoryData> optional = playbackReactionService.findPrevHistoryData(new PlaybackId(playback.getId()), partyContext.getUserId());
@@ -56,10 +53,10 @@ public class DisplayInfoService {
         // 2.   ResolvedReaction existingResolved = ReactionStateResolver.resolve(existingState);
     }
 
-    private Partymember getCurrentDjInfo(PartyroomId partyroomId, Playback playback) {
+    private Crew getCurrentDjInfo(PartyroomId partyroomId, Playback playback) {
         // FIXME Dj 대기열에서의 Dj 아이템
         // FIXME Crew 목록에서의 아이템
-        return partyroomInfoService.getPartymemberByUserId(partyroomId, playback.getUserId()).orElseThrow();
+        return partyroomInfoService.getCrewByUserId(partyroomId, playback.getUserId()).orElseThrow();
     }
 
     private static Map<String, Boolean> getHistory(Optional<PlaybackReactionHistoryData> optional) {
