@@ -12,9 +12,11 @@ import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
+import com.pfplaybackend.api.partyroom.presentation.payload.response.QueryPartyroomSummaryResponse;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -33,6 +35,7 @@ public class PartyroomInfoService {
     private final PartyroomConverter partyroomConverter;
     private final UserProfilePeerService userProfileService;
     private final PartyContextAspect partyContextAspect;
+    private final PlaybackInfoService playbackInfoService;
 
     public List<PartyroomWithCrewDto> getAllPartyrooms() {
         return partyroomRepository.getCrewDataByPartyroomId().stream().map(partyroomWithCrewDto -> {
@@ -118,14 +121,25 @@ public class PartyroomInfoService {
         return partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(userId);
     }
 
-    public void getCrews(PartyroomId partyroomId) {}
-
-    public void getSummaryInfo(PartyroomId partyroomId) {
+    // TODO 우측 사이드 바의 두번째 탭 클릭 시 호출
+    // 1. 전체 목록
+    // 2. 제재 목록
+    public void getCrews(PartyroomId partyroomId) {
+        // TODO 내가 차단한 목록은 글로벌 수준으로 유지
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-        // 파티원의 UserId 추출
         List<UserId> crewUserIds = partyroomData.getCrewDataList().stream().map(CrewData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettings = userProfileService.getUsersProfileSetting(crewUserIds);
-        // TODO Combine Map
+    }
+
+    public QueryPartyroomSummaryResponse getSummaryInfo(PartyroomId partyroomId) {
+        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        // Extract Current Djs
+        Playback playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
+        Crew djCrew = partyroom.getCrewByUserId(playback.getUserId()).orElseThrow();
+        UserId djUserId = djCrew.getUserId();
+        ProfileSettingDto profileSettingDto = userProfileService.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
+        return QueryPartyroomSummaryResponse.from(partyroom, djCrew, profileSettingDto);
     }
 
     @Transactional
@@ -140,6 +154,7 @@ public class PartyroomInfoService {
         }
     }
 
+    // TODO 중복 기능 제거
     @Transactional
     public Optional<PartyroomId> getPartyroomId(UserId userId) {
         Optional<PartyroomIdDto> optional = partyroomRepository.getPartyroomDataWithUserId(userId);

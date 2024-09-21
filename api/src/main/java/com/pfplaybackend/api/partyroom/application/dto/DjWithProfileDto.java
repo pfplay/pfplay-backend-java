@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class DjWithProfileDto {
-    // FIXME Change to memberId
+    // FIXME Change to crewId
     private long djId;
     private long orderNumber;
     private String nickname;
