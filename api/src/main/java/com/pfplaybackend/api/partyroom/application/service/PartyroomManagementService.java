@@ -41,6 +41,7 @@ public class PartyroomManagementService {
     @Transactional
     public Partyroom createGeneralPartyRoom(CreatePartyroomRequest request) {
         try {
+            // Create Partyroom
             PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
             partyroomDomainService.checkIsQualifiedToCreate(partyContext.getAuthorityTier());
             partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());

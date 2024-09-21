@@ -17,7 +17,6 @@ public class PartyroomRegulationTopicListener implements MessageListener {
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         try {
             RegulationMessage deserialized = objectMapper.readValue(new String(message.getBody()), RegulationMessage.class);
             messageSender.sendToGroup(deserialized.getPartyroomId().getId(), deserialized);

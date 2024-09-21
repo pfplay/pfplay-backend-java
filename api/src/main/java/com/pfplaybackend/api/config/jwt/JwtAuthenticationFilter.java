@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.mortbay.log.Log;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     throw new AuthenticationServiceException("Token is not Valid");
                 }
             }catch (AuthenticationException e) {
-                jwtAuthenticationFailureHandler.onAuthenticationFailure(request, response, e);
+                Log.debug(e.getMessage());
             }
         }
         filterChain.doFilter(request, response);

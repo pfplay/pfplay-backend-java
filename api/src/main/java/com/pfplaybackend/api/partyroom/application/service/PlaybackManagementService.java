@@ -78,7 +78,6 @@ public class PlaybackManagementService {
         PartyroomData partyroomData = partyroomRepository.findById(activePartyroomDto.getId()).orElseThrow();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         if(crewDomainService.isBelowManagerGrade(partyroom, partyContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
-
         cancelTask(partyroomId);
         tryProceed(partyroomId);
     }
