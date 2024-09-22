@@ -18,6 +18,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,7 +32,7 @@ public class PlaybackReactionService {
     private final PlaybackReactionPostProcessService playbackReactionPostProcessService;
 
     @Transactional
-    public void reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
+    public Map<String, Boolean> reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         ActivePartyroomDto myActivePartyroom = partyroomInfoService.getMyActivePartyroom().orElseThrow();
         // TODO [Check] MyActivePartyroom.getId() == partyroomId
@@ -45,11 +47,11 @@ public class PlaybackReactionService {
         Optional<Crew> optional  = partyroomInfoService.getCrewByUserId(partyroomId, partyContext.getUserId());
         Crew crew = optional.orElseThrow();
         playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId, new CrewId(crew.getId()));
-
-        // TODO
-//        System.out.println(targetState.isLiked());
-//        System.out.println(targetState.isDisliked());
-//        System.out.println(targetState.isGrabbed());
+        return new HashMap<>() {{
+            put("isLiked", targetState.isLiked());
+            put("isDisliked", targetState.isDisliked());
+            put("isGrabbed", targetState.isGrabbed());
+        }};
     }
 
     private PlaybackReactionHistoryData getValidReactionHistoryData(PartyContext partyContext, PlaybackId playbackId) {
