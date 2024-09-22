@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
+import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.partyroom.application.service.PlaybackReactionService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.ReactCurrentPlaybackRequest;
@@ -17,10 +18,11 @@ public class PlaybackReactionController {
     private final PlaybackReactionService playbackReactionService;
 
     @PostMapping("/{partyroomId}/playbacks/reaction")
-    public ResponseEntity<Void> reactToPlayback(
+    public ResponseEntity<?> reactToPlayback(
             @PathVariable Long partyroomId,
             @RequestBody ReactCurrentPlaybackRequest request) {
-        playbackReactionService.reactToCurrentPlayback(new PartyroomId(partyroomId), request.getReactionType());
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().body(
+                ApiCommonResponse.success(playbackReactionService.reactToCurrentPlayback(
+                        new PartyroomId(partyroomId), request.getReactionType())));
     }
 }
