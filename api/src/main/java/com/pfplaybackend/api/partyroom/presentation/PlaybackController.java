@@ -3,19 +3,11 @@ package com.pfplaybackend.api.partyroom.presentation;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.partyroom.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.partyroom.application.service.PlaybackManagementService;
-import com.pfplaybackend.api.partyroom.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.event.message.TaskWaitMessage;
-import com.pfplaybackend.api.partyroom.application.service.task.TaskScheduleService;
-import com.pfplaybackend.api.partyroom.presentation.payload.response.QueryPlaybackHistoryResponse;
-import com.pfplaybackend.api.user.domain.value.UserId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 이 클래스는 재생 시작/종료와 같은 DJ 행위에 대한 표현 계층을 담당한다.

@@ -29,12 +29,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
-    final private UserProfileRepository userProfileRepository;
-    final private GuestRepository guestRepository;
-    final private MemberRepository memberRepository;
+    private final UserProfileRepository userProfileRepository;
+    private final GuestRepository guestRepository;
+    private final MemberRepository memberRepository;
     private final UserDomainService userDomainService;
-    final private GuestDomainService guestDomainService;
-    final private UserAvatarService userAvatarService;
+    private final GuestDomainService guestDomainService;
+    private final UserAvatarService userAvatarService;
+    private final UserProfileEventService userProfileEventService;
 
     public Profile createProfileForGuest(Guest guest) {
         Profile profile = new Profile(guest.getUserId());
@@ -56,6 +57,7 @@ public class UserProfileService {
         Member member = memberData.toDomain();
         Member updatedMember = member.updateProfileBio(updateBioCommand);
         memberRepository.save(updatedMember.toData());
+        userProfileEventService.publishProfileChangedEvent(updatedMember);
     }
 
     public ProfileSummaryDto getMyProfileSummary() {
@@ -89,7 +91,6 @@ public class UserProfileService {
         List<ProfileData> list = userProfileRepository.findAllByUserIdIn(userIds);
         return userProfileRepository.findAllByUserIdIn(userIds).stream()
                 .collect(Collectors.toMap(ProfileData::getUserId, profileData ->
-                        //
                         new ProfileSettingDto(profileData.getNickname(),
                                 profileData.getAvatarBodyUri().getAvatarBodyUri(),
                                 profileData.getAvatarFaceUri().getAvatarFaceUri(),

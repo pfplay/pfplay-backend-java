@@ -34,7 +34,6 @@ public class PartyroomInfoService {
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final UserProfilePeerService userProfileService;
-    private final PartyContextAspect partyContextAspect;
     private final PlaybackInfoService playbackInfoService;
 
     public List<PartyroomWithCrewDto> getAllPartyrooms() {
@@ -115,6 +114,10 @@ public class PartyroomInfoService {
     public Optional<ActivePartyroomDto> getMyActivePartyroom() {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         return partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId());
+    }
+
+    public Optional<ActivePartyroomDto> getMyActivePartyroom(UserId userId) {
+        return partyroomRepository.getActivePartyroomByUserId(userId);
     }
 
     public Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewId(UserId userId) {

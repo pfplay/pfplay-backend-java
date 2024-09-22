@@ -7,14 +7,14 @@ import com.pfplaybackend.api.partyroom.application.dto.ReactionPostProcessDto;
 import com.pfplaybackend.api.partyroom.application.peer.GrabMusicPeerService;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
-import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
+import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.enums.MotionType;
 import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
-import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
-import com.pfplaybackend.api.partyroom.event.message.AggregationMessage;
-import com.pfplaybackend.api.partyroom.event.message.MotionMessage;
+import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.partyroom.event.message.ReactionAggregationMessage;
+import com.pfplaybackend.api.partyroom.event.message.ReactionMotionMessage;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,8 +51,8 @@ public class PlaybackReactionPostProcessService {
 
     // PostProcess After Playback Reaction
     public void publishMotionChangedEvent(PartyroomId partyroomId, MotionType motionType, CrewId crewId) {
-        MotionMessage motionMessage = MotionMessage.from(partyroomId, motionType, crewId);
-        redisMessagePublisher.publish(MessageTopic.MOTION, motionMessage);
+        ReactionMotionMessage reactionMotionMessage = ReactionMotionMessage.from(partyroomId, motionType, crewId);
+        redisMessagePublisher.publish(MessageTopic.REACTION_MOTION, reactionMotionMessage);
     }
 
     public void updateDjActivityScore(UserId djUserId, int deltaScore) {
@@ -65,7 +65,8 @@ public class PlaybackReactionPostProcessService {
 
     public void publishAggregationChangedEvent(PartyroomId partyroomId, Playback playback) {
         AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
-        redisMessagePublisher.publish(MessageTopic.AGGREGATION, new AggregationMessage(partyroomId, MessageTopic.AGGREGATION, aggregationDto));
+        redisMessagePublisher.publish(MessageTopic.REACTION_AGGREGATION,
+                new ReactionAggregationMessage(partyroomId, MessageTopic.REACTION_AGGREGATION, aggregationDto));
     }
 
     public void grabMusic(UserId userId, Playback playback) {

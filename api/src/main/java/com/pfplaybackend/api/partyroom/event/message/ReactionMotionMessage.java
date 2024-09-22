@@ -1,7 +1,8 @@
 package com.pfplaybackend.api.partyroom.event.message;
 
-import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
+import com.pfplaybackend.api.partyroom.domain.enums.MotionType;
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,20 +15,20 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OutgoingGroupChatMessage implements Serializable {
+public class ReactionMotionMessage implements Serializable {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
+    private MotionType motionType;
     private Map<String, Object> crew;
-    private String message;
 
-    public static OutgoingGroupChatMessage from(PartyroomSessionDto sessionDto, String message) {
+    public static ReactionMotionMessage from(PartyroomId partyroomId, MotionType motionType, CrewId crewId) {
         Map<String, Object> crew = new HashMap<>();
-        crew.put("crewId", sessionDto.getCrewId());
-        return new OutgoingGroupChatMessage(
-                sessionDto.getPartyroomId(),
-                MessageTopic.CHAT,
-                crew,
-                message
+        crew.put("crewId", crewId.getId());
+        return new ReactionMotionMessage(
+                partyroomId,
+                MessageTopic.REACTION_MOTION,
+                motionType,
+                crew
         );
     }
 }
