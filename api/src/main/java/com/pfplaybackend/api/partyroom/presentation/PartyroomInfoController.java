@@ -71,11 +71,6 @@ public class PartyroomInfoController {
         return ResponseEntity.ok().body(QueryPartyroomSetupResponse.from(memberDto, displayDto));
     }
 
-    @GetMapping("/{partyroomId}/playback/latest")
-    public void getLatestPlaybackInfo(@PathVariable Long partyroomId) {
-        // TODO 가장 최근 재생 이력 20건
-    }
-
     @GetMapping("/{partyroomId}/dj-queue")
     public ResponseEntity<?> getDjQueueInfo(@PathVariable Long partyroomId) {
         Partyroom partyroom = partyroomInfoService.getById(new PartyroomId(partyroomId));
