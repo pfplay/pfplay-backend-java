@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.event.message;
 
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
@@ -23,8 +24,8 @@ public class CrewProfileMessage implements Serializable {
     private int combinePositionX;
     private int combinePositionY;
 
-    public static CrewProfileMessage from(MessageTopic eventType, Crew crew, CrewProfilePreCheckMessage message) {
-        return new CrewProfileMessage(eventType, crew.getPartyroomId(), crew.getId(),
+    public static CrewProfileMessage from(PartyroomId partyroomId , Long crewId, CrewProfilePreCheckMessage message) {
+        return new CrewProfileMessage(MessageTopic.CREW_PROFILE, partyroomId, crewId,
                 message.getNickname(), message.getAvatarFaceUri(), message.getAvatarBodyUri(), message.getAvatarIconUri(),
                 message.getCombinePositionX(), message.getCombinePositionY());
     }

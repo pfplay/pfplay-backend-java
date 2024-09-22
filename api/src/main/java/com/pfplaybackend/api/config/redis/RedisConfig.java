@@ -2,7 +2,9 @@ package com.pfplaybackend.api.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.config.websocket.SimpMessageSender;
-import com.pfplaybackend.api.partyroom.application.service.task.TaskExecutorService;
+import com.pfplaybackend.api.partyroom.application.service.CrewProfileService;
+import com.pfplaybackend.api.partyroom.application.service.PlaybackManagementService;
+import com.pfplaybackend.api.partyroom.application.service.lock.DistributedLockExecutor;
 import com.pfplaybackend.api.partyroom.event.listener.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,26 +44,29 @@ public class RedisConfig {
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
-        //
+
         template.setKeySerializer(new StringRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());
-        //
+
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(Object.class);
         template.setValueSerializer(serializer);
         template.setHashValueSerializer(serializer);
-        //
+
         template.setEnableTransactionSupport(true);
-        //
         template.afterPropertiesSet();
 
         return template;
     }
 
+    // TODO Create Service Registry and Register Method (24.09.22)
+
     @Bean
     public RedisMessageListenerContainer redisContainer(RedisConnectionFactory connectionFactory,
                                                         SimpMessageSender simpMessageSender,
                                                         RedisTemplate<String, Object> redisTemplate,
-                                                        TaskExecutorService taskExecutorService,
+                                                        DistributedLockExecutor distributedLockExecutor,
+                                                        CrewProfileService crewProfileService,
+                                                        PlaybackManagementService playbackManagementService,
                                                         ObjectMapper objectMapper) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
@@ -74,10 +79,10 @@ public class RedisConfig {
         container.addMessageListener(new CrewGradeTopicListener(simpMessageSender, objectMapper), new ChannelTopic("crew_grade"));
         container.addMessageListener(new CrewPenaltyTopicListener(simpMessageSender, objectMapper), new ChannelTopic("crew_penalty"));
         container.addMessageListener(new CrewProfileTopicListener(simpMessageSender, objectMapper), new ChannelTopic("crew_profile"));
-        container.addMessageListener(new CrewProfilePreCheckTopicListener(simpMessageSender, objectMapper), new ChannelTopic("crew_profile_pre_check"));
+        container.addMessageListener(new CrewProfilePreCheckTopicListener(objectMapper, distributedLockExecutor, crewProfileService), new ChannelTopic("crew_profile_pre_check"));
         container.addMessageListener(new PlaybackStartTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback_skip"));
         container.addMessageListener(new PlaybackSkipTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback_start"));
-        container.addMessageListener(new PlaybackDurationWaitTopicListener(redisTemplate, objectMapper, taskExecutorService), new PatternTopic("__keyevent@*__:expired"));
+        container.addMessageListener(new PlaybackDurationWaitTopicListener(redisTemplate, objectMapper, distributedLockExecutor, playbackManagementService), new PatternTopic("__keyevent@*__:expired"));
         return container;
     }
 }

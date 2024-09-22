@@ -18,9 +18,9 @@ public class UserProfileEventService {
         CrewProfilePreCheckMessage crewProfilePreCheckMessage = new CrewProfilePreCheckMessage(
                 profile.getUserId(),
                 profile.getNickname(),
-                profile.getAvatarFaceUri().toString(),
-                profile.getAvatarBodyUri().toString(),
-                profile.getAvatarIconUri().toString(),
+                profile.getAvatarFaceUri().getAvatarFaceUri(),
+                profile.getAvatarBodyUri().getAvatarBodyUri(),
+                profile.getAvatarIconUri().getAvatarIconUri(),
                 profile.getCombinePositionX(),
                 profile.getCombinePositionY()
         );
