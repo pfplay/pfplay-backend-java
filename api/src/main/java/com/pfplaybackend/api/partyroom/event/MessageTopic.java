@@ -1,0 +1,16 @@
+package com.pfplaybackend.api.partyroom.event;
+
+public enum MessageTopic {
+    PARTYROOM_DEACTIVATION,
+    PARTYROOM_ACCESS,
+    PARTYROOM_NOTICE,
+    REACTION_AGGREGATION,
+    REACTION_MOTION,
+    CREW_GRADE,
+    CREW_PENALTY,
+    CREW_PROFILE,
+    CREW_PROFILE_PRE_CHECK,
+    PLAYBACK_START,
+    PLAYBACK_SKIP,
+    CHAT
+}

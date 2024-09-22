@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @RequiredArgsConstructor
-public class PartyroomAvatarUpdateService {
+public class CrewProfileService {
 
     private RedisTemplate<String, Object> redisTemplate;
     private PartyroomRepository partyroomRepository;
@@ -20,7 +20,7 @@ public class PartyroomAvatarUpdateService {
      * UserProfileService 로부터 아바타가 변경되었을 경우,
      * 같은 파티 멤버들에게 해당 변경 상태를 통지한다.
      */
-    public void updateCrewAvatar() {
+    public void updateCrewProfile() {
         // TODO Check if User is located within partyroom
         // 1. within partyroom
         // Get PartyroomId

@@ -1,7 +1,7 @@
-package com.pfplaybackend.api.partyroom.event;
+package com.pfplaybackend.api.partyroom.application.service.cache;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.manager.SessionCacheManager;
+import com.pfplaybackend.api.config.websocket.cache.SessionCacheManager;
 import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
 import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
@@ -28,7 +28,6 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
             if (PartyroomSessionDto.isEmpty()) {
                 throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
             }
-
             PartyroomSessionDto sessionData = PartyroomSessionDto.get();
             redisTemplate.opsForValue().set(sessionId, sessionData);
         }

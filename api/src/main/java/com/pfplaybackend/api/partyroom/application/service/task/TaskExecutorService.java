@@ -1,13 +1,12 @@
 package com.pfplaybackend.api.partyroom.application.service.task;
 
-import com.pfplaybackend.api.config.redis.RedisLockService;
+import com.pfplaybackend.api.config.redis.lock.RedisLockService;
 import com.pfplaybackend.api.partyroom.application.service.PlaybackManagementService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Service

@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
+// 중복 코드 제거
 public interface CrewRepository extends JpaRepository<CrewData, Long> {
 
     @Query("SELECT p FROM CrewData p WHERE p.userId = :userId AND p.isActive = true")

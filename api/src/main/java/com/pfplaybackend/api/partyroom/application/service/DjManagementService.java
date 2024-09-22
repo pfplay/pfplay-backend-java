@@ -21,7 +21,7 @@ import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
-public class DJManagementService {
+public class DjManagementService {
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;

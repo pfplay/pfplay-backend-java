@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.config.websocket.manager;
+package com.pfplaybackend.api.config.websocket.cache;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import java.util.Optional;
 

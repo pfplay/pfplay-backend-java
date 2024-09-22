@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.partyroom.event;
+package com.pfplaybackend.api.config.redis;
 
-import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
+import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;

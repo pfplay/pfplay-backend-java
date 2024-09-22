@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.partyroom.application.service.DJManagementService;
+import com.pfplaybackend.api.partyroom.application.service.DjManagementService;
 import com.pfplaybackend.api.partyroom.domain.value.DjId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class DjManagementController {
 
-    private final DJManagementService djManagementService;
+    private final DjManagementService djManagementService;
 
     /**
      *

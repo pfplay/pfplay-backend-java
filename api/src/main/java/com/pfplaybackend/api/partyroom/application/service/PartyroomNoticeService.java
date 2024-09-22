@@ -2,9 +2,8 @@ package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
+import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import jakarta.transaction.Transactional;

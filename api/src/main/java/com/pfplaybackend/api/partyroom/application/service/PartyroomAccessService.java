@@ -11,11 +11,11 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.AccessType;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
-import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
+import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
-import com.pfplaybackend.api.partyroom.event.message.AccessMessage;
+import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.partyroom.event.message.PartyroomAccessMessage;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.exception.PenaltyException;
@@ -88,8 +88,8 @@ public class PartyroomAccessService {
 
     private void publishAccessChangedEvent(Crew crew, UserId userId) {
         ProfileSettingDto profileSettingDto = userProfileService.getUserProfileSetting(userId);
-        redisMessagePublisher.publish(MessageTopic.ACCESS,
-                AccessMessage.create(
+        redisMessagePublisher.publish(MessageTopic.PARTYROOM_ACCESS,
+                PartyroomAccessMessage.create(
                         crew.getPartyroomId(),
                         AccessType.ENTER,
                         CrewSummaryDto.from(crew, profileSettingDto)
@@ -116,12 +116,12 @@ public class PartyroomAccessService {
         partyroomRepository.save(partyroomConverter.toData(partyroom));
 
         CrewSummaryDto crewSummaryDto = new CrewSummaryDto(crew.getId());
-        AccessMessage accessMessage = new AccessMessage(
+        PartyroomAccessMessage partyroomAccessMessage = new PartyroomAccessMessage(
                 partyroom.getPartyroomId(),
-                MessageTopic.ACCESS,
+                MessageTopic.PARTYROOM_ACCESS,
                 AccessType.EXIT,
                 crewSummaryDto);
-        redisMessagePublisher.publish(MessageTopic.ACCESS, accessMessage);
+        redisMessagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
     }
 
     @Transactional

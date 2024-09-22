@@ -1,8 +1,6 @@
 package com.pfplaybackend.api.config.websocket.event.listener;
 
-import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.manager.SessionCacheManager;
-import com.pfplaybackend.api.config.websocket.exception.SessionException;
+import com.pfplaybackend.api.config.websocket.cache.SessionCacheManager;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
