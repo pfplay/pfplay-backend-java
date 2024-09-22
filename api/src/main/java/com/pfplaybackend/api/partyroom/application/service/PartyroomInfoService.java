@@ -34,7 +34,6 @@ public class PartyroomInfoService {
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final UserProfilePeerService userProfileService;
-    private final PartyContextAspect partyContextAspect;
     private final PlaybackInfoService playbackInfoService;
 
     public List<PartyroomWithCrewDto> getAllPartyrooms() {

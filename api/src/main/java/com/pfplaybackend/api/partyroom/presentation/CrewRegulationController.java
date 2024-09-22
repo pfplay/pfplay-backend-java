@@ -1,6 +1,8 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
-import com.pfplaybackend.api.partyroom.application.service.PartyroomRegulationService;
+import com.pfplaybackend.api.partyroom.application.service.CrewBlockService;
+import com.pfplaybackend.api.partyroom.application.service.CrewGradeService;
+import com.pfplaybackend.api.partyroom.application.service.CrewPenaltyService;
 import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewGradeRequest;
@@ -17,20 +19,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/partyrooms")
 @RestController
 @RequiredArgsConstructor
-public class PartyroomRegulationController {
+public class CrewRegulationController {
 
-    final private PartyroomRegulationService partyroomRegulationService;
+    final private CrewGradeService crewGradeService;
+    final private CrewPenaltyService crewPenaltyService;
+    final private CrewBlockService crewBlockService;
 
     @PutMapping("/{partyroomId}/crews/{crewId}/grade")
     public void updateCrewGrade(@PathVariable("partyroomId") long partyroomId,
                             @PathVariable("crewId") long crewId,
                             @RequestBody UpdateCrewGradeRequest request) {
-        partyroomRegulationService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId), request);
+        crewGradeService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId), request);
     }
 
     @PutMapping("/{partyroomId}/crews/{crewId}/penalties")
     public void updateCrewPenalty(@PathVariable("partyroomId") long partyroomId, @PathVariable("crewId") long crewId,
                                     @RequestBody UpdateCrewPenaltyRequest request) {
-        partyroomRegulationService.updatePenalty(new PartyroomId(partyroomId), new CrewId(crewId), request);
+        crewPenaltyService.updatePenalty(new PartyroomId(partyroomId), new CrewId(crewId), request);
     }
 }

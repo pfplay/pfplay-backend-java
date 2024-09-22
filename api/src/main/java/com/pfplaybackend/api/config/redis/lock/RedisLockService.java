@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.config.redis;
+package com.pfplaybackend.api.config.redis.lock;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

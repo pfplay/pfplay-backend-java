@@ -7,13 +7,13 @@ import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverte
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
-import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
-import com.pfplaybackend.api.partyroom.domain.enums.RegulationType;
+import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.service.CrewDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
-import com.pfplaybackend.api.partyroom.event.message.RegulationMessage;
+import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.partyroom.event.message.CrewGradeMessage;
+import com.pfplaybackend.api.partyroom.event.message.CrewPenaltyMessage;
 import com.pfplaybackend.api.partyroom.exception.GradeException;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewGradeRequest;
@@ -25,13 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class PartyroomRegulationService {
+public class CrewGradeService {
 
     private final RedisMessagePublisher redisMessagePublisher;;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final CrewDomainService crewDomainService;
-
 
     @Transactional
     public void updateGrade(PartyroomId partyroomId, CrewId crewId, UpdateCrewGradeRequest request) {
@@ -49,15 +48,11 @@ public class PartyroomRegulationService {
         Partyroom updatedPartyroom = partyroom.updateCrewGrade(crewId, targetGradeType);
         partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
 
-        RegulationMessage regulationMessage = RegulationMessage.from(partyroomId, RegulationType.GRADE, crewId, prevGradeType, targetGradeType);
-        publishRegulationChangedEvent(regulationMessage);
+        CrewGradeMessage message = CrewGradeMessage.from(partyroomId, crewId, prevGradeType, targetGradeType);
+        publishCrewGradeChangedEvent(message);
     }
 
-    public void updatePenalty(PartyroomId partyroomId, CrewId crewId, UpdateCrewPenaltyRequest request) {
-        // TODO
-    }
-
-    private void publishRegulationChangedEvent(RegulationMessage regulationMessage) {
-        redisMessagePublisher.publish(MessageTopic.REGULATION, regulationMessage);
+    private void publishCrewGradeChangedEvent(CrewGradeMessage message) {
+        redisMessagePublisher.publish(MessageTopic.CREW_GRADE, message);
     }
 }

@@ -6,12 +6,12 @@ import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
-import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
+import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
-import com.pfplaybackend.api.partyroom.event.message.DeactivationMessage;
+import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.partyroom.event.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateDjQueueStatusRequest;
@@ -91,7 +91,7 @@ public class PartyroomManagementService {
     @Transactional
     public void updatePlaybackDeactivation(PartyroomId partyroomId) {
         // TODO Update PartyroomData
-        messagePublisher.publish(MessageTopic.DEACTIVATION, new DeactivationMessage(partyroomId, MessageTopic.DEACTIVATION));
+        messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION, new PartyroomDeactivationMessage(partyroomId, MessageTopic.PARTYROOM_DEACTIVATION));
     }
 
     @Transactional
