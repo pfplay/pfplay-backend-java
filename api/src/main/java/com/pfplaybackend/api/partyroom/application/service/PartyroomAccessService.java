@@ -30,13 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PartyroomAccessService {
-    @Value("${shared-link.partyroom.web-page-url}")
-    private String WEB_PAGE_URL;
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
@@ -134,12 +134,11 @@ public class PartyroomAccessService {
     }
 
     @Transactional(readOnly = true)
-    public URI getRedirectUri(String linkDomain) {
+    public Map<String, Long> getRedirectUri(String linkDomain) {
         PartyroomData partyroomData = partyroomRepository.findByLinkDomain(linkDomain)
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        return UriComponentsBuilder
-                .fromHttpUrl(WEB_PAGE_URL)
-                .queryParam("partyroomId", partyroomData.getId())
-                .build().toUri();
+        return Map.of(
+                "partyroomId", partyroomData.getId()
+        );
     }
 }

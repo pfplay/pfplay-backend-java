@@ -47,11 +47,11 @@ public class PlaybackReactionService {
         Optional<Crew> optional  = partyroomInfoService.getCrewByUserId(partyroomId, partyContext.getUserId());
         Crew crew = optional.orElseThrow();
         playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId, new CrewId(crew.getId()));
-        return new HashMap<>() {{
-            put("isLiked", targetState.isLiked());
-            put("isDisliked", targetState.isDisliked());
-            put("isGrabbed", targetState.isGrabbed());
-        }};
+        return Map.of(
+            "isLiked", targetState.isLiked(),
+            "isDisliked", targetState.isDisliked(),
+            "isGrabbed", targetState.isGrabbed()
+        );
     }
 
     private PlaybackReactionHistoryData getValidReactionHistoryData(PartyContext partyContext, PlaybackId playbackId) {
