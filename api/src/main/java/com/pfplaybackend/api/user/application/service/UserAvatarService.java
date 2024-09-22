@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
@@ -35,6 +34,7 @@ public class UserAvatarService {
     private final UserAvatarDomainService userAvatarDomainService;
     // Using Peer Service
     private final AvatarResourceService avatarResourceService;
+    private final UserProfileEventService userProfileEventService;
 
     @Transactional(readOnly = true)
     public AvatarBodyUri getDefaultAvatarBodyUri() {
@@ -84,6 +84,7 @@ public class UserAvatarService {
                 .updateAvatarFace(avatarFaceUri)
                 .updateAvatarIcon(avatarIconUri);
         memberRepository.save(updatedMember.toData());
+        userProfileEventService.publishProfileChangedEvent(updatedMember);
     }
 
     @Transactional
@@ -95,5 +96,6 @@ public class UserAvatarService {
         Member updatedMember = member.updateAvatarFace(avatarFaceUri)
                 .updateAvatarIcon(avatarIconUri);
         memberRepository.save(updatedMember.toData());
+        userProfileEventService.publishProfileChangedEvent(updatedMember);
     }
 }

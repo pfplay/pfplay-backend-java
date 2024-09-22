@@ -12,3 +12,4 @@ public class PlaybackHistoryDto {
     private String nickname;
     private String avatarIconUri;
 }
+

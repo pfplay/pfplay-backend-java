@@ -6,7 +6,7 @@ import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.application.dto.PlaybackDto;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
-import com.pfplaybackend.api.partyroom.application.service.task.TaskScheduleService;
+import com.pfplaybackend.api.partyroom.application.service.task.ExpirationTaskScheduler;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PlaybackConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
@@ -15,15 +15,15 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
-import com.pfplaybackend.api.partyroom.domain.enums.MessageTopic;
+import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.service.CrewDomainService;
 import com.pfplaybackend.api.partyroom.domain.service.DjDomainService;
 import com.pfplaybackend.api.partyroom.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
-import com.pfplaybackend.api.partyroom.event.RedisMessagePublisher;
-import com.pfplaybackend.api.partyroom.event.message.TaskWaitMessage;
-import com.pfplaybackend.api.partyroom.event.message.PlaybackMessage;
+import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.partyroom.event.message.PlaybackDurationWaitMessage;
+import com.pfplaybackend.api.partyroom.event.message.PlaybackStartMessage;
 import com.pfplaybackend.api.partyroom.exception.GradeException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;
@@ -49,7 +49,7 @@ public class PlaybackManagementService {
     private final RedisMessagePublisher redisMessagePublisher;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
-    private final TaskScheduleService scheduleService;
+    private final ExpirationTaskScheduler scheduleService;
     private final CrewDomainService domainService;
     private final CrewDomainService crewDomainService;
 
@@ -57,8 +57,8 @@ public class PlaybackManagementService {
         long seconds = playbackDomainService.convertToSeconds(playback.getDuration());
         PartyroomId partyroomId = playback.getPartyroomId();
         UserId userId = playback.getUserId();
-        TaskWaitMessage taskWaitMessage = new TaskWaitMessage(partyroomId, userId);
-        scheduleService.setKeyWithExpiration(String.valueOf(partyroomId.getId()), taskWaitMessage, seconds, TimeUnit.SECONDS);
+        PlaybackDurationWaitMessage playbackDurationWaitMessage = new PlaybackDurationWaitMessage(partyroomId, userId);
+        scheduleService.setKeyWithExpiration(String.valueOf(partyroomId.getId()), playbackDurationWaitMessage, seconds, TimeUnit.SECONDS);
     }
 
     private void cancelTask(PartyroomId partyroomId) {
@@ -87,7 +87,6 @@ public class PlaybackManagementService {
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         // FIXME Remove DjDomainService in Here!!!
         if(djDomainService.isExistDj(partyroom)) {
-            System.out.println("Dj 대기열이 비어있지 않음!");
             start(partyroom);
         }else{
             partyroomManagementService.updatePlaybackDeactivation(partyroomId);
@@ -103,18 +102,16 @@ public class PlaybackManagementService {
         PlaybackData playbackData = playbackRepository.save(playbackConverter.toData(nextPlayback));
         // Update 'CurrentPlaybackId'
         partyroomRepository.save(partyroomConverter.toData(partyroom.updatePlaybackId(new PlaybackId(playbackData.getId()))));
-
         // Schedule Task to wait for playback time
         scheduleTask(nextPlayback);
-
         // Propagation Websocket Event
         publishPlaybackChangedEvent(updataedPartyroom.getPartyroomId(), djCrew.getId(), playbackData);
     }
 
     // FIXME CrewId
     private void publishPlaybackChangedEvent(PartyroomId partyroomId, long crewId, PlaybackData playbackData ) {
-        redisMessagePublisher.publish(MessageTopic.PLAYBACK,
-                new PlaybackMessage(partyroomId, MessageTopic.PLAYBACK, crewId,
+        redisMessagePublisher.publish(MessageTopic.PLAYBACK_START,
+                new PlaybackStartMessage(partyroomId, MessageTopic.PLAYBACK_START, crewId,
                         new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(), playbackData.getDuration(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
     }
 }
