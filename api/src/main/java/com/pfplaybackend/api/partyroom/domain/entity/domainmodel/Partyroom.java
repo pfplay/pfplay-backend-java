@@ -115,6 +115,7 @@ public class Partyroom {
     }
 
     public Partyroom createAndAddDj(PlaylistId playlistId, UserId userId) {
+        // Dj 객체는 'Dj 신청 레코드'와 연관되어야 하며, 기본적으로는 'Dj 역할'의 크루를 지칭해야 한다.
         this.djs = new ImmutableList.Builder<Dj>()
                 .addAll(this.djs)
                 .add(Dj.create(partyroomId, playlistId, userId, this.djs.size() + 1))
