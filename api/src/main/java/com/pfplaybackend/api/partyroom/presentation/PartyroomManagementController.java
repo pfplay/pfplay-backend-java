@@ -6,6 +6,7 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateDjQueueStatusRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.response.CreatePartyroomResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,13 @@ public class PartyroomManagementController {
     public ResponseEntity<?> createPartyroom(@RequestBody CreatePartyroomRequest createPartyroomRequest) {
         Partyroom partyRoom = partyRoomManagementService.createGeneralPartyRoom(createPartyroomRequest);
         return ResponseEntity.ok().body(CreatePartyroomResponse.from(partyRoom));
+    }
+
+    @PutMapping("/{partyroomId}")
+    public ResponseEntity<?> updatePartyroom(@PathVariable Long partyroomId, @RequestBody UpdatePartyroomRequest request) {
+        partyRoomManagementService.updatePartyroom(new PartyroomId(partyroomId), request);
+        return ResponseEntity.ok()
+                .body(ApiCommonResponse.success("OK"));
     }
 
     @DeleteMapping("/{partyroomId}")

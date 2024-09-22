@@ -1,19 +1,18 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.partyroom.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.partyroom.application.service.PlaybackManagementService;
 import com.pfplaybackend.api.partyroom.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.message.TaskWaitMessage;
 import com.pfplaybackend.api.partyroom.application.service.task.TaskScheduleService;
+import com.pfplaybackend.api.partyroom.presentation.payload.response.QueryPlaybackHistoryResponse;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -29,15 +28,29 @@ import java.util.concurrent.TimeUnit;
 public class PlaybackController {
 
     private final PlaybackManagementService playbackManagementService;
+    private final PlaybackInfoService playbackInfoService;
 
     /**
      * 파티룸 운영진에 의해 호출되는 기능으로
      * 현재 DJ의 곡 재생에 대한 중단 동작을 트리거 한다.
      * @param partyroomId
      */
-    @PostMapping("/{partyroomId}/playback/skip")
+    @PostMapping("/{partyroomId}/playbacks/skip")
     public ResponseEntity<?> playBackSkip(@PathVariable Long partyroomId) {
         playbackManagementService.skip(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
+    }
+
+    /**
+     * 타겟 파티룸의 재생 이력을 최근순으로 20개만을 조회한다.
+     * History 의 Playback 의 당시 Dj는 현재 파티룸을 이탈했을 수도 있다.
+     * @param partyroomId
+     * @return List<PlaybackHistory>
+     */
+    @GetMapping("/{partyroomId}/playbacks/histories")
+    public ResponseEntity<?> playBackHistory(@PathVariable Long partyroomId) {
+        return ResponseEntity.ok().body(ApiCommonResponse.success(
+                playbackInfoService.getRecentPlaybackHistory(new PartyroomId(partyroomId)))
+        );
     }
 }

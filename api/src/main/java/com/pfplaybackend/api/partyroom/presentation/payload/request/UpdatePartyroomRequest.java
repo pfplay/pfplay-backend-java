@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePartyroomRequest {
+public class UpdatePartyroomRequest {
     private String title;
     private String introduction;
     private String linkDomain;

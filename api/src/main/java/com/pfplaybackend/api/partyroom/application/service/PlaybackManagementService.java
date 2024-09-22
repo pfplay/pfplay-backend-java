@@ -78,7 +78,6 @@ public class PlaybackManagementService {
         PartyroomData partyroomData = partyroomRepository.findById(activePartyroomDto.getId()).orElseThrow();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         if(crewDomainService.isBelowManagerGrade(partyroom, partyContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
-
         cancelTask(partyroomId);
         tryProceed(partyroomId);
     }
@@ -88,6 +87,7 @@ public class PlaybackManagementService {
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         // FIXME Remove DjDomainService in Here!!!
         if(djDomainService.isExistDj(partyroom)) {
+            System.out.println("Dj 대기열이 비어있지 않음!");
             start(partyroom);
         }else{
             partyroomManagementService.updatePlaybackDeactivation(partyroomId);

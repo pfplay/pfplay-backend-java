@@ -1,6 +1,8 @@
 package com.pfplaybackend.api.partyroom.repository.custom;
 
 import com.pfplaybackend.api.partyroom.application.dto.*;
+import com.pfplaybackend.api.partyroom.domain.entity.data.PlaybackData;
+import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 
 import java.util.List;
@@ -12,4 +14,5 @@ public interface PartyroomRepositoryCustom {
     Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewIdByUserId(UserId userId);
     List<PartyroomWithCrewDto> getCrewDataByPartyroomId();
     Optional<PartyroomIdDto> getPartyroomDataWithUserId(UserId userId);
+    List<PlaybackData> getRecentPlaybackHistory(PartyroomId partyroomId);
 }
