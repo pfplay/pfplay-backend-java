@@ -25,6 +25,12 @@ public class CrewRegulationController {
     final private CrewPenaltyService crewPenaltyService;
     final private CrewBlockService crewBlockService;
 
+    /**
+     * 특정 크루의 (해당 파티룸 내에서의) 등급을 조정한다.
+     * @param partyroomId
+     * @param crewId
+     * @param request
+     */
     @PutMapping("/{partyroomId}/crews/{crewId}/grade")
     public void updateCrewGrade(@PathVariable("partyroomId") long partyroomId,
                             @PathVariable("crewId") long crewId,
@@ -32,6 +38,12 @@ public class CrewRegulationController {
         crewGradeService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId), request);
     }
 
+    /**
+     * 특정 크루에게 페널티를 부과하거나 해제한다.
+     * @param partyroomId
+     * @param crewId
+     * @param request
+     */
     @PutMapping("/{partyroomId}/crews/{crewId}/penalties")
     public void updateCrewPenalty(@PathVariable("partyroomId") long partyroomId, @PathVariable("crewId") long crewId,
                                     @RequestBody UpdateCrewPenaltyRequest request) {

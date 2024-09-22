@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.peer.MusicQueryPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
@@ -12,6 +13,7 @@ import com.pfplaybackend.api.partyroom.domain.value.DjId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
+import com.pfplaybackend.api.partyroom.exception.DjException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,15 +40,8 @@ public class DjManagementService {
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
         boolean isPostActivationProcessingRequired = !partyroom.isPlaybackActivated();
-        try {
-            // TODO Change Specific Exception
-            if(partyroom.isQueueClosed()) throw new Exception();
-        }catch (Exception e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
-        }
-
-        // TODO Check is Empty Playlist!!! 24.07.20 Exception!
-        if(musicQueryService.isEmptyPlaylist(playlistId.getId())) return ;
+        if(partyroom.isQueueClosed()) throw ExceptionCreator.create(DjException.QUEUE_CLOSED);
+        if(musicQueryService.isEmptyPlaylist(playlistId.getId())) throw ExceptionCreator.create(DjException.EMPTY_PLAYLIST);
 
         // FIXME Direct Add DjData to PartyroomData
         Partyroom updatedPartyroom = partyroom.createAndAddDj(playlistId, partyContext.getUserId()).applyActivation();

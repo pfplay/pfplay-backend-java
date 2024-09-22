@@ -7,7 +7,9 @@ import lombok.Getter;
 
 @Getter
 public enum DjException implements DomainException {
-    ALREADY_REGISTERED("DJ-001", "Already Registered Dj", ConflictException.class);
+    ALREADY_REGISTERED("DJ-001", "Already Registered Dj", ConflictException.class),
+    QUEUE_CLOSED("DJ-002", "Dj Queue is Closed", ForbiddenException.class),
+    EMPTY_PLAYLIST("DJ-003", "Cannot Register Empty Playlist", ForbiddenException.class);
 
     private final String errorCode;
     private final String message;

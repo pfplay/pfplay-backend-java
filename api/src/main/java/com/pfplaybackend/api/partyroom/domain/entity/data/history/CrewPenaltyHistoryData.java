@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data.history;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -14,10 +15,10 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @DynamicUpdate
 @Table(
-        name = "USER_PENALTY_HISTORY"
+        name = "CREW_PENALTY_HISTORY"
 )
 @Entity
-public class UserPenaltyHistoryData extends BaseEntity {
+public class CrewPenaltyHistoryData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,15 +31,15 @@ public class UserPenaltyHistoryData extends BaseEntity {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "uid", column = @Column(name = "penalizing_user_id")),
+            @AttributeOverride(name = "id", column = @Column(name = "punisher_crew_id")),
     })
-    private UserId penalizingUserId;
+    private CrewId punisherCrewId;
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "uid", column = @Column(name = "penalized_user_id")),
+            @AttributeOverride(name = "id", column = @Column(name = "punished_crew_id")),
     })
-    private UserId penalizedUserId;
+    private CrewId punishedCrewId;
 
     @Column(name = "penalty_reason", length = 255)
     private String penaltyReason;
@@ -55,5 +56,5 @@ public class UserPenaltyHistoryData extends BaseEntity {
     @Column(name = "released_by_user_id")
     private Long releasedByUserId;
 
-    public UserPenaltyHistoryData() {}
+    public CrewPenaltyHistoryData() {}
 }
