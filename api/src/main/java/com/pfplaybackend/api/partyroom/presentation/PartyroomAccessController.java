@@ -44,8 +44,6 @@ public class PartyroomAccessController {
     @GetMapping("/link/{linkDomain}/enter")
     public ResponseEntity<?> enterPartyroomByLinkAddress(
             @PathVariable String linkDomain) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(partyroomAccessService.getRedirectUri(linkDomain));
-        return ResponseEntity.status(MOVED_PERMANENTLY).headers(headers).build();
+        return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomAccessService.getRedirectUri(linkDomain)));
     }
 }
