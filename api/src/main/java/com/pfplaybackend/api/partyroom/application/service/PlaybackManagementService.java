@@ -6,7 +6,7 @@ import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.application.dto.PlaybackDto;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
-import com.pfplaybackend.api.partyroom.application.service.task.TaskScheduleService;
+import com.pfplaybackend.api.partyroom.application.service.task.ExpirationTaskScheduler;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PlaybackConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
@@ -49,7 +49,7 @@ public class PlaybackManagementService {
     private final RedisMessagePublisher redisMessagePublisher;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
-    private final TaskScheduleService scheduleService;
+    private final ExpirationTaskScheduler scheduleService;
     private final CrewDomainService domainService;
     private final CrewDomainService crewDomainService;
 

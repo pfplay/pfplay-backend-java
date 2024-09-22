@@ -116,6 +116,10 @@ public class PartyroomInfoService {
         return partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId());
     }
 
+    public Optional<ActivePartyroomDto> getMyActivePartyroom(UserId userId) {
+        return partyroomRepository.getActivePartyroomByUserId(userId);
+    }
+
     public Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewId(UserId userId) {
         return partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(userId);
     }

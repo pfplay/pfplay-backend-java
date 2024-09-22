@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class TaskScheduleService {
+public class ExpirationTaskScheduler {
     private final RedisTemplate<String, Object> redisTemplate;
 
     private final String TASK_PREFIX = "TASK:WAIT:";
