@@ -2,6 +2,8 @@ package com.pfplaybackend.api.partyroom.repository.impl;
 
 import com.pfplaybackend.api.partyroom.application.dto.*;
 import com.pfplaybackend.api.partyroom.domain.entity.data.*;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
+import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.repository.custom.PartyroomRepositoryCustom;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import com.querydsl.core.Tuple;
@@ -194,6 +196,23 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 .values());
     }
 
+    @Override
+    public List<PlaybackData> getRecentPlaybackHistory(PartyroomId partyroomId) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
+        QPlaybackData qPlaybackData = QPlaybackData.playbackData;
+
+        return queryFactory
+                .select(qPlaybackData)
+                .from(qPartyroomData, qPlaybackData)
+                .where(qPartyroomData.id.eq(partyroomId.getId())
+                        .and(qPartyroomData.id.eq(qPlaybackData.partyroomId.id)))
+                .orderBy(qPlaybackData.createdAt.desc())
+                .limit(20)
+                .fetch();
+    }
+
+    // TODO 중복 기능 삭제
     @Override
     public Optional<PartyroomIdDto> getPartyroomDataWithUserId(UserId userId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);

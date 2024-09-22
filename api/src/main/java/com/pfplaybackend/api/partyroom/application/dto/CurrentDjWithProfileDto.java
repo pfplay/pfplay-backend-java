@@ -1,12 +1,12 @@
 package com.pfplaybackend.api.partyroom.application.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @AllArgsConstructor
-public class DjDto {
-    private int djId;
-    private int orderNumber;
+@Data
+public class CurrentDjWithProfileDto {
+    private long crewId;
     private String nickname;
-    private String avatarBodyUri;
-    private String avatarFaceUri;
+    private String avatarIconUri;
 }

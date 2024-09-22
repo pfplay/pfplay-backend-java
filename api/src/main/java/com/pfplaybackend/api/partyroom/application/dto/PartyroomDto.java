@@ -15,6 +15,6 @@ public class PartyroomDto {
     private String introduction;
     private boolean isPlaybackActivated;
     private boolean isQueueClosed;
-    private long memberCount;
+    private long crewCount;
     private PlaybackDto playbackDto;
 }
