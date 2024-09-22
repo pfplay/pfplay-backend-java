@@ -2,13 +2,14 @@ package com.pfplaybackend.api.partyroom.application.service.cache;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.config.websocket.cache.SessionCacheManager;
-import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
+import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
-import com.pfplaybackend.api.partyroom.repository.CrewRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,17 +20,22 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PartyroomSessionCacheManager implements SessionCacheManager {
     private final RedisTemplate<String, Object> redisTemplate;
-    private final CrewRepository crewRepository;
+    private final PartyroomInfoService partyroomInfoService;
 
     @Transactional
     public void saveSessionCache(String sessionId, UserId userId, String destination) {
-        if (destination.contains("partyroom")) {
-            Optional<PartyroomSessionDto> PartyroomSessionDto = createSessionData(sessionId, userId);
-            if (PartyroomSessionDto.isEmpty()) {
-                throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        String[] parts = destination.split("/");
+        if(parts[1].equals("sub")) {
+            String topic = parts[2];
+            String separator = parts[3];
+            if (topic.equals("partyroom")) {
+                Optional<PartyroomSessionDto> PartyroomSessionDto = createSessionData(sessionId, userId);
+                if (PartyroomSessionDto.isEmpty()) {
+                    throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+                }
+                PartyroomSessionDto sessionData = PartyroomSessionDto.get();
+                redisTemplate.opsForValue().set(sessionId, sessionData);
             }
-            PartyroomSessionDto sessionData = PartyroomSessionDto.get();
-            redisTemplate.opsForValue().set(sessionId, sessionData);
         }
     }
 
@@ -48,10 +54,10 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
     }
 
     private Optional<PartyroomSessionDto> createSessionData(String sessionId, UserId userId) {
-        Optional<CrewData> data = crewRepository.findByUserId(userId);
-        if (data.isPresent()) {
-            PartyroomId partyroomId = data.get().getPartyroomData().getPartyroomId();
-            long crewId = data.get().getId();
+        Optional<ActivePartyroomWithCrewDto> optional = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
+        if (optional.isPresent()) {
+            PartyroomId partyroomId = new PartyroomId(optional.get().getId());
+            long crewId = optional.get().getCrewId();
             return Optional.of(new PartyroomSessionDto(sessionId, userId, partyroomId, crewId));
         }
         return Optional.empty();

@@ -32,7 +32,6 @@ public class SubscriptionEventListener implements ApplicationListener<SessionSub
             throw ExceptionCreator.create(SessionException.UNAUTHORIZED_SESSION);
         }
         UserId userId = UserId.create(UUID.fromString(principal.getName()));
-
         sessionCacheManager.saveSessionCache(sessionId, userId, destination);
 
         logger.info("Session has subscribed, sessionId : " + sessionId + ", userId : " + userId + ", destination : " + destination);
