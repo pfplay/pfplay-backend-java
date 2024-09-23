@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.presentation.payload.response;
+package com.pfplaybackend.api.partyroom.presentation.payload.response.info;
 
 import lombok.Data;
 import lombok.Getter;

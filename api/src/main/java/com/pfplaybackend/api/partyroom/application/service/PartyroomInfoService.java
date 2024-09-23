@@ -2,7 +2,6 @@ package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.partyroom.application.aspect.PartyContextAspect;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.*;
 import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
@@ -16,7 +15,7 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
-import com.pfplaybackend.api.partyroom.presentation.payload.response.QueryPartyroomSummaryResponse;
+import com.pfplaybackend.api.partyroom.presentation.payload.response.info.QueryPartyroomSummaryResponse;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;

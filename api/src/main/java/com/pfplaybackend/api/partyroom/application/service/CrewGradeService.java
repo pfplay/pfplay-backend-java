@@ -13,11 +13,9 @@ import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.CrewGradeMessage;
-import com.pfplaybackend.api.partyroom.event.message.CrewPenaltyMessage;
 import com.pfplaybackend.api.partyroom.exception.GradeException;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewGradeRequest;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewPenaltyRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.regulation.AdjustGradeRequest;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,7 @@ public class CrewGradeService {
     private final CrewDomainService crewDomainService;
 
     @Transactional
-    public void updateGrade(PartyroomId partyroomId, CrewId crewId, UpdateCrewGradeRequest request) {
+    public void updateGrade(PartyroomId partyroomId, CrewId crewId, AdjustGradeRequest request) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         // TODO Exception 호출 멤버와 타겟 멤버는 같은 파티룸에 위치하는가?
         PartyroomData partyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId()).orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));

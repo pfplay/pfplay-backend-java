@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.presentation.payload.request;
+package com.pfplaybackend.api.partyroom.presentation.payload.request.playback;
 
 import com.pfplaybackend.api.partyroom.domain.enums.ReactionType;
 import lombok.Data;

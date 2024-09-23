@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.presentation.payload.request;
+package com.pfplaybackend.api.partyroom.presentation.payload.request.management;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreatePartyroomRequest {
+public class UpdatePartyroomRequest {
     private String title;
     private String introduction;
     private String linkDomain;
