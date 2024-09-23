@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.presentation.payload.response;
+package com.pfplaybackend.api.partyroom.presentation.payload.response.info;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class QueryPartyroomNoticeResponse {
-    String content;
+    private String content;
 }

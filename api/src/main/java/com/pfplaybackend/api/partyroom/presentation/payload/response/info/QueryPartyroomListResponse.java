@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.presentation.payload.response;
+package com.pfplaybackend.api.partyroom.presentation.payload.response.info;
 
 import com.pfplaybackend.api.partyroom.application.dto.PartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyroomElement;

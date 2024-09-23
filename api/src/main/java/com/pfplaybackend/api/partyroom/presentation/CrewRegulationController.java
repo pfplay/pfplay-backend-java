@@ -5,8 +5,8 @@ import com.pfplaybackend.api.partyroom.application.service.CrewGradeService;
 import com.pfplaybackend.api.partyroom.application.service.CrewPenaltyService;
 import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewGradeRequest;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewPenaltyRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.regulation.AdjustGradeRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.regulation.PunishPenaltyRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -34,19 +34,53 @@ public class CrewRegulationController {
     @PutMapping("/{partyroomId}/crews/{crewId}/grade")
     public void updateCrewGrade(@PathVariable("partyroomId") long partyroomId,
                             @PathVariable("crewId") long crewId,
-                            @RequestBody UpdateCrewGradeRequest request) {
+                            @RequestBody AdjustGradeRequest request) {
         crewGradeService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId), request);
     }
 
     /**
-     * 특정 크루에게 페널티를 부과하거나 해제한다.
+     * 특정 크루에게 페널티를 부과한다.
      * @param partyroomId
      * @param crewId
      * @param request
      */
-    @PutMapping("/{partyroomId}/crews/{crewId}/penalties")
-    public void updateCrewPenalty(@PathVariable("partyroomId") long partyroomId, @PathVariable("crewId") long crewId,
-                                    @RequestBody UpdateCrewPenaltyRequest request) {
+    @PostMapping("/{partyroomId}/crews/{crewId}/penalties")
+    public void imposeCrewPenalty(@PathVariable("partyroomId") long partyroomId, @PathVariable("crewId") long crewId,
+                                    @RequestBody PunishPenaltyRequest request) {
         crewPenaltyService.updatePenalty(new PartyroomId(partyroomId), new CrewId(crewId), request);
+    }
+
+    /**
+     * 특정 크루의 기 부과된 페널티를 해제한다.
+     * @param partyroomId
+     * @param crewId
+     * @param penaltyId
+     */
+    @DeleteMapping("/{partyroomId}/crews/{crewId}/penalties/{penaltyId}")
+    public void releaseCrewPenalty(@PathVariable("partyroomId") long partyroomId,
+                                  @PathVariable("crewId") long crewId,
+                                  @PathVariable("penaltyId") long penaltyId) {
+        //
+    }
+
+
+    /**
+     * 특정 크루의 채팅을 차단한다.
+     * @param partyroomId
+     * @param blockedCrewId
+     */
+    @PostMapping("/{partyroomId}/crews/me/blocks/{blockedCrewId}")
+    public void blockCrew(@PathVariable("partyroomId") long partyroomId,
+                                @PathVariable("blockedCrewId") long blockedCrewId) {
+    }
+
+    /**
+     * 특정 크루의 채팅 차단을 해제한다.
+     * @param partyroomId
+     * @param blockedCrewId
+     */
+    @DeleteMapping("/{partyroomId}/crews/me/blocks/{blockedCrewId}")
+    public void unblockCrew(@PathVariable("partyroomId") long partyroomId,
+                            @PathVariable("blockedCrewId") long blockedCrewId) {
     }
 }

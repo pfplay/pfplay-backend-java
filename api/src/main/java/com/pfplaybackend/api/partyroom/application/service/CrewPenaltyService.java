@@ -5,7 +5,7 @@ import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.event.message.CrewPenaltyMessage;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateCrewPenaltyRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.regulation.PunishPenaltyRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class CrewPenaltyService {
 
     private final RedisMessagePublisher redisMessagePublisher;
 
-    public void updatePenalty(PartyroomId partyroomId, CrewId crewId, UpdateCrewPenaltyRequest request) {
+    public void updatePenalty(PartyroomId partyroomId, CrewId crewId, PunishPenaltyRequest request) {
         // TODO
         CrewPenaltyMessage message = new CrewPenaltyMessage();
         publishCrewPenaltyChangedEvent(message);

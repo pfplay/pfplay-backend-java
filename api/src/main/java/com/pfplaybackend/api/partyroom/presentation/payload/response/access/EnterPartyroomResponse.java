@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.presentation.payload.response;
+package com.pfplaybackend.api.partyroom.presentation.payload.response.access;
 
 
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
