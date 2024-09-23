@@ -3,8 +3,9 @@ package com.pfplaybackend.api.partyroom.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
-import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.application.dto.CrewSummaryDto;
+import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
@@ -21,16 +22,11 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.exception.PenaltyException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,12 +34,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PartyroomAccessService {
 
+    private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final PartyroomDomainService partyroomDomainService;
-    private final RedisMessagePublisher redisMessagePublisher;
-    private final UserProfileService userProfileService;
     private final PartyroomInfoService partyroomInfoService;
+    private final PlaybackManagementService playbackManagementService;
+    private final UserProfilePeerService userProfileService;
 
     @Transactional
     public Crew tryEnter(PartyroomId partyroomId) {
@@ -88,7 +85,7 @@ public class PartyroomAccessService {
 
     private void publishAccessChangedEvent(Crew crew, UserId userId) {
         ProfileSettingDto profileSettingDto = userProfileService.getUserProfileSetting(userId);
-        redisMessagePublisher.publish(MessageTopic.PARTYROOM_ACCESS,
+        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS,
                 PartyroomAccessMessage.create(
                         crew.getPartyroomId(),
                         AccessType.ENTER,
@@ -109,11 +106,13 @@ public class PartyroomAccessService {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-        // TODO 퇴장 대상이 DJQueue 에 존재하는지 여부 확인
-        // TODO 존재할 시 'Dj 대기열'에서 강제 제거
-        //
         Crew crew = partyroom.deactivateCrewAndGet(partyContext.getUserId());
+        // FIXME
+        partyroom.tryRemoveInDjQueue(partyContext.getUserId());
         partyroomRepository.save(partyroomConverter.toData(partyroom));
+
+        // TODO 현재 Dj인 경우에 한해서 Current Playback 강제 스킵 처리
+        // playbackManagementService.skipBySystem(partyroomId);
 
         CrewSummaryDto crewSummaryDto = new CrewSummaryDto(crew.getId());
         PartyroomAccessMessage partyroomAccessMessage = new PartyroomAccessMessage(
@@ -121,16 +120,7 @@ public class PartyroomAccessService {
                 MessageTopic.PARTYROOM_ACCESS,
                 AccessType.EXIT,
                 crewSummaryDto);
-        redisMessagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
-    }
-
-    @Transactional
-    public void forceOut() {
-        if(partyroomDomainService.isExistInDjQueue()) {
-            // Dj 대기열에서 강제 제거
-        }
-        // TODO 퇴장 대상이 DJQueue 에 존재하는지 여부 확인
-        // eventPublisher.publish(MessageTopic.PARTYROOM_ACCESS, updatedPartyroom);
+        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
     }
 
     @Transactional(readOnly = true)

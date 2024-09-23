@@ -20,4 +20,9 @@ public class UserProfileProxyService implements UserProfilePeerService {
     public Map<UserId, ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds) {
         return userProfileService.getUsersProfileSetting(userIds);
     }
+
+    @Override
+    public ProfileSettingDto getUserProfileSetting(UserId userId) {
+        return userProfileService.getUserProfileSetting(userId);
+    }
 }

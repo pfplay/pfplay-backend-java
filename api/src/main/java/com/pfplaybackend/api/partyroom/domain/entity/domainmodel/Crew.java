@@ -54,19 +54,16 @@ public class Crew {
         return this;
     }
 
-    public Crew applyDeactivation() {
+    public void applyDeactivation() {
         this.isActive = false;
-        return this;
     }
 
-    public Crew applyActivation() {
+    public void applyActivation() {
         this.isActive = true;
         this.enteredAt = LocalDateTime.now();
-        return this;
     }
 
-    public Crew updateGrade(GradeType gradeType) {
+    public void updateGrade(GradeType gradeType) {
         this.gradeType = gradeType;
-        return this;
     }
 }

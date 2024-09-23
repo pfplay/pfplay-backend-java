@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CrewGradeService {
 
-    private final RedisMessagePublisher redisMessagePublisher;;
+    private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final CrewDomainService crewDomainService;
@@ -51,6 +51,6 @@ public class CrewGradeService {
     }
 
     private void publishCrewGradeChangedEvent(CrewGradeMessage message) {
-        redisMessagePublisher.publish(MessageTopic.CREW_GRADE, message);
+        messagePublisher.publish(MessageTopic.CREW_GRADE, message);
     }
 }

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.service;
 
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -9,6 +10,6 @@ import org.springframework.stereotype.Service;
 public class DjDomainService {
 
     public boolean isExistDj(Partyroom partyroom) {
-        return !partyroom.getDjs().isEmpty();
+        return partyroom.getDjSet().stream().noneMatch(Dj::isDeleted);
     }
 }

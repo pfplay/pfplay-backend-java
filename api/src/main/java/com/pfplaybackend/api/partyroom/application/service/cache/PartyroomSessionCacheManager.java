@@ -2,14 +2,13 @@ package com.pfplaybackend.api.partyroom.application.service.cache;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.config.websocket.cache.SessionCacheManager;
-import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

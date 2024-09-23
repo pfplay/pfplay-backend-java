@@ -16,7 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PartyroomNoticeService {
 
-    private final RedisMessagePublisher redisMessagePublisher;
+    private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
 
     @Transactional

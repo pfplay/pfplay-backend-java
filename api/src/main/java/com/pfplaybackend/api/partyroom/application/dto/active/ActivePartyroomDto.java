@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application.dto;
+package com.pfplaybackend.api.partyroom.application.dto.active;
 
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import lombok.AllArgsConstructor;

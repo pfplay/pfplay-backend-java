@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserProfileEventService {
-    private final RedisMessagePublisher redisMessagePublisher;
+    private final RedisMessagePublisher messagePublisher;
 
     public void publishProfileChangedEvent(Member member) {
         Profile profile = member.getProfile();
@@ -24,6 +24,6 @@ public class UserProfileEventService {
                 profile.getCombinePositionX(),
                 profile.getCombinePositionY()
         );
-        redisMessagePublisher.publish(MessageTopic.CREW_PROFILE_PRE_CHECK, crewProfilePreCheckMessage);
+        messagePublisher.publish(MessageTopic.CREW_PROFILE_PRE_CHECK, crewProfilePreCheckMessage);
     }
 }

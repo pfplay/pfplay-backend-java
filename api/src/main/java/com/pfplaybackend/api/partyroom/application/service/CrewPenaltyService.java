@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class CrewPenaltyService {
 
-    private final RedisMessagePublisher redisMessagePublisher;
+    private final RedisMessagePublisher messagePublisher;
 
     public void updatePenalty(PartyroomId partyroomId, CrewId crewId, PunishPenaltyRequest request) {
         // TODO
@@ -30,6 +30,6 @@ public class CrewPenaltyService {
     // 명시적으로 해제 가능한 페널티는 '30초간 채팅 금지'와 '영구 강제 퇴장'이다.
 
     private void publishCrewPenaltyChangedEvent(CrewPenaltyMessage message) {
-        redisMessagePublisher.publish(MessageTopic.CREW_PENALTY, message);
+        messagePublisher.publish(MessageTopic.CREW_PENALTY, message);
     }
 }
