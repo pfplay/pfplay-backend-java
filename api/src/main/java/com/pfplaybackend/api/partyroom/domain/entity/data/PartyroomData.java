@@ -14,7 +14,9 @@ import lombok.Getter;
 import org.hibernate.annotations.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @DynamicInsert
@@ -55,10 +57,10 @@ public class PartyroomData extends BaseEntity {
     private int playbackTimeLimit;
     
     @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CrewData> crewDataList = new ArrayList<>();
+    private Set<CrewData> crewDataSet;
 
     @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DjData> djDataList = new ArrayList<>();
+    private Set<DjData> djDataSet;
 
     // 공지사항 내용
     private String noticeContent;
@@ -106,8 +108,8 @@ public class PartyroomData extends BaseEntity {
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
         // Assign Empty Collection
-        this.crewDataList = new ArrayList<>();
-        this.djDataList = new ArrayList<>();
+        this.crewDataSet = new HashSet<>();
+        this.djDataSet = new HashSet<>();
         //
         this.noticeContent = noticeContent;
         this.currentPlaybackId = currentPlaybackId;
@@ -116,15 +118,15 @@ public class PartyroomData extends BaseEntity {
         this.isTerminated = isTerminated;
     }
 
-    public PartyroomData assignCrewDataList(List<CrewData> crewDataList) {
-        this.crewDataList.clear();
-        this.crewDataList.addAll(crewDataList);
+    public PartyroomData assignCrewDataSet(Set<CrewData> crewDataSet) {
+        this.crewDataSet.clear();
+        this.crewDataSet.addAll(crewDataSet);
         return this;
     }
 
-    public PartyroomData assignDjDataList(List<DjData> djDataList) {
-        this.djDataList.clear();
-        this.djDataList.addAll(djDataList);
+    public PartyroomData assignDjDataSet(Set<DjData> djDataSet) {
+        this.djDataSet.clear();
+        this.djDataSet.addAll(djDataSet);
         return this;
     }
 

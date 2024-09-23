@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,19 +37,19 @@ public class PartyroomConverter {
                 .build();
 
         // PartymemberData to Partymember
-        List<Crew> crews = partyroomData.getCrewDataList().stream()
+        Set<Crew> crewSet = partyroomData.getCrewDataSet().stream()
                 .map(crewConverter::toDomain)
                 .map(partymember -> partymember.assignPartyroomId(partyroom.getPartyroomId()))
-                .toList();
+                .collect(Collectors.toSet());
         // DjData to Dj
-        List<Dj> djs = partyroomData.getDjDataList().stream()
+        Set<Dj> djSet = partyroomData.getDjDataSet().stream()
                 .map(djConverter::toDomain)
                 .map(dj -> dj.assignPartyroomId(partyroom.getPartyroomId()))
-                .toList();
+                .collect(Collectors.toSet());
 
         return partyroom
-                .assignCrews(crews)
-                .assignDjs(djs);
+                .assignCrewSet(crewSet)
+                .assignDjSet(djSet);
     }
 
     public PartyroomData toData(Partyroom partyroom) {
@@ -67,18 +69,18 @@ public class PartyroomConverter {
                 .build();
 
         // Partymember to PartymemberData
-        List<CrewData> crewDataList = partyroom.getCrews().stream()
+        Set<CrewData> crewDataSet = partyroom.getCrewSet().stream()
                 .map(crewConverter::toData)
                 .map(partymemberData -> partymemberData.assignPartyroomData(partyroomData))
-                .toList();
+                .collect(Collectors.toSet());
         // Dj to DjData
-        List<DjData> djDataList = partyroom.getDjs().stream()
+        Set<DjData> djDataSet = partyroom.getDjSet().stream()
                 .map(djConverter::toData)
                 .map(djData -> djData.assignPartyroomData(partyroomData))
-                .toList();
+                .collect(Collectors.toSet());
 
         return partyroomData
-                .assignCrewDataList(crewDataList)
-                .assignDjDataList(djDataList);
+                .assignCrewDataSet(crewDataSet)
+                .assignDjDataSet(djDataSet);
     }
 }

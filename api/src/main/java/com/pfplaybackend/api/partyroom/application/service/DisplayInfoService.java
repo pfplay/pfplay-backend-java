@@ -4,6 +4,7 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.*;
+import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;

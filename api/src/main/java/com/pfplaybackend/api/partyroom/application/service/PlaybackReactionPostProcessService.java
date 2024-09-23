@@ -26,7 +26,7 @@ import java.util.List;
 public class PlaybackReactionPostProcessService {
     private final PlaybackInfoService playbackInfoService;
     // Using RedisMessagePublisher
-    private final RedisMessagePublisher redisMessagePublisher;
+    private final RedisMessagePublisher messagePublisher;
     // Using Proxy Services
     private final GrabMusicPeerService grabMusicService;
     private final UserActivityPeerService userActivityService;
@@ -52,7 +52,7 @@ public class PlaybackReactionPostProcessService {
     // PostProcess After Playback Reaction
     public void publishMotionChangedEvent(PartyroomId partyroomId, MotionType motionType, CrewId crewId) {
         ReactionMotionMessage reactionMotionMessage = ReactionMotionMessage.from(partyroomId, motionType, crewId);
-        redisMessagePublisher.publish(MessageTopic.REACTION_MOTION, reactionMotionMessage);
+        messagePublisher.publish(MessageTopic.REACTION_MOTION, reactionMotionMessage);
     }
 
     public void updateDjActivityScore(UserId djUserId, int deltaScore) {
@@ -65,7 +65,7 @@ public class PlaybackReactionPostProcessService {
 
     public void publishAggregationChangedEvent(PartyroomId partyroomId, Playback playback) {
         AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
-        redisMessagePublisher.publish(MessageTopic.REACTION_AGGREGATION,
+        messagePublisher.publish(MessageTopic.REACTION_AGGREGATION,
                 new ReactionAggregationMessage(partyroomId, MessageTopic.REACTION_AGGREGATION, aggregationDto));
     }
 

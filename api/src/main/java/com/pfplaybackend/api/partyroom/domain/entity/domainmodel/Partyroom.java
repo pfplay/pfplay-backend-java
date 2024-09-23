@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
@@ -15,9 +16,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @SuperBuilder(toBuilder = true)
@@ -30,8 +30,8 @@ public class Partyroom {
     private int playbackTimeLimit;
     private UserId hostId;
     private String noticeContent;
-    private List<Crew> crews;
-    private List<Dj> djs;
+    private Set<Crew> crewSet;
+    private Set<Dj> djSet;
     private PlaybackId currentPlaybackId;
     private boolean isPlaybackActivated;
     private boolean isQueueClosed;
@@ -51,8 +51,8 @@ public class Partyroom {
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
         // Assign Default Values
-        this.crews = new ArrayList<>();
-        this.djs = new ArrayList<>();
+        this.crewSet = new HashSet<>();
+        this.djSet = new HashSet<>();
         this.noticeContent = "";
         this.currentPlaybackId = null;
         this.isPlaybackActivated = false;
@@ -72,8 +72,8 @@ public class Partyroom {
         this.introduction = introduction;
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
-        this.crews = new ArrayList<>();
-        this.djs = new ArrayList<>();
+        this.crewSet = new HashSet<>();
+        this.djSet = new HashSet<>();
         this.stageType = stageType;
         this.hostId = hostId;
         this.noticeContent = noticeContent;
@@ -89,37 +89,31 @@ public class Partyroom {
     }
 
     public boolean isExceededLimit() {
-        return this.getCrews().size() > 49;
+        return this.getCrewSet().size() > 49;
     }
 
-    public Partyroom assignCrews(List<Crew> crews) {
-        this.crews = crews;
+    public Partyroom assignCrewSet(Set<Crew> crewSet) {
+        this.crewSet = crewSet;
         return this;
     }
 
-    public Partyroom assignDjs(List<Dj> djs) {
-        this.djs = djs;
+    public Partyroom assignDjSet(Set<Dj> djSet) {
+        this.djSet = djSet;
         return this;
     }
 
     public Optional<Crew> getCrewByUserId(UserId userId) {
-        return this.crews.stream().filter(crew -> crew.getUserId().equals(userId)).findFirst();
+        return this.crewSet.stream().filter(crew -> crew.getUserId().equals(userId)).findFirst();
     }
 
     public Partyroom addNewCrew(UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
-        this.crews = new ImmutableList.Builder<Crew>()
-                .addAll(this.crews)
-                .add(Crew.create(userId, this.partyroomId, authorityTier, gradeType))
-                .build();
+        this.crewSet.add(Crew.create(userId, this.partyroomId, authorityTier, gradeType));
         return this;
     }
 
     public Partyroom createAndAddDj(PlaylistId playlistId, UserId userId) {
-        // Dj 객체는 'Dj 신청 레코드'와 연관되어야 하며, 기본적으로는 'Dj 역할'의 크루를 지칭해야 한다.
-        this.djs = new ImmutableList.Builder<Dj>()
-                .addAll(this.djs)
-                .add(Dj.create(partyroomId, playlistId, userId, this.djs.size() + 1))
-                .build();
+        // TODO Dj 객체는 'Dj 신청 레코드'와 연관되어야 하며, 기본적으로는 'Dj 역할'의 크루를 지칭해야 한다.
+        this.djSet.add(Dj.create(partyroomId, playlistId, userId, this.djSet.size() + 1));
         return this;
     }
 
@@ -133,69 +127,70 @@ public class Partyroom {
         return this;
     }
 
+    public Partyroom applyDeactivation() {
+        this.isPlaybackActivated = false;
+        this.currentPlaybackId = null;
+        return this;
+    }
+
     public Partyroom rotateDjs() {
-        int totalElements = this.djs.size();
-        this.djs = new ImmutableList.Builder<Dj>()
-                .addAll(this.djs)
-                .build().stream().peek(dj -> {
-                    if(dj.getOrderNumber() == 1) {
-                        dj.updateOrderNumber(totalElements);
-                    }else {
-                        dj.updateOrderNumber(dj.getOrderNumber() - 1);
-                    }
-                }).toList();
+        int totalElements = this.djSet.size();
+        this.djSet.stream().peek(dj -> {
+            if(dj.getOrderNumber() == 1) {
+                dj.updateOrderNumber(totalElements);
+            }else {
+                dj.updateOrderNumber(dj.getOrderNumber() - 1);
+            }
+        });
         return this;
     }
 
     public Crew deactivateCrewAndGet(UserId userId) {
-        this.crews = new ImmutableList.Builder<Crew>()
-                .addAll(this.crews)
-                .build().stream().map(crew -> {
+        this.crewSet = this.crewSet.stream().peek(crew -> {
                     if(crew.getUserId().equals(userId)) {
-                        return crew.applyDeactivation();
-                    }else {
-                        return crew;
+                        crew.applyDeactivation();
                     }
-                }).toList();
-        return this.crews.stream().filter(crew -> crew.getUserId().equals(userId)).findAny().orElseThrow();
+                }).collect(Collectors.toSet());
+        return this.crewSet.stream().filter(crew -> crew.getUserId().equals(userId)).findAny().orElseThrow();
     }
 
+    public void tryRemoveInDjQueue(UserId userId) {
+        this.djSet = this.djSet.stream().peek(dj -> {
+            if(dj.getUserId().equals(userId)) {
+                dj.applyDeleted();
+            }
+        }).collect(Collectors.toSet());
+    }
+
+
     public boolean isUserInactiveCrew(UserId userId) {
-        return this.crews.stream().anyMatch(crew -> crew.getUserId().equals(userId) && !crew.isActive());
+        return this.crewSet.stream().anyMatch(crew -> crew.getUserId().equals(userId) && !crew.isActive());
     }
 
     public boolean isUserBannedCrew(UserId userId) {
-        return this.crews.stream().filter(crew -> crew.getUserId().equals(userId)).findAny().orElseThrow().isBanned();
+        return this.crewSet.stream().filter(crew -> crew.getUserId().equals(userId)).findAny().orElseThrow().isBanned();
     }
 
     public Partyroom activateCrew(UserId userId) {
-        this.crews = new ImmutableList.Builder<Crew>()
-                .addAll(this.crews.stream()
-                        .peek(crew -> {
-                            if (crew.getUserId().equals(userId)) {
-                                crew.applyActivation();
-                            }
-                        }).toList()
-                ).build();
+        this.crewSet = this.crewSet.stream().peek(crew -> {
+            if (crew.getUserId().equals(userId)) {
+                crew.applyActivation();
+            }
+        }).collect(Collectors.toSet());
         return this;
     }
 
     public Partyroom updateCrewGrade(CrewId crewId, GradeType gradeType) {
-        this.crews = new ImmutableList.Builder<Crew>()
-                .addAll(this.crews)
-                .build()
-                .stream().map(crew -> {
-                    if(crew.getId() == (crewId.getId())) {
-                        return crew.updateGrade(gradeType);
-                    }else {
-                        return crew;
-                    }
-                }).toList();
+        this.crewSet = this.crewSet.stream().peek(crew -> {
+            if (crew.getId() == (crewId.getId())) {
+                crew.updateGrade(gradeType);
+            }
+        }).collect(Collectors.toSet());
         return this;
     }
 
     public Crew getCrew(CrewId crewId) {
-        return this.crews.stream().filter(partymember -> partymember.getId() == crewId.getId()).findAny().orElseThrow();
+        return this.crewSet.stream().filter(partymember -> partymember.getId() == crewId.getId()).findAny().orElseThrow();
     }
 
     public Partyroom updateBaseInfo(UpdatePartyroomRequest request) {

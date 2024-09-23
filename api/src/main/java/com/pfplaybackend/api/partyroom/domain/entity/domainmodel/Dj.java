@@ -44,8 +44,11 @@ public class Dj {
         return new Dj(partyroomId, userId, playlistId, orderNumber, false);
     }
 
-    public Dj updateOrderNumber(int orderNumber) {
+    public void updateOrderNumber(int orderNumber) {
         this.orderNumber = orderNumber;
-        return this;
+    }
+
+    public void applyDeleted() {
+        this.isDeleted = true;
     }
 }

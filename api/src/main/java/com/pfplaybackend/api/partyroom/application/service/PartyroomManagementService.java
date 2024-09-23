@@ -87,16 +87,4 @@ public class PartyroomManagementService {
     @Transactional
     public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
     }
-
-    @Transactional
-    public void updatePlaybackDeactivation(PartyroomId partyroomId) {
-        // TODO Update PartyroomData
-        messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION, new PartyroomDeactivationMessage(partyroomId, MessageTopic.PARTYROOM_DEACTIVATION));
-    }
-
-    @Transactional
-    public Partyroom rotateDjQueue(Partyroom partyroom) {
-        PartyroomData partyroomData = partyroomRepository.save(partyroomConverter.toData(partyroom.rotateDjs()));
-        return partyroomConverter.toDomain(partyroomData);
-    }
 }
