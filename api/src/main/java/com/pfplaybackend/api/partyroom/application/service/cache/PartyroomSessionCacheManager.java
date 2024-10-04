@@ -23,11 +23,13 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
 
     @Transactional
     public void saveSessionCache(String sessionId, UserId userId, String destination) {
+        System.out.println();
         String[] parts = destination.split("/");
+        System.out.println();
         if(parts[1].equals("sub")) {
             String topic = parts[2];
             String separator = parts[3];
-            if (topic.equals("partyroom")) {
+            if (topic.equals("partyrooms")) {
                 Optional<PartyroomSessionDto> PartyroomSessionDto = createSessionData(sessionId, userId);
                 if (PartyroomSessionDto.isEmpty()) {
                     throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
