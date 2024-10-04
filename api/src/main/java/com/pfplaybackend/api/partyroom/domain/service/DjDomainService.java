@@ -5,11 +5,14 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class DjDomainService {
 
     public boolean isExistDj(Partyroom partyroom) {
-        return partyroom.getDjSet().stream().noneMatch(Dj::isDeleted);
+        Optional<Dj> optional = partyroom.getDjSet().stream().filter(Dj::isQueued).findAny();
+        return optional.isPresent();
     }
 }

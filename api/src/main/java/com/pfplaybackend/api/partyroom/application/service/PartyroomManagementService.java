@@ -92,5 +92,16 @@ public class PartyroomManagementService {
 
     @Transactional
     public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        // FIXME Extract Common Method
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomDataDto partyroomDataDto = optional.get();
+        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+
+        // TODO 권한 검증
+        partyroom.updatedQueueStatus(request);
+        partyroomRepository.save(partyroomConverter.toData(partyroom));
     }
 }

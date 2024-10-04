@@ -8,6 +8,7 @@ import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.regulation.AdjustGradeRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.regulation.PunishPenaltyRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,9 +46,9 @@ public class CrewRegulationController {
      * @param request
      */
     @PostMapping("/{partyroomId}/crews/{crewId}/penalties")
-    public void imposeCrewPenalty(@PathVariable("partyroomId") long partyroomId, @PathVariable("crewId") long crewId,
-                                    @RequestBody PunishPenaltyRequest request) {
-        crewPenaltyService.updatePenalty(new PartyroomId(partyroomId), new CrewId(crewId), request);
+    public void imposeCrewPenalty(@PathVariable("partyroomId") Long partyroomId, @PathVariable("crewId") Long crewId,
+                                  @Valid @RequestBody PunishPenaltyRequest request) {
+        crewPenaltyService.addPenalty(new PartyroomId(partyroomId), new CrewId(crewId), request);
     }
 
     /**

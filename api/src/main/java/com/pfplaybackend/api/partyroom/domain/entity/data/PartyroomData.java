@@ -61,10 +61,10 @@ public class PartyroomData extends BaseEntity {
     // 재생 길이 제약
     private int playbackTimeLimit;
     
-    @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL)
     private Set<CrewData> crewDataSet;
 
-    @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL)
     private Set<DjData> djDataSet;
 
     // 공지사항 내용
@@ -127,15 +127,11 @@ public class PartyroomData extends BaseEntity {
     }
 
     public PartyroomData assignCrewDataSet(Set<CrewData> crewDataSet) {
-        // this.crewDataSet.clear();
-        // this.crewDataSet.addAll(crewDataSet);
         this.crewDataSet = crewDataSet;
         return this;
     }
 
     public PartyroomData assignDjDataSet(Set<DjData> djDataSet) {
-        // this.djDataSet.clear();
-        // this.djDataSet.addAll(djDataSet);
         this.djDataSet = djDataSet;
         return this;
     }
