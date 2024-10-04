@@ -21,6 +21,7 @@ import com.pfplaybackend.api.user.domain.value.*;
 import com.pfplaybackend.api.user.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.web.PortResolverImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

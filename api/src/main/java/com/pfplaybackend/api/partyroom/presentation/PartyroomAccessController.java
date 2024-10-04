@@ -4,14 +4,11 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.presentation.payload.response.EnterPartyroomResponse;
+import com.pfplaybackend.api.partyroom.presentation.payload.response.access.EnterPartyroomResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static org.springframework.http.HttpStatus.MOVED_PERMANENTLY;
 
 
 @Tag(name = "Partyroom API")

@@ -1,11 +1,18 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.partyroom.application.aspect.PartyContextAspect;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
-import com.pfplaybackend.api.partyroom.application.dto.*;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.crew.CrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.crew.CrewSetupDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.dj.DjWithProfileDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
+import com.pfplaybackend.api.partyroom.domain.entity.converter.CrewConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
@@ -16,7 +23,7 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
-import com.pfplaybackend.api.partyroom.presentation.payload.response.QueryPartyroomSummaryResponse;
+import com.pfplaybackend.api.partyroom.presentation.payload.response.info.QueryPartyroomSummaryResponse;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -58,15 +65,15 @@ public class PartyroomInfoService {
 
     // 초기화를 위한 파티멤버 목록 조회
     public List<CrewSetupDto> getCrewsForSetup(PartyroomId partyroomId) {
-        Optional<PartyroomData> optPartyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId());
-        if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomData partyroomData = optPartyroomData.get();
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomDataDto partyroomDataDto = optional.get();
+        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
-        // Has uid, authorityTier
-        List<Crew> crews = partyroom.getCrews();
+        // FIXME Remove Field AuthorityTier, Uid
+        Set<Crew> crews = partyroom.getCrewSet();
         List<UserId> userIds = crews.stream().map(Crew::getUserId).toList();
-
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileService.getUsersProfileSetting(userIds);
 
         return crews.stream().map(crew -> {
@@ -83,19 +90,19 @@ public class PartyroomInfoService {
     }
 
     @Transactional
-    public Partyroom getById(PartyroomId partyroomId) {
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+    public Partyroom getPartyroomById(PartyroomId partyroomId) {
+        PartyroomData partyroomData = getPartyroom(partyroomId);
         return partyroomConverter.toDomain(partyroomData);
     }
 
     public boolean isAlreadyRegistered(Partyroom partyroom) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        return partyroom.getDjs().stream().allMatch(dj -> dj.getUserId().equals(partyContext.getUserId()));
+        return partyroom.getDjSet().stream().allMatch(dj -> dj.getUserId().equals(partyContext.getUserId()));
     }
 
     @Transactional
     public List<DjWithProfileDto> getDjs(Partyroom partyroom) {
-        List<Dj> djs = partyroom.getDjs();
+        Set<Dj> djs = partyroom.getDjSet();
         List<UserId> userIds = djs.stream().map(Dj::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileService.getUsersProfileSetting(userIds);
 
@@ -103,7 +110,7 @@ public class PartyroomInfoService {
             UserId userId = dj.getUserId();
             ProfileSettingDto profileSettingDto = profileSettingMap.get(userId);
             return new DjWithProfileDto(
-                    dj.getId(),
+                    dj.getCrewId().getId(),
                     dj.getOrderNumber(),
                     profileSettingDto.getNickname(),
                     profileSettingDto.getAvatarIconUri()
@@ -130,7 +137,7 @@ public class PartyroomInfoService {
     public void getCrews(PartyroomId partyroomId) {
         // TODO 내가 차단한 목록은 글로벌 수준으로 유지
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-        List<UserId> crewUserIds = partyroomData.getCrewDataList().stream().map(CrewData::getUserId).toList();
+        List<UserId> crewUserIds = partyroomData.getCrewDataSet().stream().map(CrewData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettings = userProfileService.getUsersProfileSetting(crewUserIds);
     }
 
@@ -161,15 +168,24 @@ public class PartyroomInfoService {
         }
     }
 
-    // TODO 중복 기능 제거
     @Transactional
-    public Optional<PartyroomId> getPartyroomId(UserId userId) {
-        Optional<PartyroomIdDto> optional = partyroomRepository.getPartyroomDataWithUserId(userId);
-        if(optional.isPresent()) {
-            PartyroomId partyroomId = optional.get().getPartyroomId();
-            return Optional.of(partyroomId);
-        } else {
-            return Optional.empty();
-        }
+    public PartyroomData getPartyroom(PartyroomId partyroomId) {
+        // 두 개의 자녀 엔티티의 LEFT JOIN 이 필요하므로, 중복 제거를 위해서 QueryDSL 을 사용해야 한다.
+        // PartyroomData partyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId()).orElseThrow();
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        return partyroomConverter.toEntity(optional.get());
+
+        // Projections 으로 읽어온 데이터(DTO)를 엔티티 객체로 변환해서 필드를 변경하지 않고
+        // 저장한다면 updatedAt이 변동될까?
+        // 변인 1. 영속성 컨텍스트에 엔티티가 없는 경우
+        // System.out.println(partyroomDataDto);
+        // partyroomRepository.save(partyroomData);
+
+        // 변인 2. 영속성 컨텍스트에 엔티티가 이미 있는 경우
+
+        // Dj 대기열에서 삭제된 크루를 조회에 계속 포함시켜야 할까?
+        // Partyroom 에서 나간 크루를 조회에 계속 포함시켜야 할까?
+        // └ 포함시켜야 하는 요건이 있을까?
     }
 }

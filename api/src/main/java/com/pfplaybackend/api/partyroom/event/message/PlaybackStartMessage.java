@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.event.message;
 
-import com.pfplaybackend.api.partyroom.application.dto.PlaybackDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import lombok.AllArgsConstructor;

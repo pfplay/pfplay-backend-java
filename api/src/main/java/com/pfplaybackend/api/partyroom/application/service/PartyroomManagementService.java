@@ -3,6 +3,7 @@ package com.pfplaybackend.api.partyroom.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
@@ -13,9 +14,9 @@ import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.CreatePartyroomRequest;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdateDjQueueStatusRequest;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.UpdatePartyroomRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.management.CreatePartyroomRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.management.UpdateDjQueueStatusRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.management.UpdatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -70,10 +72,14 @@ public class PartyroomManagementService {
     @Transactional
     public void updatePartyroom(PartyroomId partyroomId, UpdatePartyroomRequest request) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        PartyroomData partyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId()).orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        // FIXME Extract Common Method
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomDataDto partyroomDataDto = optional.get();
+        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        // Domain Logic
         partyroomDomainService.checkIsHost(partyroom, partyContext.getUserId());
-        // TODO 구현 필요
         partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
         partyroomRepository.save(partyroomConverter.toData(partyroom.updateBaseInfo(request)));
     }
@@ -86,17 +92,16 @@ public class PartyroomManagementService {
 
     @Transactional
     public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
-    }
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        // FIXME Extract Common Method
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomDataDto partyroomDataDto = optional.get();
+        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
-    @Transactional
-    public void updatePlaybackDeactivation(PartyroomId partyroomId) {
-        // TODO Update PartyroomData
-        messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION, new PartyroomDeactivationMessage(partyroomId, MessageTopic.PARTYROOM_DEACTIVATION));
-    }
-
-    @Transactional
-    public Partyroom rotateDjQueue(Partyroom partyroom) {
-        PartyroomData partyroomData = partyroomRepository.save(partyroomConverter.toData(partyroom.rotateDjs()));
-        return partyroomConverter.toDomain(partyroomData);
+        // TODO 권한 검증
+        partyroom.updatedQueueStatus(request);
+        partyroomRepository.save(partyroomConverter.toData(partyroom));
     }
 }

@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.partyroom.presentation;
 
-import com.pfplaybackend.api.partyroom.application.dto.DisplayDto;
-import com.pfplaybackend.api.partyroom.application.dto.DjWithProfileDto;
-import com.pfplaybackend.api.partyroom.application.dto.CrewSetupDto;
-import com.pfplaybackend.api.partyroom.application.dto.PartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.DisplayDto;
+import com.pfplaybackend.api.partyroom.application.dto.dj.DjWithProfileDto;
+import com.pfplaybackend.api.partyroom.application.dto.crew.CrewSetupDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.application.service.DisplayInfoService;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.partyroom.application.service.PlaybackInfoService;
@@ -11,7 +11,7 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.QueueStatus;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.presentation.payload.response.*;
+import com.pfplaybackend.api.partyroom.presentation.payload.response.info.*;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -58,7 +58,7 @@ public class PartyroomInfoController {
      */
     @GetMapping("/{partyroomId}/crews")
     public ResponseEntity<QueryCrewListResponse> getCrews(@PathVariable Long partyroomId,
-                                                                 @RequestParam(value = "groupByGrade", required = false, defaultValue = "false") boolean groupByGrade) {
+                                                          @RequestParam(value = "groupByGrade", required = false, defaultValue = "false") boolean groupByGrade) {
         // Grade 별로 그루핑할 수 있는 옵션을 제공한다.
         partyroomInfoService.getCrews(new PartyroomId(partyroomId));
         return null;
@@ -66,14 +66,14 @@ public class PartyroomInfoController {
 
     @GetMapping("/{partyroomId}/setup")
     public ResponseEntity<?> getSetupInfo(@PathVariable Long partyroomId) {
-        List<CrewSetupDto> memberDto = partyroomInfoService.getCrewsForSetup(new PartyroomId(partyroomId));
+        List<CrewSetupDto> crewSetupDtoList = partyroomInfoService.getCrewsForSetup(new PartyroomId(partyroomId));
         DisplayDto displayDto = displayInfoService.getDisplayInfo();
-        return ResponseEntity.ok().body(QueryPartyroomSetupResponse.from(memberDto, displayDto));
+        return ResponseEntity.ok().body(QueryPartyroomSetupResponse.from(crewSetupDtoList, displayDto));
     }
 
     @GetMapping("/{partyroomId}/dj-queue")
     public ResponseEntity<?> getDjQueueInfo(@PathVariable Long partyroomId) {
-        Partyroom partyroom = partyroomInfoService.getById(new PartyroomId(partyroomId));
+        Partyroom partyroom = partyroomInfoService.getPartyroomById(new PartyroomId(partyroomId));
         boolean isPlaybackActivated = partyroom.isPlaybackActivated();
         QueueStatus queueStatus = partyroom.isQueueClosed() ? QueueStatus.CLOSE :  QueueStatus.OPEN;
         boolean isRegistered = partyroomInfoService.isAlreadyRegistered(partyroom);

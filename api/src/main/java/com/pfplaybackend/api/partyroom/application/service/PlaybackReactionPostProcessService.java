@@ -2,8 +2,8 @@ package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
-import com.pfplaybackend.api.partyroom.application.dto.AggregationDto;
-import com.pfplaybackend.api.partyroom.application.dto.ReactionPostProcessDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.AggregationDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.ReactionPostProcessDto;
 import com.pfplaybackend.api.partyroom.application.peer.GrabMusicPeerService;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
@@ -26,7 +26,7 @@ import java.util.List;
 public class PlaybackReactionPostProcessService {
     private final PlaybackInfoService playbackInfoService;
     // Using RedisMessagePublisher
-    private final RedisMessagePublisher redisMessagePublisher;
+    private final RedisMessagePublisher messagePublisher;
     // Using Proxy Services
     private final GrabMusicPeerService grabMusicService;
     private final UserActivityPeerService userActivityService;
@@ -52,7 +52,7 @@ public class PlaybackReactionPostProcessService {
     // PostProcess After Playback Reaction
     public void publishMotionChangedEvent(PartyroomId partyroomId, MotionType motionType, CrewId crewId) {
         ReactionMotionMessage reactionMotionMessage = ReactionMotionMessage.from(partyroomId, motionType, crewId);
-        redisMessagePublisher.publish(MessageTopic.REACTION_MOTION, reactionMotionMessage);
+        messagePublisher.publish(MessageTopic.REACTION_MOTION, reactionMotionMessage);
     }
 
     public void updateDjActivityScore(UserId djUserId, int deltaScore) {
@@ -65,7 +65,7 @@ public class PlaybackReactionPostProcessService {
 
     public void publishAggregationChangedEvent(PartyroomId partyroomId, Playback playback) {
         AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
-        redisMessagePublisher.publish(MessageTopic.REACTION_AGGREGATION,
+        messagePublisher.publish(MessageTopic.REACTION_AGGREGATION,
                 new ReactionAggregationMessage(partyroomId, MessageTopic.REACTION_AGGREGATION, aggregationDto));
     }
 

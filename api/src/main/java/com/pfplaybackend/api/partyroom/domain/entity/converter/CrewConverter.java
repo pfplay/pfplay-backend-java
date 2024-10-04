@@ -18,6 +18,8 @@ public class CrewConverter {
                 .isBanned(crewData.isBanned())
                 .enteredAt(crewData.getEnteredAt())
                 .exitedAt(crewData.getExitedAt())
+                .createdAt(crewData.getCreatedAt())
+                .updatedAt(crewData.getUpdatedAt())
                 .build();
     }
 
@@ -31,6 +33,8 @@ public class CrewConverter {
                 .isBanned(crew.isBanned())
                 .enteredAt(crew.getEnteredAt())
                 .exitedAt(crew.getExitedAt())
+                .createdAt(crew.getCreatedAt())
+                .updatedAt(crew.getUpdatedAt())
                 .build();
     }
 }

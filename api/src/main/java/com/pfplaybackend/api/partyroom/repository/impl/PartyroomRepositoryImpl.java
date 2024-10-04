@@ -1,8 +1,14 @@
 package com.pfplaybackend.api.partyroom.repository.impl;
 
-import com.pfplaybackend.api.partyroom.application.dto.*;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.crew.CrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.CrewDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.DjDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.*;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.repository.custom.PartyroomRepositoryCustom;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -22,45 +28,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     @PersistenceContext
     private EntityManager em;
-
-    @Override
-    public List<PartyroomDto> getAllPartyrooms() {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
-        QCrewData qCrewData = QCrewData.crewData;
-        QPlaybackData qPlaybackData = QPlaybackData.playbackData;
-
-        return queryFactory
-                .select(Projections.constructor(
-                        PartyroomDto.class,
-                        qPartyroomData.id,
-                        qPartyroomData.stageType,
-                        qPartyroomData.hostId,
-                        qPartyroomData.title,
-                        qPartyroomData.introduction,
-                        qPartyroomData.isPlaybackActivated,
-                        qPartyroomData.isQueueClosed,
-                        qCrewData.id.count().as("crewCount"),
-                        Projections.constructor(PlaybackDto.class,
-                                qPlaybackData.id,
-                                qPlaybackData.linkId,
-                                qPlaybackData.name,
-                                qPlaybackData.duration,
-                                qPlaybackData.thumbnailImage
-                        )
-                ))
-                .from(qPartyroomData)
-                .leftJoin(qCrewData)
-                .on(qPartyroomData.eq(qCrewData.partyroomData)
-                        .and(qCrewData.isActive.eq(true))
-                        .and(qCrewData.isBanned.eq(false))
-                )
-                .leftJoin(qPlaybackData)
-                .on(qPlaybackData.id.eq(qPartyroomData.currentPlaybackId.id))
-                .where(qPartyroomData.isTerminated.eq(false))
-                .groupBy(qPartyroomData.id)
-                .fetch();
-    }
 
     @Override
     public Optional<ActivePartyroomDto> getActivePartyroomByUserId(UserId userId) {
@@ -212,23 +179,47 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 .fetch();
     }
 
-    // TODO 중복 기능 삭제
     @Override
-    public Optional<PartyroomIdDto> getPartyroomDataWithUserId(UserId userId) {
+    public Optional<PartyroomDataDto> findPartyroomDto(PartyroomId partyroomId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QCrewData qCrewData = QCrewData.crewData;
-        PartyroomData partyroomData = queryFactory
-                .select(qCrewData.partyroomData)
-                .from(qCrewData)
-                .where(qCrewData.isActive.eq(true)
-                        .and(qCrewData.userId.eq(userId)))
-                .fetchOne();
+        QDjData qDjData = QDjData.djData;
 
-        PartyroomIdDto partyroomIdDto = null;
-        if (partyroomData != null) {
-            partyroomIdDto = new PartyroomIdDto(partyroomData.getPartyroomId());
-        }
+        List<Tuple> result = queryFactory
+                .select(qPartyroomData,
+                        qCrewData, qDjData)
+                .from(qPartyroomData)
+                .leftJoin(qPartyroomData.crewDataSet, qCrewData)
+                .on(qPartyroomData.eq(qCrewData.partyroomData)
+                        .and(qCrewData.isActive.eq(true))
+                        .and(qCrewData.isBanned.eq(false))
+                )
+                .leftJoin(qPartyroomData.djDataSet, qDjData)
+                .on(qPartyroomData.eq(qDjData.partyroomData)
+                        .and(qDjData.isQueued.eq(true))
+                )
+                .where(qPartyroomData.id.eq(partyroomId.getId()))
+                .distinct()
+                // .fetchJoin() 명시 불필요
+                .fetch();
 
-        return Optional.ofNullable(partyroomIdDto);
+        if(result.isEmpty()) return Optional.empty();
+
+        PartyroomDataDto partyroomDataDto = PartyroomDataDto.create(Objects.requireNonNull(result.get(0).get(qPartyroomData)));
+
+        Map<Long, Set<CrewDataDto>> crewDataMap = result.stream()
+                .filter(tuple -> Optional.ofNullable(tuple.get(qCrewData)).isPresent())
+                .map(tuple -> CrewDataDto.from(Objects.requireNonNull(tuple.get(qCrewData))))
+                .collect(Collectors.groupingBy(CrewDataDto::getId, Collectors.toSet()));
+
+        Map<Long, Set<DjDataDto>> djDataMap = result.stream()
+                .filter(tuple -> Optional.ofNullable(tuple.get(qDjData)).isPresent())
+                .map(tuple -> DjDataDto.from(Objects.requireNonNull(tuple.get(qDjData))))
+                .collect(Collectors.groupingBy(DjDataDto::getId, Collectors.toSet()));
+
+        partyroomDataDto.setCrewDataSet(crewDataMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet()));
+        partyroomDataDto.setDjDataSet(djDataMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet()));
+        return Optional.of(partyroomDataDto);
     }
 }
