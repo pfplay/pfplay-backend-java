@@ -3,8 +3,8 @@ package com.pfplaybackend.api.partyroom.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
-import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomWithCrewDto;
-import com.pfplaybackend.api.partyroom.application.dto.CrewSummaryDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.crew.CrewSummaryDto;
 import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
@@ -39,7 +39,6 @@ public class PartyroomAccessService {
     private final PartyroomConverter partyroomConverter;
     private final PartyroomDomainService partyroomDomainService;
     private final PartyroomInfoService partyroomInfoService;
-    private final PlaybackManagementService playbackManagementService;
     private final UserProfilePeerService userProfileService;
 
     @Transactional
@@ -47,11 +46,11 @@ public class PartyroomAccessService {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         UserId userId = partyContext.getUserId();
         AuthorityTier authorityTier = partyContext.getAuthorityTier();
-        // Validate Partyroom Condition
+        // Validate Partyroom Condition (Repeated)
+        // FIXME Do not use 'findById' Method
         Optional<PartyroomData> optPartyroomData = partyroomRepository.findById(partyroomId.getId());
         if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomData partyroomData = optPartyroomData.get();
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        Partyroom partyroom = partyroomConverter.toDomain(optPartyroomData.get());
         if(partyroom.isTerminated()) throw ExceptionCreator.create(PartyroomException.ALREADY_TERMINATED);
         if(partyroom.isExceededLimit()) throw ExceptionCreator.create(PartyroomException.EXCEEDED_LIMIT);
 
@@ -64,8 +63,8 @@ public class PartyroomAccessService {
             return partyroom.getCrewByUserId(userId).orElseThrow();
         }
 
-        Partyroom updPartyRoom = addOrActivateCrew(partyroom, userId, authorityTier);
-        PartyroomData savedPartyRoomData = partyroomRepository.save(partyroomConverter.toData(updPartyRoom));
+        Partyroom updatedPartyRoom = addOrActivateCrew(partyroom, userId, authorityTier);
+        PartyroomData savedPartyRoomData = partyroomRepository.save(partyroomConverter.toData(updatedPartyRoom));
         // Publish Changed Event
         Crew crew = partyroomConverter.toDomain(savedPartyRoomData).getCrewByUserId(userId).orElseThrow();
         publishAccessChangedEvent(crew, userId);

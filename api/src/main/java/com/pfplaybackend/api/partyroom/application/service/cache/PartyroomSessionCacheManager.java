@@ -2,9 +2,9 @@ package com.pfplaybackend.api.partyroom.application.service.cache;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.config.websocket.cache.SessionCacheManager;
-import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
-import com.pfplaybackend.api.partyroom.application.dto.PartyroomSessionDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.user.domain.value.UserId;

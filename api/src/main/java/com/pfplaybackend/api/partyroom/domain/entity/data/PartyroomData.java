@@ -1,6 +1,11 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomDto;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
+import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
@@ -13,10 +18,10 @@ import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
+
+import static com.pfplaybackend.api.partyroom.domain.entity.data.QCrewData.crewData;
 
 @Getter
 @DynamicInsert
@@ -98,7 +103,8 @@ public class PartyroomData extends BaseEntity {
     @Builder
     public PartyroomData(Long id, PartyroomId partyroomId, UserId hostId, StageType stageType,
                          String title, String introduction, String linkDomain, int playbackTimeLimit,
-                         String noticeContent, PlaybackId currentPlaybackId, boolean isPlaybackActivated, boolean isQueueClosed, boolean isTerminated) {
+                         String noticeContent, PlaybackId currentPlaybackId, boolean isPlaybackActivated, boolean isQueueClosed, boolean isTerminated,
+                         LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.hostId = hostId;
@@ -116,22 +122,47 @@ public class PartyroomData extends BaseEntity {
         this.isPlaybackActivated = isPlaybackActivated;
         this.isQueueClosed = isQueueClosed;
         this.isTerminated = isTerminated;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public PartyroomData assignCrewDataSet(Set<CrewData> crewDataSet) {
-        this.crewDataSet.clear();
-        this.crewDataSet.addAll(crewDataSet);
+        // this.crewDataSet.clear();
+        // this.crewDataSet.addAll(crewDataSet);
+        this.crewDataSet = crewDataSet;
         return this;
     }
 
     public PartyroomData assignDjDataSet(Set<DjData> djDataSet) {
-        this.djDataSet.clear();
-        this.djDataSet.addAll(djDataSet);
+        // this.djDataSet.clear();
+        // this.djDataSet.addAll(djDataSet);
+        this.djDataSet = djDataSet;
         return this;
     }
 
     public PartyroomData applyActivation() {
         this.isPlaybackActivated = true;
         return this;
+    }
+
+
+    public static PartyroomData from(PartyroomDataDto dto) {
+        return PartyroomData.builder()
+                .id(dto.getId())
+                .partyroomId(dto.getPartyroomId())
+                .hostId(dto.getHostId())
+                .stageType(dto.getStageType())
+                .title(dto.getTitle())
+                .introduction(dto.getIntroduction())
+                .linkDomain(dto.getLinkDomain())
+                .playbackTimeLimit(dto.getPlaybackTimeLimit())
+                .noticeContent(dto.getNoticeContent())
+                .currentPlaybackId(dto.getCurrentPlaybackId())
+                .isPlaybackActivated(dto.isPlaybackActivated())
+                .isQueueClosed(dto.isQueueClosed())
+                .isTerminated(dto.isTerminated())
+                .createdAt(dto.getCreatedAt())
+                .updatedAt(dto.getUpdatedAt())
+                .build();
     }
 }

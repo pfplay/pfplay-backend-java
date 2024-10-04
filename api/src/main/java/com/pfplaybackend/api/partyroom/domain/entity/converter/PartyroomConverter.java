@@ -1,5 +1,9 @@
 package com.pfplaybackend.api.partyroom.domain.entity.converter;
 
+import com.pfplaybackend.api.partyroom.application.dto.base.CrewDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.DjDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.DjData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
@@ -19,6 +23,19 @@ public class PartyroomConverter {
 
     private final CrewConverter crewConverter;
     private final DjConverter djConverter;
+
+    public PartyroomData toEntity(PartyroomDataDto partyroomDataDto) {
+        PartyroomData partyroomData = PartyroomData.from(partyroomDataDto);
+        Set<CrewData> crewDataSet = partyroomDataDto.getCrewDataSet().stream()
+                .map(crewDataDto -> crewDataDto.toData().assignPartyroomData(partyroomData)).collect(Collectors.toSet());
+        Set<DjData> djDataSet = partyroomDataDto.getDjDataSet().stream()
+                .map(djDataDto -> djDataDto.toData().assignPartyroomData(partyroomData)).collect(Collectors.toSet());
+
+        partyroomData.assignCrewDataSet(crewDataSet);
+        partyroomData.assignDjDataSet(djDataSet);
+
+        return partyroomData;
+    }
 
     public Partyroom toDomain(PartyroomData partyroomData) {
         Partyroom partyroom = Partyroom.builder()
@@ -68,10 +85,10 @@ public class PartyroomConverter {
                 .isTerminated(partyroom.isTerminated())
                 .build();
 
-        // Partymember to PartymemberData
+        // Crew to CrewData
         Set<CrewData> crewDataSet = partyroom.getCrewSet().stream()
                 .map(crewConverter::toData)
-                .map(partymemberData -> partymemberData.assignPartyroomData(partyroomData))
+                .map(crewData -> crewData.assignPartyroomData(partyroomData))
                 .collect(Collectors.toSet());
         // Dj to DjData
         Set<DjData> djDataSet = partyroom.getDjSet().stream()

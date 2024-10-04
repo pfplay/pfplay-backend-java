@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application.dto;
+package com.pfplaybackend.api.partyroom.application.dto.playback;
 
 import com.pfplaybackend.api.partyroom.domain.enums.MotionType;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application.dto;
+package com.pfplaybackend.api.partyroom.application.dto.partyroom;
 
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;

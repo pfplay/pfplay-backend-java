@@ -41,6 +41,7 @@ public class PartyroomDomainService {
         }
     }
 
+    // TODO 구현 필요
     // 링크 주소가 중복되었는지 확인
     public void checkIsLinkAddressDuplicated(String linkAddress) {
 

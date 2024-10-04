@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.presentation.payload.response.info;
 
-import com.pfplaybackend.api.partyroom.application.dto.DisplayDto;
-import com.pfplaybackend.api.partyroom.application.dto.CrewSetupDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.DisplayDto;
+import com.pfplaybackend.api.partyroom.application.dto.crew.CrewSetupDto;
 import lombok.Builder;
 import lombok.Data;
 

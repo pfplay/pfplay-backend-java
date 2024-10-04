@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application.dto;
+package com.pfplaybackend.api.partyroom.application.dto.crew;
 
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;

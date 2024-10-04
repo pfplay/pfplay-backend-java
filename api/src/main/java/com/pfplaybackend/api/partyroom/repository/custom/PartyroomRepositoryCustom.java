@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.partyroom.repository.custom;
 
-import com.pfplaybackend.api.partyroom.application.dto.*;
-import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomDto;
-import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomWithCrewDto;
-import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -16,5 +16,5 @@ public interface PartyroomRepositoryCustom {
     Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewIdByUserId(UserId userId);
     List<PartyroomWithCrewDto> getCrewDataByPartyroomId();
     List<PlaybackData> getRecentPlaybackHistory(PartyroomId partyroomId);
-    PartyroomDataDto findPartyroomDto(PartyroomId partyroomId);
+    Optional<PartyroomDataDto> findPartyroomDto(PartyroomId partyroomId);
 }

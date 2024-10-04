@@ -20,12 +20,15 @@ public class Crew {
     private boolean isBanned;
     private LocalDateTime enteredAt;
     private LocalDateTime exitedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Crew() {}
 
     @Builder
     public Crew(long id, PartyroomId partyroomId, UserId userId, AuthorityTier authorityTier,
-                GradeType gradeType, boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt) {
+                GradeType gradeType, boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt,
+                LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
@@ -35,6 +38,8 @@ public class Crew {
         this.isBanned = isBanned;
         this.enteredAt = enteredAt;
         this.exitedAt = exitedAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public static Crew create(UserId userId, PartyroomId partyroomId, AuthorityTier authorityTier, GradeType gradeType) {
