@@ -1,14 +1,14 @@
 package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
-import com.pfplaybackend.api.partyroom.domain.entity.data.DjData;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
+import com.pfplaybackend.api.partyroom.domain.enums.QueueStatus;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.partyroom.domain.value.*;
+import com.pfplaybackend.api.partyroom.exception.DjException;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.management.CreatePartyroomRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.management.UpdateDjQueueStatusRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.management.UpdatePartyroomRequest;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
@@ -17,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Getter
@@ -116,9 +117,10 @@ public class Partyroom {
 
     public Partyroom createAndAddDj(PlaylistId playlistId, UserId userId) {
         Crew crewIdOfDj = this.getCrewByUserId(userId).orElseThrow();
+        if(this.djSet.stream().anyMatch(dj -> dj.getUserId().equals(userId) && dj.isQueued())) throw ExceptionCreator.create(DjException.ALREADY_REGISTERED);
         CrewId crewId = new CrewId(crewIdOfDj.getId());
         // TODO Dj 객체는 'Dj 신청 레코드'와 연관되어야 하며, 기본적으로는 'Dj 역할'의 크루를 지칭하는 개념으로 존재해야한다.
-        this.djSet.add(Dj.create(partyroomId, playlistId, userId, crewId,this.djSet.size() + 1));
+        this.djSet.add(Dj.create(this.partyroomId, playlistId, userId, crewId,this.djSet.size() + 1));
         return this;
     }
 
@@ -159,10 +161,17 @@ public class Partyroom {
         return this.crewSet.stream().filter(crew -> crew.getUserId().equals(userId)).findAny().orElseThrow();
     }
 
-    public void tryRemoveInDjQueue(UserId userId) {
+    // TODO 순서 '일괄 변경' 필요
+    // 예를 들면, 제거된 Dj 순번에서 한자리씩 당겨야 한다.
+    public void tryRemoveInDjQueue(CrewId crewId) {
+        AtomicInteger orderNumber = new AtomicInteger(1);
+        // FIXME
         this.djSet = this.djSet.stream().peek(dj -> {
-            if(dj.getUserId().equals(userId)) {
-                dj.applyDeleted();
+            if(dj.getCrewId().equals(crewId)) {
+                dj.applyDequeued();
+            }else {
+                dj.updateOrderNumber(orderNumber.get());
+                orderNumber.getAndIncrement();
             }
         }).collect(Collectors.toSet());
     }
@@ -187,7 +196,7 @@ public class Partyroom {
 
     public Partyroom updateCrewGrade(CrewId crewId, GradeType gradeType) {
         this.crewSet = this.crewSet.stream().peek(crew -> {
-            if (crew.getId() == (crewId.getId())) {
+            if (crew.getId() == crewId.getId()) {
                 crew.updateGrade(gradeType);
             }
         }).collect(Collectors.toSet());
@@ -195,7 +204,7 @@ public class Partyroom {
     }
 
     public Crew getCrew(CrewId crewId) {
-        return this.crewSet.stream().filter(partymember -> partymember.getId() == crewId.getId()).findAny().orElseThrow();
+        return this.crewSet.stream().filter(crew -> crew.getId().equals(crewId.getId())).findAny().orElseThrow();
     }
 
     public Partyroom updateBaseInfo(UpdatePartyroomRequest request) {
@@ -204,5 +213,14 @@ public class Partyroom {
         this.linkDomain = request.getLinkDomain();
         this.playbackTimeLimit = request.getPlaybackTimeLimit();
         return this;
+    }
+
+    public Dj getCurrentDj() {
+        return this.djSet.stream().filter(dj -> dj.getOrderNumber() == 1).findFirst().orElseThrow();
+    }
+
+    public void updatedQueueStatus(UpdateDjQueueStatusRequest request) {
+        if(request.getQueueStatus().equals(QueueStatus.CLOSE)) this.isQueueClosed = true;
+        if(request.getQueueStatus().equals(QueueStatus.OPEN)) this.isQueueClosed = false;
     }
 }

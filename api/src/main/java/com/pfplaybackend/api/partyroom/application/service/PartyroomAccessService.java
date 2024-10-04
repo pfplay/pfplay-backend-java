@@ -3,6 +3,7 @@ package com.pfplaybackend.api.partyroom.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.application.dto.crew.CrewSummaryDto;
 import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
@@ -12,6 +13,7 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.AccessType;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
@@ -40,6 +42,7 @@ public class PartyroomAccessService {
     private final PartyroomDomainService partyroomDomainService;
     private final PartyroomInfoService partyroomInfoService;
     private final UserProfilePeerService userProfileService;
+    private final PlaybackManagementService playbackManagementService;
 
     @Transactional
     public Crew tryEnter(PartyroomId partyroomId) {
@@ -103,15 +106,21 @@ public class PartyroomAccessService {
     @Transactional
     public void exit(PartyroomId partyroomId) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomData partyroomData =  partyroomConverter.toEntity(optional.get());
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+
         Crew crew = partyroom.deactivateCrewAndGet(partyContext.getUserId());
-        // FIXME
-        partyroom.tryRemoveInDjQueue(partyContext.getUserId());
+        // '퇴장하려는 크루'가 Dj 대기열에 존재한다면 강제 삭제(무효화)
+        partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
         partyroomRepository.save(partyroomConverter.toData(partyroom));
 
-        // TODO 현재 Dj인 경우에 한해서 Current Playback 강제 스킵 처리
-        // playbackManagementService.skipBySystem(partyroomId);
+        // TODO 24.10.04 '퇴장하려는 크루'가 CurrentDj 인 경우에 한해, Current Playback 강제 스킵 처리
+        // CurrentDj: orderNumber == 1
+        if(partyroom.getCurrentDj().getCrewId().equals(new CrewId(crew.getId()))) {
+            playbackManagementService.skipBySystem(partyroomId);
+        }
 
         CrewSummaryDto crewSummaryDto = new CrewSummaryDto(crew.getId());
         PartyroomAccessMessage partyroomAccessMessage = new PartyroomAccessMessage(

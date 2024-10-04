@@ -22,6 +22,7 @@ public class DjDataDto {
     private CrewId crewId;
     private PlaylistId playlistId;
     private Integer orderNumber;
+    private Boolean isQueued;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -32,6 +33,7 @@ public class DjDataDto {
                 .crewId(this.crewId)
                 .playlistId(this.playlistId)
                 .orderNumber(this.orderNumber)
+                .isQueued(this.isQueued)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
                 .build();
@@ -45,6 +47,7 @@ public class DjDataDto {
                 djData.getCrewId(),
                 djData.getPlaylistId(),
                 djData.getOrderNumber(),
+                djData.isQueued(),
                 djData.getCreatedAt(),
                 djData.getUpdatedAt()
         );

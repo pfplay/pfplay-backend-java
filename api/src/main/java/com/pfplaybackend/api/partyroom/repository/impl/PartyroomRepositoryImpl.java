@@ -197,7 +197,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 )
                 .leftJoin(qPartyroomData.djDataSet, qDjData)
                 .on(qPartyroomData.eq(qDjData.partyroomData)
-                        .and(qDjData.isDeleted.eq(false))
+                        .and(qDjData.isQueued.eq(true))
                 )
                 .where(qPartyroomData.id.eq(partyroomId.getId()))
                 .distinct()

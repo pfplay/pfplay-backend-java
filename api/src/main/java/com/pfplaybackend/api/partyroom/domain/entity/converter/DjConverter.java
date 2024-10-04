@@ -15,7 +15,7 @@ public class DjConverter {
                 .crewId(djData.getCrewId())
                 .playlistId(djData.getPlaylistId())
                 .orderNumber(djData.getOrderNumber())
-                .isDeleted(djData.isDeleted())
+                .isQueued(djData.isQueued())
                 .createdAt(djData.getCreatedAt())
                 .updatedAt(djData.getUpdatedAt())
                 .build();
@@ -27,7 +27,7 @@ public class DjConverter {
                 .crewId(dj.getCrewId())
                 .playlistId(dj.getPlaylistId())
                 .orderNumber(dj.getOrderNumber())
-                .isDeleted(dj.isDeleted())
+                .isQueued(dj.isQueued())
                 .createdAt(dj.getCreatedAt())
                 .updatedAt(dj.getUpdatedAt())
                 .build();
