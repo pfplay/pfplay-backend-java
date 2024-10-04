@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -8,6 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.LocalDateTime;
 
 @Getter
 @DynamicInsert
@@ -36,6 +39,12 @@ public class DjData extends BaseEntity {
 
     @Embedded
     @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "crew_id")),
+    })
+    private CrewId crewId;
+
+    @Embedded
+    @AttributeOverrides({
             @AttributeOverride(name = "id", column = @Column(name = "playlist_id")),
     })
     private PlaylistId playlistId;
@@ -43,18 +52,23 @@ public class DjData extends BaseEntity {
     private int orderNumber;
 
     // Dj 대기열에서 삭제되었을 경우, 레코드 무효화
-    private boolean isDeleted;
+    private boolean isQueued;
 
     // 데이터 엔티티 생성자
-    public DjData() {}
+    public DjData() {
+    }
 
     @Builder
-    public DjData(Long id, UserId userId, PartyroomData partyroomData, PlaylistId playlistId, int orderNumber, boolean isDeleted) {
+    public DjData(Long id, CrewId crewId, UserId userId, PlaylistId playlistId, int orderNumber, boolean isQueued,
+                  LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.crewId = crewId;
         this.userId = userId;
         this.playlistId = playlistId;
         this.orderNumber = orderNumber;
-        this.isDeleted = isDeleted;
+        this.isQueued = isQueued;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public DjData assignPartyroomData(PartyroomData partyroomData) {

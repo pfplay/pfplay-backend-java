@@ -3,7 +3,7 @@ package com.pfplaybackend.api.partyroom.presentation;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.partyroom.application.service.PlaybackReactionService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.presentation.payload.request.ReactCurrentPlaybackRequest;
+import com.pfplaybackend.api.partyroom.presentation.payload.request.playback.ReactCurrentPlaybackRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

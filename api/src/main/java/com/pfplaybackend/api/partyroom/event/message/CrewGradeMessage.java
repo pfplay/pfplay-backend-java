@@ -18,19 +18,24 @@ import java.util.Map;
 public class CrewGradeMessage implements Serializable {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
-    private Map<String, Object> crew;
+    private Map<String, Object> adjuster;
+    private Map<String, Object> adjusted;
 
     public static CrewGradeMessage from(PartyroomId partyroomId,
-                                        CrewId crewId, GradeType prevGradeType, GradeType currGradeType) {
-        Map<String, Object> crew = new HashMap<>();
-        crew.put("crewId", crewId.getId());
-        crew.put("prevGradeType", prevGradeType);
-        crew.put("currGradeType", currGradeType);
+                                        CrewId adjusterCrewId, CrewId adjustedCrewId, GradeType prevGradeType, GradeType currGradeType) {
+        Map<String, Object> adjuster = new HashMap<>();
+        adjuster.put("crewId", adjusterCrewId.getId());
+
+        Map<String, Object> adjusted = new HashMap<>();
+        adjusted.put("crewId", adjustedCrewId.getId());
+        adjusted.put("prevGradeType", prevGradeType);
+        adjusted.put("currGradeType", currGradeType);
 
         return new CrewGradeMessage(
                 partyroomId,
                 MessageTopic.CREW_GRADE,
-                crew
+                adjuster,
+                adjusted
         );
     }
 }

@@ -1,15 +1,13 @@
 package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 
-import com.pfplaybackend.api.partyroom.application.dto.MusicDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.MusicDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
 @Getter

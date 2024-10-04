@@ -2,6 +2,7 @@ package com.pfplaybackend.api.partyroom.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.partyroom.application.dto.base.CrewDataDto;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -9,9 +10,11 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.commons.lang3.builder.HashCodeExclude;
 import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 @Getter
@@ -64,7 +67,8 @@ public class CrewData extends BaseEntity {
 
     @Builder
     public CrewData(Long id, UserId userId, AuthorityTier authorityTier, GradeType gradeType,
-                    boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt) {
+                    boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt,
+                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.userId = userId;
         this.authorityTier = authorityTier;
@@ -73,6 +77,8 @@ public class CrewData extends BaseEntity {
         this.isBanned = isBanned;
         this.enteredAt = enteredAt;
         this.exitedAt = exitedAt;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public CrewData assignPartyroomData(PartyroomData partyroomData) {

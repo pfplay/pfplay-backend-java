@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.event.message;
 
-import com.pfplaybackend.api.partyroom.application.dto.CrewSummaryDto;
+import com.pfplaybackend.api.partyroom.application.dto.crew.CrewSummaryDto;
 import com.pfplaybackend.api.partyroom.domain.enums.AccessType;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;

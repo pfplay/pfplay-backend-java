@@ -3,8 +3,9 @@ package com.pfplaybackend.api.partyroom.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
-import com.pfplaybackend.api.partyroom.application.dto.ActivePartyroomDto;
-import com.pfplaybackend.api.partyroom.application.dto.PlaybackDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.partyroom.application.service.task.ExpirationTaskScheduler;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
@@ -22,9 +23,11 @@ import com.pfplaybackend.api.partyroom.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
 import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.partyroom.event.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.partyroom.event.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.partyroom.event.message.PlaybackStartMessage;
 import com.pfplaybackend.api.partyroom.exception.GradeException;
+import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -33,6 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -44,13 +48,11 @@ public class PlaybackManagementService {
     private final PlaybackDomainService playbackDomainService;
     private final DjDomainService djDomainService;
     private final PlaybackInfoService playbackInfoService;
-    private final PartyroomManagementService partyroomManagementService;
     private final UserActivityPeerService userActivityService;
-    private final RedisMessagePublisher redisMessagePublisher;
+    private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final ExpirationTaskScheduler scheduleService;
-    private final CrewDomainService domainService;
     private final CrewDomainService crewDomainService;
 
     private void scheduleTask(Playback playback) {
@@ -72,7 +74,7 @@ public class PlaybackManagementService {
     }
 
     @Transactional
-    public void skip(PartyroomId partyroomId) {
+    public void skipByManager(PartyroomId partyroomId) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         ActivePartyroomDto activePartyroomDto = partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId()).orElseThrow();
         PartyroomData partyroomData = partyroomRepository.findById(activePartyroomDto.getId()).orElseThrow();
@@ -82,22 +84,35 @@ public class PlaybackManagementService {
         tryProceed(partyroomId);
     }
 
+    @Transactional()
+    public void skipBySystem(PartyroomId partyroomId) {
+        cancelTask(partyroomId);
+        tryProceed(partyroomId);
+    }
+
     private void tryProceed(PartyroomId partyroomId) {
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+        // TODO Do Not Use findById
+        // PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        // 여기에서 저장이 되면서 무효화된 레코드가 모두 삭제된다.
+        PartyroomData partyroomData = partyroomConverter.toEntity(optional.get());
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+
         // FIXME Remove DjDomainService in Here!!!
         if(djDomainService.isExistDj(partyroom)) {
             start(partyroom);
         }else{
-            partyroomManagementService.updatePlaybackDeactivation(partyroomId);
+            updatePlaybackDeactivation(partyroom);
         }
     }
 
+
     public void start(Partyroom partyroom) {
         // FIXME All Dj 'orderNumber' bulk update
-        Partyroom updataedPartyroom = partyroomManagementService.rotateDjQueue(partyroom);
-        Dj nextDj = updataedPartyroom.getDjs().stream().min(Comparator.comparingInt(Dj::getOrderNumber)).orElseThrow();
-        Crew djCrew = updataedPartyroom.getCrews().stream().filter(crew -> crew.getUserId().equals(nextDj.getUserId())).toList().get(0);
+        Partyroom updataedPartyroom = rotateDjQueue(partyroom);
+        Dj nextDj = updataedPartyroom.getDjSet().stream().min(Comparator.comparingInt(Dj::getOrderNumber)).orElseThrow();
+        Crew djCrew = updataedPartyroom.getCrewSet().stream().filter(crew -> crew.getUserId().equals(nextDj.getUserId())).toList().get(0);
         Playback nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(updataedPartyroom.getPartyroomId(), nextDj);
         PlaybackData playbackData = playbackRepository.save(playbackConverter.toData(nextPlayback));
         // Update 'CurrentPlaybackId'
@@ -110,8 +125,18 @@ public class PlaybackManagementService {
 
     // FIXME CrewId
     private void publishPlaybackChangedEvent(PartyroomId partyroomId, long crewId, PlaybackData playbackData ) {
-        redisMessagePublisher.publish(MessageTopic.PLAYBACK_START,
+        messagePublisher.publish(MessageTopic.PLAYBACK_START,
                 new PlaybackStartMessage(partyroomId, MessageTopic.PLAYBACK_START, crewId,
                         new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(), playbackData.getDuration(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
+    }
+
+    private void updatePlaybackDeactivation(Partyroom partyroom) {
+        partyroomRepository.save(partyroomConverter.toData(partyroom.applyDeactivation()));
+        messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION, new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION));
+    }
+
+    private Partyroom rotateDjQueue(Partyroom partyroom) {
+        PartyroomData partyroomData = partyroomRepository.save(partyroomConverter.toData(partyroom.rotateDjs()));
+        return partyroomConverter.toDomain(partyroomData);
     }
 }

@@ -8,4 +8,5 @@ import java.util.Map;
 
 public interface UserProfilePeerService {
     Map<UserId, ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds);
+    ProfileSettingDto getUserProfileSetting(UserId userId);
 }

@@ -25,8 +25,9 @@ public class CacheConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
-        redisCacheConfigurationMap.put("partyroomUser", redisCacheConfiguration.entryTtl(Duration.ofDays(30)));
-        redisCacheConfigurationMap.put("partyroomPenalty", redisCacheConfiguration.entryTtl(Duration.ofSeconds(30)));
+        // Configure Cache 'Value'
+        redisCacheConfigurationMap.put("crewInfoCache", redisCacheConfiguration.entryTtl(Duration.ofMinutes(30)));
+        redisCacheConfigurationMap.put("crewChatPenaltyCache", redisCacheConfiguration.entryTtl(Duration.ofSeconds(30)));
 
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)

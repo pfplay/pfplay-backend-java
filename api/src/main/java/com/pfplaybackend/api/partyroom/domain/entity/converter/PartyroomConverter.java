@@ -1,5 +1,9 @@
 package com.pfplaybackend.api.partyroom.domain.entity.converter;
 
+import com.pfplaybackend.api.partyroom.application.dto.base.CrewDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.DjDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.DjData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
@@ -10,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +23,19 @@ public class PartyroomConverter {
 
     private final CrewConverter crewConverter;
     private final DjConverter djConverter;
+
+    public PartyroomData toEntity(PartyroomDataDto partyroomDataDto) {
+        PartyroomData partyroomData = PartyroomData.from(partyroomDataDto);
+        Set<CrewData> crewDataSet = partyroomDataDto.getCrewDataSet().stream()
+                .map(crewDataDto -> crewDataDto.toData().assignPartyroomData(partyroomData)).collect(Collectors.toSet());
+        Set<DjData> djDataSet = partyroomDataDto.getDjDataSet().stream()
+                .map(djDataDto -> djDataDto.toData().assignPartyroomData(partyroomData)).collect(Collectors.toSet());
+
+        partyroomData.assignCrewDataSet(crewDataSet);
+        partyroomData.assignDjDataSet(djDataSet);
+
+        return partyroomData;
+    }
 
     public Partyroom toDomain(PartyroomData partyroomData) {
         Partyroom partyroom = Partyroom.builder()
@@ -35,19 +54,19 @@ public class PartyroomConverter {
                 .build();
 
         // PartymemberData to Partymember
-        List<Crew> crews = partyroomData.getCrewDataList().stream()
+        Set<Crew> crewSet = partyroomData.getCrewDataSet().stream()
                 .map(crewConverter::toDomain)
                 .map(partymember -> partymember.assignPartyroomId(partyroom.getPartyroomId()))
-                .toList();
+                .collect(Collectors.toSet());
         // DjData to Dj
-        List<Dj> djs = partyroomData.getDjDataList().stream()
+        Set<Dj> djSet = partyroomData.getDjDataSet().stream()
                 .map(djConverter::toDomain)
                 .map(dj -> dj.assignPartyroomId(partyroom.getPartyroomId()))
-                .toList();
+                .collect(Collectors.toSet());
 
         return partyroom
-                .assignCrews(crews)
-                .assignDjs(djs);
+                .assignCrewSet(crewSet)
+                .assignDjSet(djSet);
     }
 
     public PartyroomData toData(Partyroom partyroom) {
@@ -66,19 +85,19 @@ public class PartyroomConverter {
                 .isTerminated(partyroom.isTerminated())
                 .build();
 
-        // Partymember to PartymemberData
-        List<CrewData> crewDataList = partyroom.getCrews().stream()
+        // Crew to CrewData
+        Set<CrewData> crewDataSet = partyroom.getCrewSet().stream()
                 .map(crewConverter::toData)
-                .map(partymemberData -> partymemberData.assignPartyroomData(partyroomData))
-                .toList();
+                .map(crewData -> crewData.assignPartyroomData(partyroomData))
+                .collect(Collectors.toSet());
         // Dj to DjData
-        List<DjData> djDataList = partyroom.getDjs().stream()
+        Set<DjData> djDataSet = partyroom.getDjSet().stream()
                 .map(djConverter::toData)
                 .map(djData -> djData.assignPartyroomData(partyroomData))
-                .toList();
+                .collect(Collectors.toSet());
 
         return partyroomData
-                .assignCrewDataList(crewDataList)
-                .assignDjDataList(djDataList);
+                .assignCrewDataSet(crewDataSet)
+                .assignDjDataSet(djDataSet);
     }
 }

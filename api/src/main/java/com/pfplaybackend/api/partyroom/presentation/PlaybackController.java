@@ -29,7 +29,7 @@ public class PlaybackController {
      */
     @PostMapping("/{partyroomId}/playbacks/skip")
     public ResponseEntity<?> playBackSkip(@PathVariable Long partyroomId) {
-        playbackManagementService.skip(new PartyroomId(partyroomId));
+        playbackManagementService.skipByManager(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 

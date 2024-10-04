@@ -1,10 +1,9 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
-import com.pfplaybackend.api.partyroom.application.dto.MusicDto;
-import com.pfplaybackend.api.partyroom.application.dto.PlaybackHistoryDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.MusicDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.PlaybackHistoryDto;
 import com.pfplaybackend.api.partyroom.application.peer.MusicQueryPeerService;
 import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
-import com.pfplaybackend.api.partyroom.application.proxy.UserProfileProxyService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PlaybackConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
@@ -19,8 +18,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
