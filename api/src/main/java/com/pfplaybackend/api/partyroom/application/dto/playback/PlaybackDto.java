@@ -1,12 +1,9 @@
-package com.pfplaybackend.api.partyroom.application.dto;
+package com.pfplaybackend.api.partyroom.application.dto.playback;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.Instant;
-import java.time.LocalTime;
 
 @AllArgsConstructor
 @NoArgsConstructor

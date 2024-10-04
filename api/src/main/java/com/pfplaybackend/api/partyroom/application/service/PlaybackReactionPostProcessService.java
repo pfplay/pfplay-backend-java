@@ -2,8 +2,8 @@ package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
-import com.pfplaybackend.api.partyroom.application.dto.AggregationDto;
-import com.pfplaybackend.api.partyroom.application.dto.ReactionPostProcessDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.AggregationDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.ReactionPostProcessDto;
 import com.pfplaybackend.api.partyroom.application.peer.GrabMusicPeerService;
 import com.pfplaybackend.api.partyroom.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;

@@ -3,6 +3,7 @@ package com.pfplaybackend.api.partyroom.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -70,10 +72,14 @@ public class PartyroomManagementService {
     @Transactional
     public void updatePartyroom(PartyroomId partyroomId, UpdatePartyroomRequest request) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        PartyroomData partyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId()).orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        // FIXME Extract Common Method
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomDataDto partyroomDataDto = optional.get();
+        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        // Domain Logic
         partyroomDomainService.checkIsHost(partyroom, partyContext.getUserId());
-        // TODO 구현 필요
         partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
         partyroomRepository.save(partyroomConverter.toData(partyroom.updateBaseInfo(request)));
     }

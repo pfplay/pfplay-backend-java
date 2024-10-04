@@ -1,5 +1,6 @@
-package com.pfplaybackend.api.partyroom.application.dto;
+package com.pfplaybackend.api.partyroom.application.dto.partyroom;
 
+import com.pfplaybackend.api.partyroom.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.application.dto;
+package com.pfplaybackend.api.partyroom.application.dto.dj;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class DjWithProfileDto {
     // FIXME Change to crewId
-    private long djId;
+    private long crewId;
     private long orderNumber;
     private String nickname;
     private String avatarIconUri;

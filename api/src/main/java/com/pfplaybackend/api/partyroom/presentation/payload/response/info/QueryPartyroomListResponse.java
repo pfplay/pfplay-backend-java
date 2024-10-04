@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation.payload.response.info;
 
-import com.pfplaybackend.api.partyroom.application.dto.PartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.presentation.dto.PartyroomElement;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;

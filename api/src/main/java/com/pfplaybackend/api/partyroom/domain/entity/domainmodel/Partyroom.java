@@ -3,12 +3,11 @@ package com.pfplaybackend.api.partyroom.domain.entity.domainmodel;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.partyroom.domain.entity.data.CrewData;
+import com.pfplaybackend.api.partyroom.domain.entity.data.DjData;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
-import com.pfplaybackend.api.partyroom.domain.value.CrewId;
-import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
-import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
-import com.pfplaybackend.api.partyroom.domain.value.PlaylistId;
+import com.pfplaybackend.api.partyroom.domain.value.*;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.management.UpdatePartyroomRequest;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -16,6 +15,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,6 +36,8 @@ public class Partyroom {
     private boolean isPlaybackActivated;
     private boolean isQueueClosed;
     private boolean isTerminated;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Partyroom() {}
 
@@ -63,10 +65,9 @@ public class Partyroom {
     @Builder
     public Partyroom(PartyroomId partyroomId, StageType stageType, String title, String introduction,
                      String linkDomain, int playbackTimeLimit,
-                     UserId hostId, String noticeContent,
-                     List<Crew> crews, List<Dj> djs,
-                     PlaybackId currentPlaybackId,
-                     boolean isPlaybackActivated, boolean isQueueClosed, boolean isTerminated) {
+                     UserId hostId, String noticeContent, PlaybackId currentPlaybackId,
+                     boolean isPlaybackActivated, boolean isQueueClosed, boolean isTerminated,
+                     LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.partyroomId = partyroomId;
         this.title = title;
         this.introduction = introduction;
@@ -81,6 +82,8 @@ public class Partyroom {
         this.isPlaybackActivated = isPlaybackActivated;
         this.isQueueClosed = isQueueClosed;
         this.isTerminated = isTerminated;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public static Partyroom create(CreatePartyroomRequest request, StageType stageType, UserId hostId) {
@@ -112,8 +115,10 @@ public class Partyroom {
     }
 
     public Partyroom createAndAddDj(PlaylistId playlistId, UserId userId) {
-        // TODO Dj 객체는 'Dj 신청 레코드'와 연관되어야 하며, 기본적으로는 'Dj 역할'의 크루를 지칭해야 한다.
-        this.djSet.add(Dj.create(partyroomId, playlistId, userId, this.djSet.size() + 1));
+        Crew crewIdOfDj = this.getCrewByUserId(userId).orElseThrow();
+        CrewId crewId = new CrewId(crewIdOfDj.getId());
+        // TODO Dj 객체는 'Dj 신청 레코드'와 연관되어야 하며, 기본적으로는 'Dj 역할'의 크루를 지칭하는 개념으로 존재해야한다.
+        this.djSet.add(Dj.create(partyroomId, playlistId, userId, crewId,this.djSet.size() + 1));
         return this;
     }
 

@@ -6,4 +6,5 @@ import lombok.Getter;
 @Getter
 public class PunishPenaltyRequest {
     private PenaltyType penaltyType;
+    private String reason;
 }

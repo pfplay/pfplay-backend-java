@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.presentation.payload.response.info;
 
-import com.pfplaybackend.api.partyroom.application.dto.DjWithProfileDto;
+import com.pfplaybackend.api.partyroom.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.enums.QueueStatus;
 import lombok.AllArgsConstructor;

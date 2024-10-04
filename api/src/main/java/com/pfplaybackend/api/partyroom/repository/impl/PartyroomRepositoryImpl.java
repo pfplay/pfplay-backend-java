@@ -1,13 +1,14 @@
 package com.pfplaybackend.api.partyroom.repository.impl;
 
-import com.pfplaybackend.api.partyroom.application.dto.*;
-import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomDto;
-import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomWithCrewDto;
-import com.pfplaybackend.api.partyroom.application.dto.partyroom.CrewDataDto;
-import com.pfplaybackend.api.partyroom.application.dto.partyroom.DjDataDto;
-import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.crew.CrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.CrewDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.DjDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.*;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.repository.custom.PartyroomRepositoryCustom;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -179,14 +180,14 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
     }
 
     @Override
-    public PartyroomDataDto findPartyroomDto(PartyroomId partyroomId) {
+    public Optional<PartyroomDataDto> findPartyroomDto(PartyroomId partyroomId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QCrewData qCrewData = QCrewData.crewData;
         QDjData qDjData = QDjData.djData;
 
         List<Tuple> result = queryFactory
-                .select(qPartyroomData.id, qPartyroomData.title, qPartyroomData.introduction,
+                .select(qPartyroomData,
                         qCrewData, qDjData)
                 .from(qPartyroomData)
                 .leftJoin(qPartyroomData.crewDataSet, qCrewData)
@@ -200,36 +201,25 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 )
                 .where(qPartyroomData.id.eq(partyroomId.getId()))
                 .distinct()
+                // .fetchJoin() 명시 불필요
                 .fetch();
 
-        PartyroomDataDto partyroomDataDto = new PartyroomDataDto(
-                result.get(0).get(qPartyroomData.id),
-                result.get(0).get(qPartyroomData.title),
-                result.get(0).get(qPartyroomData.introduction),
-                null, null);
+        if(result.isEmpty()) return Optional.empty();
+
+        PartyroomDataDto partyroomDataDto = PartyroomDataDto.create(Objects.requireNonNull(result.get(0).get(qPartyroomData)));
 
         Map<Long, Set<CrewDataDto>> crewDataMap = result.stream()
                 .filter(tuple -> Optional.ofNullable(tuple.get(qCrewData)).isPresent())
-                .map(tuple -> {
-                    CrewData crewData = tuple.get(qCrewData);
-                    assert crewData != null;
-                    return CrewDataDto.from(crewData);
-                })
+                .map(tuple -> CrewDataDto.from(Objects.requireNonNull(tuple.get(qCrewData))))
                 .collect(Collectors.groupingBy(CrewDataDto::getId, Collectors.toSet()));
 
         Map<Long, Set<DjDataDto>> djDataMap = result.stream()
                 .filter(tuple -> Optional.ofNullable(tuple.get(qDjData)).isPresent())
-                .map(tuple -> {
-                    DjData djData = tuple.get(qDjData);
-                    assert djData != null;
-                    return DjDataDto.from(djData);
-                })
+                .map(tuple -> DjDataDto.from(Objects.requireNonNull(tuple.get(qDjData))))
                 .collect(Collectors.groupingBy(DjDataDto::getId, Collectors.toSet()));
 
         partyroomDataDto.setCrewDataSet(crewDataMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet()));
         partyroomDataDto.setDjDataSet(djDataMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet()));
-        return partyroomDataDto;
+        return Optional.of(partyroomDataDto);
     }
-
-
 }

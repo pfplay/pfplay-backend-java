@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.partyroom.domain.service;
 
-import com.pfplaybackend.api.partyroom.application.dto.ReactionPostProcessDto;
+import com.pfplaybackend.api.partyroom.application.dto.playback.ReactionPostProcessDto;
 import com.pfplaybackend.api.partyroom.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.partyroom.domain.enums.ReactionType;
 import com.pfplaybackend.api.partyroom.domain.model.ReactionState;

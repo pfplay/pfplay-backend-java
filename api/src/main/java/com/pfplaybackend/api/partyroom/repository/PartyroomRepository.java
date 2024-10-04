@@ -9,7 +9,15 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface PartyroomRepository extends JpaRepository<PartyroomData, Long>, PartyroomRepositoryCustom {
-    @Query("SELECT p FROM PartyroomData p LEFT JOIN FETCH p.crewDataSet m WHERE p.id = :partyroomId AND m.isActive = true")
+
+
+    // TODO 'LEFT JOIN'
+    @Query("SELECT p " +
+            "FROM PartyroomData p " +
+            "LEFT JOIN FETCH p.crewDataSet m " +
+            "WHERE p.id = :partyroomId " +
+            "AND m.isActive = true "
+    )
     Optional<PartyroomData> findByPartyroomId(@Param("partyroomId") Long partyroomId);
     Optional<PartyroomData> findByLinkDomain(String linkDomain);
 }

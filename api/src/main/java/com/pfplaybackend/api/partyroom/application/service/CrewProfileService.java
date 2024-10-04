@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.partyroom.application.dto.active.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.event.message.CrewProfileMessage;

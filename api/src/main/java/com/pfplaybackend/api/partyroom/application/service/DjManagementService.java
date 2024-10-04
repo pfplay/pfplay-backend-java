@@ -36,6 +36,7 @@ public class DjManagementService {
     public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         // ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom();
+        // TODO Do not use 'findById'
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
