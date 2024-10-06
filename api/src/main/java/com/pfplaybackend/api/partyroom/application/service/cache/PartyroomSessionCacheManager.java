@@ -23,7 +23,6 @@ public class PartyroomSessionCacheManager implements SessionCacheManager {
 
     @Transactional
     public void saveSessionCache(String sessionId, UserId userId, String destination) {
-        System.out.println();
         String[] parts = destination.split("/");
         System.out.println();
         if(parts[1].equals("sub")) {

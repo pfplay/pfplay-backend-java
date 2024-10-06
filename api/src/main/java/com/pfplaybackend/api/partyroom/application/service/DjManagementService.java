@@ -72,8 +72,7 @@ public class DjManagementService {
         Crew crew = crewOptional.get();
         partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
         partyroomRepository.save(partyroomConverter.toData(partyroom));
-
-        // TODO Current Dj 라면?
+        // TODO 2024.10.06 CurrentDj인 경우, skipBySystem 호출
     }
 
     /**
@@ -84,9 +83,5 @@ public class DjManagementService {
     @Transactional
     public void dequeueDj(PartyroomId partyroomId, DjId djId) {
         // TODO 관리자 등급 여부를 체크
-    }
-
-    public Dj getDjByPlayback(PlaybackId playbackId) {
-        return new Dj();
     }
 }

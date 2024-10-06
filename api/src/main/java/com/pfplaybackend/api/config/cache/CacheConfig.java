@@ -27,7 +27,6 @@ public class CacheConfig {
         Map<String, RedisCacheConfiguration> redisCacheConfigurationMap = new HashMap<>();
         // Configure Cache 'Value'
         redisCacheConfigurationMap.put("crewInfoCache", redisCacheConfiguration.entryTtl(Duration.ofMinutes(30)));
-        redisCacheConfigurationMap.put("crewChatPenaltyCache", redisCacheConfiguration.entryTtl(Duration.ofSeconds(30)));
 
         return RedisCacheManager.RedisCacheManagerBuilder
                 .fromConnectionFactory(redisConnectionFactory)
