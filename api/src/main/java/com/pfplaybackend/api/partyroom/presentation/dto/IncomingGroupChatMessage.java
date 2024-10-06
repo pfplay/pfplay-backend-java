@@ -10,5 +10,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class IncomingGroupChatMessage {
-    private String message;
+    private String content;
 }

@@ -10,6 +10,7 @@ import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
+import com.pfplaybackend.api.partyroom.domain.enums.PenaltyType;
 import com.pfplaybackend.api.partyroom.domain.service.CrewDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
@@ -20,8 +21,11 @@ import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.regulation.PunishPenaltyRequest;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @Service
@@ -32,30 +36,46 @@ public class CrewPenaltyService {
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final CrewDomainService crewDomainService;
+    private final PartyroomAccessService partyroomAccessService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
+    @Transactional
     public void addPenalty(PartyroomId partyroomId, CrewId punishedCrewId, PunishPenaltyRequest request) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
         if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
         PartyroomDataDto partyroomDataDto = optional.get();
         PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
-        // TODO 1. 파티룸 조회
+        // FIXME 1. 파티룸 조회
+        // partyroomRepository.findPartyroomDto(PartyroomId partyroomId, UserId userId);
         // TODO 2. 같은 파티룸에 위치하는가?
+        // crewDomainService.isExistIn();
 
-        // 권한 검증
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         Crew punisherCrew = partyroom.getCrewByUserId(partyContext.getUserId()).orElseThrow();
+        Crew punishedCrew = partyroom.getCrew(punishedCrewId);
         GradeType punishedGradeType = partyroom.getCrew(punishedCrewId).getGradeType();
+        PenaltyType penaltyType = request.getPenaltyType();
+
+        // 권한 검증
         if(crewDomainService.isBelowManagerGrade(partyroom, partyContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
         if(crewDomainService.isAdjusterGradeLowerThanSubject(partyroom, partyContext.getUserId(), punishedCrewId)) throw ExceptionCreator.create(GradeException.GRADE_INSUFFICIENT_FOR_OPERATION);
         if(crewDomainService.isTargetGradeExceedingAdjuster(partyroom, partyContext.getUserId(), punishedGradeType)) throw ExceptionCreator.create(GradeException.GRADE_EXCEEDS_ALLOWED_THRESHOLD);
-        // TODO 4. 채팅 금지 → save in Redis key
-        // TODO 5. 임시 퇴장 → exit()
-        // TODO 6. 강제 퇴장 → exit(), isBanned()
-        // TODO 7. 페널티 부과 이벤트 발행
-        // TODO 8. 페널티 부과 이력 기록
-        CrewPenaltyMessage message = CrewPenaltyMessage.from(partyroomId, new CrewId(punisherCrew.getId()), punishedCrewId, request.getReason(), request.getPenaltyType());
+
+        // 페널티 부과
+        if(penaltyType.equals(PenaltyType.CHAT_BAN_30_SECONDS)) recordInShortTime(punishedCrewId.getId());
+        if(penaltyType.equals(PenaltyType.ONE_TIME_EXPULSION)) partyroomAccessService.expel(partyroom, punishedCrew, false);
+        if(penaltyType.equals(PenaltyType.PERMANENT_EXPULSION)) partyroomAccessService.expel(partyroom, punishedCrew, true);
+
+        CrewPenaltyMessage message = CrewPenaltyMessage.from(partyroomId, new CrewId(punisherCrew.getId()), punishedCrewId, request.getDetail(), request.getPenaltyType());
         publishCrewPenaltyChangedEvent(message);
+
+        // TODO 8. 페널티 부과 이력 기록(옵션)
+    }
+
+    private void recordInShortTime(Long crewIdValue) {
+        String key = "PENALTY:CHAT_BAN:" + crewIdValue;
+        redisTemplate.opsForValue().set(key, 30, Duration.ofSeconds(30));
     }
 
     // CHAT_BAN_30_SECONDS("채팅 금지", 30), // 채팅 금지 이벤트

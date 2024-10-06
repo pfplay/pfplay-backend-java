@@ -60,17 +60,21 @@ public class Crew {
         return this;
     }
 
-    public void applyDeactivation() {
+    public void deactivatePresence() {
         this.isActive = false;
         this.exitedAt = LocalDateTime.now();
     }
 
-    public void applyActivation() {
+    public void activatePresence() {
         this.isActive = true;
         this.enteredAt = LocalDateTime.now();
     }
 
     public void updateGrade(GradeType gradeType) {
         this.gradeType = gradeType;
+    }
+
+    public void enforceBan() {
+        this.isBanned = true;
     }
 }

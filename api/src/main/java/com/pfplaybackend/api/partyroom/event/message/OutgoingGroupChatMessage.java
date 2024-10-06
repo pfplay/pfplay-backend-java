@@ -18,11 +18,15 @@ public class OutgoingGroupChatMessage implements Serializable {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
     private Map<String, Object> crew;
-    private String message;
+    private Map<String, Object> message;
 
-    public static OutgoingGroupChatMessage from(PartyroomSessionDto sessionDto, String message) {
+    public static OutgoingGroupChatMessage from(PartyroomSessionDto sessionDto, String content) {
         Map<String, Object> crew = new HashMap<>();
         crew.put("crewId", sessionDto.getCrewId());
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("messageId", System.currentTimeMillis() + ":" + sessionDto.getCrewId());
+        message.put("content", content);
         return new OutgoingGroupChatMessage(
                 sessionDto.getPartyroomId(),
                 MessageTopic.CHAT,
