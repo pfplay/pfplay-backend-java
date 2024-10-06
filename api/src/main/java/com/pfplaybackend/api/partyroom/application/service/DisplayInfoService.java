@@ -61,6 +61,8 @@ public class DisplayInfoService {
     private Crew getCurrentDjInfo(PartyroomId partyroomId, Playback playback) {
         // FIXME Dj 대기열에서의 Dj 아이템
         // FIXME Crew 목록에서의 아이템
+        // crewSet 에서 조회하기 때문에 처리는 정상적으로 된다.
+        // 하지만 djSet 에서는 존재하지 않는다.
         return partyroomInfoService.getCrewByUserId(partyroomId, playback.getUserId()).orElseThrow();
     }
 

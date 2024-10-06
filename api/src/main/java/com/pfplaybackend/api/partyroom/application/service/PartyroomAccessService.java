@@ -131,6 +131,28 @@ public class PartyroomAccessService {
         messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
     }
 
+    @Transactional
+    public void expel(Partyroom partyroom, Crew crew, boolean isPermanent)  {
+        // FIXME Parameter UserId → CrewId
+        partyroom.deactivateCrewAndGet(crew.getUserId());
+        // FIXME crew.getId() return type → CrewId
+        if(isPermanent) partyroom.applyPermanentBan(new CrewId(crew.getId()));
+        partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
+        partyroomRepository.save(partyroomConverter.toData(partyroom));
+
+        if(partyroom.isCurrentDj(new CrewId(crew.getId()))) {
+            playbackManagementService.skipBySystem(partyroom.getPartyroomId());
+        }
+
+        CrewSummaryDto crewSummaryDto = new CrewSummaryDto(crew.getId());
+        PartyroomAccessMessage partyroomAccessMessage = new PartyroomAccessMessage(
+                partyroom.getPartyroomId(),
+                MessageTopic.PARTYROOM_ACCESS,
+                AccessType.EXIT,
+                crewSummaryDto);
+        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
+    }
+
     @Transactional(readOnly = true)
     public Map<String, Long> getRedirectUri(String linkDomain) {
         PartyroomData partyroomData = partyroomRepository.findByLinkDomain(linkDomain)
