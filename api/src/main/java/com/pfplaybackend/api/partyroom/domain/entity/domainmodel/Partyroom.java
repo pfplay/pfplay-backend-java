@@ -155,7 +155,7 @@ public class Partyroom {
     public Crew deactivateCrewAndGet(UserId userId) {
         this.crewSet = this.crewSet.stream().peek(crew -> {
                     if(crew.getUserId().equals(userId)) {
-                        crew.applyDeactivation();
+                        crew.deactivatePresence();
                     }
                 }).collect(Collectors.toSet());
         return this.crewSet.stream().filter(crew -> crew.getUserId().equals(userId)).findAny().orElseThrow();
@@ -188,19 +188,18 @@ public class Partyroom {
     public Partyroom activateCrew(UserId userId) {
         this.crewSet = this.crewSet.stream().peek(crew -> {
             if (crew.getUserId().equals(userId)) {
-                crew.applyActivation();
+                crew.activatePresence();
             }
         }).collect(Collectors.toSet());
         return this;
     }
 
-    public Partyroom updateCrewGrade(CrewId crewId, GradeType gradeType) {
+    public void updateCrewGrade(CrewId crewId, GradeType gradeType) {
         this.crewSet = this.crewSet.stream().peek(crew -> {
             if (crew.getId() == crewId.getId()) {
                 crew.updateGrade(gradeType);
             }
         }).collect(Collectors.toSet());
-        return this;
     }
 
     public Crew getCrew(CrewId crewId) {
@@ -219,8 +218,24 @@ public class Partyroom {
         return this.djSet.stream().filter(dj -> dj.getOrderNumber() == 1).findFirst().orElseThrow();
     }
 
+    public boolean isCurrentDj(CrewId crewId) {
+        if(isPlaybackActivated) {
+            return this.djSet.stream().anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
+        }else {
+            return false;
+        }
+    }
+
     public void updatedQueueStatus(UpdateDjQueueStatusRequest request) {
         if(request.getQueueStatus().equals(QueueStatus.CLOSE)) this.isQueueClosed = true;
         if(request.getQueueStatus().equals(QueueStatus.OPEN)) this.isQueueClosed = false;
+    }
+
+    public void applyPermanentBan(CrewId crewId) {
+        this.crewSet = this.crewSet.stream().peek(crew -> {
+            if (crew.getId() == crewId.getId()) {
+                crew.enforceBan();
+            }
+        }).collect(Collectors.toSet());
     }
 }

@@ -11,13 +11,15 @@ public class PunishPenaltyRequest {
 
     @NotNull(message = "PenaltyType is required.")
     private PenaltyType penaltyType;
-    private String reason;
+    private String detail;
 
     @AssertTrue(message = "Reason of penalty is required")
-    public boolean isReasonValid() {
-        if(!penaltyType.equals(PenaltyType.CHAT_MESSAGE_REMOVAL)) {
-            return reason != null && reason.length() > 1;
+    public boolean isDetailValid() {
+        if(penaltyType.equals(PenaltyType.CHAT_MESSAGE_REMOVAL)) {
+            String regex = "^\\d{13}:\\d+$";
+            return detail.matches(regex);
+        }else {
+            return detail != null && detail.length() > 1;
         }
-        return true;
     }
 }

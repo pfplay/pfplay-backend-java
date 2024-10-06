@@ -19,12 +19,12 @@ public class CrewPenaltyMessage implements Serializable {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
     private PenaltyType penaltyType;
-    private String reason;
+    private String detail;
     private Map<String, Object> punisher;
     private Map<String, Object> punished;
 
     public static CrewPenaltyMessage from(PartyroomId partyroomId,
-                                        CrewId punisherCrewId, CrewId punishedCrewId, String reason, PenaltyType penaltyType) {
+                                        CrewId punisherCrewId, CrewId punishedCrewId, String detail, PenaltyType penaltyType) {
         Map<String, Object> punisher = new HashMap<>();
         punisher.put("crewId", punisherCrewId.getId());
 
@@ -33,9 +33,9 @@ public class CrewPenaltyMessage implements Serializable {
 
         return new CrewPenaltyMessage(
                 partyroomId,
-                MessageTopic.CREW_GRADE,
+                MessageTopic.CREW_PENALTY,
                 penaltyType,
-                reason,
+                detail,
                 punisher,
                 punished
         );
