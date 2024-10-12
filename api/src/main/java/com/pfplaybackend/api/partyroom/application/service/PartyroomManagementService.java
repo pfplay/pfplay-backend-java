@@ -4,6 +4,7 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
+import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
@@ -45,20 +46,19 @@ public class PartyroomManagementService {
 
     @Transactional
     public Partyroom createGeneralPartyRoom(CreatePartyroomRequest request) {
-        try {
-            // Create Partyroom
-            PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-            partyroomDomainService.checkIsQualifiedToCreate(partyContext.getAuthorityTier());
-            // TODO 구현 필요
-            partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
-            Partyroom createdPartyroom = createPartyroom(request, StageType.GENERAL, partyContext.getUserId());
-            // Enter Partyroom
-            partyroomAccessService.enterByHost(partyContext.getUserId(), createdPartyroom);
-            return createdPartyroom;
-        }catch (Exception e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
-        }
-        return null;
+        // Create Partyroom
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        partyroomDomainService.checkIsQualifiedToCreate(partyContext.getAuthorityTier());
+        // TODO 이미 활동중인 파티룸이 존재하는가?
+        Optional<PartyroomData> optionalActive = partyroomRepository.findActiveHostRoom(partyContext.getUserId());
+        if(optionalActive.isPresent()) throw ExceptionCreator.create(PartyroomException.ALREADY_HOST);
+
+        // TODO 구현 필요
+        partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
+        Partyroom createdPartyroom = createPartyroom(request, StageType.GENERAL, partyContext.getUserId());
+        // Enter Partyroom
+        partyroomAccessService.enterByHost(partyContext.getUserId(), createdPartyroom);
+        return createdPartyroom;
     }
 
     private Partyroom createPartyroom(CreatePartyroomRequest request, StageType stageType, UserId hostId) {
