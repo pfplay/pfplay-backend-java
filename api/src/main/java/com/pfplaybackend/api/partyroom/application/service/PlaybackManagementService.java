@@ -91,11 +91,8 @@ public class PlaybackManagementService {
     }
 
     private void tryProceed(PartyroomId partyroomId) {
-        // TODO Do Not Use findById
-        // PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
         if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        // 여기에서 저장이 되면서 무효화된 레코드가 모두 삭제된다.
         PartyroomData partyroomData = partyroomConverter.toEntity(optional.get());
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
@@ -124,7 +121,7 @@ public class PlaybackManagementService {
     }
 
     // FIXME CrewId
-    private void publishPlaybackChangedEvent(PartyroomId partyroomId, long crewId, PlaybackData playbackData ) {
+    private void publishPlaybackChangedEvent(PartyroomId partyroomId, long crewId, PlaybackData playbackData) {
         messagePublisher.publish(MessageTopic.PLAYBACK_START,
                 new PlaybackStartMessage(partyroomId, MessageTopic.PLAYBACK_START, crewId,
                         new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(), playbackData.getDuration(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
