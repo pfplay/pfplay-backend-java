@@ -35,9 +35,9 @@ public class PartyroomDomainService {
     }
 
     // 파티룸을 생성할 수 있는 권한을 보유했는지 확인
-    public void checkIsQualifiedToCreate(AuthorityTier authorityTier) throws Exception {
+    public void checkIsQualifiedToCreate(AuthorityTier authorityTier) {
         if(!authorityTier.equals(AuthorityTier.FM)) {
-            throw new Exception();
+            throw ExceptionCreator.create(PartyroomException.RESTRICTED_AUTHORITY);
         }
     }
 

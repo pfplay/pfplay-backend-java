@@ -11,7 +11,9 @@ public enum PartyroomException implements DomainException {
     ALREADY_TERMINATED("PTR-002", "Already Terminated Partyroom", ForbiddenException.class),
     EXCEEDED_LIMIT("PTR-003", "Exceeded Entrance Limit", ForbiddenException.class),
     ACTIVE_ANOTHER_ROOM("PTR-004", "Already Active in Another Partyroom", ForbiddenException.class),
-    CACHE_MISSED_SESSION("PTR-005", "No cached data found for sessionId", NotFoundException.class);
+    CACHE_MISSED_SESSION("PTR-005", "No cached data found for sessionId", NotFoundException.class),
+    RESTRICTED_AUTHORITY("PTR-006", "Authority Restriction", ForbiddenException.class),
+    ALREADY_HOST("PTR-007", "Already Host in Another Partyroom", ForbiddenException.class);
 
     private final String errorCode;
     private final String message;

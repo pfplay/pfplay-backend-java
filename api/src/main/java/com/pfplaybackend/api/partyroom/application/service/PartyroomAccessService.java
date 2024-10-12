@@ -10,6 +10,7 @@ import com.pfplaybackend.api.partyroom.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
+import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.enums.AccessType;
 import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
@@ -118,8 +119,11 @@ public class PartyroomAccessService {
 
         // TODO 24.10.04 '퇴장하려는 크루'가 CurrentDj 인 경우에 한해, Current Playback 강제 스킵 처리
         // CurrentDj: orderNumber == 1
-        if(partyroom.getCurrentDj().getCrewId().equals(new CrewId(crew.getId()))) {
-            playbackManagementService.skipBySystem(partyroomId);
+        Optional<Dj> optionalDj = partyroom.getCurrentDj();
+        if(optionalDj.isPresent()) {
+            if(optionalDj.get().getCrewId().equals(new CrewId(crew.getId()))) {
+                playbackManagementService.skipBySystem(partyroomId);
+            }
         }
 
         CrewSummaryDto crewSummaryDto = new CrewSummaryDto(crew.getId());
