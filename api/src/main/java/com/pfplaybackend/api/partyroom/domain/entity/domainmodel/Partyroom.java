@@ -214,8 +214,8 @@ public class Partyroom {
         return this;
     }
 
-    public Dj getCurrentDj() {
-        return this.djSet.stream().filter(dj -> dj.getOrderNumber() == 1).findFirst().orElseThrow();
+    public Optional<Dj> getCurrentDj() {
+        return this.djSet.stream().filter(dj -> dj.getOrderNumber() == 1).findFirst();
     }
 
     public boolean isCurrentDj(CrewId crewId) {
