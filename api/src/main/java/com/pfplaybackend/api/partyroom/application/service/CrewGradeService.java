@@ -59,6 +59,8 @@ public class CrewGradeService {
         if(crewDomainService.isTargetGradeExceedingAdjuster(partyroom, partyContext.getUserId(), targetGradeType)) throw ExceptionCreator.create(GradeException.GRADE_EXCEEDS_ALLOWED_THRESHOLD);
         partyroom.updateCrewGrade(adjustedCrewId, targetGradeType);
 
+        partyroomRepository.save(partyroomConverter.toData(partyroom));
+
         CrewGradeMessage message = CrewGradeMessage.from(partyroomId, new CrewId(adjusterCrew.getId()), adjustedCrewId, prevGradeType, targetGradeType);
         publishCrewGradeChangedEvent(message);
     }

@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,11 +50,13 @@ public class PartyroomManagementService {
         // Create Partyroom
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         partyroomDomainService.checkIsQualifiedToCreate(partyContext.getAuthorityTier());
-        // TODO 이미 활동중인 파티룸이 존재하는가?
         Optional<PartyroomData> optionalActive = partyroomRepository.findActiveHostRoom(partyContext.getUserId());
         if(optionalActive.isPresent()) throw ExceptionCreator.create(PartyroomException.ALREADY_HOST);
 
-        // TODO 구현 필요
+        // TODO 고유성 검증 구현 필요
+        if(request.getLinkDomain().isEmpty()) {
+            request.setLinkDomain(UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12));
+        }
         partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
         Partyroom createdPartyroom = createPartyroom(request, StageType.GENERAL, partyContext.getUserId());
         // Enter Partyroom

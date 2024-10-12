@@ -80,8 +80,8 @@ public class RedisConfig {
         container.addMessageListener(new CrewPenaltyTopicListener(simpMessageSender, objectMapper), new ChannelTopic("crew_penalty"));
         container.addMessageListener(new CrewProfileTopicListener(simpMessageSender, objectMapper), new ChannelTopic("crew_profile"));
         container.addMessageListener(new CrewProfilePreCheckTopicListener(objectMapper, distributedLockExecutor, crewProfileService), new ChannelTopic("crew_profile_pre_check"));
-        container.addMessageListener(new PlaybackStartTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback_skip"));
-        container.addMessageListener(new PlaybackSkipTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback_start"));
+        container.addMessageListener(new PlaybackStartTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback_start"));
+        container.addMessageListener(new PlaybackSkipTopicListener(simpMessageSender, objectMapper), new ChannelTopic("playback_skip"));
         container.addMessageListener(new PlaybackDurationWaitTopicListener(redisTemplate, objectMapper, distributedLockExecutor, playbackManagementService), new PatternTopic("__keyevent@*__:expired"));
         return container;
     }
