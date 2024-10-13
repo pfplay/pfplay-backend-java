@@ -39,7 +39,10 @@ public class DjManagementService {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         // ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom();
         // TODO Do not use 'findById'
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomDataDto partyroomDataDto = optional.get();
+        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
         boolean isPostActivationProcessingRequired = !partyroom.isPlaybackActivated();
