@@ -20,6 +20,7 @@ import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.PartyroomAccessMessage;
+import com.pfplaybackend.api.partyroom.exception.CrewException;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.exception.PenaltyException;
@@ -112,7 +113,12 @@ public class PartyroomAccessService {
         PartyroomData partyroomData =  partyroomConverter.toEntity(optional.get());
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
+        // 해당 방에 들어간 적이 없거나, 이미 나간 상황이라면 crewSet 에 없을 것이다.
+        Optional<Crew> optionalCrew = partyroom.getCrewByUserId(partyContext.getUserId());
+        if(optionalCrew.isEmpty()) throw ExceptionCreator.create(CrewException.INVALID_ACTIVE_ROOM);
+
         Crew crew = partyroom.deactivateCrewAndGet(partyContext.getUserId());
+
         // '퇴장하려는 크루'가 Dj 대기열에 존재한다면 강제 삭제(무효화)
         partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
         partyroomRepository.save(partyroomConverter.toData(partyroom));
