@@ -57,11 +57,15 @@ public class PartyroomInfoController {
      * → 파티룸 입장 시 초기화 정보 조회 목적
      */
     @GetMapping("/{partyroomId}/crews")
-    public ResponseEntity<QueryCrewListResponse> getCrews(@PathVariable Long partyroomId,
-                                                          @RequestParam(value = "groupByGrade", required = false, defaultValue = "false") boolean groupByGrade) {
-        // Grade 별로 그루핑할 수 있는 옵션을 제공한다.
-        partyroomInfoService.getCrews(new PartyroomId(partyroomId));
-        return null;
+    public ResponseEntity<?> getCrews(@PathVariable Long partyroomId) {
+        List<CrewSetupDto> crewSetupDtoList = partyroomInfoService.getCrewsForSetup(new PartyroomId(partyroomId));
+        return ResponseEntity.ok().body(QueryCrewListResponse.from(crewSetupDtoList));
+    }
+
+    @GetMapping("/{partyroomId}/display")
+    public ResponseEntity<?> getDisplay() {
+        DisplayDto displayDto = displayInfoService.getDisplayInfo();
+        return ResponseEntity.ok().body(QueryDisplayResponse.from(displayDto));
     }
 
     @GetMapping("/{partyroomId}/setup")
