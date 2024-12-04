@@ -90,7 +90,15 @@ public class PartyroomManagementService {
     @Transactional
     public void deletePartyRoom(PartyroomId partyroomId) {
         // TODO 클라이언트가 파티룸의 호스트가 맞는가?
-        // TODO 파티룸에 자신을 제외한 멤버가 없는가?
+        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        partyroom.terminate();
+        partyroomRepository.save(partyroomConverter.toData(partyroom));
+        messagePublisher.publish(
+                MessageTopic.PARTYROOM_DEACTIVATION,
+                new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
+        );
     }
 
     @Transactional
