@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
@@ -89,7 +90,10 @@ public class PartyroomManagementService {
 
     @Transactional
     public void deletePartyRoom(PartyroomId partyroomId) {
-        // TODO 클라이언트가 파티룸의 호스트가 맞는가?
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        if (partyContext.getAuthorityTier() != AuthorityTier.FM) {
+            throw ExceptionCreator.create(PartyroomException.RESTRICTED_AUTHORITY);
+        }
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
