@@ -222,4 +222,10 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
         partyroomDataDto.setDjDataSet(djDataMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet()));
         return Optional.of(partyroomDataDto);
     }
+
+    @Override
+    public List<PartyroomData> findAllUnusedPartyroomData() {
+        // TODO: Check unused partyroom condition
+        return List.of();
+    }
 }

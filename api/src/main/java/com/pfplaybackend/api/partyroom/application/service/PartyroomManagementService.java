@@ -22,10 +22,12 @@ import com.pfplaybackend.api.partyroom.presentation.payload.request.management.U
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -103,6 +105,21 @@ public class PartyroomManagementService {
                 MessageTopic.PARTYROOM_DEACTIVATION,
                 new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
         );
+    }
+
+    @Scheduled(cron = "0 6 * * *")
+    @Transactional
+    public void deleteUnusedPartyroom() {
+        List<PartyroomData> unusedPartyroomDataList = partyroomRepository.findAllUnusedPartyroomData();
+        unusedPartyroomDataList.forEach(partyroomData -> {
+            Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+            partyroom.terminate();
+            partyroomRepository.save(partyroomConverter.toData(partyroom));
+            messagePublisher.publish(
+                    MessageTopic.PARTYROOM_DEACTIVATION,
+                    new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
+            );
+        });
     }
 
     @Transactional
