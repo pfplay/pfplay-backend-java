@@ -4,6 +4,7 @@ import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroom
 import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomWithCrewDto;
+import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -17,4 +18,5 @@ public interface PartyroomRepositoryCustom {
     List<PartyroomWithCrewDto> getCrewDataByPartyroomId();
     List<PlaybackData> getRecentPlaybackHistory(PartyroomId partyroomId);
     Optional<PartyroomDataDto> findPartyroomDto(PartyroomId partyroomId);
+    List<PartyroomData> findAllUnusedPartyroomData();
 }
