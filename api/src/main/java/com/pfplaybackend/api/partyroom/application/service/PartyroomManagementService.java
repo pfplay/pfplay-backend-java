@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.partyroom.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
-import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
@@ -21,10 +21,11 @@ import com.pfplaybackend.api.partyroom.presentation.payload.request.management.U
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -89,8 +90,35 @@ public class PartyroomManagementService {
 
     @Transactional
     public void deletePartyRoom(PartyroomId partyroomId) {
-        // TODO 클라이언트가 파티룸의 호스트가 맞는가?
-        // TODO 파티룸에 자신을 제외한 멤버가 없는가?
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        if (partyContext.getAuthorityTier() != AuthorityTier.FM) {
+            throw ExceptionCreator.create(PartyroomException.RESTRICTED_AUTHORITY);
+        }
+        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        partyroom.terminate();
+        partyroomRepository.save(partyroomConverter.toData(partyroom));
+        messagePublisher.publish(
+                MessageTopic.PARTYROOM_DEACTIVATION,
+                new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
+        );
+    }
+
+    @Scheduled(cron = "0 0 3 * * *")
+//    @Scheduled(cron = "0 * * * * ?")
+    @Transactional
+    public void deleteUnusedPartyroom() {
+        List<PartyroomData> unusedPartyroomDataList = partyroomRepository.findAllUnusedPartyroomDataByDay(30);
+        unusedPartyroomDataList.forEach(partyroomData -> {
+            Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+            partyroom.terminate();
+            partyroomRepository.save(partyroomConverter.toData(partyroom));
+            messagePublisher.publish(
+                    MessageTopic.PARTYROOM_DEACTIVATION,
+                    new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
+            );
+        });
     }
 
     @Transactional
