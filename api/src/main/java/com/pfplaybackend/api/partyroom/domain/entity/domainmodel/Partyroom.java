@@ -238,4 +238,8 @@ public class Partyroom {
             }
         }).collect(Collectors.toSet());
     }
+
+    public void terminate() {
+        this.isTerminated = true;
+    }
 }
