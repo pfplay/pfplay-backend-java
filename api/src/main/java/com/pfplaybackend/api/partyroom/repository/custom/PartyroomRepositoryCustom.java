@@ -18,5 +18,5 @@ public interface PartyroomRepositoryCustom {
     List<PartyroomWithCrewDto> getCrewDataByPartyroomId();
     List<PlaybackData> getRecentPlaybackHistory(PartyroomId partyroomId);
     Optional<PartyroomDataDto> findPartyroomDto(PartyroomId partyroomId);
-    List<PartyroomData> findAllUnusedPartyroomData();
+    List<PartyroomData> findAllUnusedPartyroomDataByDay(int days);
 }

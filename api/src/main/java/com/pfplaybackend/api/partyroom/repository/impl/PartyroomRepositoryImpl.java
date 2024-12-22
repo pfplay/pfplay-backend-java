@@ -21,6 +21,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -224,8 +225,13 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
     }
 
     @Override
-    public List<PartyroomData> findAllUnusedPartyroomData() {
-        // TODO: Check unused partyroom condition
-        return List.of();
+    public List<PartyroomData> findAllUnusedPartyroomDataByDay(int days) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
+
+        return queryFactory.select(qPartyroomData)
+                .from(qPartyroomData)
+                .where(qPartyroomData.updatedAt.before(LocalDateTime.now().minusDays(days)))
+                .fetch();
     }
 }
