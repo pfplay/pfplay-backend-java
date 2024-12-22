@@ -5,7 +5,6 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.partyroom.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.partyroom.application.dto.base.PartyroomDataDto;
-import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
@@ -26,7 +25,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -107,10 +105,11 @@ public class PartyroomManagementService {
         );
     }
 
-    @Scheduled(cron = "0 6 * * *")
+    @Scheduled(cron = "0 0 3 * * *")
+//    @Scheduled(cron = "0 * * * * ?")
     @Transactional
     public void deleteUnusedPartyroom() {
-        List<PartyroomData> unusedPartyroomDataList = partyroomRepository.findAllUnusedPartyroomData();
+        List<PartyroomData> unusedPartyroomDataList = partyroomRepository.findAllUnusedPartyroomDataByDay(30);
         unusedPartyroomDataList.forEach(partyroomData -> {
             Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
             partyroom.terminate();
