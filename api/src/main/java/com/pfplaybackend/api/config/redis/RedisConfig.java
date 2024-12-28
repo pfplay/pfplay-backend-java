@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pfplaybackend.api.config.websocket.SimpMessageSender;
+import com.pfplaybackend.api.liveconnect.websocket.SimpMessageSender;
 import com.pfplaybackend.api.partyroom.application.service.CrewProfileService;
 import com.pfplaybackend.api.partyroom.application.service.PlaybackManagementService;
 import com.pfplaybackend.api.partyroom.application.service.lock.DistributedLockExecutor;

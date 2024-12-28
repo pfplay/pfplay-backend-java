@@ -2,7 +2,7 @@ package com.pfplaybackend.api.user.domain.service;
 
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
-import com.pfplaybackend.api.user.application.service.AvatarResourceService;
+import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.function.BinaryOperator;
 
 @Service
 @RequiredArgsConstructor

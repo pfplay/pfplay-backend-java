@@ -1,15 +1,10 @@
 package com.pfplaybackend.api.user.application.service.initialize;
 
-import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.config.jwt.JwtProvider;
 import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
-import com.pfplaybackend.api.user.application.aspect.context.UserContext;
-import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.application.service.AvatarResourceService;
+import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
-import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
@@ -21,7 +16,6 @@ import com.pfplaybackend.api.user.domain.value.*;
 import com.pfplaybackend.api.user.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.web.PortResolverImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
