@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.partyroom.application.service.cache;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.cache.SessionCacheManager;
+import com.pfplaybackend.api.liveconnect.websocket.cache.SessionCacheManager;
 import com.pfplaybackend.api.partyroom.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.partyroom.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomSessionDto;

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.user.application.service;
 
+import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
