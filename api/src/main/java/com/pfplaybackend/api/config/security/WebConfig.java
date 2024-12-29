@@ -20,7 +20,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "http://localhost:3000",
                         "http://localhost:4000",
                         "http://localhost:8080",
-                        "https://pfplay.io",
+                        "https://pfplay.xyz",
                         "https://pfplay-api.app")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowCredentials(true)
