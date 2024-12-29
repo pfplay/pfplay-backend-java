@@ -6,7 +6,7 @@ import com.pfplaybackend.api.partyroom.domain.enums.GradeType;
 import com.pfplaybackend.api.partyroom.domain.enums.QueueStatus;
 import com.pfplaybackend.api.partyroom.domain.enums.StageType;
 import com.pfplaybackend.api.partyroom.domain.value.*;
-import com.pfplaybackend.api.partyroom.exception.DjException;
+import com.pfplaybackend.api.partyplay.exception.DjException;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.management.UpdateDjQueueStatusRequest;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.management.UpdatePartyroomRequest;
