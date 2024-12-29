@@ -6,6 +6,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum Domain {
-    CLIENT("https://pfplay.io/");
+    CLIENT("https://pfplay.xyz/");
     private final String url;
 }
