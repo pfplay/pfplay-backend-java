@@ -1,12 +1,10 @@
 package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistMusicData;
-import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.playlist.exception.PlaylistMusicException;
+import com.pfplaybackend.api.playlist.exception.TrackException;
 import com.pfplaybackend.api.playlist.presentation.payload.request.AddMusicRequest;
 import com.pfplaybackend.api.playlist.repository.PlaylistMusicRepository;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
@@ -15,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,7 +31,7 @@ public class GrabMusicService {
         PlaylistData playlistData = playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST);
         // LinkId cannot be duplicated.
         Optional<PlaylistMusicData> optional = playlistMusicRepository.findByPlaylistDataIdAndLinkId(playlistData.getId(), linkId);
-        if(optional.isPresent()) throw ExceptionCreator.create(PlaylistMusicException.DUPLICATE_MUSIC_IN_PLAYLIST);
+        if(optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
 
         AddMusicRequest request = new AddMusicRequest(
                 targetPlaylistMusicData.getName(),

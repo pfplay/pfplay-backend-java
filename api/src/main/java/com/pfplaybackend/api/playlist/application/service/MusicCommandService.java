@@ -3,13 +3,11 @@ package com.pfplaybackend.api.playlist.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
-import com.pfplaybackend.api.playlist.application.dto.PlaylistDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistMusicData;
-import com.pfplaybackend.api.playlist.exception.PlaylistMusicException;
+import com.pfplaybackend.api.playlist.exception.TrackException;
 import com.pfplaybackend.api.playlist.presentation.payload.request.AddMusicRequest;
-import com.pfplaybackend.api.playlist.presentation.payload.response.AddMusicResponse;
 import com.pfplaybackend.api.playlist.repository.PlaylistMusicRepository;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -43,7 +41,7 @@ public class MusicCommandService {
 
         // 중복 검사
         Optional<PlaylistMusicData> optional = playlistMusicRepository.findByPlaylistDataIdAndLinkId(playlistData.getId(), request.getLinkId());
-        if(optional.isPresent()) throw ExceptionCreator.create(PlaylistMusicException.DUPLICATE_MUSIC_IN_PLAYLIST);
+        if(optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
 
         long nextMusicOrderNumber = PlaylistSummary.getMusicCount() == 0 ? 1 : PlaylistSummary.getMusicCount() + 1;
 

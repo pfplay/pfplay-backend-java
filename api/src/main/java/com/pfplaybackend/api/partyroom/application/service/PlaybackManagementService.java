@@ -26,7 +26,7 @@ import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.partyroom.event.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.partyroom.event.message.PlaybackStartMessage;
-import com.pfplaybackend.api.partyroom.exception.GradeException;
+import com.pfplaybackend.api.partyplay.exception.GradeException;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import com.pfplaybackend.api.partyroom.repository.PlaybackRepository;

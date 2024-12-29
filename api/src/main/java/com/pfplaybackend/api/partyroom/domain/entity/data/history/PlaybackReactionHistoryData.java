@@ -3,7 +3,6 @@ package com.pfplaybackend.api.partyroom.domain.entity.data.history;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.partyroom.domain.model.ReactionState;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
-import com.pfplaybackend.api.partyroom.presentation.PlaybackReactionController;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Getter;

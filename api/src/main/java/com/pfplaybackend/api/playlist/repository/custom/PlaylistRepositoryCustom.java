@@ -9,8 +9,8 @@ import com.querydsl.core.Tuple;
 import java.util.List;
 
 public interface PlaylistRepositoryCustom {
-    public List<PlaylistSummary> findAllByUserId(UserId userId);
-    public PlaylistSummary findByIdAndUserId(Long playlistId, UserId userId);
-    public List<Long> findByUserIdAndListIdAndType(UserId userId, List<Long> listIds, PlaylistType type);
-    public Long deleteByListIds(List<Long> listIds);
+    List<PlaylistSummary> findAllByUserId(UserId userId);
+    PlaylistSummary findByIdAndUserId(Long playlistId, UserId userId);
+    List<Long> findByUserIdAndListIdAndType(UserId userId, List<Long> listIds, PlaylistType type);
+    Long deleteByListIds(List<Long> listIds);
 }

@@ -1,12 +1,13 @@
 package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.service.PlaylistDomainService;
-import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
+import com.pfplaybackend.api.playlist.exception.PlaylistException;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.transaction.Transactional;
@@ -54,7 +55,7 @@ public class PlaylistCommandService {
         UserId userId = playlistContext.getUserId();
 
         PlaylistData playlistData = playlistRepository.findByIdAndOwnerIdAndType(playlistId, userId, PlaylistType.PLAYLIST)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 플레이리스트"));
+                .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         Playlist playlist = playlistData.toDomain();
 
@@ -71,19 +72,12 @@ public class PlaylistCommandService {
 
         Set<Long> userPlaylistIdSet = playlistDataList.stream().map(PlaylistData::getId).collect(Collectors.toSet());
         if (!userPlaylistIdSet.containsAll(playlistIds)) {
-            throw new NoSuchElementException("존재하지 않거나 유효하지 않은 플레이리스트");
+            throw ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST);
         }
 
-        try {
-            Long count = playlistRepository.deleteByListIds(playlistIds);
-            if (count != playlistIds.size()) {
-                throw new InvalidDeleteRequestException("비정상적인 삭제 요청");
-            }
-        } catch (Exception e) {
-            if (e instanceof InvalidDeleteRequestException) {
-                throw e;
-            }
-            throw new RuntimeException(e);
+        Long count = playlistRepository.deleteByListIds(playlistIds);
+        if (count != playlistIds.size()) {
+            throw ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST);
         }
     }
 }

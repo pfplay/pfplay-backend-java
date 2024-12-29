@@ -2,15 +2,12 @@ package com.pfplaybackend.api.partyroom.event.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pfplaybackend.api.config.websocket.SimpMessageSender;
 import com.pfplaybackend.api.partyroom.application.service.CrewProfileService;
 import com.pfplaybackend.api.partyroom.application.service.lock.DistributedLockExecutor;
-import com.pfplaybackend.api.partyroom.event.message.CrewGradeMessage;
 import com.pfplaybackend.api.partyroom.event.message.CrewProfilePreCheckMessage;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @AllArgsConstructor
 public class CrewProfilePreCheckTopicListener implements MessageListener {

@@ -3,7 +3,6 @@ package com.pfplaybackend.api.common.exception;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.enums.ExceptionEnum;
 import com.pfplaybackend.api.common.exception.http.*;
-import com.pfplaybackend.api.playlist.exception.InvalidDeleteRequestException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
@@ -104,67 +103,6 @@ public class GlobalExceptionHandler {
                                 ExceptionResult.builder()
                                         .code(ExceptionEnum.EXCEPTION.getHttpStatusCode())
                                         .message(ExceptionEnum.EXCEPTION.getMessage())
-                                        .build()
-                        )
-                );
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ApiCommonResponse.error(
-                                ExceptionResult.builder()
-                                        .status(HttpStatus.BAD_REQUEST)
-                                        .code(HttpStatus.BAD_REQUEST.value())
-                                        .message(HttpStatus.BAD_REQUEST.getReasonPhrase())
-                                        .build()
-                        )
-                );
-    }
-
-
-    // TODO Delete Method
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<?> handleNoSuchElementFoundException(NoSuchElementException e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(ApiCommonResponse.error(
-                                ExceptionResult.builder()
-                                        .code(ExceptionEnum.NO_SUCH_ELEMENT.getHttpStatusCode())
-                                        .message(e.getMessage())
-                                        .build()
-                        )
-                );
-    }
-
-    // TODO Delete Method
-    @ExceptionHandler(InvalidDeleteRequestException.class)
-    public ResponseEntity<?> handleInvalidDeleteRequestException(InvalidDeleteRequestException e) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(ApiCommonResponse.error(
-                                ExceptionResult.builder()
-                                        .message(e.getMessage())
-                                        .build()
-                        )
-                );
-    }
-
-    // TODO Delete Method
-    @ExceptionHandler(DuplicateKeyException.class)
-    public final ResponseEntity<?> handleDuplicateKeyException(DuplicateKeyException e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.CONFLICT)
-                .body(ApiCommonResponse.error(
-                                ExceptionResult.builder()
-                                        .code(ExceptionEnum.DUPLICATE_KEY.getHttpStatusCode())
-                                        .message(ExceptionEnum.DUPLICATE_KEY.getMessage())
                                         .build()
                         )
                 );
