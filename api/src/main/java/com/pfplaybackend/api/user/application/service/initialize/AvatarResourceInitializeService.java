@@ -1,14 +1,13 @@
 package com.pfplaybackend.api.user.application.service.initialize;
 
-import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarFaceResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarIconResource;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import com.pfplaybackend.api.user.domain.enums.PairType;
-import com.pfplaybackend.api.user.repository.AvatarBodyResourceRepository;
-import com.pfplaybackend.api.user.repository.AvatarFaceResourceRepository;
-import com.pfplaybackend.api.user.repository.AvatarIconResourceRepository;
+import com.pfplaybackend.api.avatarresource.repository.AvatarBodyResourceRepository;
+import com.pfplaybackend.api.avatarresource.repository.AvatarFaceResourceRepository;
+import com.pfplaybackend.api.avatarresource.repository.AvatarIconResourceRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

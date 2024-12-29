@@ -8,19 +8,17 @@ import com.pfplaybackend.api.partyroom.application.peer.MusicQueryPeerService;
 import com.pfplaybackend.api.partyroom.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.partyroom.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.partyroom.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.partyroom.domain.value.*;
-import com.pfplaybackend.api.partyroom.exception.CrewException;
-import com.pfplaybackend.api.partyroom.exception.DjException;
+import com.pfplaybackend.api.partyplay.exception.CrewException;
+import com.pfplaybackend.api.partyplay.exception.DjException;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 @Service

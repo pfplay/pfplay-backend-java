@@ -14,7 +14,7 @@ import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.partyroom.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.domain.value.PlaybackId;
-import com.pfplaybackend.api.partyroom.exception.CrewException;
+import com.pfplaybackend.api.partyplay.exception.CrewException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

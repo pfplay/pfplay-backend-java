@@ -16,7 +16,7 @@ import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.partyroom.event.message.CrewPenaltyMessage;
-import com.pfplaybackend.api.partyroom.exception.GradeException;
+import com.pfplaybackend.api.partyplay.exception.GradeException;
 import com.pfplaybackend.api.partyroom.exception.PartyroomException;
 import com.pfplaybackend.api.partyroom.presentation.payload.request.regulation.PunishPenaltyRequest;
 import com.pfplaybackend.api.partyroom.repository.PartyroomRepository;

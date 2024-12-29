@@ -2,9 +2,8 @@ package com.pfplaybackend.api.partyroom.application.service.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.websocket.cache.SessionCacheManager;
+import com.pfplaybackend.api.liveconnect.websocket.cache.SessionCacheManager;
 import com.pfplaybackend.api.partyroom.application.dto.partyroom.PartyroomSessionDto;
-import com.pfplaybackend.api.partyroom.domain.value.CrewId;
 import com.pfplaybackend.api.partyroom.event.MessageTopic;
 import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.partyroom.event.message.OutgoingGroupChatMessage;
