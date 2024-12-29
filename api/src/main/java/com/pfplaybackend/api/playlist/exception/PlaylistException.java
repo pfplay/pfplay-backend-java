@@ -1,21 +1,24 @@
-package com.pfplaybackend.api.partyroom.exception;
+package com.pfplaybackend.api.playlist.exception;
 
 import com.pfplaybackend.api.common.exception.DomainException;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
+import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import lombok.Getter;
 
 @Getter
-public enum DjException implements DomainException {
-    ALREADY_REGISTERED("DJ-001", "Already Registered Dj", ConflictException.class),
-    QUEUE_CLOSED("DJ-002", "Dj Queue is Closed", ForbiddenException.class),
-    EMPTY_PLAYLIST("DJ-003", "Cannot Register Empty Playlist", ForbiddenException.class);
+public enum PlaylistException implements DomainException {
+
+
+    NO_WALLET("PLL-001", "", ForbiddenException.class),
+    EXCEEDED_PLAYLIST_LIMIT("PLL-002", "", ConflictException.class),
+    NOT_FOUND_PLAYLIST("PLL-003", "", NotFoundException.class);
 
     private final String errorCode;
     private final String message;
     private final Class<?> aClass;
 
-    DjException(String errorCode, String message, Class<?> aClass) {
+    PlaylistException(String errorCode, String message, Class<?> aClass) {
         this.message = message;
         this.errorCode = errorCode;
         this.aClass = aClass;

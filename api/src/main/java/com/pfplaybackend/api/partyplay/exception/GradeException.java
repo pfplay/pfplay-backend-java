@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.partyroom.exception;
+package com.pfplaybackend.api.partyplay.exception;
 
 import com.pfplaybackend.api.common.exception.DomainException;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
