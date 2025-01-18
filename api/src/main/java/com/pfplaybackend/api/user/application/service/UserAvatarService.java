@@ -84,9 +84,14 @@ public class UserAvatarService {
         AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(command.getAvatarBodyUri());
         AvatarFaceUri avatarFaceUri = userAvatarDomainService.updateFaceUriOnBodyUriChange(member, avatarBodyDto);
         AvatarIconUri avatarIconUri = userAvatarDomainService.updateIconUriOnBodyUriChange(member, avatarBodyDto);
+
         // TODO Check if the score is actually configurable in Domain Service
-        if(member.getActivityMap().get(ActivityType.of(avatarBodyDto.getObtainableType())).getScore() < avatarBodyDto.getObtainableScore()) {
-            throw ExceptionCreator.create(UserAvatarException.AVATAR_SELECTION_FORBIDDEN);
+        if(!avatarBodyDto.getObtainableType().equals(ObtainmentType.BASIC)) {
+            ActivityType activityType = ActivityType.of(avatarBodyDto.getObtainableType());
+            Activity activity = member.getActivityMap().get(activityType);
+            if(activity.getScore() < avatarBodyDto.getObtainableScore()) {
+                throw ExceptionCreator.create(UserAvatarException.AVATAR_SELECTION_FORBIDDEN);
+            }
         }
 
         Member updatedMember = member.updateAvatarBody(avatarBodyDto)
