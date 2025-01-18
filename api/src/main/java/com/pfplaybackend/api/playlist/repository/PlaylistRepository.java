@@ -14,4 +14,5 @@ public interface PlaylistRepository extends JpaRepository<PlaylistData, Long>, P
     List<PlaylistData> findByOwnerIdAndTypeOrderByOrderNumberDesc(UserId userId, PlaylistType type);
     PlaylistData findByOwnerIdAndType(UserId userId, PlaylistType type);
     Optional<PlaylistData> findByIdAndOwnerIdAndType(Long playlistId, UserId userId, PlaylistType type);
+    Optional<PlaylistData> findByIdAndOwnerId(Long playlistId, UserId userId);
 }
