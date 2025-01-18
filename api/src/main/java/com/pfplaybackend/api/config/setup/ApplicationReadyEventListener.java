@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.config.setup;
 
-import com.pfplaybackend.api.partyroom.application.service.initialize.PartyroomInitializeService;
+import com.pfplaybackend.api.party.application.service.initialize.PartyroomInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.AdminUserInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.AvatarResourceInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;

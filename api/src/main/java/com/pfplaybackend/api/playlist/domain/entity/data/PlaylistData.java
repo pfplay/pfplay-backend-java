@@ -7,10 +7,12 @@ import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+@Setter
 @Getter
 @DynamicInsert
 @DynamicUpdate
