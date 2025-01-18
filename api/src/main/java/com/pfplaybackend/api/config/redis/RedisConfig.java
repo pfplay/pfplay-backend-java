@@ -1,11 +1,12 @@
 package com.pfplaybackend.api.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfplaybackend.api.liveconnect.chat.interfaces.listener.redis.ChatTopicListener;
 import com.pfplaybackend.api.liveconnect.websocket.SimpMessageSender;
-import com.pfplaybackend.api.partyroom.application.service.CrewProfileService;
-import com.pfplaybackend.api.partyroom.application.service.PlaybackManagementService;
-import com.pfplaybackend.api.partyroom.application.service.lock.DistributedLockExecutor;
-import com.pfplaybackend.api.partyroom.event.listener.*;
+import com.pfplaybackend.api.party.application.service.CrewProfileService;
+import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
+import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
+import com.pfplaybackend.api.party.interfaces.listener.redis.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -2,8 +2,7 @@ package com.pfplaybackend.api.playlist.domain.service;
 
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.playlist.exception.PlaylistException;
-import com.pfplaybackend.api.playlist.exception.TrackException;
+import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
 import org.springframework.stereotype.Service;
 
 @Service
