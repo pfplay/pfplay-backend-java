@@ -93,6 +93,7 @@ public class CrewPenaltyService {
                     .penaltyReason(request.getDetail())
                     .penaltyDate(LocalDateTime.now())
                     .penaltyType(request.getPenaltyType())
+                    .released(false)
                     .build();
             crewPenaltyHistoryRepository.save(crewPenaltyHistoryData);
         }

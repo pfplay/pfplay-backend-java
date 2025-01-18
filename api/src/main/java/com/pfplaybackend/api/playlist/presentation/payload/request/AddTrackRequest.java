@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "Music list")
+@Schema(description = "Track")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddMusicRequest {
+public class AddTrackRequest {
     @Schema(description = "곡 이름", example = "BLACKPINK - ‘Shut Down’ M/V", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String name;
 

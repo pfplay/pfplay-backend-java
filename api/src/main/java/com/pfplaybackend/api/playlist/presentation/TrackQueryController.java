@@ -3,7 +3,7 @@ package com.pfplaybackend.api.playlist.presentation;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.playlist.application.service.TrackQueryService;
 import com.pfplaybackend.api.playlist.presentation.payload.request.PaginationRequest;
-import com.pfplaybackend.api.playlist.presentation.payload.response.QueryMusicListResponse;
+import com.pfplaybackend.api.playlist.presentation.payload.response.QueryTrackListResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,13 @@ public class TrackQueryController {
 
     private final TrackQueryService trackQueryService;
 
-    @GetMapping("{playlistId}/musics")
+    @GetMapping("{playlistId}/tracks")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> getMusics(@PathVariable Long playlistId, @ModelAttribute @Valid PaginationRequest request) {
+    public ResponseEntity<?> getAllTracks(@PathVariable Long playlistId, @ModelAttribute @Valid PaginationRequest request) {
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(
-                        QueryMusicListResponse.from(trackQueryService.getMusics(playlistId, request.getPageNumber(), request.getPageSize()))
+                        QueryTrackListResponse.from(trackQueryService.getMusics(playlistId, request.getPageNumber(), request.getPageSize()))
                 ));
     }
 }

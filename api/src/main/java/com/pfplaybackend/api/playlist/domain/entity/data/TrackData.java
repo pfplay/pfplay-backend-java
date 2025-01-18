@@ -15,13 +15,13 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @Table(
-        name = "PLAYLIST_MUSIC",
+        name = "TRACK",
         indexes = {
-            @Index(name = "playlist_music_playlist_id_IDX", columnList = "playlist_id")
+            @Index(name = "track_playlist_id_IDX", columnList = "playlist_id")
         }
 )
 @Entity
-public class PlaylistMusicData extends BaseEntity {
+public class TrackData extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "integer unsigned")
@@ -47,10 +47,10 @@ public class PlaylistMusicData extends BaseEntity {
     @Comment("썸네일 이미지 url")
     private String thumbnailImage;
 
-    protected PlaylistMusicData() { }
+    protected TrackData() { }
 
     @Builder
-    public PlaylistMusicData(PlaylistData playlistData, Integer orderNumber, String name, String duration, String linkId, String thumbnailImage) {
+    public TrackData(PlaylistData playlistData, Integer orderNumber, String name, String duration, String linkId, String thumbnailImage) {
         this.playlistData = playlistData;
         this.orderNumber = orderNumber;
         this.name = name;

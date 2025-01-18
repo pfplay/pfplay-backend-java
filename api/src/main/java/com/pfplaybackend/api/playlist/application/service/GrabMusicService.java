@@ -2,10 +2,10 @@ package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
-import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistMusicData;
+import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
-import com.pfplaybackend.api.playlist.presentation.payload.request.AddMusicRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.request.AddTrackRequest;
 import com.pfplaybackend.api.playlist.repository.TrackRepository;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -26,19 +26,19 @@ public class GrabMusicService {
     @Transactional
     public void grabMusic(UserId userId, String linkId) {
         // Get 'PlaylistMusic' Record By linkId
-        PlaylistMusicData targetPlaylistMusicData = trackRepository.findFirstByLinkId(linkId);
+        TrackData targetTrackData = trackRepository.findFirstByLinkId(linkId);
 
         PlaylistData playlistData = playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST);
         // LinkId cannot be duplicated.
-        Optional<PlaylistMusicData> optional = trackRepository.findByPlaylistDataIdAndLinkId(playlistData.getId(), linkId);
+        Optional<TrackData> optional = trackRepository.findByPlaylistDataIdAndLinkId(playlistData.getId(), linkId);
         if(optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
 
-        AddMusicRequest request = new AddMusicRequest(
-                targetPlaylistMusicData.getName(),
-                targetPlaylistMusicData.getLinkId(),
-                targetPlaylistMusicData.getDuration(),
-                targetPlaylistMusicData.getThumbnailImage()
+        AddTrackRequest request = new AddTrackRequest(
+                targetTrackData.getName(),
+                targetTrackData.getLinkId(),
+                targetTrackData.getDuration(),
+                targetTrackData.getThumbnailImage()
         );
-        trackCommandService.addMusicInPlaylist(playlistData.getId(), request);
+        trackCommandService.addTrackInPlaylist(playlistData.getId(), request);
     }
 }
