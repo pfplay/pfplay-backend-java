@@ -27,7 +27,7 @@ public class GuestSignController {
             @RequestBody SignGuestRequest request,
             HttpServletResponse response
     ) {
-        Guest guest = guestSignService.getGuestOrCreate(request.getUserAgent());
+        Guest guest = guestSignService.getGuestOrCreate();
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, CookieUtil.getCookieWithToken("AccessToken",
                         jwtProvider.generateAccessTokenForGuest(guest)).toString());
