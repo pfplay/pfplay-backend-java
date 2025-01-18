@@ -2,6 +2,7 @@ package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
@@ -12,6 +13,8 @@ import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
+import com.pfplaybackend.api.user.domain.exception.UserAvatarException;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
@@ -36,6 +39,7 @@ public class UserAvatarService {
     // Using Peer Service
     private final AvatarResourceService avatarResourceService;
     private final UserProfileEventService userProfileEventService;
+    private final UserActivityService userActivityService;
 
     @Transactional(readOnly = true)
     public AvatarBodyUri getDefaultAvatarBodyUri() {
@@ -81,6 +85,10 @@ public class UserAvatarService {
         AvatarFaceUri avatarFaceUri = userAvatarDomainService.updateFaceUriOnBodyUriChange(member, avatarBodyDto);
         AvatarIconUri avatarIconUri = userAvatarDomainService.updateIconUriOnBodyUriChange(member, avatarBodyDto);
         // TODO Check if the score is actually configurable in Domain Service
+        if(member.getActivityMap().get(ActivityType.of(avatarBodyDto.getObtainableType())).getScore() < avatarBodyDto.getObtainableScore()) {
+            throw ExceptionCreator.create(UserAvatarException.AVATAR_SELECTION_FORBIDDEN);
+        }
+
         Member updatedMember = member.updateAvatarBody(avatarBodyDto)
                 .updateAvatarFace(avatarFaceUri)
                 .updateAvatarIcon(avatarIconUri);

@@ -1,13 +1,10 @@
 package com.pfplaybackend.api.playlist.repository.impl;
 
-import com.pfplaybackend.api.playlist.application.dto.PlaylistDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
 import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistMusicData;
-import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.repository.custom.PlaylistRepositoryCustom;
 import com.pfplaybackend.api.user.domain.value.UserId;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -64,24 +61,6 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom {
                 .groupBy(qPlaylistData.id)
                 .orderBy(qPlaylistData.type.desc(), qPlaylistData.orderNumber.asc())
                 .fetchOne();
-    }
-
-    @Override
-    public List<Long> findByUserIdAndListIdAndType(UserId ownerId, List<Long> listIds, PlaylistType type){
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPlaylistData qPlaylistData = QPlaylistData.playlistData;
-
-        return queryFactory
-                .select(
-                        qPlaylistData.id
-                )
-                .from(qPlaylistData)
-                .where(qPlaylistData.ownerId.eq(ownerId)
-                        .and(qPlaylistData.id.in(listIds))
-                        .and(qPlaylistData.type.eq(type)))
-                .groupBy(qPlaylistData.id)
-                .orderBy(qPlaylistData.type.desc(), qPlaylistData.orderNumber.asc())
-                .fetch();
     }
 
     @Override
