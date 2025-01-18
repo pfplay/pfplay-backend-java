@@ -77,6 +77,7 @@ public class CrewBlockService {
                 .blockedCrewId(blockedCrewId)
                 .blockedUserId(partyroom.getCrew(blockedCrewId).getUserId())
                 .blockDate(LocalDateTime.now())
+                .unblocked(false)
                 .build();
 
         crewBlockHistoryRepository.save(historyData);

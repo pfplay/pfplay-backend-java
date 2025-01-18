@@ -1,7 +1,9 @@
 package com.pfplaybackend.api.party.application.proxy;
 
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -24,5 +26,10 @@ public class UserProfileProxyService implements UserProfilePeerService {
     @Override
     public ProfileSettingDto getUserProfileSetting(UserId userId) {
         return userProfileService.getUserProfileSetting(userId);
+    }
+
+    @Override
+    public ProfileSummaryDto getOtherProfileSummary(UserId userId, AuthorityTier authorityTier) {
+        return userProfileService.getOtherProfileSummary(userId, authorityTier);
     }
 }

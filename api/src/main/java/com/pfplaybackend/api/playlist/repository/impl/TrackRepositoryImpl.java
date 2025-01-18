@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.playlist.repository.impl;
 
 import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
-import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistMusicData;
+import com.pfplaybackend.api.playlist.domain.entity.data.QTrackData;
 import com.pfplaybackend.api.playlist.repository.custom.TrackRepositoryCustom;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,53 +21,31 @@ public class TrackRepositoryImpl implements TrackRepositoryCustom {
     @Override
     public Page<PlaylistMusicDto> getMusicsWithPagination(Long playlistId, Pageable pageable) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPlaylistMusicData qPlaylistMusicData = QPlaylistMusicData.playlistMusicData;
+        QTrackData qTrackData = QTrackData.trackData;
 
         List<PlaylistMusicDto> playlistMusics = queryFactory
                 .select(Projections.constructor(PlaylistMusicDto.class,
-                        qPlaylistMusicData.linkId,
-                        qPlaylistMusicData.name,
-                        qPlaylistMusicData.orderNumber,
-                        qPlaylistMusicData.duration,
-                        qPlaylistMusicData.thumbnailImage))
-                .from(qPlaylistMusicData)
-                .where(qPlaylistMusicData.playlistData.id.eq(playlistId))
-                .orderBy(qPlaylistMusicData.orderNumber.asc())
+                        qTrackData.id,
+                        qTrackData.linkId,
+                        qTrackData.name,
+                        qTrackData.orderNumber,
+                        qTrackData.duration,
+                        qTrackData.thumbnailImage))
+                .from(qTrackData)
+                .where(qTrackData.playlistData.id.eq(playlistId))
+                .orderBy(qTrackData.orderNumber.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
         Long count = queryFactory
-                .select(qPlaylistMusicData.count())
-                .from(qPlaylistMusicData)
-                .where(qPlaylistMusicData.playlistData.id.eq(playlistId))
+                .select(qTrackData.count())
+                .from(qTrackData)
+                .where(qTrackData.playlistData.id.eq(playlistId))
                 .fetchOne();
 
         long total = count != null ? count : 0;
 
         return new PageImpl<>(playlistMusics, pageable, total);
-    }
-
-    @Override
-    public Long deleteByPlayListIds(List<Long> listIds) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPlaylistMusicData playlistMusicData = QPlaylistMusicData.playlistMusicData;
-
-        return queryFactory
-                .delete(playlistMusicData)
-                .where(playlistMusicData.playlistData.id.in(listIds))
-                .execute();
-    }
-
-    @Override
-    public Long deleteByIdsAndPlayListId(List<Long> ids, Long playListId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
-        QPlaylistMusicData playlistMusicData = QPlaylistMusicData.playlistMusicData;
-
-        return queryFactory
-                .delete(playlistMusicData)
-                .where(playlistMusicData.id.in(ids)
-                        .and(playlistMusicData.playlistData.id.eq(playListId)))
-                .execute();
     }
 }

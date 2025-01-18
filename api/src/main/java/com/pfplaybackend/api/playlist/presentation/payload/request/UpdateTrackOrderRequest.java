@@ -7,6 +7,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateOrderRequest {
+public class UpdateTrackOrderRequest {
     private Integer nextOrderNumber;
 }

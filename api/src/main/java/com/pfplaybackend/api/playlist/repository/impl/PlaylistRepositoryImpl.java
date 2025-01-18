@@ -2,7 +2,7 @@ package com.pfplaybackend.api.playlist.repository.impl;
 
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
 import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistData;
-import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistMusicData;
+import com.pfplaybackend.api.playlist.domain.entity.data.QTrackData;
 import com.pfplaybackend.api.playlist.repository.custom.PlaylistRepositoryCustom;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import com.querydsl.core.types.Projections;
@@ -20,19 +20,18 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom {
     public List<PlaylistSummary> findAllByUserId(UserId ownerId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPlaylistData qPlaylistData = QPlaylistData.playlistData;
-        QPlaylistMusicData qPlaylistMusicData = QPlaylistMusicData.playlistMusicData;
-
+        QTrackData qTrackData = QTrackData.trackData;
         return queryFactory
                 .select(Projections.constructor(PlaylistSummary.class,
-                        qPlaylistData.id,
-                        qPlaylistData.name,
-                        qPlaylistData.orderNumber,
-                        qPlaylistData.type,
-                        qPlaylistMusicData.id.count().as("memberCount")
+                                qPlaylistData.id,
+                                qPlaylistData.name,
+                                qPlaylistData.orderNumber,
+                                qPlaylistData.type,
+                                qTrackData.id.count().as("memberCount")
                         )
                 )
                 .from(qPlaylistData)
-                .leftJoin(qPlaylistMusicData).on(qPlaylistData.id.eq(qPlaylistMusicData.playlistData.id))
+                .leftJoin(qTrackData).on(qPlaylistData.id.eq(qTrackData.playlistData.id))
                 .where(qPlaylistData.ownerId.eq(ownerId))
                 .groupBy(qPlaylistData.id)
                 .orderBy(qPlaylistData.type.desc(), qPlaylistData.orderNumber.asc())
@@ -43,18 +42,18 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom {
     public PlaylistSummary findByIdAndUserId(Long playlistId, UserId ownerId) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPlaylistData qPlaylistData = QPlaylistData.playlistData;
-        QPlaylistMusicData qPlaylistMusicData = QPlaylistMusicData.playlistMusicData;
+        QTrackData qTrackData = QTrackData.trackData;
         return queryFactory
                 .select(Projections.constructor(PlaylistSummary.class,
                                 qPlaylistData.id,
                                 qPlaylistData.name,
                                 qPlaylistData.orderNumber,
                                 qPlaylistData.type,
-                                qPlaylistMusicData.id.count().as("musicCount")
+                                qTrackData.id.count().as("musicCount")
                         )
                 )
                 .from(qPlaylistData)
-                .leftJoin(qPlaylistMusicData).on(qPlaylistData.id.eq(qPlaylistMusicData.playlistData.id))
+                .leftJoin(qTrackData).on(qPlaylistData.id.eq(qTrackData.playlistData.id))
                 .where(qPlaylistData.id.eq(playlistId)
                         .and(qPlaylistData.ownerId.eq(ownerId))
                 )
@@ -64,7 +63,7 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom {
     }
 
     @Override
-    public Long deleteByListIds(List<Long> listIds){
+    public Long deleteByListIds(List<Long> listIds) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPlaylistData qPlaylistData = QPlaylistData.playlistData;
 

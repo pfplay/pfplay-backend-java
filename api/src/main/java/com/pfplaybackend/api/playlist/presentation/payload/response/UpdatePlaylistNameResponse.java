@@ -8,12 +8,12 @@ import lombok.Data;
 @Data
 @Schema
 @Builder
-public class UpdatePlaylistResponse {
+public class UpdatePlaylistNameResponse {
     private final Long id;
     private final String name;
 
-    public static UpdatePlaylistResponse from(Playlist playlist) {
-        return UpdatePlaylistResponse.builder()
+    public static UpdatePlaylistNameResponse from(Playlist playlist) {
+        return UpdatePlaylistNameResponse.builder()
                 .id(playlist.getId())
                 .name(playlist.getName())
                 .build();

@@ -10,12 +10,12 @@ import java.util.List;
 
 @Getter
 @Builder
-public class QueryMusicListResponse {
+public class QueryTrackListResponse {
     private List<PlaylistMusicDto> content;
     private PaginationDto pagination;
 
-    public static QueryMusicListResponse from(Page<PlaylistMusicDto> page) {
-        return QueryMusicListResponse.builder()
+    public static QueryTrackListResponse from(Page<PlaylistMusicDto> page) {
+        return QueryTrackListResponse.builder()
                 .content(page.getContent())
                 .pagination(PaginationDto.builder()
                         .pageNumber(page.getNumber())

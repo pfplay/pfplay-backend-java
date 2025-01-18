@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 public enum UserAvatarException implements DomainException {
 
-    AVATAR_SELECTION_FORBIDDEN("CRW-001", "Cannot Select Due To Restrictions", ForbiddenException.class);
+    AVATAR_SELECTION_FORBIDDEN("UAV-001", "Cannot Select Due To Restrictions", ForbiddenException.class);
 
     private final String errorCode;
     private final String message;

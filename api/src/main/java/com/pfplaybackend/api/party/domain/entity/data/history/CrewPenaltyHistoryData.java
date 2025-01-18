@@ -58,7 +58,7 @@ public class CrewPenaltyHistoryData extends BaseEntity {
     private LocalDateTime penaltyDate;
 
     @Column(name = "is_released", nullable = false)
-    private boolean released = false;
+    private boolean released;
 
     @Column(name = "release_date")
     private LocalDateTime releaseDate;
