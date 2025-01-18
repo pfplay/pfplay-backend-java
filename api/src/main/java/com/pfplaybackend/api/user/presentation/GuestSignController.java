@@ -24,7 +24,6 @@ public class GuestSignController {
 
     @PostMapping("/guests/sign")
     public ResponseEntity<?> createGuest(
-            @RequestBody SignGuestRequest request,
             HttpServletResponse response
     ) {
         Guest guest = guestSignService.getGuestOrCreate();
