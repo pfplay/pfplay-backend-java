@@ -15,8 +15,8 @@ public class GuestSignService {
     private final UserProfileService userProfileService;
 
     @Transactional
-    public Guest getGuestOrCreate(String userAgent) {
-        Guest guest = Guest.create(userAgent);
+    public Guest getGuestOrCreate() {
+        Guest guest = Guest.create();
         Profile profile = userProfileService.createProfileForGuest(guest);
         Guest updatedGuest = guest.initiateProfile(profile);
         guestRepository.save(updatedGuest.toData());

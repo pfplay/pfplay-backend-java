@@ -59,7 +59,6 @@ public class GuestData extends BaseEntity {
                 .authorityTier(this.authorityTier)
                 .profile(this.profileData.toDomain())
                 .isProfileUpdated(this.isProfileUpdated)
-                .agent(this.agent)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
                 .build();

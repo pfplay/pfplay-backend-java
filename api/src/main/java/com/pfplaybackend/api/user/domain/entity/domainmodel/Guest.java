@@ -13,20 +13,16 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class Guest extends User {
 
-    final private String agent;
-
-    public Guest(String agent) {
+    public Guest() {
         super(AuthorityTier.GT);
-        this.agent = agent;
     }
 
     public Guest(UserId userId, String agent) {
         super(userId, AuthorityTier.GT);
-        this.agent = agent;
     }
 
-    static public Guest create(String agent) {
-        return new Guest(agent);
+    static public Guest create() {
+        return new Guest();
     }
 
     static public Guest createWithFixedUserId(UserId userId, String agent) {
@@ -47,7 +43,6 @@ public class Guest extends User {
                 .authorityTier(this.authorityTier)
                 .profileData(this.profile.toData())
                 .isProfileUpdated(this.isProfileUpdated)
-                .agent(this.agent)
                 .build();
     }
 
