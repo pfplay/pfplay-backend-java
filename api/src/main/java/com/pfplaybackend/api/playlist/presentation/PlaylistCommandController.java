@@ -5,10 +5,10 @@ import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService
 import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.presentation.payload.request.DeletePlaylistListRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.request.CreatePlaylistRequest;
-import com.pfplaybackend.api.playlist.presentation.payload.request.UpdatePlaylistRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.request.UpdatePlaylistNameRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.response.CreatePlaylistResponse;
 import com.pfplaybackend.api.playlist.presentation.payload.response.DeletePlaylistListResponse;
-import com.pfplaybackend.api.playlist.presentation.payload.response.UpdatePlaylistResponse;
+import com.pfplaybackend.api.playlist.presentation.payload.response.UpdatePlaylistNameResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,10 +45,10 @@ public class PlaylistCommandController {
 
     @PatchMapping("{playlistId}")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> modifyPlaylistName(@PathVariable Long playlistId, @RequestBody UpdatePlaylistRequest request) {
+    public ResponseEntity<?> modifyPlaylistName(@PathVariable Long playlistId, @RequestBody UpdatePlaylistNameRequest request) {
         Playlist playlist = playlistCommandService.renamePlaylist(playlistId, request.getName());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(ApiCommonResponse.success(UpdatePlaylistResponse.from(playlist)));
+                .body(ApiCommonResponse.success(UpdatePlaylistNameResponse.from(playlist)));
     }
 }

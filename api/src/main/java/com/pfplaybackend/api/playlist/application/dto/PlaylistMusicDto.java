@@ -9,6 +9,7 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class PlaylistMusicDto {
+    private Long trackId;
     private String linkId;
     private String name;
     private Integer orderNumber;
