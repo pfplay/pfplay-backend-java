@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class AddMusicResponse {
+public class AddTrackResponse {
     private Long playlistId;
-    private Long musicId;
+    private Long trackId;
     private Integer orderNumber;
     private String name;
     private String duration;

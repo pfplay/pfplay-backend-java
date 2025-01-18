@@ -50,7 +50,7 @@ public class CrewBlockHistoryData extends BaseEntity {
     private LocalDateTime blockDate;
 
     @Column(name = "is_unblocked", nullable = false)
-    private boolean unblocked = false;
+    private boolean unblocked;
 
     @Column(name = "unblock_date")
     private LocalDateTime unblockDate;

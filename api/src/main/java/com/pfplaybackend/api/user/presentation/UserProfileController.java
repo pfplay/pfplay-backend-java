@@ -47,12 +47,4 @@ public class UserProfileController {
         userProfileService.updateMyBio(updateBioCommand);
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
-
-    @GetMapping("/{userId}/profile/summary")
-    @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
-    public ResponseEntity<?> getOtherProfileSummary(@PathVariable String userId,
-                                                    @RequestBody GetOtherProfileSummaryRequest request) {
-        ProfileSummaryDto profileSummaryDto = userProfileService.getOtherProfileSummary(new UserId(UUID.fromString(userId)), request.getAuthorityTier());
-        return ResponseEntity.ok().body(ApiCommonResponse.success(OtherProfileSummaryResponse.from(profileSummaryDto)));
-    }
 }
