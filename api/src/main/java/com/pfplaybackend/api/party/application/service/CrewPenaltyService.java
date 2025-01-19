@@ -6,6 +6,7 @@ import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.result.PenaltyResult;
+import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewPenaltyHistoryData;
@@ -24,14 +25,19 @@ import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.regulation.PunishPenaltyRequest;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
+import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.web.PortResolverImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -45,10 +51,24 @@ public class CrewPenaltyService {
     private final PartyroomAccessService partyroomAccessService;
     private final CrewPenaltyHistoryRepository crewPenaltyHistoryRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final UserProfilePeerService userProfileService;
 
     public List<PenaltyResult> getPenalties(PartyroomId partyroomId) {
         List<CrewPenaltyHistoryData> crewPenaltyHistoryDataList = crewPenaltyHistoryRepository.findAllByPartyroomIdAndReleasedIsFalse(partyroomId);
-        return crewPenaltyHistoryDataList.stream().map(PenaltyResult::from).toList();
+        // TODO 강제퇴장
+        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+
+        List<UserId> PunishedUserIds = crewPenaltyHistoryDataList.stream().map(history ->
+                partyroom.getCrew(history.getPunishedCrewId()).getUserId()).toList();
+
+        Map<UserId, ProfileSettingDto> map = userProfileService.getUsersProfileSetting(PunishedUserIds);
+
+        return crewPenaltyHistoryDataList.stream().map(history -> {
+            UserId userId = partyroom.getCrew(history.getPunishedCrewId()).getUserId();
+            ProfileSettingDto profileSettingDto = map.get(userId);
+            return PenaltyResult.from(history, profileSettingDto);
+        }).toList();
     }
 
     // TODO '권한 검증' 전용 어노테이션 부착 필요
