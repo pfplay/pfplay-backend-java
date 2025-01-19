@@ -2,6 +2,7 @@ package com.pfplaybackend.api.party.application.dto.result;
 
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewPenaltyHistoryData;
 import com.pfplaybackend.api.party.domain.enums.PenaltyType;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,15 +11,19 @@ import lombok.Data;
 @Builder
 @AllArgsConstructor
 public class PenaltyResult {
-    Long penaltyId;
-    PenaltyType penaltyType;
-    Long crewId;
+    private Long penaltyId;
+    private PenaltyType penaltyType;
+    private Long crewId;
+    private String nickname;
+    private String avatarIconUri;
 
-    public static PenaltyResult from(CrewPenaltyHistoryData crewPenaltyHistoryData) {
+    public static PenaltyResult from(CrewPenaltyHistoryData crewPenaltyHistoryData, ProfileSettingDto profileSettingDto) {
         return PenaltyResult.builder()
                 .penaltyId(crewPenaltyHistoryData.getId())
                 .crewId(crewPenaltyHistoryData.getPunishedCrewId().getId())
                 .penaltyType(crewPenaltyHistoryData.getPenaltyType())
+                .nickname(profileSettingDto.getNickname())
+                .avatarIconUri(profileSettingDto.getAvatarIconUri())
                 .build();
     }
 }
