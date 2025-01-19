@@ -68,6 +68,7 @@ public class PartyroomInfoController {
     public ResponseEntity<?> getSetupInfo(@PathVariable Long partyroomId) {
         List<CrewSetupDto> crewSetupDtoList = partyroomInfoService.getCrewsForSetup(new PartyroomId(partyroomId));
         DisplayDto displayDto = displayInfoService.getDisplayInfo();
+        // TODO 현재 채팅 차단된 크루 목록 반환
         return ResponseEntity.ok().body(QueryPartyroomSetupResponse.from(crewSetupDtoList, displayDto));
     }
 

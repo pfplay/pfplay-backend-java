@@ -1,10 +1,7 @@
 package com.pfplaybackend.api.party.application.dto.playback;
 
 import com.pfplaybackend.api.party.domain.enums.MotionType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -12,6 +9,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class ReactionPostProcessDto {
     private boolean isAggregationChanged;
     private boolean isMotionChanged;
