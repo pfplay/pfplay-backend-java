@@ -45,7 +45,7 @@ public class PlaybackReactionService {
         // Get CrewId for Event Propagation
         Optional<Crew> optional  = partyroomInfoService.getCrewByUserId(partyroomId, partyContext.getUserId());
         Crew crew = optional.orElseThrow();
-        playbackReactionPostProcessService.postProcess(reactionPostProcessDto, partyroomId, playbackId, new CrewId(crew.getId()));
+        playbackReactionPostProcessService.postProcess(reactionPostProcessDto, reactionType, partyroomId, playbackId, new CrewId(crew.getId()));
         return Map.of(
             "isLiked", targetState.isLiked(),
             "isDisliked", targetState.isDisliked(),

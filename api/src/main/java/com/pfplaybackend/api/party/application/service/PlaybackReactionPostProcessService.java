@@ -9,6 +9,7 @@ import com.pfplaybackend.api.party.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.enums.MotionType;
+import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
@@ -31,7 +32,7 @@ public class PlaybackReactionPostProcessService {
     private final GrabMusicPeerService grabMusicService;
     private final UserActivityPeerService userActivityService;
 
-    public void postProcess(ReactionPostProcessDto postProcessDto, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
+    public void postProcess(ReactionPostProcessDto postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         Playback playback = playbackInfoService.getPlaybackById(playbackId);
         if(postProcessDto.isGrabStatusChanged()) {
@@ -44,14 +45,12 @@ public class PlaybackReactionPostProcessService {
             updatePlaybackAggregation(playback, postProcessDto.getDeltaRecord());
             publishAggregationChangedEvent(partyroomId, playback);
         }
-        if(postProcessDto.isMotionChanged()) {
-            publishMotionChangedEvent(partyroomId, postProcessDto.getDeterminedMotionType(), crewId);
-        }
+        publishMotionChangedEvent(partyroomId, reactionType, postProcessDto.getDeterminedMotionType(), crewId);
     }
 
     // PostProcess After Playback Reaction
-    public void publishMotionChangedEvent(PartyroomId partyroomId, MotionType motionType, CrewId crewId) {
-        ReactionMotionMessage reactionMotionMessage = ReactionMotionMessage.from(partyroomId, motionType, crewId);
+    public void publishMotionChangedEvent(PartyroomId partyroomId, ReactionType reactionType, MotionType motionType, CrewId crewId) {
+        ReactionMotionMessage reactionMotionMessage = ReactionMotionMessage.from(partyroomId, reactionType, motionType, crewId);
         messagePublisher.publish(MessageTopic.REACTION_MOTION, reactionMotionMessage);
     }
 
