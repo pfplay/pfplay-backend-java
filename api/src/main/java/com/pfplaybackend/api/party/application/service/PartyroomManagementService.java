@@ -100,8 +100,8 @@ public class PartyroomManagementService {
         partyroom.terminate();
         partyroomRepository.save(partyroomConverter.toData(partyroom));
         messagePublisher.publish(
-                MessageTopic.PARTYROOM_CLOSING,
-                new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSING)
+                MessageTopic.PARTYROOM_CLOSED,
+                new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
         );
     }
 
@@ -114,8 +114,8 @@ public class PartyroomManagementService {
             partyroom.terminate();
             partyroomRepository.save(partyroomConverter.toData(partyroom));
             messagePublisher.publish(
-                    MessageTopic.PARTYROOM_CLOSING,
-                    new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSING)
+                    MessageTopic.PARTYROOM_CLOSED,
+                    new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
             );
         });
     }
