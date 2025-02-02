@@ -13,5 +13,5 @@ public enum MessageTopic {
     PLAYBACK_START,
     PLAYBACK_SKIP,
     CHAT,
-    PARTYROOM_CLOSING
+    PARTYROOM_CLOSED
 }
