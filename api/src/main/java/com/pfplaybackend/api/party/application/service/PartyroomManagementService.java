@@ -100,13 +100,12 @@ public class PartyroomManagementService {
         partyroom.terminate();
         partyroomRepository.save(partyroomConverter.toData(partyroom));
         messagePublisher.publish(
-                MessageTopic.PARTYROOM_DEACTIVATION,
-                new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
+                MessageTopic.PARTYROOM_CLOSING,
+                new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSING)
         );
     }
 
     @Scheduled(cron = "0 0 3 * * *")
-//    @Scheduled(cron = "0 * * * * ?")
     @Transactional
     public void deleteUnusedPartyroom() {
         List<PartyroomData> unusedPartyroomDataList = partyroomRepository.findAllUnusedPartyroomDataByDay(30);
@@ -115,8 +114,8 @@ public class PartyroomManagementService {
             partyroom.terminate();
             partyroomRepository.save(partyroomConverter.toData(partyroom));
             messagePublisher.publish(
-                    MessageTopic.PARTYROOM_DEACTIVATION,
-                    new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
+                    MessageTopic.PARTYROOM_CLOSING,
+                    new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSING)
             );
         });
     }
