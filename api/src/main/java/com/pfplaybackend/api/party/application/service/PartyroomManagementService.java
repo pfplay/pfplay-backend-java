@@ -14,6 +14,7 @@ import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
+import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomClosedMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
@@ -101,7 +102,7 @@ public class PartyroomManagementService {
         partyroomRepository.save(partyroomConverter.toData(partyroom));
         messagePublisher.publish(
                 MessageTopic.PARTYROOM_CLOSED,
-                new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
+                new PartyroomClosedMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
         );
     }
 
@@ -115,7 +116,7 @@ public class PartyroomManagementService {
             partyroomRepository.save(partyroomConverter.toData(partyroom));
             messagePublisher.publish(
                     MessageTopic.PARTYROOM_CLOSED,
-                    new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
+                    new PartyroomClosedMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
             );
         });
     }

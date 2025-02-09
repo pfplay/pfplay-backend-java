@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PartyroomClosingMessage {
+public class PartyroomClosedMessage {
     private PartyroomId partyroomId;
     private MessageTopic eventType;
 }
