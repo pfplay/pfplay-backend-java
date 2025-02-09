@@ -12,5 +12,6 @@ public enum MessageTopic {
     CREW_PROFILE_PRE_CHECK,
     PLAYBACK_START,
     PLAYBACK_SKIP,
-    CHAT
+    CHAT,
+    PARTYROOM_CLOSED
 }
