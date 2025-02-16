@@ -17,8 +17,8 @@ public class PartyroomClosedTopicListener implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         String jsonstring = new String(message.getBody());
         try {
-            PartyroomClosedMessage partyroomDeactivationMessage = objectMapper.readValue(jsonstring, PartyroomClosedMessage.class);
-            messageSender.sendToGroup(partyroomDeactivationMessage.getPartyroomId().getId(), partyroomDeactivationMessage);
+            PartyroomClosedMessage partyroomClosedMessage = objectMapper.readValue(jsonstring, PartyroomClosedMessage.class);
+            messageSender.sendToGroup(partyroomClosedMessage.getPartyroomId().getId(), partyroomClosedMessage);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
