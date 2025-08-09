@@ -1,10 +1,9 @@
 package com.pfplaybackend.api.user.application.service;
 
-import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
-import com.pfplaybackend.api.config.oauth2.properties.OAuth2ProviderConfig;
-import com.pfplaybackend.api.config.oauth2.model.OAuth2Redirection;
+import com.pfplaybackend.api.common.config.security.enums.ProviderType;
+import com.pfplaybackend.api.common.config.security.model.OAuth2Redirection;
+import com.pfplaybackend.api.common.config.security.properties.OAuth2ProviderConfig;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
-import com.pfplaybackend.api.playlist.application.service.PlaylistQueryService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;

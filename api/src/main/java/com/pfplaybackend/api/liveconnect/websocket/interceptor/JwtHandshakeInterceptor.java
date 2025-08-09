@@ -1,8 +1,6 @@
 package com.pfplaybackend.api.liveconnect.websocket.interceptor;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
-import com.pfplaybackend.api.config.jwt.JwtValidator;
-import com.pfplaybackend.api.config.jwt.enums.TokenClaim;
+import com.pfplaybackend.api.common.config.security.jwt.JwtCookieValidator;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -22,24 +20,20 @@ import java.util.Map;
 public class JwtHandshakeInterceptor implements HandshakeInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtHandshakeInterceptor.class);
-    private final JwtValidator jwtValidator;
+    private final JwtCookieValidator jwtCookieValidator;
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         if (request instanceof ServletServerHttpRequest servletServerRequest) {
             HttpServletRequest servletRequest = servletServerRequest.getServletRequest();
-            final String accessToken = jwtValidator.extractAccessTokenFromCookie(servletRequest).orElseThrow(
-                    () -> new AuthenticationServiceException("Token does not exist"));
-            if(jwtValidator.isTokenValid(accessToken)) {
-                DecodedJWT decodedJWT = jwtValidator.getDecodedJWT(accessToken);
-                String extractedUid = decodedJWT.getClaim(TokenClaim.UID.getValue()).asString();
-                attributes.put("uid", extractedUid);
-            }else {
-                return false;
-            }
+
+            String uid = jwtCookieValidator.extractUserId(servletRequest).orElseThrow(
+                    () -> new AuthenticationServiceException("Invalid Access Token"));
+            attributes.put("uid", uid);
+            // TODO return '예외 발생'이 return false;를 대체할 수 있는가?
         }
-        return true;  // JWT 토큰이 유효하지 않은 경우, 연결 거부(false)
+        return true;  // JWT 토큰이 유효하지 않은 경우, 연결 거부(=false)
     }
 
     @Override

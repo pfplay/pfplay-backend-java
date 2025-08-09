@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.liveconnect.websocket.cache.SessionCacheManager;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
-import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.liveconnect.chat.interfaces.listener.redis.message.OutgoingGroupChatMessage;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.interfaces.api.rest.dto.IncomingGroupChatMessage;

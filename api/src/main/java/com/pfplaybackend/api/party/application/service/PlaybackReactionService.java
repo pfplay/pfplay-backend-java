@@ -1,12 +1,15 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
+import com.pfplaybackend.api.party.domain.exception.ReactionException;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
 import com.pfplaybackend.api.party.domain.service.PlaybackReactionDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -33,6 +36,11 @@ public class PlaybackReactionService {
     @Transactional
     public Map<String, Boolean> reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        // TODO GT → GRAB 불가능하게 만들기
+        if(AuthorityTier.GT.equals(partyContext.getAuthorityTier()) && reactionType.equals(ReactionType.GRAB)) {
+            throw ExceptionCreator.create(ReactionException.INVALID_REACTION);
+        }
+
         ActivePartyroomDto myActivePartyroom = partyroomInfoService.getMyActivePartyroom().orElseThrow();
         // TODO [Check] MyActivePartyroom.getId() == partyroomId
         PlaybackId playbackId = myActivePartyroom.getCurrentPlaybackId();

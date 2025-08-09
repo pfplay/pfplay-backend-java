@@ -1,15 +1,15 @@
 package com.pfplaybackend.api.user.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.config.jwt.JwtProvider;
-import com.pfplaybackend.api.config.jwt.util.CookieUtil;
+import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
+import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.user.application.dto.command.UpdateWalletCommand;
 import com.pfplaybackend.api.user.application.service.UserWalletService;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyWalletRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,8 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class UserWalletController {
 
-    private final JwtProvider jwtProvider;
     private final UserWalletService userWalletService;
+    private final CookieUtil cookieUtil;
+    private final JwtService jwtService;
 
     /**
      * 호출한(인증된) 사용자의 프로필 리소스 내 Wallet 리소스를 갱신한다.
@@ -33,16 +34,14 @@ public class UserWalletController {
      */
     @PutMapping("/me/profile/wallet")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> updateMyWallet(@RequestBody UpdateMyWalletRequest request) {
+    public ResponseEntity<?> updateMyWallet(@RequestBody UpdateMyWalletRequest request, HttpServletResponse response) {
         Member member = userWalletService.updateMyWalletAddress(UpdateWalletCommand.builder()
                 .walletAddress(request.getWalletAddress())
                 .build()
         );
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.SET_COOKIE, CookieUtil.getCookieWithToken("AccessToken",
-                jwtProvider.generateAccessTokenForMember(member)).toString());
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessTokenForMember(member));
+
         return ResponseEntity.ok()
-                .headers(headers)
                 .body(ApiCommonResponse.success("OK"));
     }
 }

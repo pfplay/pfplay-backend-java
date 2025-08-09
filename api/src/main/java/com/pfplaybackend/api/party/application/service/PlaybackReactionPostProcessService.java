@@ -13,7 +13,7 @@ import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.ReactionAggregationMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.ReactionMotionMessage;
 import com.pfplaybackend.api.user.domain.value.UserId;
