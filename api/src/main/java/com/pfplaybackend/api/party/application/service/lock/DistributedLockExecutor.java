@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.application.service.lock;
 
-import com.pfplaybackend.api.config.redis.lock.RedisLockService;
+import com.pfplaybackend.api.common.config.redis.lock.RedisLockService;
 import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -1,15 +1,13 @@
 package com.pfplaybackend.api.user.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.config.jwt.JwtProvider;
-import com.pfplaybackend.api.config.jwt.util.CookieUtil;
+import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
+import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.user.application.service.GuestSignService;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
-import com.pfplaybackend.api.user.presentation.payload.request.SignGuestRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,19 +18,17 @@ import org.springframework.web.bind.annotation.*;
 public class GuestSignController {
 
     private final GuestSignService guestSignService;
-    private final JwtProvider jwtProvider;
+    private final CookieUtil cookieUtil;
+    private final JwtService jwtService;
 
     @PostMapping("/guests/sign")
     public ResponseEntity<?> createGuest(
             HttpServletResponse response
     ) {
         Guest guest = guestSignService.getGuestOrCreate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.SET_COOKIE, CookieUtil.getCookieWithToken("AccessToken",
-                        jwtProvider.generateAccessTokenForGuest(guest)).toString());
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessTokenForGuest(guest));
 
         return ResponseEntity.ok()
-                .headers(headers)
                 .body(ApiCommonResponse.success("OK"));
     }
 }

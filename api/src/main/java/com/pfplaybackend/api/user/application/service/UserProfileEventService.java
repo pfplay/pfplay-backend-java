@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
-import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.CrewProfilePreCheckMessage;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;

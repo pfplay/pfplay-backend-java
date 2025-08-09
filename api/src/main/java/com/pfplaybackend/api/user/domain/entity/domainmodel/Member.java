@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.domain.entity.domainmodel;
 
-import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
+import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;

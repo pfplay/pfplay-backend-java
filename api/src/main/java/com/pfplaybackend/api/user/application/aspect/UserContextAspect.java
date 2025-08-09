@@ -1,7 +1,8 @@
 package com.pfplaybackend.api.user.application.aspect;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
+import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
+import com.pfplaybackend.api.common.config.security.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
@@ -23,7 +24,7 @@ public class UserContextAspect {
     public void beforeServiceMethods(JoinPoint joinPoint) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
-            UserContext userContext = UserContext.create((UserCredentials)authentication.getPrincipal());
+            UserContext userContext = UserContext.create((CustomJwtAuthenticationToken) authentication);
             ThreadLocalContext.setContext(userContext);
         }
     }

@@ -1,14 +1,14 @@
 package com.pfplaybackend.api.user.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.config.jwt.JwtProvider;
-import com.pfplaybackend.api.config.jwt.util.CookieUtil;
+import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
+import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,33 +20,29 @@ import java.util.UUID;
 @RequestMapping("/api/v1/users")
 public class EasyUserManagementController {
 
-    private final JwtProvider jwtProvider;
+    private final CookieUtil cookieUtil;
+    private final JwtService jwtService;
+
     private final TemporaryUserInitializeService temporaryUserInitializeService;
 
     @PostMapping("/members/sign/temporary/associate-member")
-    public ResponseEntity<?> createAssociateMember() {
+    public ResponseEntity<?> createAssociateMember(HttpServletResponse response) {
         UserId userId = new UserId(UUID.randomUUID());
         Member member = temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com");
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.SET_COOKIE, CookieUtil.getCookieWithToken("AccessToken",
-                jwtProvider.generateAccessTokenForMember(member)).toString());
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessTokenForMember(member));
 
         return ResponseEntity.ok()
-                .headers(headers)
                 .body(ApiCommonResponse.success("OK"));
     }
 
     @PostMapping("/members/sign/temporary/full-member")
-    public ResponseEntity<?> createFullMember() {
+    public ResponseEntity<?> createFullMember(HttpServletResponse response) {
         UserId userId = new UserId(UUID.randomUUID());
         Member member = temporaryUserInitializeService.upgradeMember(
                 temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com"));
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.SET_COOKIE, CookieUtil.getCookieWithToken("AccessToken",
-                jwtProvider.generateAccessTokenForMember(member)).toString());
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessTokenForMember(member));
 
         return ResponseEntity.ok()
-                .headers(headers)
                 .body(ApiCommonResponse.success("OK"));
     }
 }

@@ -1,7 +1,8 @@
 package com.pfplaybackend.api.party.application.aspect;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
+import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
+import com.pfplaybackend.api.common.config.security.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
@@ -25,7 +26,7 @@ public class PartyContextAspect {
     public void beforeServiceMethods(JoinPoint joinPoint) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
-            PartyContext partyContext = PartyContext.create((UserCredentials)authentication.getPrincipal());
+            PartyContext partyContext = PartyContext.create((CustomJwtAuthenticationToken) authentication);
             ThreadLocalContext.setContext(partyContext);
         }
     }

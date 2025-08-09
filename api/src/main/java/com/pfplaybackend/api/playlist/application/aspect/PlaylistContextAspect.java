@@ -1,7 +1,8 @@
 package com.pfplaybackend.api.playlist.application.aspect;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
+import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
+import com.pfplaybackend.api.common.config.security.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import org.aspectj.lang.JoinPoint;
@@ -23,7 +24,7 @@ public class PlaylistContextAspect {
     public void beforeServiceMethods(JoinPoint joinPoint) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
-            PlaylistContext playlistContext = PlaylistContext.create((UserCredentials)authentication.getPrincipal());
+            PlaylistContext playlistContext = PlaylistContext.create((CustomJwtAuthenticationToken) authentication);
             ThreadLocalContext.setContext(playlistContext);
         }
     }
