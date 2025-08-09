@@ -75,6 +75,7 @@ public class RedisConfig {
         container.addMessageListener(new PartyroomDeactivationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("partyroom_deactivation"));
         container.addMessageListener(new PartyroomAccessTopicListener(simpMessageSender, objectMapper), new ChannelTopic("partyroom_access"));
         container.addMessageListener(new PartyroomNoticeTopicListener(simpMessageSender, objectMapper), new ChannelTopic("partyroom_notice"));
+        container.addMessageListener(new PartyroomClosedTopicListener(simpMessageSender, objectMapper), new ChannelTopic("partyroom_closed"));
         container.addMessageListener(new ReactionMotionTopicListener(simpMessageSender, objectMapper), new ChannelTopic("reaction_motion"));
         container.addMessageListener(new ReactionAggregationTopicListener(simpMessageSender, objectMapper), new ChannelTopic("reaction_aggregation"));
         container.addMessageListener(new CrewGradeTopicListener(simpMessageSender, objectMapper), new ChannelTopic("crew_grade"));
