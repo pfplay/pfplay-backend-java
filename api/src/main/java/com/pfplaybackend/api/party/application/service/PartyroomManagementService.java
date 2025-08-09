@@ -14,6 +14,7 @@ import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
+import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomClosedMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
@@ -100,13 +101,12 @@ public class PartyroomManagementService {
         partyroom.terminate();
         partyroomRepository.save(partyroomConverter.toData(partyroom));
         messagePublisher.publish(
-                MessageTopic.PARTYROOM_DEACTIVATION,
-                new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
+                MessageTopic.PARTYROOM_CLOSED,
+                new PartyroomClosedMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
         );
     }
 
     @Scheduled(cron = "0 0 3 * * *")
-//    @Scheduled(cron = "0 * * * * ?")
     @Transactional
     public void deleteUnusedPartyroom() {
         List<PartyroomData> unusedPartyroomDataList = partyroomRepository.findAllUnusedPartyroomDataByDay(30);
@@ -115,8 +115,8 @@ public class PartyroomManagementService {
             partyroom.terminate();
             partyroomRepository.save(partyroomConverter.toData(partyroom));
             messagePublisher.publish(
-                    MessageTopic.PARTYROOM_DEACTIVATION,
-                    new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION)
+                    MessageTopic.PARTYROOM_CLOSED,
+                    new PartyroomClosedMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
             );
         });
     }
