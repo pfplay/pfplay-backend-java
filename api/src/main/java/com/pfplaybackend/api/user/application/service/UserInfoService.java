@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.config.jwt.dto.UserCredentials;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;

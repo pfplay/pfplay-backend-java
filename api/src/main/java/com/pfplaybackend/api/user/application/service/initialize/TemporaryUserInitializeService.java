@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.application.service.initialize;
 
-import com.pfplaybackend.api.config.oauth2.enums.ProviderType;
+import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.service.UserActivityService;

@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.application.service;
 
-import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;

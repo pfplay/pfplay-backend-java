@@ -22,7 +22,7 @@ import com.pfplaybackend.api.party.domain.service.DjDomainService;
 import com.pfplaybackend.api.party.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PlaybackStartMessage;

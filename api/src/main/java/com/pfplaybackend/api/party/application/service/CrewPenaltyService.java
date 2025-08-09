@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.result.PenaltyResult;
@@ -26,11 +26,9 @@ import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.regulation.PunishPenaltyRequest;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.web.PortResolverImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
