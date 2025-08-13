@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.user.presentation.payload.request;
+package com.pfplaybackend.api.profile.presentation.dto.request;
 
 import lombok.Getter;
 

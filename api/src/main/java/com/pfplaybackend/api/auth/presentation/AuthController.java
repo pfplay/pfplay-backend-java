@@ -8,6 +8,7 @@ import com.pfplaybackend.api.auth.dto.request.OAuthUrlRequest;
 import com.pfplaybackend.api.auth.dto.response.OAuthUrlResponse;
 import com.pfplaybackend.api.auth.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
