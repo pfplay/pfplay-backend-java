@@ -88,11 +88,15 @@ public class UserProfileService {
         return userProfileRepository.findAllByUserIdIn(userIds).stream()
                 .collect(Collectors.toMap(ProfileData::getUserId, profileData ->
                         new ProfileSettingDto(profileData.getNickname(),
+                                profileData.getAvatarCompositionType(),
                                 profileData.getAvatarBodyUri().getAvatarBodyUri(),
                                 profileData.getAvatarFaceUri().getAvatarFaceUri(),
                                 profileData.getAvatarIconUri().getAvatarIconUri(),
                                 profileData.getCombinePositionX(),
-                                profileData.getCombinePositionY()
+                                profileData.getCombinePositionY(),
+                                profileData.getOffsetX(),
+                                profileData.getOffsetY(),
+                                profileData.getScale()
                         )
                 ));
     }
@@ -102,11 +106,15 @@ public class UserProfileService {
     public ProfileSettingDto getUserProfileSetting(UserId userId) {
         ProfileData profileData = userProfileRepository.findByUserId(userId);
         return new ProfileSettingDto(profileData.getNickname(),
+                profileData.getAvatarCompositionType(),
                 profileData.getAvatarBodyUri().getAvatarBodyUri(),
                 profileData.getAvatarFaceUri().getAvatarFaceUri(),
                 profileData.getAvatarIconUri().getAvatarIconUri(),
                 profileData.getCombinePositionX(),
-                profileData.getCombinePositionY()
+                profileData.getCombinePositionY(),
+                profileData.getOffsetX(),
+                profileData.getOffsetY(),
+                profileData.getScale()
         );
     }
 }

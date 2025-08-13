@@ -17,10 +17,10 @@ public class CrewProfileMessage implements Serializable {
     private PartyroomId partyroomId;
     private long crewId;
     private String nickname;
-    private String avatarFaceUri;
-    private String avatarBodyUri;
-    private String avatarIconUri;
     private AvatarCompositionType avatarCompositionType;
+    private String avatarBodyUri;
+    private String avatarFaceUri;
+    private String avatarIconUri;
     private int combinePositionX;
     private int combinePositionY;
     private double offsetX;
@@ -29,8 +29,9 @@ public class CrewProfileMessage implements Serializable {
 
     public static CrewProfileMessage from(PartyroomId partyroomId , Long crewId, CrewProfilePreCheckMessage message) {
         return new CrewProfileMessage(MessageTopic.CREW_PROFILE, partyroomId, crewId,
-                message.getNickname(), message.getAvatarFaceUri(), message.getAvatarBodyUri(), message.getAvatarIconUri(),
+                message.getNickname(),
                 message.getAvatarCompositionType(),
+                message.getAvatarBodyUri(), message.getAvatarFaceUri(), message.getAvatarIconUri(),
                 message.getCombinePositionX(), message.getCombinePositionY(),
                 message.getOffsetX(), message.getOffsetY(), message.getScale());
     }
