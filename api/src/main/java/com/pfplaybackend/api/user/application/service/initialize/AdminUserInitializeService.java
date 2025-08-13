@@ -5,7 +5,7 @@ import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
-import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.profile.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
@@ -62,8 +62,9 @@ public class AdminUserInitializeService {
 
     private Member updateAvatarBody(Member member, AvatarBodyUri avatarBodyUri) {
         AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(avatarBodyUri);
-        AvatarFaceUri avatarFaceUri = userAvatarDomainService.updateFaceUriOnBodyUriChange(member, avatarBodyDto);
-        AvatarIconUri avatarIconUri = userAvatarDomainService.updateIconUriOnBodyUriChange(member, avatarBodyDto);
+        AvatarFaceUri avatarFaceUri = new AvatarFaceUri();
+        AvatarIconUri avatarIconUri = userAvatarDomainService.findAvatarIconPairWithSingleBody(avatarBodyDto);
+
         // TODO Check if the score is actually configurable in Domain Service
         Member updatedMember = member.updateAvatarBody(avatarBodyDto)
                 .updateAvatarFace(avatarFaceUri)

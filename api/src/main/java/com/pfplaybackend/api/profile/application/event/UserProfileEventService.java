@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.user.application.service;
+package com.pfplaybackend.api.profile.application.event;
 
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
@@ -21,8 +21,12 @@ public class UserProfileEventService {
                 profile.getAvatarFaceUri().getAvatarFaceUri(),
                 profile.getAvatarBodyUri().getAvatarBodyUri(),
                 profile.getAvatarIconUri().getAvatarIconUri(),
+                profile.getAvatarCompositionType(),
                 profile.getCombinePositionX(),
-                profile.getCombinePositionY()
+                profile.getCombinePositionY(),
+                profile.getOffsetX(),
+                profile.getOffsetY(),
+                profile.getScale()
         );
         messagePublisher.publish(MessageTopic.CREW_PROFILE_PRE_CHECK, crewProfilePreCheckMessage);
     }

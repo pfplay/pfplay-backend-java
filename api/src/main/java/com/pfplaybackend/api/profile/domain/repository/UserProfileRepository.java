@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.user.repository;
+package com.pfplaybackend.api.profile.domain.repository;
 
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
+import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 

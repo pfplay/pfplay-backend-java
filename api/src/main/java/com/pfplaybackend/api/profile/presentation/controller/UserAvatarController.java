@@ -1,15 +1,15 @@
-package com.pfplaybackend.api.user.presentation;
+package com.pfplaybackend.api.profile.presentation.controller;
 
-import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
+import com.pfplaybackend.api.profile.application.validation.AvatarRequestValidator;
+import com.pfplaybackend.api.profile.presentation.dto.request.SetAvatarRequest;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.application.service.UserAvatarService;
+import com.pfplaybackend.api.profile.application.service.UserAvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.presentation.api.UserAvatarApi;
-import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyAvatarBodyRequest;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyAvatarFaceRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +24,8 @@ import java.util.List;
 public class UserAvatarController implements UserAvatarApi {
 
     private final UserAvatarService userAvatarService;
+    private final AvatarRequestValidator avatarRequestValidator;
+
 
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     @GetMapping("/me/profile/avatar/bodies")
@@ -42,18 +44,10 @@ public class UserAvatarController implements UserAvatarApi {
     }
 
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    @PutMapping("/me/profile/avatar/body")
-    public ResponseEntity<?> updateMyAvatarBody(@RequestBody UpdateMyAvatarBodyRequest request) {
-        UpdateAvatarBodyCommand command = new UpdateAvatarBodyCommand(new AvatarBodyUri(request.getAvatarBodyUri()));
-        userAvatarService.updateAvatarBodyUri(command);
-        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
-    }
-
-    @PreAuthorize("hasRole('ROLE_MEMBER')")
-    @PutMapping("/me/profile/avatar/face")
-    public ResponseEntity<?> updateMyAvatarFace(@RequestBody UpdateMyAvatarFaceRequest updateMyAvatarFaceRequest) {
-        UpdateAvatarFaceCommand updateAvatarFaceCommand = new UpdateAvatarFaceCommand(updateMyAvatarFaceRequest.getAvatarFaceUri());
-        userAvatarService.updateAvatarFaceUri(updateAvatarFaceCommand);
+    @PutMapping("/me/profile/avatar")
+    public ResponseEntity<?> setMyAvatar(@Valid @RequestBody SetAvatarRequest request) {
+        avatarRequestValidator.validate(request);
+        userAvatarService.setUserAvatar(request);
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
     }
 }
