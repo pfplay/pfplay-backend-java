@@ -186,8 +186,12 @@ public class Member extends User {
                 .avatarBodyUri(this.profile.getAvatarBodyUri().getAvatarBodyUri())
                 .avatarFaceUri(this.profile.getAvatarFaceUri().getAvatarFaceUri())
                 .avatarIconUri(this.profile.getAvatarIconUri().getAvatarIconUri())
+                .avatarCompositionType(this.profile.getAvatarCompositionType())
                 .combinePositionX(this.profile.getCombinePositionX())
                 .combinePositionY(this.profile.getCombinePositionY())
+                .offsetX(this.profile.getOffsetX())
+                .offsetY(this.profile.getOffsetY())
+                .scale(this.profile.getScale())
                 .walletAddress(this.profile.getWalletAddress().getWalletAddress())
                 .activitySummaries(activitySummaries)
                 .build();
