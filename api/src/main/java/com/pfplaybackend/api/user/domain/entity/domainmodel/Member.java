@@ -1,6 +1,10 @@
 package com.pfplaybackend.api.user.domain.entity.domainmodel;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
+import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.profile.domain.vo.FaceTransform;
+import com.pfplaybackend.api.profile.presentation.dto.request.AvatarFaceRequest;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
@@ -115,7 +119,21 @@ public class Member extends User {
 
     public Member updateAvatarFace(AvatarFaceUri avatarFaceUri) {
         Profile newProfile = this.profile
+                .withAvatarCompositionType(AvatarCompositionType.SINGLE_BODY)
                 .withAvatarFaceUri(avatarFaceUri);
+        return this.toBuilder()
+                .profile(newProfile)
+                .build();
+    }
+
+    public Member updateAvatarFace(AvatarFaceUri avatarFaceUri, AvatarFaceRequest avatarFaceRequest) {
+        Profile newProfile = this.profile
+                .withAvatarCompositionType(AvatarCompositionType.BODY_WITH_FACE)
+                .withFaceSourceType(avatarFaceRequest.getSourceType())
+                .withAvatarFaceUri(avatarFaceUri)
+                .withOffsetX(avatarFaceRequest.getTransform().getOffsetX())
+                .withOffsetY(avatarFaceRequest.getTransform().getOffsetY())
+                .withScale(avatarFaceRequest.getTransform().getScale());
         return this.toBuilder()
                 .profile(newProfile)
                 .build();

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.party.interfaces.listener.redis.message;
 
+import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +17,10 @@ public class CrewProfilePreCheckMessage implements Serializable {
     private String avatarFaceUri;
     private String avatarBodyUri;
     private String avatarIconUri;
+    private AvatarCompositionType avatarCompositionType;
     private int combinePositionX;
     private int combinePositionY;
+    private double offsetX;
+    private double offsetY;
+    private double scale;
 }

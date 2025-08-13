@@ -19,7 +19,7 @@ import com.pfplaybackend.api.party.infrastructure.repository.CrewBlockHistoryRep
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.AddBlockRequest;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.profile.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

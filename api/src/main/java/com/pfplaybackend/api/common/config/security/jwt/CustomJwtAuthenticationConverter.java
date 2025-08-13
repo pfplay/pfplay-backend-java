@@ -25,8 +25,6 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
 
-        System.out.println(jwt);
-
         // JWT에서 '클레임' 정보 추출
         UserId userId = UserId.create(UUID.fromString(jwt.getClaim("uid")));
         String email = jwt.getClaim("email");

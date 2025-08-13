@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.user.application.service;
 
+import com.pfplaybackend.api.profile.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.repository.GuestRepository;

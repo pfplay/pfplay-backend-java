@@ -1,13 +1,15 @@
-package com.pfplaybackend.api.user.application.service;
+package com.pfplaybackend.api.profile.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
+import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.user.application.aspect.context.UserContext;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
@@ -17,7 +19,7 @@ import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.service.UserDomainService;
 import com.pfplaybackend.api.user.repository.GuestRepository;
 import com.pfplaybackend.api.user.repository.MemberRepository;
-import com.pfplaybackend.api.user.repository.UserProfileRepository;
+import com.pfplaybackend.api.profile.domain.repository.UserProfileRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,29 +37,23 @@ public class UserProfileService {
     private final UserDomainService userDomainService;
     private final GuestDomainService guestDomainService;
     private final UserAvatarService userAvatarService;
-    private final UserProfileEventService userProfileEventService;
 
     public Profile createProfileForGuest(Guest guest) {
         Profile profile = new Profile(guest.getUserId());
+        AvatarBodyResource avatarBodyResource = userAvatarService.getDefaultAvatarBodyResource();
         return profile
                 .withNickname(guestDomainService.generateRandomNickname())
+                .withAvatarCompositionType(AvatarCompositionType.BODY_WITH_FACE)
+                .withFaceSourceType(FaceSourceType.INTERNAL_IMAGE)
                 .withAvatarBodyUri(userAvatarService.getDefaultAvatarBodyUri())
                 .withAvatarFaceUri(userAvatarService.getDefaultAvatarFaceUri())
-                .withAvatarIconUri(userAvatarService.getDefaultAvatarIconUri());
+                .withAvatarIconUri(userAvatarService.getDefaultAvatarIconUri())
+                .withCombinePositionX(avatarBodyResource.getCombinePositionX())
+                .withCombinePositionY(avatarBodyResource.getCombinePositionY());
     }
 
     public Profile createProfileForMember(Member member) {
         return new Profile(member.getUserId());
-    }
-
-    @Transactional
-    public void updateMyBio(UpdateBioCommand updateBioCommand) {
-        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
-        MemberData memberData = memberRepository.findByUserId(userContext.getUserId()).orElseThrow();
-        Member member = memberData.toDomain();
-        Member updatedMember = member.updateProfileBio(updateBioCommand);
-        memberRepository.save(updatedMember.toData());
-        userProfileEventService.publishProfileChangedEvent(updatedMember);
     }
 
     public ProfileSummaryDto getMyProfileSummary() {

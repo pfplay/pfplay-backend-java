@@ -1,5 +1,8 @@
 package com.pfplaybackend.api.user.domain.service;
 
+import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.profile.domain.vo.Avatar;
+import com.pfplaybackend.api.profile.presentation.dto.request.SetAvatarRequest;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
 import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
@@ -43,25 +46,18 @@ public class UserAvatarDomainService {
         return null;
     }
 
-    public AvatarFaceUri updateFaceUriOnBodyUriChange(Member member, AvatarBodyDto avatarBodyDto) {
-        return avatarBodyDto.isCombinable() ? member.getProfile().getAvatarFaceUri() : new AvatarFaceUri();
+    public AvatarIconUri findAvatarIconPairWithSingleBody(AvatarBodyDto avatarBodyDto) {
+        AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByBodyUri(new AvatarBodyUri(avatarBodyDto.getResourceUri()));
+        return new AvatarIconUri(avatarIconDto.getResourceUri());
     }
 
-    public AvatarIconUri updateIconUriOnBodyUriChange(Member member, AvatarBodyDto avatarBodyDto) {
-        if(avatarBodyDto.isCombinable()) {
-            return member.getProfile().getAvatarIconUri();
-        }else {
-            AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByBodyUri(new AvatarBodyUri(avatarBodyDto.getResourceUri()));
-            return new AvatarIconUri(avatarIconDto.getResourceUri());
-        }
-    }
-
-    public AvatarIconUri updateIconUriOnFaceUriChange(Member member, AvatarFaceUri avatarFaceUri) {
-        if(avatarResourceService.isBasicFaceUri(avatarFaceUri)) {
+    public AvatarIconUri findAvatarIconByFaceSourceType(SetAvatarRequest request) {
+        AvatarFaceUri avatarFaceUri = new AvatarFaceUri(request.getFace().getUri());
+        if(request.getFace().getSourceType().equals(FaceSourceType.INTERNAL_IMAGE)) {
             AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByFaceUri(avatarFaceUri);
             return new AvatarIconUri(avatarIconDto.getResourceUri());
         }else {
-            // Return equal uri
+            // FIXME
             return new AvatarIconUri(avatarFaceUri.getAvatarFaceUri());
         }
     }
