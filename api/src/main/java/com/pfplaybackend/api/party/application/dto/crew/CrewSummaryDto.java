@@ -2,6 +2,7 @@ package com.pfplaybackend.api.party.application.dto.crew;
 
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,11 +17,15 @@ public class CrewSummaryDto {
     private GradeType gradeType;
     // Profile
     private String nickname;
+    private AvatarCompositionType avatarCompositionType;
     private String avatarBodyUri;
     private String avatarFaceUri;
     private String avatarIconUri;
     private int combinePositionX;
     private int combinePositionY;
+    private double offsetX;
+    private double offsetY;
+    private double scale;
 
     public CrewSummaryDto(long crewId) {
         this.crewId = crewId;
@@ -31,11 +36,15 @@ public class CrewSummaryDto {
                 crew.getId(),
                 crew.getGradeType(),
                 profileSettingDto.getNickname(),
+                profileSettingDto.getAvatarCompositionType(),
                 profileSettingDto.getAvatarBodyUri(),
                 profileSettingDto.getAvatarFaceUri(),
                 profileSettingDto.getAvatarIconUri(),
                 profileSettingDto.getCombinePositionX(),
-                profileSettingDto.getCombinePositionY()
+                profileSettingDto.getCombinePositionY(),
+                profileSettingDto.getOffsetX(),
+                profileSettingDto.getOffsetY(),
+                profileSettingDto.getScale()
         );
     }
 }
