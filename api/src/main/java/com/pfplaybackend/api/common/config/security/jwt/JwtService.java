@@ -106,10 +106,10 @@ public class JwtService {
         Date expiryDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(now)
+                .expiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -117,15 +117,15 @@ public class JwtService {
     private String createNonExpiringToken(Map<String, Object> claims, String subject) {
         Calendar calendar = Calendar.getInstance();
         calendar.set(2099, Calendar.DECEMBER, 31, 23, 59, 59);
-        Date specificDate = calendar.getTime();
+        Date expiryDate = calendar.getTime();
 
         Date now = new Date();
 
         return Jwts.builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuedAt(now)
-                .setExpiration(specificDate)
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(now)
+                .expiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
@@ -180,10 +180,6 @@ public class JwtService {
 
     public Long getAccessTokenExpiration() {
         return jwtProperties.getExpirationMs();
-    }
-
-    public Long getRefreshTokenExpiration() {
-        return jwtProperties.getRefreshExpirationMs();
     }
 
     /**
