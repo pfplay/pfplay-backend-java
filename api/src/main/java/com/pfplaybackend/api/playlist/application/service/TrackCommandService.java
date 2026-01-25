@@ -10,8 +10,8 @@ import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
 import com.pfplaybackend.api.playlist.presentation.payload.request.AddTrackRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.request.UpdateTrackOrderRequest;
-import com.pfplaybackend.api.playlist.repository.TrackRepository;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
+import com.pfplaybackend.api.playlist.repository.TrackRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,10 +34,10 @@ public class TrackCommandService {
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 트랙 중복 검사
         Optional<TrackData> optional = trackRepository.findByPlaylistDataIdAndLinkId(playlistData.getId(), request.getLinkId());
-        if(optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
+        if (optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 최대 보유 한계치 초과 검사
         PlaylistSummary playlistSummary = playlistQueryService.getPlaylist(playlistId);
-        if(playlistSummary.getMusicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
+        if (playlistSummary.getMusicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
 
         long nextMusicOrderNumber = playlistSummary.getMusicCount() == 0 ? 1 : playlistSummary.getMusicCount() + 1;
 
@@ -68,16 +68,16 @@ public class TrackCommandService {
         Integer nextOrderNumber = request.getNextOrderNumber();
         // 이동할 순서 값에 대한 유효성 검증
         PlaylistSummary playlistSummary = playlistQueryService.getPlaylist(playlistId);
-        if(prevOrderNumber < 1 || nextOrderNumber < 1
+        if (prevOrderNumber < 1 || nextOrderNumber < 1
                 || Objects.equals(prevOrderNumber, nextOrderNumber)
                 || playlistSummary.getMusicCount() < nextOrderNumber)
             throw ExceptionCreator.create(TrackException.INVALID_TRACK_ORDER);
 
-        if(prevOrderNumber < nextOrderNumber) {
+        if (prevOrderNumber < nextOrderNumber) {
             // prevOrderNumber < x <= nextOrderNumber 사이에 있는 Track 레코드의 order_number 를 -1씩 변경
             trackRepository.shiftUpOrderByDnD(playlistId, prevOrderNumber, nextOrderNumber);
         }
-        if(prevOrderNumber > nextOrderNumber) {
+        if (prevOrderNumber > nextOrderNumber) {
             // nextOrderNumber <= x < prevOrderNumber  사이에 있는 Track 레코드의 order_number 를 +1씩 변경
             trackRepository.shiftDownOrderByDnD(playlistId, prevOrderNumber, nextOrderNumber);
         }
