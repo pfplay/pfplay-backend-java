@@ -40,6 +40,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/oauth/callback", "/api/v1/auth/oauth/url", "/api/v1/auth/logout",
                                 "/api/v1/users/members/sign/**", "/api/v1/users/guests/sign/**", "/api/v1/partyrooms/link/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/api/v1/admin/**").permitAll()  // Admin API - no auth required (temporary)
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll()
                 )
@@ -60,6 +61,7 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:4000",
                 "http://localhost:8080",
+                "http://admin.pfplay.xyz",
                 "https://pfplay.xyz",
                 "https://pfplay-api.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
