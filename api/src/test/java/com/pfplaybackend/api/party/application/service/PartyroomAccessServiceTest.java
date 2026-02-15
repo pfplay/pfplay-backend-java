@@ -161,7 +161,6 @@ class PartyroomAccessServiceTest {
         when(partyroomConverter.toEntity(oldPartyroomDataDto)).thenReturn(oldPartyroomData);
         when(partyroomConverter.toDomain(oldPartyroomData)).thenReturn(oldPartyroom);
         when(partyroomConverter.toData(any(Partyroom.class))).thenReturn(oldPartyroomData);
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(oldPartyroomData);
 
         // 새 룸 enter 시 필요한 mock
         Crew newCrew = Crew.builder()
@@ -183,7 +182,8 @@ class PartyroomAccessServiceTest {
 
         PartyroomData savedNewPartyroomData = mock(PartyroomData.class);
         when(partyroomConverter.toDomain(savedNewPartyroomData)).thenReturn(savedNewPartyroom);
-        when(partyroomRepository.save(any())).thenReturn(savedNewPartyroomData);
+        // 첫 번째 save(exit) → oldPartyroomData, 두 번째 save(enter) → savedNewPartyroomData
+        when(partyroomRepository.save(any())).thenReturn(oldPartyroomData, savedNewPartyroomData);
 
         ProfileSettingDto profileSettingDto = mock(ProfileSettingDto.class);
         when(userProfileService.getUserProfileSetting(userId)).thenReturn(profileSettingDto);

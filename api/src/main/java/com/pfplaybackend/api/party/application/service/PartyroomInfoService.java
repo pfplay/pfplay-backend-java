@@ -100,11 +100,14 @@ public class PartyroomInfoService {
 
     @Transactional
     public List<DjWithProfileDto> getDjs(Partyroom partyroom) {
-        Set<Dj> djs = partyroom.getDjSet();
-        List<UserId> userIds = djs.stream().map(Dj::getUserId).toList();
+        List<Dj> queuedDjs = partyroom.getDjSet().stream()
+                .filter(Dj::isQueued)
+                .sorted(Comparator.comparingInt(Dj::getOrderNumber))
+                .toList();
+        List<UserId> userIds = queuedDjs.stream().map(Dj::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileService.getUsersProfileSetting(userIds);
 
-        return djs.stream().map(dj -> {
+        return queuedDjs.stream().map(dj -> {
             UserId userId = dj.getUserId();
             ProfileSettingDto profileSettingDto = profileSettingMap.get(userId);
             return new DjWithProfileDto(

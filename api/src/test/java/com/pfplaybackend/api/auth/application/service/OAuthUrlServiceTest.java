@@ -35,7 +35,7 @@ class OAuthUrlServiceTest {
         googleConfig.setClientId("test-client-id");
         googleConfig.setRedirectUri("http://localhost/callback");
         googleConfig.setAuthorizationUri("https://accounts.google.com/o/oauth2/auth");
-        googleConfig.setScopes("openid email profile");
+        googleConfig.setScopes(java.util.List.of("openid", "email", "profile"));
     }
 
     @Test

@@ -12,6 +12,7 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.domain.enums.AccessType;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -19,6 +20,7 @@ import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.party.interfaces.listener.redis.message.DjQueueChangeMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomAccessMessage;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
@@ -125,9 +127,17 @@ public class PartyroomAccessService {
 
         Crew crew = partyroom.deactivateCrewAndGet(partyContext.getUserId());
 
+        // '퇴장하려는 크루'가 Dj 대기열에 존재하는지 확인
+        boolean wasInDjQueue = partyroom.getDjSet().stream()
+                .anyMatch(dj -> dj.getCrewId().equals(new CrewId(crew.getId())) && dj.isQueued());
+
         // '퇴장하려는 크루'가 Dj 대기열에 존재한다면 강제 삭제(무효화)
         partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
         partyroomRepository.save(partyroomConverter.toData(partyroom));
+
+        if(wasInDjQueue) {
+            publishDjQueueChangeEvent(partyroom);
+        }
 
         // TODO 24.10.04 '퇴장하려는 크루'가 CurrentDj 인 경우에 한해, Current Playback 강제 스킵 처리
         // CurrentDj: orderNumber == 1
@@ -153,10 +163,19 @@ public class PartyroomAccessService {
         partyroom.deactivateCrewAndGet(crew.getUserId());
         // FIXME crew.getId() return type → CrewId
         if(isPermanent) partyroom.applyPermanentBan(new CrewId(crew.getId()));
+
+        boolean wasInDjQueue = partyroom.getDjSet().stream()
+                .anyMatch(dj -> dj.getCrewId().equals(new CrewId(crew.getId())) && dj.isQueued());
+        boolean wasCurrentDj = partyroom.isCurrentDj(new CrewId(crew.getId()));
+
         partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
         partyroomRepository.save(partyroomConverter.toData(partyroom));
 
-        if(partyroom.isCurrentDj(new CrewId(crew.getId()))) {
+        if(wasInDjQueue) {
+            publishDjQueueChangeEvent(partyroom);
+        }
+
+        if(wasCurrentDj) {
             playbackManagementService.skipBySystem(partyroom.getPartyroomId());
         }
 
@@ -167,6 +186,15 @@ public class PartyroomAccessService {
                 AccessType.EXIT,
                 crewSummaryDto);
         messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
+    }
+
+    private void publishDjQueueChangeEvent(Partyroom partyroom) {
+        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
+                DjQueueChangeMessage.create(
+                        partyroom.getPartyroomId(),
+                        partyroomInfoService.getDjs(partyroom)
+                )
+        );
     }
 
     @Transactional(readOnly = true)
