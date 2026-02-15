@@ -71,10 +71,12 @@ public class DjManagementService {
         Optional<Crew> crewOptional = partyroom.getCrewByUserId(partyContext.getUserId());
         if(crewOptional.isEmpty()) throw ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM);
         Crew crew = crewOptional.get();
+        boolean wasCurrentDj = partyroom.isCurrentDj(new CrewId(crew.getId()));
         partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
         partyroomRepository.save(partyroomConverter.toData(partyroom));
-        // TODO 2024.10.06 CurrentDj인 경우, skipBySystem 호출
-        playbackManagementService.skipBySystem(partyroomId);
+        if (wasCurrentDj) {
+            playbackManagementService.skipBySystem(partyroomId);
+        }
     }
 
     /**
