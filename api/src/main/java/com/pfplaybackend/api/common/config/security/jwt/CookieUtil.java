@@ -78,11 +78,19 @@ public class CookieUtil {
     private void deleteCookie(HttpServletResponse response, String name) {
         var cookieConfig = jwtProperties.getCookie();
 
-        Cookie cookie = new Cookie(name, "");
-        cookie.setPath(cookieConfig.getPath());
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
+        StringBuilder cookieBuilder = new StringBuilder();
+        cookieBuilder.append(name).append("=");
+        cookieBuilder.append("; Path=").append(cookieConfig.getPath());
+        cookieBuilder.append("; Max-Age=0");
+        cookieBuilder.append("; HttpOnly");
+
+        if (cookieConfig.getSecure()) {
+            cookieBuilder.append("; Secure");
+        }
+
+        cookieBuilder.append("; SameSite=").append(cookieConfig.getSameSite());
+
+        response.addHeader("Set-Cookie", cookieBuilder.toString());
 
         log.debug("Deleted cookie: {}", name);
     }
