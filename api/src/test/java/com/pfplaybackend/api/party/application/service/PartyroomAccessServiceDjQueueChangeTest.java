@@ -28,7 +28,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,7 +57,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
 
     @BeforeEach
     void setUp() {
-        userId = new UserId(UUID.randomUUID());
+        userId = new UserId();
         partyroomId = new PartyroomId(1L);
 
         PartyContext partyContext = mock(PartyContext.class);
@@ -162,7 +165,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
     @DisplayName("expel - DJ 대기열에 있던 사용자가 강퇴되면 DJ_QUEUE_CHANGE 이벤트가 발행되어야 한다")
     void expel_userInDjQueue_shouldPublishDjQueueChangeEvent() {
         // given
-        UserId targetUserId = new UserId(UUID.randomUUID());
+        UserId targetUserId = new UserId();
 
         Crew targetCrew = Crew.builder()
                 .id(2L)
@@ -211,7 +214,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
     @DisplayName("expel - DJ 대기열에 없던 사용자가 강퇴되면 DJ_QUEUE_CHANGE 이벤트가 발행되지 않아야 한다")
     void expel_userNotInDjQueue_shouldNotPublishDjQueueChangeEvent() {
         // given
-        UserId targetUserId = new UserId(UUID.randomUUID());
+        UserId targetUserId = new UserId();
 
         Crew targetCrew = Crew.builder()
                 .id(2L)

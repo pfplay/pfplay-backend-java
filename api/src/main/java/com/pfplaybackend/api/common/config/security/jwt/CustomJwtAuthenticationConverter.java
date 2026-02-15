@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.UUID;
 
 @Slf4j
 @Component
@@ -26,7 +25,7 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Abstract
     public AbstractAuthenticationToken convert(Jwt jwt) {
 
         // JWT에서 '클레임' 정보 추출
-        UserId userId = UserId.create(UUID.fromString(jwt.getClaim("uid")));
+        UserId userId = UserId.fromString(jwt.getClaim("uid"));
         String email = jwt.getClaim("email");
         AccessLevel accessLevel = AccessLevel.valueOf(jwt.getClaim("access_level"));
         AuthorityTier authorityTier = AuthorityTier.valueOf(jwt.getClaim("authority_tier"));

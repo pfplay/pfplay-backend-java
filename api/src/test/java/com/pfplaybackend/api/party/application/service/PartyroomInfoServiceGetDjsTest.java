@@ -16,7 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -51,9 +55,9 @@ class PartyroomInfoServiceGetDjsTest {
     @DisplayName("getDjs - isQueued가 false인 DJ는 결과에서 제외되어야 한다")
     void getDjs_shouldExcludeDequeuedDjs() {
         // given
-        UserId user1 = new UserId(UUID.randomUUID());
-        UserId user2 = new UserId(UUID.randomUUID());
-        UserId user3 = new UserId(UUID.randomUUID());
+        UserId user1 = new UserId();
+        UserId user2 = new UserId();
+        UserId user3 = new UserId();
 
         Dj queuedDj1 = createDj(1L, 1, true, user1);
         Dj dequeuedDj = createDj(2L, 0, false, user2);
@@ -86,9 +90,9 @@ class PartyroomInfoServiceGetDjsTest {
     @DisplayName("getDjs - orderNumber 기준으로 오름차순 정렬되어야 한다")
     void getDjs_shouldSortByOrderNumberAscending() {
         // given
-        UserId user1 = new UserId(UUID.randomUUID());
-        UserId user2 = new UserId(UUID.randomUUID());
-        UserId user3 = new UserId(UUID.randomUUID());
+        UserId user1 = new UserId();
+        UserId user2 = new UserId();
+        UserId user3 = new UserId();
 
         Dj dj3 = createDj(3L, 3, true, user3);
         Dj dj1 = createDj(1L, 1, true, user1);
@@ -124,7 +128,7 @@ class PartyroomInfoServiceGetDjsTest {
     @DisplayName("getDjs - 모든 DJ가 dequeued이면 빈 리스트를 반환해야 한다")
     void getDjs_shouldReturnEmptyList_whenAllDjsDequeued() {
         // given
-        UserId user1 = new UserId(UUID.randomUUID());
+        UserId user1 = new UserId();
         Dj dequeuedDj = createDj(1L, 0, false, user1);
 
         Set<Dj> djSet = new HashSet<>();

@@ -6,9 +6,8 @@ import com.pfplaybackend.api.user.repository.custom.MemberRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public interface MemberRepository extends JpaRepository<MemberData, UUID>, MemberRepositoryCustom {
+public interface MemberRepository extends JpaRepository<MemberData, Long>, MemberRepositoryCustom {
     Optional<MemberData> findByEmail(String email);
 
     long countByProviderType(ProviderType providerType);

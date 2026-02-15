@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 
 import java.security.Principal;
-import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +30,7 @@ public class SubscriptionEventListener implements ApplicationListener<SessionSub
             logger.warn("Unauthorized session requested, UserId is null" + " Session ID: " + sessionId);
             throw ExceptionCreator.create(SessionException.UNAUTHORIZED_SESSION);
         }
-        UserId userId = UserId.create(UUID.fromString(principal.getName()));
+        UserId userId = UserId.fromString(principal.getName());
         sessionCacheManager.saveSessionCache(sessionId, userId, destination);
 
         logger.info("Session has subscribed, sessionId : " + sessionId + ", userId : " + userId + ", destination : " + destination);
