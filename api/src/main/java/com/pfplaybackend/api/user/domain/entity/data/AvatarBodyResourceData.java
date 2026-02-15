@@ -54,6 +54,17 @@ public class AvatarBodyResourceData {
         this.combinePositionY = combinePositionY;
     }
 
+    public void updateResource(String resourceUri, ObtainmentType obtainableType, int obtainableScore,
+                               boolean isCombinable, boolean isDefaultSetting, int combinePositionX, int combinePositionY) {
+        this.resourceUri = resourceUri;
+        this.obtainableType = obtainableType;
+        this.obtainableScore = obtainableScore;
+        this.isCombinable = isCombinable;
+        this.isDefaultSetting = isDefaultSetting;
+        this.combinePositionX = combinePositionX;
+        this.combinePositionY = combinePositionY;
+    }
+
     public AvatarBodyResource toDomain() {
         return AvatarBodyResource.builder()
                 .id(this.id)

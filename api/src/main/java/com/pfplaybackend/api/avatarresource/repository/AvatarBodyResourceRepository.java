@@ -16,4 +16,6 @@ public interface AvatarBodyResourceRepository extends JpaRepository<AvatarBodyRe
     Optional<List<AvatarBodyResourceData>> findAllAvatarResources();
 
     AvatarBodyResourceData findOneAvatarResourceByResourceUri(String resourceUri);
+
+    Optional<AvatarBodyResourceData> findByName(String name);
 }

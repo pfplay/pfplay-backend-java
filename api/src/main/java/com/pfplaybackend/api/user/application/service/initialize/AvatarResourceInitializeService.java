@@ -3,6 +3,7 @@ package com.pfplaybackend.api.user.application.service.initialize;
 import com.pfplaybackend.api.avatarresource.repository.AvatarBodyResourceRepository;
 import com.pfplaybackend.api.avatarresource.repository.AvatarFaceResourceRepository;
 import com.pfplaybackend.api.avatarresource.repository.AvatarIconResourceRepository;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarFaceResource;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarIconResource;
@@ -11,6 +12,8 @@ import com.pfplaybackend.api.user.domain.enums.PairType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -56,9 +59,16 @@ public class AvatarResourceInitializeService {
 
     private void addAvatarBody(String name, String resourceUri, ObtainmentType obtainableType,
                                int obtainableScore, boolean isCombinable, boolean isDefaultSetting, int x, int y) {
-        AvatarBodyResource avatarBodyResource = AvatarBodyResource.create(name, resourceUri, obtainableType, obtainableScore,
-                isCombinable, isDefaultSetting, x, y);
-        avatarBodyResourceRepository.save(avatarBodyResource.toData());
+        Optional<AvatarBodyResourceData> existing = avatarBodyResourceRepository.findByName(name);
+        if (existing.isPresent()) {
+            AvatarBodyResourceData data = existing.get();
+            data.updateResource(resourceUri, obtainableType, obtainableScore, isCombinable, isDefaultSetting, x, y);
+            avatarBodyResourceRepository.save(data);
+        } else {
+            AvatarBodyResource avatarBodyResource = AvatarBodyResource.create(name, resourceUri, obtainableType, obtainableScore,
+                    isCombinable, isDefaultSetting, x, y);
+            avatarBodyResourceRepository.save(avatarBodyResource.toData());
+        }
     }
 
     private void addAvatarFace(String name, String resourceUri) {

@@ -143,10 +143,10 @@ public class Partyroom {
 
     public Partyroom rotateDjs() {
         int totalElements = this.djSet.size();
-        this.djSet.stream().peek(dj -> {
+        this.djSet.forEach(dj -> {
             if(dj.getOrderNumber() == 1) {
                 dj.updateOrderNumber(totalElements);
-            }else {
+            } else {
                 dj.updateOrderNumber(dj.getOrderNumber() - 1);
             }
         });
@@ -166,15 +166,15 @@ public class Partyroom {
     // 예를 들면, 제거된 Dj 순번에서 한자리씩 당겨야 한다.
     public void tryRemoveInDjQueue(CrewId crewId) {
         AtomicInteger orderNumber = new AtomicInteger(1);
-        // FIXME
-        this.djSet = this.djSet.stream().peek(dj -> {
-            if(dj.getCrewId().equals(crewId)) {
-                dj.applyDequeued();
-            }else {
-                dj.updateOrderNumber(orderNumber.get());
-                orderNumber.getAndIncrement();
-            }
-        }).collect(Collectors.toSet());
+        this.djSet = this.djSet.stream()
+            .sorted(Comparator.comparingInt(Dj::getOrderNumber))
+            .peek(dj -> {
+                if(dj.getCrewId().equals(crewId)) {
+                    dj.applyDequeued();
+                } else {
+                    dj.updateOrderNumber(orderNumber.getAndIncrement());
+                }
+            }).collect(Collectors.toSet());
     }
 
 
@@ -214,6 +214,10 @@ public class Partyroom {
         this.linkDomain = request.getLinkDomain();
         this.playbackTimeLimit = request.getPlaybackTimeLimit();
         return this;
+    }
+
+    public Optional<Dj> getDjById(Long djId) {
+        return this.djSet.stream().filter(dj -> dj.getId() != null && dj.getId().equals(djId)).findFirst();
     }
 
     public Optional<Dj> getCurrentDj() {

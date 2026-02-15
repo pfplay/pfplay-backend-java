@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,11 +33,15 @@ public class TemporaryUserInitializeService {
     private final PlaylistCommandService playlistCommandService;
     private final JwtService jwtService;
 
+    private static final long GUEST_FIXED_ID = 1000000000000001L;
+    private static final long ASSOCIATE_MEMBER_FIXED_ID = 1000000000000002L;
+    private static final long FULL_MEMBER_FIXED_ID = 1000000000000003L;
+
     @Transactional
     public void addTemporaryUsers() {
-        UserId guestId = new UserId(UUID.fromString("d4e3f7a2-8df0-4f7b-a6b2-4d5b8e1c2f0e"));
-        UserId associateMemberId = new UserId(UUID.fromString("3f7a2d4e-1c8b-4d2e-8a5f-7b4e8a6c2b1d"));
-        UserId fullMemberId = new UserId(UUID.fromString("2a5b3c18-5a2e-45c6-9a5d-748b7a5e1b2c"));
+        UserId guestId = new UserId(GUEST_FIXED_ID);
+        UserId associateMemberId = new UserId(ASSOCIATE_MEMBER_FIXED_ID);
+        UserId fullMemberId = new UserId(FULL_MEMBER_FIXED_ID);
         // Add Users
         addGuest(guestId);
         addAssociateMember(associateMemberId, "AM@google.com");

@@ -12,8 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @Tag(name = "User Sign API")
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +25,7 @@ public class EasyUserManagementController {
 
     @PostMapping("/members/sign/temporary/associate-member")
     public ResponseEntity<?> createAssociateMember(HttpServletResponse response) {
-        UserId userId = new UserId(UUID.randomUUID());
+        UserId userId = new UserId();
         Member member = temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com");
         cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessTokenForMember(member));
 
@@ -37,7 +35,7 @@ public class EasyUserManagementController {
 
     @PostMapping("/members/sign/temporary/full-member")
     public ResponseEntity<?> createFullMember(HttpServletResponse response) {
-        UserId userId = new UserId(UUID.randomUUID());
+        UserId userId = new UserId();
         Member member = temporaryUserInitializeService.upgradeMember(
                 temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com"));
         cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessTokenForMember(member));

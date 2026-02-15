@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.domain.exception;
 
 import com.pfplaybackend.api.common.exception.DomainException;
+import com.pfplaybackend.api.common.exception.http.BadRequestException;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import lombok.Getter;
@@ -9,7 +10,8 @@ import lombok.Getter;
 public enum DjException implements DomainException {
     ALREADY_REGISTERED("DJ-001", "Already Registered Dj", ConflictException.class),
     QUEUE_CLOSED("DJ-002", "Dj Queue is Closed", ForbiddenException.class),
-    EMPTY_PLAYLIST("DJ-003", "Cannot Register Empty Playlist", ForbiddenException.class);
+    EMPTY_PLAYLIST("DJ-003", "Cannot Register Empty Playlist", ForbiddenException.class),
+    NOT_FOUND_DJ("DJ-004", "DJ not found in queue", BadRequestException.class);
 
     private final String errorCode;
     private final String message;
