@@ -11,7 +11,6 @@ public class SearchMusicListRequest {
     @NotNull(message = "q cannot be null")
     private final String q;
 
-    @NotNull(message = "platform cannot be null")
     private final String platform;
 
     SearchMusicListRequest(@BindParam("q") String q, @BindParam("platform") String platform) {
