@@ -143,10 +143,10 @@ public class Partyroom {
 
     public Partyroom rotateDjs() {
         int totalElements = this.djSet.size();
-        this.djSet.stream().peek(dj -> {
+        this.djSet.forEach(dj -> {
             if(dj.getOrderNumber() == 1) {
                 dj.updateOrderNumber(totalElements);
-            }else {
+            } else {
                 dj.updateOrderNumber(dj.getOrderNumber() - 1);
             }
         });
