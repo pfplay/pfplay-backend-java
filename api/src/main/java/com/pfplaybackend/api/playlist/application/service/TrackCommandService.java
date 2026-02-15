@@ -27,6 +27,7 @@ public class TrackCommandService {
     private final TrackRepository trackRepository;
     private final PlaylistQueryService playlistQueryService;
 
+    @Transactional
     public void addTrackInPlaylist(Long playlistId, AddTrackRequest request) {
         PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
         // 플레이리스트 접근 권한 검사
