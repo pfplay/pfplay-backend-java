@@ -19,11 +19,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class AdminUserInitializeService {
+
+    private static final long ADMIN_FIXED_ID = 1000000000000000L;
 
     private final MemberRepository memberRepository;
     private final UserProfileService userProfileService;
@@ -33,7 +34,7 @@ public class AdminUserInitializeService {
 
     @Transactional
     public UserId addAdminUser() {
-        UserId adminId = new UserId(UUID.fromString("a4e3f7a2-87f0-4f7b-a6b2-4d5b8e1c2d0e"));
+        UserId adminId = new UserId(ADMIN_FIXED_ID);
         Member member = addAssociateMember(adminId);
         Member updatedMember = updateAvatarBody(member, new AvatarBodyUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_003.png?alt=media"));
         upgradeMember(updatedMember);

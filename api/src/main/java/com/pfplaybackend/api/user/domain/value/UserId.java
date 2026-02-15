@@ -1,27 +1,32 @@
 package com.pfplaybackend.api.user.domain.value;
 
+import com.pfplaybackend.api.common.util.TsidGenerator;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 
 @Getter
 @Embeddable
-public class UserId {
+public class UserId implements Serializable {
 
-    private UUID uid;
+    private Long uid;
 
     public UserId() {
-        this.uid = UUID.randomUUID();
+        this.uid = TsidGenerator.nextId();
     }
 
-    public UserId(UUID uid) {
+    public UserId(Long uid) {
         this.uid = uid;
     }
 
-    public static UserId create(UUID uid) {
+    public static UserId create(Long uid) {
         return new UserId(uid);
+    }
+
+    public static UserId fromString(String uid) {
+        return new UserId(Long.parseLong(uid));
     }
 
     @Override
@@ -35,5 +40,10 @@ public class UserId {
     @Override
     public int hashCode() {
         return Objects.hash(uid);
+    }
+
+    @Override
+    public String toString() {
+        return String.valueOf(uid);
     }
 }

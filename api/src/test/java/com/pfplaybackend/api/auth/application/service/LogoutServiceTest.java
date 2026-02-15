@@ -20,7 +20,6 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -43,7 +42,7 @@ class LogoutServiceTest {
     @DisplayName("활성 파티룸이 있으면 exit()을 호출해야 한다")
     void exitActivePartyroomIfPresent_shouldCallExit_whenActivePartyroomExists() {
         // given
-        UserId userId = new UserId(UUID.randomUUID());
+        UserId userId = new UserId();
         setAuthentication(userId);
 
         ActivePartyroomWithCrewDto activePartyroom = mock(ActivePartyroomWithCrewDto.class);
@@ -61,7 +60,7 @@ class LogoutServiceTest {
     @DisplayName("활성 파티룸이 없으면 exit()을 호출하지 않아야 한다")
     void exitActivePartyroomIfPresent_shouldNotCallExit_whenNoActivePartyroom() {
         // given
-        UserId userId = new UserId(UUID.randomUUID());
+        UserId userId = new UserId();
         setAuthentication(userId);
 
         when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.empty());

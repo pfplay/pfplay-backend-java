@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -36,8 +35,8 @@ class PartyroomInfoServiceIsRegisteredTest {
 
     @BeforeEach
     void setUp() {
-        myUserId = new UserId(UUID.randomUUID());
-        otherUserId = new UserId(UUID.randomUUID());
+        myUserId = new UserId();
+        otherUserId = new UserId();
 
         PartyContext partyContext = mock(PartyContext.class);
         when(partyContext.getUserId()).thenReturn(myUserId);

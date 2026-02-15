@@ -246,9 +246,9 @@ public class AdminPartyroomService {
      */
     private UserId parseUserId(String userIdString) {
         try {
-            UUID uuid = UUID.fromString(userIdString);
-            return new UserId(uuid);
-        } catch (IllegalArgumentException e) {
+            Long id = Long.parseLong(userIdString);
+            return new UserId(id);
+        } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid user ID format: " + userIdString, e);
         }
     }

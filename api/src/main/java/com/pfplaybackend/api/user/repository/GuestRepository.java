@@ -6,8 +6,7 @@ import com.pfplaybackend.api.user.repository.custom.GuestRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
-import java.util.UUID;
 
-public interface GuestRepository extends JpaRepository<GuestData, UUID>, GuestRepositoryCustom {
+public interface GuestRepository extends JpaRepository<GuestData, Long>, GuestRepositoryCustom {
     Optional<GuestData> findGuestByUserId(UserId userId);
 }

@@ -74,7 +74,7 @@ public class AdminUserController {
     @GetMapping("/virtual/{userId}")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<VirtualMemberResponse> getVirtualMember(@PathVariable String userId) {
-        UserId userIdObj = new UserId(java.util.UUID.fromString(userId));
+        UserId userIdObj = UserId.fromString(userId);
         Member member = adminUserService.getVirtualMember(userIdObj);
 
         VirtualMemberResponse response = buildResponse(member);
@@ -99,7 +99,7 @@ public class AdminUserController {
             @PathVariable String userId,
             @Valid @RequestBody VirtualMemberAvatarUpdateRequest request) {
 
-        UserId userIdObj = new UserId(java.util.UUID.fromString(userId));
+        UserId userIdObj = UserId.fromString(userId);
         AvatarBodyUri avatarBodyUri = new AvatarBodyUri(request.getAvatarBodyUri());
         AvatarFaceUri avatarFaceUri = request.getAvatarFaceUri() != null
                 ? new AvatarFaceUri(request.getAvatarFaceUri())
@@ -130,7 +130,7 @@ public class AdminUserController {
     @DeleteMapping("/virtual/{userId}")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<Void> deleteVirtualMember(@PathVariable String userId) {
-        UserId userIdObj = new UserId(java.util.UUID.fromString(userId));
+        UserId userIdObj = UserId.fromString(userId);
         adminUserService.deleteVirtualMember(userIdObj);
 
         return ResponseEntity.noContent().build();

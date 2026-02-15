@@ -29,7 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,7 +53,7 @@ class PartyroomAccessServiceTest {
 
     @BeforeEach
     void setUp() {
-        userId = new UserId(UUID.randomUUID());
+        userId = new UserId();
         partyroomId = new PartyroomId(1L);
 
         PartyContext partyContext = mock(PartyContext.class);

@@ -28,7 +28,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -54,7 +58,7 @@ class DjManagementServiceDjQueueChangeTest {
 
     @BeforeEach
     void setUp() {
-        userId = new UserId(UUID.randomUUID());
+        userId = new UserId();
         partyroomId = new PartyroomId(1L);
 
         PartyContext partyContext = mock(PartyContext.class);
@@ -225,7 +229,7 @@ class DjManagementServiceDjQueueChangeTest {
         // given — setUp()에서 설정된 userId를 관리자로 사용
         UserId adminUserId = userId;
 
-        UserId targetUserId = new UserId(UUID.randomUUID());
+        UserId targetUserId = new UserId();
         DjId djId = new DjId(100L);
 
         Dj targetDj = Dj.builder()
