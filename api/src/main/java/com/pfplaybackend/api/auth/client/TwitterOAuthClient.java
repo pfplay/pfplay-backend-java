@@ -116,12 +116,12 @@ public class TwitterOAuthClient {
      * Twitter username으로부터 이메일 형식 문자열 생성
      *
      * @param username Twitter username (예: "john_doe")
-     * @return 이메일 형식 문자열 (예: "john_doe@twitter.local")
+     * @return 이메일 형식 문자열 (예: "john_doe@x.com")
      */
     private String generateEmailFromUsername(String username) {
         if (username == null || username.isBlank()) {
             log.warn("Twitter username is null or empty, using fallback");
-            return "unknown@twitter.local";
+            return "unknown@x.com";
         }
 
         // @ 기호가 이미 있으면 그대로 사용 (혹시 Twitter에서 이메일을 제공하는 경우)
@@ -137,7 +137,7 @@ public class TwitterOAuthClient {
             cleanUsername = "user" + cleanUsername;
         }
 
-        return cleanUsername + "@twitter.local";
+        return cleanUsername + "@x.com";
     }
 
     @Data
