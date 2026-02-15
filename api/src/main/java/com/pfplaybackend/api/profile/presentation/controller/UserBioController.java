@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ public class UserBioController {
      */
     @PutMapping("/me/profile/bio")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> setMyBio(@RequestBody UpdateMyBioRequest request) {
+    public ResponseEntity<?> setMyBio(@Valid @RequestBody UpdateMyBioRequest request) {
         UpdateBioCommand updateBioCommand = new UpdateBioCommand(request.getNickname(), request.getIntroduction());
         userBioService.updateMyBio(updateBioCommand);
         return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));

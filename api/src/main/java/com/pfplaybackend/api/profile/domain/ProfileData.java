@@ -38,7 +38,7 @@ public class ProfileData extends BaseEntity {
     @Column(length = 20)
     private String nickname;
 
-    @Column(length = 30)
+    @Column(length = 50)
     private String introduction;
 
     @Embedded
