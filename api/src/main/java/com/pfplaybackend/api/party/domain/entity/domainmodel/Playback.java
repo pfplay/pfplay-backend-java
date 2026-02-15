@@ -73,12 +73,20 @@ public class Playback {
 
     private static Duration parseDuration(String durationStr) {
         String[] parts = durationStr.split(":");
-        if (parts.length != 2) {
-            throw new DateTimeParseException("Invalid duration format", durationStr, 0);
-        }
-        int minutes = Integer.parseInt(parts[0]);
-        int seconds = Integer.parseInt(parts[1]);
-        return Duration.ofMinutes(minutes).plusSeconds(seconds);
+        return switch (parts.length) {
+            case 2 -> {
+                int minutes = Integer.parseInt(parts[0]);
+                int seconds = Integer.parseInt(parts[1]);
+                yield Duration.ofMinutes(minutes).plusSeconds(seconds);
+            }
+            case 3 -> {
+                int hours = Integer.parseInt(parts[0]);
+                int minutes = Integer.parseInt(parts[1]);
+                int seconds = Integer.parseInt(parts[2]);
+                yield Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
+            }
+            default -> throw new DateTimeParseException("Invalid duration format", durationStr, 0);
+        };
     }
 
     public Playback updateAggregation(int deltaLikeCount, int deltaDislikeCount, int deltaGrabCount) {
