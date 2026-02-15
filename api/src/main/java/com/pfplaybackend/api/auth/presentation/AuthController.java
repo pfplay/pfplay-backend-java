@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.auth.presentation;
 
 import com.pfplaybackend.api.auth.application.service.AuthService;
+import com.pfplaybackend.api.auth.application.service.LogoutService;
 import com.pfplaybackend.api.auth.application.service.OAuthUrlService;
 import com.pfplaybackend.api.auth.dto.response.AuthResponse;
 import com.pfplaybackend.api.auth.dto.request.OAuthLoginRequest;
@@ -8,7 +9,6 @@ import com.pfplaybackend.api.auth.dto.request.OAuthUrlRequest;
 import com.pfplaybackend.api.auth.dto.response.OAuthUrlResponse;
 import com.pfplaybackend.api.auth.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +27,7 @@ public class AuthController {
 
     private final OAuthUrlService oAuthUrlService;
     private final AuthService authService;
+    private final LogoutService logoutService;
     private final CookieUtil cookieUtil;
 
     /**
@@ -113,6 +114,12 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
+        try {
+            logoutService.exitActivePartyroomIfPresent();
+        } catch (Exception e) {
+            log.warn("Failed to exit active partyroom during logout: {}", e.getMessage());
+        }
+
         cookieUtil.deleteAccessTokenCookie(response);
         cookieUtil.deleteRefreshTokenCookie(response);
 
