@@ -216,6 +216,10 @@ public class Partyroom {
         return this;
     }
 
+    public Optional<Dj> getDjById(Long djId) {
+        return this.djSet.stream().filter(dj -> dj.getId() != null && dj.getId().equals(djId)).findFirst();
+    }
+
     public Optional<Dj> getCurrentDj() {
         return this.djSet.stream().filter(dj -> dj.getOrderNumber() == 1).findFirst();
     }
