@@ -63,12 +63,15 @@ public class PartyroomAccessService {
         Optional<ActivePartyroomWithCrewDto> optActiveRoomInfo = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
         if (optActiveRoomInfo.isPresent()) {
             ActivePartyroomWithCrewDto activeRoomInfo = optActiveRoomInfo.get();
-            if(partyroomDomainService.isActiveInAnotherRoom(partyroomId, new PartyroomId(activeRoomInfo.getId())))
-                throw ExceptionCreator.create(PartyroomException.ACTIVE_ANOTHER_ROOM);
-            // 같은 룸 재진입 — 아바타 이벤트를 다시 발행하여 다른 Crew에게 전파
-            Crew crew = partyroom.getCrewByUserId(userId).orElseThrow();
-            publishAccessChangedEvent(crew, userId);
-            return crew;
+            if(partyroomDomainService.isActiveInAnotherRoom(partyroomId, new PartyroomId(activeRoomInfo.getId()))) {
+                // 기존 룸 자동 exit 처리 후 새 룸 enter 진행
+                exit(new PartyroomId(activeRoomInfo.getId()));
+            } else {
+                // 같은 룸 재진입 — 아바타 이벤트를 다시 발행하여 다른 Crew에게 전파
+                Crew crew = partyroom.getCrewByUserId(userId).orElseThrow();
+                publishAccessChangedEvent(crew, userId);
+                return crew;
+            }
         }
 
         Partyroom updatedPartyRoom = addOrActivateCrew(partyroom, userId, authorityTier);
