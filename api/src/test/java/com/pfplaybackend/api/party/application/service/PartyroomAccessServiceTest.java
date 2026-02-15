@@ -4,6 +4,7 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
@@ -30,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -107,5 +109,89 @@ class PartyroomAccessServiceTest {
 
         // then — 재진입 시에도 이벤트가 발행되어야 함
         verify(messagePublisher, times(1)).publish(any(), any());
+    }
+
+    @Test
+    @DisplayName("다른 룸이 active일 때 ACTIVE_ANOTHER_ROOM 예외 대신 exit이 호출되어야 한다")
+    void tryEnter_anotherRoomActive_shouldAutoExitInsteadOfException() {
+        // given
+        PartyroomId newRoomId = new PartyroomId(2L);
+        PartyroomId oldRoomId = new PartyroomId(1L);
+
+        Partyroom newPartyroom = Partyroom.builder()
+                .partyroomId(newRoomId)
+                .crewSet(new HashSet<>())
+                .djSet(new HashSet<>())
+                .isTerminated(false)
+                .build();
+
+        PartyroomData newPartyroomData = mock(PartyroomData.class);
+        when(partyroomRepository.findById(newRoomId.getId())).thenReturn(Optional.of(newPartyroomData));
+        when(partyroomConverter.toDomain(newPartyroomData)).thenReturn(newPartyroom);
+
+        // 다른 룸에 이미 active
+        ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
+        when(activeRoomInfo.getId()).thenReturn(oldRoomId.getId());
+        when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activeRoomInfo));
+        when(partyroomDomainService.isActiveInAnotherRoom(eq(newRoomId), any())).thenReturn(true);
+
+        // exit() 호출 시 필요한 mock — 기존 룸 조회
+        Crew oldCrew = Crew.builder()
+                .id(5L)
+                .partyroomId(oldRoomId)
+                .userId(userId)
+                .gradeType(GradeType.LISTENER)
+                .isActive(true)
+                .build();
+
+        Set<Crew> oldCrewSet = new HashSet<>();
+        oldCrewSet.add(oldCrew);
+
+        Partyroom oldPartyroom = Partyroom.builder()
+                .partyroomId(oldRoomId)
+                .crewSet(oldCrewSet)
+                .djSet(new HashSet<>())
+                .isTerminated(false)
+                .build();
+
+        PartyroomDataDto oldPartyroomDataDto = mock(PartyroomDataDto.class);
+        PartyroomData oldPartyroomData = mock(PartyroomData.class);
+
+        when(partyroomRepository.findPartyroomDto(oldRoomId)).thenReturn(Optional.of(oldPartyroomDataDto));
+        when(partyroomConverter.toEntity(oldPartyroomDataDto)).thenReturn(oldPartyroomData);
+        when(partyroomConverter.toDomain(oldPartyroomData)).thenReturn(oldPartyroom);
+        when(partyroomConverter.toData(any(Partyroom.class))).thenReturn(oldPartyroomData);
+        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(oldPartyroomData);
+
+        // 새 룸 enter 시 필요한 mock
+        Crew newCrew = Crew.builder()
+                .id(20L)
+                .partyroomId(newRoomId)
+                .userId(userId)
+                .gradeType(GradeType.LISTENER)
+                .isActive(true)
+                .build();
+
+        Set<Crew> newCrewSet = new HashSet<>();
+        newCrewSet.add(newCrew);
+
+        Partyroom savedNewPartyroom = Partyroom.builder()
+                .partyroomId(newRoomId)
+                .crewSet(newCrewSet)
+                .djSet(new HashSet<>())
+                .build();
+
+        PartyroomData savedNewPartyroomData = mock(PartyroomData.class);
+        when(partyroomConverter.toDomain(savedNewPartyroomData)).thenReturn(savedNewPartyroom);
+        when(partyroomRepository.save(any())).thenReturn(savedNewPartyroomData);
+
+        ProfileSettingDto profileSettingDto = mock(ProfileSettingDto.class);
+        when(userProfileService.getUserProfileSetting(userId)).thenReturn(profileSettingDto);
+
+        // when — 예외 없이 정상 실행되어야 함
+        partyroomAccessService.tryEnter(newRoomId);
+
+        // then — exit 이벤트 + enter 이벤트 = 최소 2번 publish 호출
+        verify(messagePublisher, atLeast(2)).publish(any(), any());
     }
 }
