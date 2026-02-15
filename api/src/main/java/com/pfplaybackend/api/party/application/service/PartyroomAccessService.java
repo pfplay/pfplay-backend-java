@@ -30,12 +30,14 @@ import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PartyroomAccessService {
@@ -53,23 +55,45 @@ public class PartyroomAccessService {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
         UserId userId = partyContext.getUserId();
         AuthorityTier authorityTier = partyContext.getAuthorityTier();
+        log.info("[tryEnter] START - userId={}, targetPartyroomId={}, authorityTier={}",
+                userId, partyroomId.getId(), authorityTier);
+
         // Validate Partyroom Condition (Repeated)
         // FIXME Do not use 'findById' Method
         Optional<PartyroomData> optPartyroomData = partyroomRepository.findById(partyroomId.getId());
-        if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        if(optPartyroomData.isEmpty()) {
+            log.warn("[tryEnter] NOT_FOUND_ROOM - partyroomId={} does not exist in DB. userId={}",
+                    partyroomId.getId(), userId);
+            throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        }
         Partyroom partyroom = partyroomConverter.toDomain(optPartyroomData.get());
-        if(partyroom.isTerminated()) throw ExceptionCreator.create(PartyroomException.ALREADY_TERMINATED);
+        log.debug("[tryEnter] Partyroom found - partyroomId={}, isTerminated={}, crewCount={}, djCount={}",
+                partyroomId.getId(), partyroom.isTerminated(),
+                partyroom.getCrewSet().size(), partyroom.getDjSet().size());
+
+        if(partyroom.isTerminated()) {
+            log.warn("[tryEnter] ALREADY_TERMINATED - partyroomId={}, userId={}", partyroomId.getId(), userId);
+            throw ExceptionCreator.create(PartyroomException.ALREADY_TERMINATED);
+        }
         if(partyroom.isExceededLimit()) throw ExceptionCreator.create(PartyroomException.EXCEEDED_LIMIT);
 
         // Validate Crew Condition
         Optional<ActivePartyroomWithCrewDto> optActiveRoomInfo = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
+        log.info("[tryEnter] Active room check - userId={}, hasActiveRoom={}, activeRoomId={}",
+                userId,
+                optActiveRoomInfo.isPresent(),
+                optActiveRoomInfo.map(ActivePartyroomWithCrewDto::getId).orElse(null));
+
         if (optActiveRoomInfo.isPresent()) {
             ActivePartyroomWithCrewDto activeRoomInfo = optActiveRoomInfo.get();
             if(partyroomDomainService.isActiveInAnotherRoom(partyroomId, new PartyroomId(activeRoomInfo.getId()))) {
                 // 기존 룸 자동 exit 처리 후 새 룸 enter 진행
+                log.info("[tryEnter] Auto-exit from another room - userId={}, exitingRoomId={}, enteringRoomId={}",
+                        userId, activeRoomInfo.getId(), partyroomId.getId());
                 exit(new PartyroomId(activeRoomInfo.getId()));
             } else {
                 // 같은 룸 재진입 — 아바타 이벤트를 다시 발행하여 다른 Crew에게 전파
+                log.info("[tryEnter] Same room re-entry - userId={}, partyroomId={}", userId, partyroomId.getId());
                 Crew crew = partyroom.getCrewByUserId(userId).orElseThrow();
                 publishAccessChangedEvent(crew, userId);
                 return crew;
@@ -80,6 +104,7 @@ public class PartyroomAccessService {
         PartyroomData savedPartyRoomData = partyroomRepository.save(partyroomConverter.toData(updatedPartyRoom));
         // Publish Changed Event
         Crew crew = partyroomConverter.toDomain(savedPartyRoomData).getCrewByUserId(userId).orElseThrow();
+        log.info("[tryEnter] SUCCESS - userId={}, partyroomId={}, crewId={}", userId, partyroomId.getId(), crew.getId());
         publishAccessChangedEvent(crew, userId);
         return crew;
     }
@@ -87,10 +112,18 @@ public class PartyroomAccessService {
     private Partyroom addOrActivateCrew(Partyroom partyroom, UserId userId, AuthorityTier authorityTier) {
         if (partyroom.isUserInactiveCrew(userId)) {
             // Restore Existing Record
-            if(partyroom.isUserBannedCrew(userId)) throw ExceptionCreator.create(PenaltyException.PERMANENT_EXPULSION);
+            if(partyroom.isUserBannedCrew(userId)) {
+                log.warn("[addOrActivateCrew] PERMANENT_EXPULSION - userId={}, partyroomId={}",
+                        userId, partyroom.getPartyroomId().getId());
+                throw ExceptionCreator.create(PenaltyException.PERMANENT_EXPULSION);
+            }
+            log.info("[addOrActivateCrew] Reactivating inactive crew - userId={}, partyroomId={}",
+                    userId, partyroom.getPartyroomId().getId());
             return partyroom.activateCrew(userId);
         }else {
             // Create New Record
+            log.info("[addOrActivateCrew] Adding new crew - userId={}, partyroomId={}, gradeType=LISTENER",
+                    userId, partyroom.getPartyroomId().getId());
             return partyroom.addNewCrew(userId, authorityTier, GradeType.LISTENER);
         }
     }
@@ -116,14 +149,24 @@ public class PartyroomAccessService {
     @Transactional
     public void exit(PartyroomId partyroomId) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        log.info("[exit] START - userId={}, partyroomId={}", partyContext.getUserId(), partyroomId.getId());
+
         Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
-        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        if(optional.isEmpty()) {
+            log.warn("[exit] NOT_FOUND_ROOM - partyroomId={} not found via findPartyroomDto. userId={}",
+                    partyroomId.getId(), partyContext.getUserId());
+            throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        }
         PartyroomData partyroomData =  partyroomConverter.toEntity(optional.get());
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
         // 해당 방에 들어간 적이 없거나, 이미 나간 상황이라면 crewSet 에 없을 것이다.
         Optional<Crew> optionalCrew = partyroom.getCrewByUserId(partyContext.getUserId());
-        if(optionalCrew.isEmpty()) throw ExceptionCreator.create(CrewException.INVALID_ACTIVE_ROOM);
+        if(optionalCrew.isEmpty()) {
+            log.warn("[exit] INVALID_ACTIVE_ROOM - userId={} has no active crew in partyroomId={}. crewSetSize={}",
+                    partyContext.getUserId(), partyroomId.getId(), partyroom.getCrewSet().size());
+            throw ExceptionCreator.create(CrewException.INVALID_ACTIVE_ROOM);
+        }
 
         Crew crew = partyroom.deactivateCrewAndGet(partyContext.getUserId());
 
