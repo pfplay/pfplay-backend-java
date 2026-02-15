@@ -10,10 +10,13 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
+import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.DjException;
+import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
+import com.pfplaybackend.api.party.domain.service.CrewDomainService;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ public class DjManagementService {
     private final PartyroomRepository partyroomRepository;
     private final PartyroomConverter partyroomConverter;
     private final PartyroomDomainService partyroomDomainService;
+    private final CrewDomainService crewDomainService;
     private final PartyroomInfoService partyroomInfoService;
     private final PlaybackManagementService playbackManagementService;
     private final MusicQueryPeerService musicQueryService;
@@ -86,6 +90,23 @@ public class DjManagementService {
      */
     @Transactional
     public void dequeueDj(PartyroomId partyroomId, DjId djId) {
-        // TODO 관리자 등급 여부를 체크
+        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
+        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+        PartyroomDataDto partyroomDataDto = optional.get();
+        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        // 관리자 등급 체크
+        if(crewDomainService.isBelowManagerGrade(partyroom, partyContext.getUserId()))
+            throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
+        // 대상 DJ 조회
+        Dj targetDj = partyroom.getDjById(djId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(DjException.NOT_FOUND_DJ));
+        boolean wasCurrentDj = partyroom.isCurrentDj(targetDj.getCrewId());
+        partyroom.tryRemoveInDjQueue(targetDj.getCrewId());
+        partyroomRepository.save(partyroomConverter.toData(partyroom));
+        if (wasCurrentDj) {
+            playbackManagementService.skipBySystem(partyroomId);
+        }
     }
 }

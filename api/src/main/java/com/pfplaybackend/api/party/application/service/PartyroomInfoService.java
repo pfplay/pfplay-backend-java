@@ -95,7 +95,7 @@ public class PartyroomInfoService {
 
     public boolean isAlreadyRegistered(Partyroom partyroom) {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        return partyroom.getDjSet().stream().allMatch(dj -> dj.getUserId().equals(partyContext.getUserId()));
+        return partyroom.getDjSet().stream().anyMatch(dj -> dj.getUserId().equals(partyContext.getUserId()));
     }
 
     @Transactional
