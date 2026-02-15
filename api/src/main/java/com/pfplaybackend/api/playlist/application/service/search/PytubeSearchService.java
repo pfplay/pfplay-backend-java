@@ -47,6 +47,17 @@ public class PytubeSearchService implements YoutubeSearchService {
         ResponseEntity<SearchMusicResultDto> response = restTemplate.exchange(
                 uri, HttpMethod.GET, entity, SearchMusicResultDto.class);
 
-        return response.getBody();
+        SearchMusicResultDto result = response.getBody();
+        if (result != null && result.getData() != null) {
+            result = SearchMusicResultDto.builder()
+                    .message(result.getMessage())
+                    .data(result.getData().stream()
+                            .filter(music -> music.getRunning_time() != null
+                                    && !music.getRunning_time().isBlank()
+                                    && !music.getRunning_time().equals("0"))
+                            .toList())
+                    .build();
+        }
+        return result;
     }
 }
