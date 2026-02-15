@@ -166,15 +166,15 @@ public class Partyroom {
     // 예를 들면, 제거된 Dj 순번에서 한자리씩 당겨야 한다.
     public void tryRemoveInDjQueue(CrewId crewId) {
         AtomicInteger orderNumber = new AtomicInteger(1);
-        // FIXME
-        this.djSet = this.djSet.stream().peek(dj -> {
-            if(dj.getCrewId().equals(crewId)) {
-                dj.applyDequeued();
-            }else {
-                dj.updateOrderNumber(orderNumber.get());
-                orderNumber.getAndIncrement();
-            }
-        }).collect(Collectors.toSet());
+        this.djSet = this.djSet.stream()
+            .sorted(Comparator.comparingInt(Dj::getOrderNumber))
+            .peek(dj -> {
+                if(dj.getCrewId().equals(crewId)) {
+                    dj.applyDequeued();
+                } else {
+                    dj.updateOrderNumber(orderNumber.getAndIncrement());
+                }
+            }).collect(Collectors.toSet());
     }
 
 
