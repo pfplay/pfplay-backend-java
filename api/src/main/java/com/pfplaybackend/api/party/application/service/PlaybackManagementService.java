@@ -106,18 +106,47 @@ public class PlaybackManagementService {
 
 
     public void start(Partyroom partyroom) {
+        int maxAttempts = (int) partyroom.getDjSet().stream().filter(Dj::isQueued).count();
+        doStart(partyroom, maxAttempts);
+    }
+
+    private void doStart(Partyroom partyroom, int remainingAttempts) {
         // FIXME All Dj 'orderNumber' bulk update
-        Partyroom updataedPartyroom = rotateDjQueue(partyroom);
-        Dj nextDj = updataedPartyroom.getDjSet().stream().min(Comparator.comparingInt(Dj::getOrderNumber)).orElseThrow();
-        Crew djCrew = updataedPartyroom.getCrewSet().stream().filter(crew -> crew.getUserId().equals(nextDj.getUserId())).toList().get(0);
-        Playback nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(updataedPartyroom.getPartyroomId(), nextDj);
+        Partyroom updatedPartyroom = rotateDjQueue(partyroom);
+        Dj nextDj = updatedPartyroom.getDjSet().stream().min(Comparator.comparingInt(Dj::getOrderNumber)).orElseThrow();
+        Crew djCrew = updatedPartyroom.getCrewSet().stream().filter(crew -> crew.getUserId().equals(nextDj.getUserId())).toList().get(0);
+        Playback nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(updatedPartyroom.getPartyroomId(), nextDj);
+
+        if (exceedsPlaybackTimeLimit(updatedPartyroom, nextPlayback)) {
+            if (remainingAttempts <= 1) {
+                updatePlaybackDeactivation(updatedPartyroom);
+                return;
+            }
+            Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(updatedPartyroom.getPartyroomId());
+            if (optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+            Partyroom reloaded = partyroomConverter.toDomain(partyroomConverter.toEntity(optional.get()));
+            if (djDomainService.isExistDj(reloaded)) {
+                doStart(reloaded, remainingAttempts - 1);
+            } else {
+                updatePlaybackDeactivation(reloaded);
+            }
+            return;
+        }
+
         PlaybackData playbackData = playbackRepository.save(playbackConverter.toData(nextPlayback));
         // Update 'CurrentPlaybackId'
         partyroomRepository.save(partyroomConverter.toData(partyroom.updatePlaybackId(new PlaybackId(playbackData.getId()))));
         // Schedule Task to wait for playback time
         scheduleTask(nextPlayback);
         // Propagation Websocket Event
-        publishPlaybackChangedEvent(updataedPartyroom.getPartyroomId(), djCrew.getId(), playbackData);
+        publishPlaybackChangedEvent(updatedPartyroom.getPartyroomId(), djCrew.getId(), playbackData);
+    }
+
+    private boolean exceedsPlaybackTimeLimit(Partyroom partyroom, Playback playback) {
+        int limitSeconds = partyroom.getPlaybackTimeLimit();
+        if (limitSeconds <= 0) return false;
+        long durationSeconds = playbackDomainService.convertToSeconds(playback.getDuration());
+        return durationSeconds > limitSeconds;
     }
 
     // FIXME CrewId
