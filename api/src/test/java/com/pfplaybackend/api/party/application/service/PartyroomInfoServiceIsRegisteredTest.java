@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
@@ -76,9 +75,8 @@ class PartyroomInfoServiceIsRegisteredTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(new PartyroomId(1L))
-                .djSet(djSet)
-                .crewSet(new HashSet<>())
                 .build();
+        partyroom.assignDjSet(djSet);
 
         // when
         boolean result = partyroomInfoService.isAlreadyRegistered(partyroom);
@@ -105,9 +103,8 @@ class PartyroomInfoServiceIsRegisteredTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(new PartyroomId(1L))
-                .djSet(djSet)
-                .crewSet(new HashSet<>())
                 .build();
+        partyroom.assignDjSet(djSet);
 
         // when
         boolean result = partyroomInfoService.isAlreadyRegistered(partyroom);

@@ -42,9 +42,8 @@ class PartyroomDjQueueTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(new PartyroomId(1L))
-                .djSet(djSet)
-                .crewSet(new HashSet<>())
                 .build();
+        partyroom.assignDjSet(djSet);
 
         // when
         partyroom.tryRemoveInDjQueue(new CrewId(2L));
@@ -74,9 +73,8 @@ class PartyroomDjQueueTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(new PartyroomId(1L))
-                .djSet(djSet)
-                .crewSet(new HashSet<>())
                 .build();
+        partyroom.assignDjSet(djSet);
 
         // when
         partyroom.tryRemoveInDjQueue(new CrewId(1L));
@@ -104,10 +102,9 @@ class PartyroomDjQueueTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(new PartyroomId(1L))
-                .djSet(djSet)
-                .crewSet(new HashSet<>())
                 .isPlaybackActivated(true)
                 .build();
+        partyroom.assignDjSet(djSet);
 
         // when & then
         assertThat(partyroom.isCurrentDj(new CrewId(1L))).isTrue();
@@ -125,10 +122,9 @@ class PartyroomDjQueueTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(new PartyroomId(1L))
-                .djSet(djSet)
-                .crewSet(new HashSet<>())
                 .isPlaybackActivated(false)
                 .build();
+        partyroom.assignDjSet(djSet);
 
         // when & then
         assertThat(partyroom.isCurrentDj(new CrewId(1L))).isFalse();
