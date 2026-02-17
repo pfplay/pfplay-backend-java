@@ -42,9 +42,8 @@ class PartyroomRotateDjsTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(new PartyroomId(1L))
-                .djSet(djSet)
-                .crewSet(new HashSet<>())
                 .build();
+        partyroom.assignDjSet(djSet);
 
         // when
         partyroom.rotateDjs();
@@ -69,9 +68,8 @@ class PartyroomRotateDjsTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(new PartyroomId(1L))
-                .djSet(djSet)
-                .crewSet(new HashSet<>())
                 .build();
+        partyroom.assignDjSet(djSet);
 
         // when
         partyroom.rotateDjs();

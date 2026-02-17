@@ -84,10 +84,10 @@ class PartyroomAccessServiceTest {
 
         Partyroom partyroom = Partyroom.builder()
                 .partyroomId(partyroomId)
-                .crewSet(crewSet)
-                .djSet(new HashSet<>())
                 .isTerminated(false)
                 .build();
+        partyroom.assignCrewSet(crewSet);
+        partyroom.assignDjSet(new HashSet<>());
 
         PartyroomData partyroomData = mock(PartyroomData.class);
 
@@ -119,10 +119,10 @@ class PartyroomAccessServiceTest {
 
         Partyroom newPartyroom = Partyroom.builder()
                 .partyroomId(newRoomId)
-                .crewSet(new HashSet<>())
-                .djSet(new HashSet<>())
                 .isTerminated(false)
                 .build();
+        newPartyroom.assignCrewSet(new HashSet<>());
+        newPartyroom.assignDjSet(new HashSet<>());
 
         PartyroomData newPartyroomData = mock(PartyroomData.class);
         when(partyroomRepository.findById(newRoomId.getId())).thenReturn(Optional.of(newPartyroomData));
@@ -148,10 +148,10 @@ class PartyroomAccessServiceTest {
 
         Partyroom oldPartyroom = Partyroom.builder()
                 .partyroomId(oldRoomId)
-                .crewSet(oldCrewSet)
-                .djSet(new HashSet<>())
                 .isTerminated(false)
                 .build();
+        oldPartyroom.assignCrewSet(oldCrewSet);
+        oldPartyroom.assignDjSet(new HashSet<>());
 
         PartyroomDataDto oldPartyroomDataDto = mock(PartyroomDataDto.class);
         PartyroomData oldPartyroomData = mock(PartyroomData.class);
@@ -175,9 +175,9 @@ class PartyroomAccessServiceTest {
 
         Partyroom savedNewPartyroom = Partyroom.builder()
                 .partyroomId(newRoomId)
-                .crewSet(newCrewSet)
-                .djSet(new HashSet<>())
                 .build();
+        savedNewPartyroom.assignCrewSet(newCrewSet);
+        savedNewPartyroom.assignDjSet(new HashSet<>());
 
         PartyroomData savedNewPartyroomData = mock(PartyroomData.class);
         when(partyroomConverter.toDomain(savedNewPartyroomData)).thenReturn(savedNewPartyroom);
