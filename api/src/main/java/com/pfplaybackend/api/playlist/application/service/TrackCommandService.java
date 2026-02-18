@@ -9,7 +9,9 @@ import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
 import com.pfplaybackend.api.playlist.presentation.payload.request.AddTrackRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.request.MoveTrackRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.request.UpdateTrackOrderRequest;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.playlist.repository.TrackRepository;
 import jakarta.transaction.Transactional;
@@ -83,6 +85,34 @@ public class TrackCommandService {
             trackRepository.shiftDownOrderByDnD(playlistId, prevOrderNumber, nextOrderNumber);
         }
 
+        trackData.setOrderNumber(nextOrderNumber);
+        trackRepository.save(trackData);
+    }
+
+    @Transactional
+    public void moveTrackToPlaylist(Long sourcePlaylistId, Long trackId, MoveTrackRequest request) {
+        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+        UserId ownerId = playlistContext.getUserId();
+        // 소스 플레이리스트 소유권 검증
+        playlistRepository.findByIdAndOwnerId(sourcePlaylistId, ownerId)
+                .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
+        // 타겟 플레이리스트 소유권 검증
+        PlaylistData targetPlaylistData = playlistRepository.findByIdAndOwnerId(request.getTargetPlaylistId(), ownerId)
+                .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
+        // 소스에서 트랙 조회
+        TrackData trackData = trackRepository.findByIdAndPlaylistDataId(trackId, sourcePlaylistId)
+                .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
+        // 타겟에 동일 linkId 중복 검사
+        Optional<TrackData> duplicate = trackRepository.findByPlaylistDataIdAndLinkId(targetPlaylistData.getId(), trackData.getLinkId());
+        if (duplicate.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
+        // 타겟 트랙 개수 15개 제한 검사
+        PlaylistSummary targetSummary = playlistQueryService.getPlaylist(request.getTargetPlaylistId());
+        if (targetSummary.getMusicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
+        // 소스 orderNumber 재정렬
+        trackRepository.shiftUpOrderByDelete(sourcePlaylistId, trackData.getOrderNumber());
+        // 트랙을 타겟 플레이리스트로 이동
+        int nextOrderNumber = (int) (targetSummary.getMusicCount() + 1);
+        trackData.setPlaylistData(targetPlaylistData);
         trackData.setOrderNumber(nextOrderNumber);
         trackRepository.save(trackData);
     }
