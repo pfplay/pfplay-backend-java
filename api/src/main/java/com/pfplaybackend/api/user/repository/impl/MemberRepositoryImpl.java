@@ -7,19 +7,17 @@ import com.pfplaybackend.api.user.domain.entity.data.QMemberData;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.user.repository.custom.MemberRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
+@RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepositoryCustom {
 
-    @PersistenceContext
-    private EntityManager em;
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public Optional<MemberData> findByUserId(UserId userId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QMemberData qMemberData = QMemberData.memberData;
         QProfileData qProfileData = QProfileData.profileData;
         QActivityData qActivityData = QActivityData.activityData;

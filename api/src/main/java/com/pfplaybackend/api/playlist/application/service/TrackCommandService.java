@@ -2,7 +2,7 @@ package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
@@ -31,9 +31,9 @@ public class TrackCommandService {
 
     @Transactional
     public void addTrackInPlaylist(Long playlistId, AddTrackRequest request) {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         // 플레이리스트 접근 권한 검사
-        PlaylistData playlistData = playlistRepository.findByIdAndOwnerId(playlistId, playlistContext.getUserId())
+        PlaylistData playlistData = playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 트랙 중복 검사
         Optional<TrackData> optional = trackRepository.findByPlaylistDataIdAndLinkId(playlistData.getId(), request.getLinkId());
@@ -58,9 +58,9 @@ public class TrackCommandService {
 
     @Transactional
     public void updateTrackOrderInPlaylist(Long playlistId, Long trackId, UpdateTrackOrderRequest request) {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         // 플레이리스트 접근 권한 검사
-        playlistRepository.findByIdAndOwnerId(playlistId, playlistContext.getUserId())
+        playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         // 타겟 트랙 존재 여부 검사
@@ -91,8 +91,8 @@ public class TrackCommandService {
 
     @Transactional
     public void moveTrackToPlaylist(Long sourcePlaylistId, Long trackId, MoveTrackRequest request) {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
-        UserId ownerId = playlistContext.getUserId();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        UserId ownerId = authContext.getUserId();
         // 소스 플레이리스트 소유권 검증
         playlistRepository.findByIdAndOwnerId(sourcePlaylistId, ownerId)
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
@@ -119,9 +119,9 @@ public class TrackCommandService {
 
     @Transactional
     public void deleteTrackInPlaylist(Long playlistId, Long trackId) {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         // 플레이리스트 접근 권한 검사
-        playlistRepository.findByIdAndOwnerId(playlistId, playlistContext.getUserId())
+        playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         // 타겟 트랙 존재 여부 검사

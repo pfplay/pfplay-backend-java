@@ -3,7 +3,7 @@ package com.pfplaybackend.api.playlist.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.application.dto.playback.MusicDto;
-import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
@@ -28,8 +28,8 @@ public class TrackQueryService {
 
     public Page<PlaylistMusicDto> getMusics(Long playlistId, int pageNo, int pageSize) {
         // 접근코자 하는 플레이리스트에 대한 소유자가 맞는가?
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
-        Optional<PlaylistData> playlistOptional = playlistRepository.findByIdAndOwnerId(playlistId, playlistContext.getUserId());
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        Optional<PlaylistData> playlistOptional = playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId());
         if(playlistOptional.isEmpty()) throw ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST);
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.ASC, "orderNumber"));

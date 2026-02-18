@@ -18,21 +18,19 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
-    @PersistenceContext
-    private EntityManager em;
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public Optional<ActivePartyroomDto> getActivePartyroomByUserId(UserId userId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QCrewData qCrewData = QCrewData.crewData;
 
@@ -55,7 +53,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     @Override
     public Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewIdByUserId(UserId userId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QCrewData qCrewData = QCrewData.crewData;
 
@@ -79,7 +76,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     @Override
     public List<PartyroomWithCrewDto> getCrewDataByPartyroomId() {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QCrewData qCrewData = QCrewData.crewData;
         QPlaybackData qPlaybackData = QPlaybackData.playbackData;
@@ -166,7 +162,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     @Override
     public List<PlaybackData> getRecentPlaybackHistory(PartyroomId partyroomId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QPlaybackData qPlaybackData = QPlaybackData.playbackData;
 
@@ -182,7 +177,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     @Override
     public Optional<PartyroomDataDto> findPartyroomDto(PartyroomId partyroomId) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QCrewData qCrewData = QCrewData.crewData;
         QDjData qDjData = QDjData.djData;
@@ -202,7 +196,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 )
                 .where(qPartyroomData.id.eq(partyroomId.getId()))
                 .distinct()
-                // .fetchJoin() 명시 불필요
                 .fetch();
 
         if(result.isEmpty()) return Optional.empty();
@@ -226,7 +219,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     @Override
     public List<PartyroomData> findAllUnusedPartyroomDataByDay(int days) {
-        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
 
         return queryFactory.select(qPartyroomData)

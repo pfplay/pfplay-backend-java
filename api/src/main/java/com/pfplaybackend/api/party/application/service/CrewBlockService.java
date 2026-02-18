@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.result.BlockedCrewResult;
@@ -41,8 +41,8 @@ public class CrewBlockService {
     private final PartyroomConverter partyroomConverter;
 
     public List<BlockedCrewResult> getBlocks() {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(partyContext.getUserId())
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
         List<CrewBlockHistoryData> historyDataList = blockHistoryRepository.findAllByBlockerCrewIdAndUnblockedIsFalse(new CrewId(dto.getCrewId()));
@@ -53,8 +53,8 @@ public class CrewBlockService {
 
     @Transactional
     public void addBlock(AddBlockRequest request) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(partyContext.getUserId())
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
 
@@ -85,8 +85,8 @@ public class CrewBlockService {
 
     @Transactional
     public void removeBlock(Long blockId) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(partyContext.getUserId())
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
         CrewId blockerCrewId = new CrewId(dto.getCrewId());

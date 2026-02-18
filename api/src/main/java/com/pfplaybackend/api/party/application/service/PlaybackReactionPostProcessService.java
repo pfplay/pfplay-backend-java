@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
 import com.pfplaybackend.api.party.application.peer.GrabMusicPeerService;
@@ -33,10 +33,10 @@ public class PlaybackReactionPostProcessService {
     private final UserActivityPeerService userActivityService;
 
     public void postProcess(ReactionPostProcessDto postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         Playback playback = playbackInfoService.getPlaybackById(playbackId);
         if(postProcessDto.isGrabStatusChanged()) {
-            grabMusic(partyContext.getUserId(), playback);
+            grabMusic(authContext.getUserId(), playback);
         }
         if(postProcessDto.isDjActivityScoreChanged()) {
             updateDjActivityScore(playback.getUserId(), postProcessDto.getDeltaScore());

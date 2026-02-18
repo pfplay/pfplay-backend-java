@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.user.application.aspect.context.UserContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
@@ -57,12 +57,12 @@ public class UserProfileService {
     }
 
     public ProfileSummaryDto getMyProfileSummary() {
-        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
-        if(userDomainService.isGuest(userContext)) {
-            GuestData guestData = guestRepository.findByUserId(userContext.getUserId()).orElseThrow();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        if(userDomainService.isGuest(authContext)) {
+            GuestData guestData = guestRepository.findByUserId(authContext.getUserId()).orElseThrow();
             return guestData.toDomain().getProfileSummary();
         }else {
-            MemberData memberData = memberRepository.findByUserId(userContext.getUserId()).orElseThrow();
+            MemberData memberData = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
             return memberData.toDomain().getProfileSummary();
         }
     }

@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.user.application.aspect.context.UserContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
@@ -21,12 +21,12 @@ public class UserInfoService {
 
     @Transactional(readOnly = true)
     public User getMyInfo () {
-        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
-        if(userContext.getAuthorityTier() == AuthorityTier.GT) {
-            GuestData guestData = guestRepository.findGuestByUserId(userContext.getUserId()).orElseThrow();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        if(authContext.getAuthorityTier() == AuthorityTier.GT) {
+            GuestData guestData = guestRepository.findGuestByUserId(authContext.getUserId()).orElseThrow();
             return guestData.toDomain();
         }else {
-            MemberData memberData = memberRepository.findByUserId(userContext.getUserId()).orElseThrow();
+            MemberData memberData = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
             return memberData.toDomain();
         }
     }

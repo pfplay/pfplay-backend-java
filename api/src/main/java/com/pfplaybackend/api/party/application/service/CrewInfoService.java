@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
@@ -32,8 +32,8 @@ public class CrewInfoService {
     private final UserProfilePeerService userProfileService;
 
     public CrewProfileSummaryResult getProfileSummaryByCrewId(Long crewId) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        ActivePartyroomWithCrewDto activePartyroomDto = partyroomInfoService.getMyActivePartyroomWithCrewId(partyContext.getUserId())
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        ActivePartyroomWithCrewDto activePartyroomDto = partyroomInfoService.getMyActivePartyroomWithCrewId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
         PartyroomId partyroomId = PartyroomId.of(activePartyroomDto.getId());

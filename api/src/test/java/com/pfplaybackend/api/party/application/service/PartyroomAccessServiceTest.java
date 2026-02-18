@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
@@ -56,10 +56,10 @@ class PartyroomAccessServiceTest {
         userId = new UserId();
         partyroomId = new PartyroomId(1L);
 
-        PartyContext partyContext = mock(PartyContext.class);
-        when(partyContext.getUserId()).thenReturn(userId);
-        when(partyContext.getAuthorityTier()).thenReturn(AuthorityTier.FM);
-        ThreadLocalContext.setContext(partyContext);
+        AuthContext authContext = mock(AuthContext.class);
+        when(authContext.getUserId()).thenReturn(userId);
+        when(authContext.getAuthorityTier()).thenReturn(AuthorityTier.FM);
+        ThreadLocalContext.setContext(authContext);
     }
 
     @AfterEach

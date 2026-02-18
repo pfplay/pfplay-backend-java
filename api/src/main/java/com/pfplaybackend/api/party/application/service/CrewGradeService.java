@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -37,7 +37,7 @@ public class CrewGradeService {
 
     @Transactional
     public void updateGrade(PartyroomId partyroomId, CrewId adjustedCrewId, AdjustGradeRequest request) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         // TODO Exception 호출 멤버와 타겟 멤버는 같은 파티룸에 위치하는가?
         // TODO Extract Common Method
         Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
@@ -50,13 +50,13 @@ public class CrewGradeService {
         AuthorityTier authorityTier = adjustedCrew.getAuthorityTier();
         GradeType prevGradeType = adjustedCrew.getGradeType();
         GradeType targetGradeType = request.getGradeType();
-        Crew adjusterCrew = partyroom.getCrewByUserId(partyContext.getUserId()).orElseThrow();
+        Crew adjusterCrew = partyroom.getCrewByUserId(authContext.getUserId()).orElseThrow();
 
-        if(crewDomainService.isBelowManagerGrade(partyroom, partyContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
+        if(crewDomainService.isBelowManagerGrade(partyroom, authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
         if(!request.getGradeType().equals(GradeType.LISTENER) && authorityTier.equals(AuthorityTier.GT)) throw ExceptionCreator.create(GradeException.GUEST_ONLY_POSSIBLE_LISTENER);
         if(request.getGradeType().equals(GradeType.HOST)) throw ExceptionCreator.create(GradeException.UNABLE_TO_SET_HOST);
-        if(crewDomainService.isAdjusterGradeLowerThanSubject(partyroom, partyContext.getUserId(), adjustedCrewId)) throw ExceptionCreator.create(GradeException.GRADE_INSUFFICIENT_FOR_OPERATION);
-        if(crewDomainService.isTargetGradeExceedingAdjuster(partyroom, partyContext.getUserId(), targetGradeType)) throw ExceptionCreator.create(GradeException.GRADE_EXCEEDS_ALLOWED_THRESHOLD);
+        if(crewDomainService.isAdjusterGradeLowerThanSubject(partyroom, authContext.getUserId(), adjustedCrewId)) throw ExceptionCreator.create(GradeException.GRADE_INSUFFICIENT_FOR_OPERATION);
+        if(crewDomainService.isTargetGradeExceedingAdjuster(partyroom, authContext.getUserId(), targetGradeType)) throw ExceptionCreator.create(GradeException.GRADE_EXCEEDS_ALLOWED_THRESHOLD);
         partyroom.updateCrewGrade(adjustedCrewId, targetGradeType);
 
         partyroomRepository.save(partyroomConverter.toData(partyroom));

@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.dj.CurrentDjDto;
 import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
@@ -31,7 +31,7 @@ public class DisplayInfoService {
     private final PlaybackReactionService playbackReactionService;
 
     public DisplayDto getDisplayInfo() {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         Optional<ActivePartyroomDto> optActivePartyroom = partyroomInfoService.getMyActivePartyroom();
         // Throw Exception
         if(optActivePartyroom.isEmpty()) throw ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM);
@@ -45,7 +45,7 @@ public class DisplayInfoService {
             Crew djInfo = getCurrentDjInfo(partyroomId, playback);
             CurrentDjDto currentDjDto = new CurrentDjDto(djInfo.getId());
             //
-            Optional<PlaybackReactionHistoryData> optional = playbackReactionService.findPrevHistoryData(new PlaybackId(playback.getId()), partyContext.getUserId());
+            Optional<PlaybackReactionHistoryData> optional = playbackReactionService.findPrevHistoryData(new PlaybackId(playback.getId()), authContext.getUserId());
             AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
             ReactionDto reactionDto = ReactionDto.from(getHistory(optional), aggregationDto);
             PlaybackDto playbackDto = new PlaybackDto(playback.getId(), playback.getLinkId(), playback.getName(), playback.getDuration(), playback.getThumbnailImage(), playback.getEndTime());

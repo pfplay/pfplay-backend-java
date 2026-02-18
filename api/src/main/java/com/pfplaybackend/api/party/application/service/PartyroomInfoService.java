@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
@@ -94,8 +94,8 @@ public class PartyroomInfoService {
     }
 
     public boolean isAlreadyRegistered(Partyroom partyroom) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        return partyroom.getDjSet().stream().anyMatch(dj -> dj.getUserId().equals(partyContext.getUserId()));
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        return partyroom.getDjSet().stream().anyMatch(dj -> dj.getUserId().equals(authContext.getUserId()));
     }
 
     @Transactional
@@ -120,8 +120,8 @@ public class PartyroomInfoService {
     }
 
     public Optional<ActivePartyroomDto> getMyActivePartyroom() {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        return partyroomRepository.getActivePartyroomByUserId(partyContext.getUserId());
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        return partyroomRepository.getActivePartyroomByUserId(authContext.getUserId());
     }
 
     public Optional<ActivePartyroomDto> getMyActivePartyroom(UserId userId) {

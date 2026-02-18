@@ -11,7 +11,7 @@ import com.pfplaybackend.api.profile.domain.repository.UserProfileRepository;
 import com.pfplaybackend.api.profile.domain.vo.*;
 import com.pfplaybackend.api.profile.presentation.dto.request.AvatarFaceRequest;
 import com.pfplaybackend.api.profile.presentation.dto.request.SetAvatarRequest;
-import com.pfplaybackend.api.user.application.aspect.context.UserContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
 import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
@@ -79,12 +79,12 @@ public class UserAvatarService {
 
     @Transactional(readOnly = true)
     public List<AvatarBodyDto> findMyAvatarBodies() {
-        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         List<AvatarBodyDto> avatarBodyDtoList = avatarResourceService.findAllAvatarBodies();
-        if (userDomainService.isGuest(userContext)) {
+        if (userDomainService.isGuest(authContext)) {
             return avatarBodyDtoList;
         } else {
-            Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
+            Member member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow().toDomain();
             Map<ActivityType, Activity> activityMap = member.getActivityMap();
             return avatarBodyDtoList.stream()
                     .map(avatarBodyDto -> avatarBodyDto.toBuilder()
@@ -96,8 +96,8 @@ public class UserAvatarService {
 
     @Transactional
     public void setUserAvatar(SetAvatarRequest request) {
-        UserContext userContext = (UserContext) ThreadLocalContext.getContext();
-        Member member = memberRepository.findByUserId(userContext.getUserId()).orElseThrow().toDomain();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        Member member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow().toDomain();
 
         // 0. 리소스 접근 권한 유효성 검증
         AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(new AvatarBodyUri(request.getBody().getUri()));

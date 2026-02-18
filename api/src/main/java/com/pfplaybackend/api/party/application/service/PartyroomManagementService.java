@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -50,9 +50,9 @@ public class PartyroomManagementService {
     @Transactional
     public Partyroom createGeneralPartyRoom(CreatePartyroomRequest request) {
         // Create Partyroom
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        partyroomDomainService.checkIsQualifiedToCreate(partyContext.getAuthorityTier());
-        Optional<PartyroomData> optionalActive = partyroomRepository.findActiveHostRoom(partyContext.getUserId());
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        partyroomDomainService.checkIsQualifiedToCreate(authContext.getAuthorityTier());
+        Optional<PartyroomData> optionalActive = partyroomRepository.findActiveHostRoom(authContext.getUserId());
         if(optionalActive.isPresent()) throw ExceptionCreator.create(PartyroomException.ALREADY_HOST);
 
         // TODO 고유성 검증 구현 필요
@@ -60,9 +60,9 @@ public class PartyroomManagementService {
             request.setLinkDomain(UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12));
         }
         partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
-        Partyroom createdPartyroom = createPartyroom(request, StageType.GENERAL, partyContext.getUserId());
+        Partyroom createdPartyroom = createPartyroom(request, StageType.GENERAL, authContext.getUserId());
         // Enter Partyroom
-        partyroomAccessService.enterByHost(partyContext.getUserId(), createdPartyroom);
+        partyroomAccessService.enterByHost(authContext.getUserId(), createdPartyroom);
         return createdPartyroom;
     }
 
@@ -76,7 +76,7 @@ public class PartyroomManagementService {
 
     @Transactional
     public void updatePartyroom(PartyroomId partyroomId, UpdatePartyroomRequest request) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         // FIXME Extract Common Method
         Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
         if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
@@ -84,15 +84,15 @@ public class PartyroomManagementService {
         PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
         // Domain Logic
-        partyroomDomainService.checkIsHost(partyroom, partyContext.getUserId());
+        partyroomDomainService.checkIsHost(partyroom, authContext.getUserId());
         partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
         partyroomRepository.save(partyroomConverter.toData(partyroom.updateBaseInfo(request)));
     }
 
     @Transactional
     public void deletePartyRoom(PartyroomId partyroomId) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        if (partyContext.getAuthorityTier() != AuthorityTier.FM) {
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        if (authContext.getAuthorityTier() != AuthorityTier.FM) {
             throw ExceptionCreator.create(PartyroomException.RESTRICTED_AUTHORITY);
         }
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId())
@@ -123,7 +123,7 @@ public class PartyroomManagementService {
 
     @Transactional
     public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         // FIXME Extract Common Method
         Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
         if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);

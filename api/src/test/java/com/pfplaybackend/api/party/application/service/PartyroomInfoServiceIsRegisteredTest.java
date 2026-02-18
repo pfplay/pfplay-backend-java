@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -37,9 +37,9 @@ class PartyroomInfoServiceIsRegisteredTest {
         myUserId = new UserId();
         otherUserId = new UserId();
 
-        PartyContext partyContext = mock(PartyContext.class);
-        when(partyContext.getUserId()).thenReturn(myUserId);
-        ThreadLocalContext.setContext(partyContext);
+        AuthContext authContext = mock(AuthContext.class);
+        when(authContext.getUserId()).thenReturn(myUserId);
+        ThreadLocalContext.setContext(authContext);
     }
 
     @AfterEach

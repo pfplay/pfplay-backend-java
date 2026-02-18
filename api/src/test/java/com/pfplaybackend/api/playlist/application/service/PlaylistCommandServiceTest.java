@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
-import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
@@ -46,10 +46,10 @@ class PlaylistCommandServiceTest {
     @BeforeEach
     void setUp() {
         userId = new UserId(1L);
-        PlaylistContext playlistContext = mock(PlaylistContext.class);
-        lenient().when(playlistContext.getUserId()).thenReturn(userId);
-        lenient().when(playlistContext.getAuthorityTier()).thenReturn(AuthorityTier.FM);
-        ThreadLocalContext.setContext(playlistContext);
+        AuthContext authContext = mock(AuthContext.class);
+        lenient().when(authContext.getUserId()).thenReturn(userId);
+        lenient().when(authContext.getAuthorityTier()).thenReturn(AuthorityTier.FM);
+        ThreadLocalContext.setContext(authContext);
     }
 
     @AfterEach

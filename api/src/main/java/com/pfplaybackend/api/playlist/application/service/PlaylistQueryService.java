@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +21,13 @@ public class PlaylistQueryService {
 
     @Transactional(readOnly = true)
     public List<PlaylistSummary> getPlaylists() {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
-        return playlistRepository.findAllByUserId(playlistContext.getUserId());
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        return playlistRepository.findAllByUserId(authContext.getUserId());
     }
 
     @Transactional(readOnly = true)
     public PlaylistSummary getPlaylist(Long playlistId) {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
-        return playlistRepository.findByIdAndUserId(playlistId, playlistContext.getUserId());
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        return playlistRepository.findByIdAndUserId(playlistId, authContext.getUserId());
     }
 }

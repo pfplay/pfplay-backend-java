@@ -1,13 +1,11 @@
 package com.pfplaybackend.api.user.application.aspect;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
-import com.pfplaybackend.api.common.config.security.jwt.dto.UserCredentials;
-import com.pfplaybackend.api.user.application.aspect.context.UserContext;
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,17 +19,16 @@ public class UserContextAspect {
             " || execution(* com.pfplaybackend.api.profile.application.service..*(..))")
     public void contextRequiredMethods() {}
 
-    @Before("contextRequiredMethods()")
-    public void beforeServiceMethods(JoinPoint joinPoint) {
+    @Around("contextRequiredMethods()")
+    public Object aroundServiceMethods(ProceedingJoinPoint joinPoint) throws Throwable {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null && !authentication.getPrincipal().equals("anonymousUser")) {
-            UserContext userContext = UserContext.create((CustomJwtAuthenticationToken) authentication);
-            ThreadLocalContext.setContext(userContext);
+        if (authentication instanceof CustomJwtAuthenticationToken token) {
+            ThreadLocalContext.setContext(AuthContext.create(token));
         }
-    }
-
-    @After("contextRequiredMethods()")
-    public void clearContext() {
-        ThreadLocalContext.clearContext();
+        try {
+            return joinPoint.proceed();
+        } finally {
+            ThreadLocalContext.clearContext();
+        }
     }
 }

@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewSummaryDto;
@@ -52,9 +52,9 @@ public class PartyroomAccessService {
 
     @Transactional
     public Crew tryEnter(PartyroomId partyroomId) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        UserId userId = partyContext.getUserId();
-        AuthorityTier authorityTier = partyContext.getAuthorityTier();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        UserId userId = authContext.getUserId();
+        AuthorityTier authorityTier = authContext.getAuthorityTier();
         log.info("[tryEnter] START - userId={}, targetPartyroomId={}, authorityTier={}",
                 userId, partyroomId.getId(), authorityTier);
 
@@ -148,27 +148,27 @@ public class PartyroomAccessService {
 
     @Transactional
     public void exit(PartyroomId partyroomId) {
-        PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        log.info("[exit] START - userId={}, partyroomId={}", partyContext.getUserId(), partyroomId.getId());
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        log.info("[exit] START - userId={}, partyroomId={}", authContext.getUserId(), partyroomId.getId());
 
         Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
         if(optional.isEmpty()) {
             log.warn("[exit] NOT_FOUND_ROOM - partyroomId={} not found via findPartyroomDto. userId={}",
-                    partyroomId.getId(), partyContext.getUserId());
+                    partyroomId.getId(), authContext.getUserId());
             throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
         }
         PartyroomData partyroomData =  partyroomConverter.toEntity(optional.get());
         Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
         // 해당 방에 들어간 적이 없거나, 이미 나간 상황이라면 crewSet 에 없을 것이다.
-        Optional<Crew> optionalCrew = partyroom.getCrewByUserId(partyContext.getUserId());
+        Optional<Crew> optionalCrew = partyroom.getCrewByUserId(authContext.getUserId());
         if(optionalCrew.isEmpty()) {
             log.warn("[exit] INVALID_ACTIVE_ROOM - userId={} has no active crew in partyroomId={}. crewSetSize={}",
-                    partyContext.getUserId(), partyroomId.getId(), partyroom.getCrewSet().size());
+                    authContext.getUserId(), partyroomId.getId(), partyroom.getCrewSet().size());
             throw ExceptionCreator.create(CrewException.INVALID_ACTIVE_ROOM);
         }
 
-        Crew crew = partyroom.deactivateCrewAndGet(partyContext.getUserId());
+        Crew crew = partyroom.deactivateCrewAndGet(authContext.getUserId());
 
         // '퇴장하려는 크루'가 Dj 대기열에 존재하는지 확인
         boolean wasInDjQueue = partyroom.getDjSet().stream()

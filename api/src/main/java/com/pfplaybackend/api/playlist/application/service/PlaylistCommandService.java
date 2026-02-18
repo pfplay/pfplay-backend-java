@@ -2,7 +2,7 @@ package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.playlist.application.aspect.context.PlaylistContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
@@ -35,12 +35,12 @@ public class PlaylistCommandService {
 
     @Transactional
     public Playlist createPlaylist(String playlistName) {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
-        UserId userId = playlistContext.getUserId();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        UserId userId = authContext.getUserId();
         List<PlaylistData> playlistDataList = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST);
 
         // 권한 계층별 '생성 제약' 조건에 대한 위반 여부를 검증한다.
-        playlistDomainService.checkWhetherExceedConstraints(playlistContext.getAuthorityTier(), playlistDataList.size());
+        playlistDomainService.checkWhetherExceedConstraints(authContext.getAuthorityTier(), playlistDataList.size());
 
         // Save
         int nextOrderNumber = playlistDataList.isEmpty() ? 1 : playlistDataList.size();
@@ -51,8 +51,8 @@ public class PlaylistCommandService {
 
     @Transactional
     public Playlist renamePlaylist(Long playlistId, String name) {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
-        UserId userId = playlistContext.getUserId();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        UserId userId = authContext.getUserId();
 
         PlaylistData playlistData = playlistRepository.findByIdAndOwnerIdAndType(playlistId, userId, PlaylistType.PLAYLIST)
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
@@ -66,8 +66,8 @@ public class PlaylistCommandService {
 
     @Transactional
     public void deletePlaylist(List<Long> playlistIds) {
-        PlaylistContext playlistContext = (PlaylistContext) ThreadLocalContext.getContext();
-        UserId userId = playlistContext.getUserId();
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        UserId userId = authContext.getUserId();
         List<PlaylistData> playlistDataList = playlistRepository.findAllByOwnerId(userId);
 
         Set<Long> userPlaylistIdSet = playlistDataList.stream().map(PlaylistData::getId).collect(Collectors.toSet());
