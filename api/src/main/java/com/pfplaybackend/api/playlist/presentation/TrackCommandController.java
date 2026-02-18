@@ -3,6 +3,7 @@ package com.pfplaybackend.api.playlist.presentation;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.playlist.application.service.TrackCommandService;
 import com.pfplaybackend.api.playlist.presentation.payload.request.AddTrackRequest;
+import com.pfplaybackend.api.playlist.presentation.payload.request.MoveTrackRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.request.UpdateTrackOrderRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,14 @@ public class TrackCommandController {
     @DeleteMapping("{playlistId}/tracks/{trackId}")
     public ResponseEntity<?> deleteTrack(@PathVariable Long playlistId, @PathVariable Long trackId) {
         trackCommandService.deleteTrackInPlaylist(playlistId, trackId);
+        return ResponseEntity.accepted().build();
+    }
+
+    @PatchMapping("{playlistId}/tracks/{trackId}/move")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
+    public ResponseEntity<?> moveTrack(@PathVariable Long playlistId, @PathVariable Long trackId,
+                                       @RequestBody MoveTrackRequest request) {
+        trackCommandService.moveTrackToPlaylist(playlistId, trackId, request);
         return ResponseEntity.accepted().build();
     }
 
