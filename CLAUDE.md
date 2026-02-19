@@ -25,25 +25,31 @@ This document serves as the primary entry point for Claude Code when working on 
 
 ## Core Architecture Principles
 
-### 1. Domain-Driven Design (DDD)
+### 1. Hexagonal Architecture (Ports & Adapters)
 
-The codebase follows DDD with clear separation:
+Each domain module follows a hexagonal package structure:
 
 ```
-Presentation Layer (Controllers)
+adapter/in/web/         (REST Controllers)
+adapter/in/listener/    (Redis Topic Listeners)
+adapter/in/stomp/       (WebSocket STOMP Controllers)
     ↓
-Application Layer (Application Services)
+application/service/    (Use Case Orchestration)
+application/port/out/   (Outbound Port Interfaces)
     ↓
-Domain Layer (Domain Models, Services)
-    ↓
-Infrastructure Layer (Repositories, External Services)
+domain/entity/data/     (JPA Data Entities with business logic)
+domain/service/         (Domain Services)
+domain/value/           (Value Objects)
+    ↑
+adapter/out/persistence/ (JPA Repositories, QueryDSL)
+adapter/out/external/    (Cross-domain Port Adapters)
 ```
 
-**Key Pattern: Domain Model vs Data Entity**
-- `*Data.java` - JPA entities for persistence (infrastructure concern)
-- `domain/domainmodel/*` - Rich domain models with business logic
-- Converters translate between layers
+**Key Pattern: Unified Data Entities**
+- `*Data.java` - JPA entities that also contain business logic (no separate domain models)
+- No converters — entities are used directly across layers
 - Value Objects (UserId, PartyroomId, etc.) for type safety
+- Cross-domain dependencies resolved via Port/Adapter pattern
 
 ### 2. Event-Driven Architecture
 
@@ -63,47 +69,58 @@ Infrastructure Layer (Repositories, External Services)
 
 The project is organized into clear domain modules:
 
-| Domain | Purpose | Key Entities |
+| Module/Domain | Purpose | Key Entities |
 |--------|---------|--------------|
-| **auth** | Authentication & OAuth | Member, Guest, OAuth tokens |
-| **user** | User management | Member, Guest, ActivityData |
-| **profile** | User profiles & avatars | UserProfile, AvatarResources |
-| **party** | Party room core | Partyroom, Crew, DJ, Playback |
-| **playlist** | Music playlists | Playlist, Track |
-| **liveconnect** | Real-time communication | Chat, WebSocket events |
-| **avatarresource** | Avatar resources | AvatarBody, Face, Icon |
+| **auth** | Authentication & OAuth | OAuth tokens, StateStorePort |
+| **user** | User management | MemberData, GuestData, ActivityData |
+| **profile** | User profiles & avatars | ProfileData, Avatar VOs |
+| **party** | Party room core + chat | PartyroomData, CrewData, DjData, PlaybackData |
+| **playlist** | Music playlists | PlaylistData, TrackData |
 | **admin** | Administrative tools | Admin operations |
+| **common** | Cross-cutting concerns | Config, exceptions, adapters |
+| **realtime** *(Gradle module)* | WebSocket infrastructure | WebSocketAuthPort, SessionCachePort, SimpMessageSender |
 
 ## Package Structure Convention
 
-Each domain module follows this consistent structure:
+Each domain module follows this hexagonal structure:
 
 ```
 com.pfplaybackend.api.{domain}/
-├── presentation/              # REST Controllers
-│   └── *Controller.java
+├── adapter/
+│   ├── in/
+│   │   ├── web/              # REST Controllers + payload/request, response/
+│   │   ├── listener/         # Redis Topic Listeners + message/
+│   │   └── stomp/            # WebSocket STOMP Controllers (optional)
+│   └── out/
+│       ├── persistence/      # JPA Repositories + custom/ + impl/ (QueryDSL)
+│       └── external/         # Cross-domain Port Adapters
 ├── application/
-│   └── service/              # Application Services (use cases)
-│       └── *ApplicationService.java
-├── domain/
-│   ├── domainmodel/          # Domain Models
-│   │   └── *.java
-│   ├── service/              # Domain Services
-│   │   └── *DomainService.java
-│   ├── enums/                # Domain Enums
-│   └── valueobject/          # Value Objects
-│       └── *Id.java
-└── infrastructure/
-    └── repository/           # JPA Repositories
-        ├── *Data.java        # JPA Entities
-        └── *Repository.java  # Spring Data Repositories
+│   ├── service/              # Application Services (use cases)
+│   ├── port/out/             # Outbound Port Interfaces (cross-domain)
+│   ├── dto/                  # Application DTOs
+│   └── aspect/               # Cross-cutting Aspects
+└── domain/
+    ├── entity/data/          # JPA Data Entities (*Data.java, with business logic)
+    ├── service/              # Domain Services (*DomainService.java)
+    ├── enums/                # Domain Enums
+    ├── value/                # Value Objects (*Id.java)
+    └── exception/            # Domain Exceptions
 ```
+
+### Gradle Multi-Module
+
+```
+pfplay-backend-java/          (root)
+├── api/                       # All domain code (depends on realtime)
+└── realtime/                  # WebSocket infrastructure (10 files, zero domain imports)
+```
+
+Build from root: `./gradlew :api:compileJava`, `./gradlew :api:test`
 
 ## Naming Conventions
 
 ### Entities and Models
-- **JPA Entities**: `*Data.java` (e.g., `MemberData`, `PartyroomData`)
-- **Domain Models**: Plain names in `domainmodel/` (e.g., `Member`, `Partyroom`)
+- **JPA Entities**: `*Data.java` (e.g., `MemberData`, `PartyroomData`) — unified model with business logic
 - **Value Objects**: `*Id`, `*Info`, `*Summary` (e.g., `UserId`, `CrewInfo`)
 
 ### Services
@@ -113,7 +130,7 @@ com.pfplaybackend.api.{domain}/
 
 ### Controllers
 - **REST Controllers**: `*Controller` (e.g., `PartyroomController`)
-- **WebSocket Controllers**: `*MessageController` (e.g., `ChatMessageController`)
+- **WebSocket STOMP Controllers**: in `adapter/in/stomp/` (e.g., `PartyroomChatController`)
 
 ### Exceptions
 - **HTTP Exceptions**: `BadRequestException`, `UnauthorizedException`, etc.
@@ -152,18 +169,18 @@ com.pfplaybackend.api.{domain}/
 ### When Adding New Features
 
 1. **Identify the Domain**: Which domain boundary does this belong to?
-2. **Start with Domain Layer**: Define domain models and business logic
-3. **Add Application Service**: Implement use case orchestration
-4. **Expose via Controller**: Create REST endpoints
-5. **Consider Events**: Should this trigger real-time events?
+2. **Start with Data Entity**: Define `*Data.java` in `domain/entity/data/` with business logic
+3. **Add Application Service**: Implement use case orchestration in `application/service/`
+4. **Expose via Controller**: Create REST endpoints in `adapter/in/web/`
+5. **Consider Events**: Should this trigger real-time events via Redis Pub/Sub?
 6. **Think Distributed**: Do we need distributed locks?
 
 ### When Modifying Existing Code
 
-1. **Read the Domain Model**: Understand business rules first
-2. **Check Data Entity**: See how it's persisted
-3. **Review Application Service**: Understand the use case flow
-4. **Check Event Publishing**: Are events being published?
+1. **Read the Data Entity**: Understand business rules in `*Data.java`
+2. **Review Application Service**: Understand the use case flow
+3. **Check Event Publishing**: Are events being published?
+4. **Check Cross-Domain Ports**: Are there port interfaces in `application/port/out/`?
 5. **Consider Impact**: Will this affect other instances (distributed)?
 
 ### When Debugging
@@ -238,7 +255,7 @@ throw new BadRequestException("Invalid request");
 
 ## Common Pitfalls to Avoid
 
-1. **Don't mix Domain and Data entities**: Keep them separate
+1. **Don't bypass Port/Adapter boundaries**: Cross-domain access must go through `application/port/out/` interfaces
 2. **Don't skip distributed locks**: Critical sections must be protected
 3. **Don't forget to publish events**: Real-time features depend on it
 4. **Don't create transactions in controllers**: Use application services
@@ -246,6 +263,7 @@ throw new BadRequestException("Invalid request");
 6. **Don't bypass security**: Always validate permissions
 7. **Don't ignore Redis failures**: Handle gracefully
 8. **Don't block WebSocket threads**: Use async for long operations
+9. **Don't import domain code in realtime module**: realtime depends only on port interfaces
 
 ## Testing Strategy
 
@@ -299,7 +317,7 @@ For deeper understanding, refer to these detailed documents:
 
 ---
 
-**Last Updated**: 2026-01-09
+**Last Updated**: 2026-02-20
 
 This document should be updated when:
 - New domain modules are added

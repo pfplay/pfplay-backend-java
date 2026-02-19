@@ -103,7 +103,6 @@ A sophisticated Spring Boot backend service powering PFPlay, a real-time collabo
 
 ### API & Documentation
 - **SpringDoc OpenAPI 3** - API documentation (Swagger UI)
-- **MapStruct 1.5.5** - Object mapping
 - **Lombok** - Boilerplate reduction
 
 ### External Integrations
@@ -120,37 +119,43 @@ A sophisticated Spring Boot backend service powering PFPlay, a real-time collabo
 ## Architecture
 
 ### Design Pattern
-The project follows **Domain-Driven Design (DDD)** principles with a clean layered architecture:
+The project follows **Hexagonal Architecture (Ports & Adapters)** with DDD principles:
 
 ```
-┌─────────────────────────────────────────┐
-│        Presentation Layer               │
-│     (REST Controllers, WebSocket)       │
-└─────────────────────────────────────────┘
-                  ↓
-┌─────────────────────────────────────────┐
-│       Application Layer                 │
-│    (Application Services, Use Cases)    │
-└─────────────────────────────────────────┘
-                  ↓
-┌─────────────────────────────────────────┐
-│          Domain Layer                   │
-│   (Domain Models, Services, Events)     │
-└─────────────────────────────────────────┘
-                  ↓
-┌─────────────────────────────────────────┐
-│      Infrastructure Layer               │
-│    (Repositories, External Services)    │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────┐
+│  Inbound Adapters                                   │
+│  adapter/in/web/      (REST Controllers)            │
+│  adapter/in/listener/ (Redis Topic Listeners)       │
+│  adapter/in/stomp/    (WebSocket STOMP Controllers)  │
+└──────────────────────┬──────────────────────────────┘
+                       ↓
+┌──────────────────────┴──────────────────────────────┐
+│  Application Layer                                   │
+│  application/service/    (Use Case Orchestration)    │
+│  application/port/out/   (Outbound Port Interfaces)  │
+└──────────────────────┬──────────────────────────────┘
+                       ↓
+┌──────────────────────┴──────────────────────────────┐
+│  Domain Layer                                        │
+│  domain/entity/data/  (JPA Entities + Business Logic)│
+│  domain/service/      (Domain Services)              │
+│  domain/value/        (Value Objects)                │
+└──────────────────────┬──────────────────────────────┘
+                       ↑
+┌──────────────────────┴──────────────────────────────┐
+│  Outbound Adapters                                   │
+│  adapter/out/persistence/ (JPA Repositories, QueryDSL)│
+│  adapter/out/external/    (Cross-domain Port Adapters)│
+└─────────────────────────────────────────────────────┘
 ```
 
 ### Key Architectural Patterns
 
-**1. Domain-Driven Design (DDD)**
+**1. Hexagonal Architecture (Ports & Adapters)**
 - Clear domain boundaries (Party, User, Playlist, etc.)
-- Domain models separate from data entities
+- Unified data entities (`*Data.java`) with business logic
 - Value objects for type safety (UserId, PartyroomId)
-- Domain services for business logic
+- Cross-domain dependencies resolved via Port/Adapter interfaces
 
 **2. Event-Driven Architecture**
 - Redis pub/sub for cross-instance communication
@@ -158,10 +163,10 @@ The project follows **Domain-Driven Design (DDD)** principles with a clean layer
 - Decoupled components via message passing
 - Scalable distributed architecture
 
-**3. CQRS-inspired Approach**
-- Separate read and write models where beneficial
-- QueryDSL for complex read queries
-- Command pattern for state changes
+**3. Gradle Multi-Module**
+- `api` — all domain code and business logic
+- `realtime` — WebSocket infrastructure (zero domain imports, port interfaces only)
+- Unidirectional dependency: `api` → `realtime`
 
 **4. Distributed Systems**
 - Redis-based distributed locks
@@ -220,8 +225,8 @@ jwt:
 
 4. **Build and run the application**
 ```bash
-./gradlew build
-./gradlew bootRun --args='--spring.profiles.active=local'
+./gradlew :api:build
+./gradlew :api:bootRun --args='--spring.profiles.active=local'
 ```
 
 The application will start on `http://localhost:8080`
@@ -368,59 +373,60 @@ stompClient.subscribe('/sub/events/' + partyroomId + '/playback-start',
 
 ```
 pfplay-backend-java/
-├── api/
+├── api/                                # Main application module
 │   └── src/main/java/com/pfplaybackend/api/
-│       ├── admin/                    # Admin functionality
-│       ├── auth/                     # Authentication & OAuth
-│       │   ├── presentation/         # Controllers
-│       │   ├── application/service/  # Application services
-│       │   ├── domain/               # Domain models
-│       │   └── infrastructure/       # External integrations
-│       ├── avatarresource/           # Avatar management
-│       ├── common/                   # Shared components
-│       │   ├── config/               # Configuration classes
-│       │   │   ├── cache/            # Cache configuration
-│       │   │   ├── security/         # Security & JWT config
-│       │   │   └── websocket/        # WebSocket config
-│       │   ├── entity/               # Base entities
-│       │   ├── enums/                # Common enums
-│       │   ├── exception/            # Exception handling
-│       │   └── util/                 # Utility classes
-│       ├── liveconnect/              # WebSocket & messaging
-│       │   ├── chatting/             # Chat functionality
-│       │   ├── event/                # Event handlers
-│       │   └── redis/                # Redis pub/sub
-│       ├── party/                    # Party room domain
-│       │   ├── partyroom/            # Party room management
-│       │   ├── crew/                 # Crew management
-│       │   ├── dj/                   # DJ queue
-│       │   ├── playback/             # Playback control
-│       │   └── reaction/             # Reaction system
-│       ├── playlist/                 # Playlist management
-│       ├── profile/                  # User profiles
-│       └── user/                     # User management
-├── docker-compose.yml                # Docker services
-├── Dockerfile                        # Container image
-├── build.gradle                      # Gradle build config
-└── README.md                         # This file
+│       ├── admin/                      # Admin functionality
+│       ├── auth/                       # Authentication & OAuth
+│       ├── avatarresource/             # Avatar resource management
+│       ├── common/                     # Shared components
+│       │   ├── config/                 # Configuration (security, redis, cache)
+│       │   ├── entity/                 # Base entities
+│       │   ├── enums/                  # Common enums
+│       │   ├── exception/              # Exception handling
+│       │   └── adapter/realtime/       # Realtime port implementations
+│       ├── party/                      # Party room domain (rooms, crew, DJ, playback, chat)
+│       ├── playlist/                   # Playlist management
+│       ├── profile/                    # User profiles & avatars
+│       └── user/                       # User management (member, guest)
+├── realtime/                           # WebSocket infrastructure module
+│   └── src/main/java/com/pfplaybackend/realtime/
+│       ├── config/                     # WebSocket/STOMP configuration
+│       ├── controller/                 # Heartbeat controller
+│       ├── event/                      # Connection/Subscription event listeners
+│       ├── interceptor/                # WebSocket handshake interceptor
+│       ├── port/                       # Port interfaces (WebSocketAuthPort, SessionCachePort)
+│       └── sender/                     # SimpMessageSender
+├── build.gradle                        # Root Gradle config
+├── settings.gradle                     # Multi-module settings
+├── docker-compose.yml                  # Docker services
+├── Dockerfile                          # Container image
+└── README.md                           # This file
 ```
 
 ### Domain Module Structure
 
-Each domain module follows a consistent layered architecture:
+Each domain module follows a hexagonal architecture:
 
 ```
-module/
-├── presentation/           # REST controllers
+{domain}/
+├── adapter/
+│   ├── in/
+│   │   ├── web/              # REST Controllers + payload/
+│   │   ├── listener/         # Redis Topic Listeners
+│   │   └── stomp/            # WebSocket STOMP Controllers
+│   └── out/
+│       ├── persistence/      # JPA Repositories + QueryDSL (custom/, impl/)
+│       └── external/         # Cross-domain Port Adapters
 ├── application/
-│   └── service/           # Application services (use cases)
-├── domain/
-│   ├── domainmodel/       # Domain models
-│   ├── service/           # Domain services
-│   ├── enums/             # Domain enums
-│   └── valueobject/       # Value objects
-└── infrastructure/
-    └── repository/        # JPA repositories
+│   ├── service/              # Application Services (use cases)
+│   ├── port/out/             # Outbound Port Interfaces
+│   └── dto/                  # Application DTOs
+└── domain/
+    ├── entity/data/          # JPA Data Entities (*Data.java)
+    ├── service/              # Domain Services
+    ├── enums/                # Domain Enums
+    ├── value/                # Value Objects
+    └── exception/            # Domain Exceptions
 ```
 
 ## Configuration
@@ -435,7 +441,7 @@ The application supports multiple profiles:
 
 Activate a profile:
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=local'
+./gradlew :api:bootRun --args='--spring.profiles.active=local'
 ```
 
 ### Environment Variables

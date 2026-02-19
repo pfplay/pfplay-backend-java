@@ -471,27 +471,39 @@ JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11" ./gradlew :realtime:compileJav
 
 ---
 
-## Phase 5: QueryDSL 정비
+## Phase 5: QueryDSL 정비 ✅ 완료 (2026-02-20)
 
 ### 목표
 구조 변경 완료 후 QueryDSL 코드를 정비
 
-### 5-1. N+1 쿼리 수정
-- `PartyroomRepositoryImpl.getCrewDataByPartyroomId()`: 전체 메모리 로드 → 2-query 전략
-- Phase 2에서 Partyroom 컬렉션 제거되므로 일부 메서드 불필요해짐
+### 실제 수행 내역
 
-### 5-2. fetchJoin 적용
-남아있는 컬렉션 조인에 `.fetchJoin()` 명시
+#### 5-1. MemberRepositoryImpl — fetchJoin 추가 + 중복 WHERE 제거
+- `join` → `leftJoin().fetchJoin()` (profileData, activityDataMap)
+- 중복 WHERE 조건 2개 제거 (join이 보장하는 `qActivityData.userId`, `qProfileData.userId`)
 
-### 5-3. 비효율 쿼리 개선
-- `MemberRepositoryImpl`: 중복 WHERE 조건 제거
-- `TrackRepositoryImpl`: count 쿼리 최적화
+#### 5-2. GuestRepositoryImpl — fetchJoin 추가 + 중복 WHERE 제거
+- `join` → `leftJoin().fetchJoin()` (profileData)
+- 중복 WHERE 조건 1개 제거 (`qProfileData.userId.eq(qGuestData.userId)`)
+
+#### 5-3. PartyroomRepositoryImpl — cross-join 제거
+- `getRecentPlaybackHistory()`: `from(qPartyroomData, qPlaybackData)` cross-join → `from(qPlaybackData)` 단일 테이블 쿼리
+- `PlaybackData.partyroomId`가 `@Embedded` VO이므로 PartyroomData 테이블 불필요
+
+#### 5-4. PlaylistRepositoryImpl — 필드 alias 통일
+- `findAllByUserId`의 `.as("memberCount")` → `.as("musicCount")` (PlaylistSummary 필드명과 일치)
+
+### 수정하지 않은 항목
+- `getCrewDataByPartyroomId()` 클라이언트 사이드 그룹핑 — QueryDSL 표준 패턴
+- `TrackRepositoryImpl` 2-query 페이지네이션 — `PageImpl` 표준 패턴
+- `PlaylistRepositoryImpl` leftJoin 구문 — explicit join이 정확
 
 ### 완료 기준
-- [ ] `new JPAQueryFactory(em)` 패턴이 코드베이스에 없음 (Phase 0에서 처리)
-- [ ] N+1 위험 쿼리 제거
-- [ ] 불필요한 메모리 로드 패턴 제거
-- [ ] 전체 테스트 통과
+- [x] `new JPAQueryFactory(em)` 패턴 제거 (Phase 0에서 처리 완료)
+- [x] N+1 위험 쿼리 제거 (fetchJoin 적용)
+- [x] 불필요한 cross-join 제거
+- [x] 필드 alias 일관성 수정
+- [x] 전체 테스트 통과
 
 ---
 
@@ -508,7 +520,7 @@ Phase 3 (헥사고널 패키지 구조)      ✅ 완료
     ↓
 Phase 4 (Gradle 멀티모듈 분리)     ✅ 완료 (2026-02-20)
     ↓
-Phase 5 (QueryDSL 정비)           ⬜ 다음 작업
+Phase 5 (QueryDSL 정비)           ✅ 완료 (2026-02-20)
 ```
 
 ---

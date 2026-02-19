@@ -535,100 +535,95 @@ public class ManualCacheService {
 
 ## Session Management
 
-### WebSocket Session Caching
+### WebSocket Session Caching (Port/Adapter Pattern)
 
-**SessionCacheManager**:
+Session management is split across two Gradle modules via the Port/Adapter pattern:
+
+**SessionCachePort** (defined in `realtime` module):
+```java
+public interface SessionCachePort {
+    void saveSessionCache(String sessionId, String userId, String partyroomId);
+    void removeSessionCache(String sessionId);
+    String getUserIdBySessionId(String sessionId);
+    String getPartyroomIdBySessionId(String sessionId);
+}
+```
+
+**PartyroomSessionCacheManager** (implements the port in `api` module):
 ```java
 @Service
 @RequiredArgsConstructor
-public class SessionCacheManager {
+public class PartyroomSessionCacheManager implements SessionCachePort {
 
-    private final RedisTemplate<String, SessionInfo> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public void saveSession(String sessionId, SessionInfo sessionInfo) {
+    @Override
+    public void saveSessionCache(String sessionId, String userId, String partyroomId) {
         String key = "session:ws:" + sessionId;
-        redisTemplate.opsForValue().set(key, sessionInfo, Duration.ofHours(24));
+        // Store session data in Redis with TTL
+        redisTemplate.opsForHash().put(key, "userId", userId);
+        redisTemplate.opsForHash().put(key, "partyroomId", partyroomId);
+        redisTemplate.expire(key, Duration.ofHours(24));
     }
 
-    public Optional<SessionInfo> getSession(String sessionId) {
-        String key = "session:ws:" + sessionId;
-        SessionInfo info = redisTemplate.opsForValue().get(key);
-        return Optional.ofNullable(info);
-    }
-
-    public void removeSession(String sessionId) {
+    @Override
+    public void removeSessionCache(String sessionId) {
         String key = "session:ws:" + sessionId;
         redisTemplate.delete(key);
     }
-
-    public void updateSessionActivity(String sessionId) {
-        String key = "session:ws:" + sessionId;
-        redisTemplate.expire(key, Duration.ofHours(24));
-    }
+    // ...
 }
 ```
 
-**SessionInfo Structure**:
-```java
-@Data
-@Builder
-public class SessionInfo implements Serializable {
-    private String sessionId;
-    private String userId;
-    private String partyroomId;
-    private LocalDateTime connectedAt;
-    private LocalDateTime lastActivityAt;
-}
-```
+> **Key Design**: The `realtime` module's event listeners (Connection, Disconnection, Subscription, Unsubscription) use `SessionCachePort` with `String userId` (not domain `UserId`), keeping the realtime module free of domain imports.
 
 ### Session Lifecycle
 
-1. **Connection**: Create session entry
-2. **Activity**: Update last activity timestamp
-3. **Disconnect**: Remove session entry
-4. **Expiration**: Auto-remove after 24h inactivity
+1. **Connection**: `ConnectionEventListener` logs the connection
+2. **Subscription**: `SubscriptionEventListener` calls `sessionCachePort.saveSessionCache()`
+3. **Unsubscription**: `UnsubscriptionEventListener` calls `sessionCachePort.removeSessionCache()`
+4. **Disconnect**: `DisconnectionEventListener` calls `sessionCachePort.removeSessionCache()`
+5. **Expiration**: Auto-remove after 24h inactivity (Redis TTL)
 
 ## OAuth State Management
 
-### State Storage
+### State Storage (Port/Adapter Pattern)
 
-**RedisStateStore**:
+OAuth state management uses the Port/Adapter pattern:
+
+**StateStorePort** (defined in `auth/application/port/out/`):
 ```java
-@Service
+public interface StateStorePort {
+    void save(String state, String provider);
+    Optional<String> getProvider(String state);
+    void remove(String state);
+}
+```
+
+**RedisStateStoreAdapter** (implements in `auth/adapter/out/persistence/`):
+```java
+@Component
 @RequiredArgsConstructor
-public class RedisStateStore {
+public class RedisStateStoreAdapter implements StateStorePort {
 
-    private final RedisTemplate<String, OAuthState> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public void saveState(String state, ProviderType provider) {
+    @Override
+    public void save(String state, String provider) {
         String key = "oauth:state:" + state;
-
-        OAuthState oauthState = OAuthState.builder()
-            .state(state)
-            .provider(provider)
-            .createdAt(LocalDateTime.now())
-            .build();
-
-        // Expire after 10 minutes
-        redisTemplate.opsForValue().set(key, oauthState, Duration.ofMinutes(10));
+        redisTemplate.opsForValue().set(key, provider, Duration.ofMinutes(10));
     }
 
-    public Optional<OAuthState> getState(String state) {
+    @Override
+    public Optional<String> getProvider(String state) {
         String key = "oauth:state:" + state;
-        OAuthState oauthState = redisTemplate.opsForValue().get(key);
-        return Optional.ofNullable(oauthState);
+        return Optional.ofNullable(redisTemplate.opsForValue().get(key));
     }
 
-    public boolean validateAndRemove(String state) {
+    @Override
+    public void remove(String state) {
         String key = "oauth:state:" + state;
-        OAuthState oauthState = redisTemplate.opsForValue().get(key);
-
-        if (oauthState != null) {
-            redisTemplate.delete(key);
-            return true;
-        }
-
-        return false;
+        redisTemplate.delete(key);
     }
 }
 ```

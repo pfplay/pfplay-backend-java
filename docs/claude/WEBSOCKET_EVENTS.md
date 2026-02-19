@@ -43,8 +43,28 @@ This document describes the WebSocket implementation and real-time event system 
 
 1. **STOMP over WebSocket**: Protocol for message framing
 2. **Redis Pub/Sub**: Cross-instance message distribution
-3. **Session Management**: User session tracking via Redis
-4. **JWT Authentication**: Secure handshake authentication
+3. **Session Management**: User session tracking via Redis (SessionCachePort)
+4. **JWT Authentication**: Secure handshake via WebSocketAuthPort
+
+### Module Structure
+
+WebSocket infrastructure is in the **`realtime` Gradle module**, separate from domain code:
+
+```
+realtime/
+├── config/WebSocketConfig.java           # STOMP configuration
+├── controller/HeartbeatController.java   # Heartbeat handler
+├── sender/SimpMessageSender.java         # Message sender (used by api module listeners)
+├── interceptor/WebSocketHandshakeInterceptor.java  # Auth via WebSocketAuthPort
+├── port/
+│   ├── WebSocketAuthPort.java            # Auth abstraction (implemented by api module)
+│   └── SessionCachePort.java             # Session cache abstraction (implemented by api module)
+└── event/                                # Connection, Disconnection, Subscription, Unsubscription listeners
+```
+
+Port implementations in the `api` module:
+- `JwtWebSocketAuthAdapter` → implements `WebSocketAuthPort` (delegates to JwtCookieValidator)
+- `PartyroomSessionCacheManager` → implements `SessionCachePort`
 
 ### How It Works
 
@@ -85,9 +105,12 @@ Cookie: access_token={JWT_TOKEN}
 ### Connection Flow
 
 ```java
-// Server-side handshake interceptor
+// Server-side handshake interceptor (in realtime module)
 @Component
-public class JwtHandshakeInterceptor implements HandshakeInterceptor {
+@RequiredArgsConstructor
+public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
+
+    private final WebSocketAuthPort webSocketAuthPort;
 
     @Override
     public boolean beforeHandshake(
@@ -96,22 +119,20 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes) {
 
-        // Extract JWT from cookie
-        String token = extractTokenFromCookie(request);
+        // Delegate JWT extraction/validation to WebSocketAuthPort
+        Optional<String> userId = webSocketAuthPort.extractUserId(request);
 
-        // Validate JWT
-        if (!jwtService.validateToken(token)) {
+        if (userId.isEmpty()) {
             return false; // Reject connection
         }
 
-        // Extract user info
-        UserId userId = jwtService.getUserIdFromToken(token);
-        attributes.put("userId", userId);
-
+        attributes.put("userId", userId.get());
         return true; // Accept connection
     }
 }
 ```
+
+> **Note**: The interceptor has no direct dependency on JWT or domain classes. It uses `WebSocketAuthPort` which is implemented by `JwtWebSocketAuthAdapter` in the `api` module.
 
 ## STOMP Protocol
 
@@ -506,64 +527,35 @@ public class RedisMessagePublisher {
 
 ## Subscribing to Events
 
-### Redis Listener Implementation
+### Redis Topic Listener Implementation
+
+Topic listeners live in `party/adapter/in/listener/` and implement `MessageListener`:
 
 ```java
 @Component
 @RequiredArgsConstructor
-public class PlaybackEventListener {
+public class PlaybackStartTopicListener implements MessageListener {
 
-    private final SimpMessagingTemplate messagingTemplate;
+    private final SimpMessageSender simpMessageSender;  // from realtime module
 
-    @RedisMessageListener(topics = "partyroom:*:playback-start")
-    public void handlePlaybackStart(PlaybackStartMessage message) {
-        // This method is called when message is published to Redis
+    @Override
+    public void onMessage(Message message, byte[] pattern) {
+        PlaybackStartMessage parsed = deserialize(message);
 
-        // Broadcast to all WebSocket clients connected to THIS server instance
-        messagingTemplate.convertAndSend(
-            "/sub/events/" + message.getPartyroomId() + "/playback-start",
-            message
+        // Broadcast to WebSocket clients via realtime module's SimpMessageSender
+        simpMessageSender.sendToTopic(
+            "/sub/events/" + parsed.getPartyroomId() + "/playback-start",
+            parsed
         );
-
-        // Optional: Additional processing
-        schedulePlaybackEnd(message);
     }
 }
 ```
 
-### Custom Annotation for Redis Listeners
-
-```java
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface RedisMessageListener {
-    String[] topics();
-}
-```
+> **Note**: Listeners use `SimpMessageSender` from the `realtime` module (`com.pfplaybackend.realtime.sender.SimpMessageSender`), not `SimpMessagingTemplate` directly.
 
 ### Registration in Redis Config
 
-```java
-@Configuration
-public class RedisConfig {
-
-    @Bean
-    public RedisMessageListenerContainer redisMessageListenerContainer(
-            RedisConnectionFactory connectionFactory,
-            List<MessageListener> listeners) {
-
-        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-
-        // Register all @RedisMessageListener annotated methods
-        for (MessageListener listener : listeners) {
-            container.addMessageListener(listener, getTopics(listener));
-        }
-
-        return container;
-    }
-}
-```
+Topic listeners and their patterns are registered in `common/config/redis/RedisConfig.java`.
 
 ## Message Formats
 
@@ -642,23 +634,25 @@ message: Invalid or expired token
 
 ### Disconnect Handling
 
-**Server-side**:
+**Server-side** (in `realtime` module):
 ```java
 @Component
-public class WebSocketEventListener {
+@RequiredArgsConstructor
+public class DisconnectionEventListener implements ApplicationListener<SessionDisconnectEvent> {
 
-    @EventListener
-    public void handleWebSocketDisconnect(SessionDisconnectEvent event) {
+    private final SessionCachePort sessionCachePort;
+
+    @Override
+    public void onApplicationEvent(SessionDisconnectEvent event) {
         String sessionId = event.getSessionId();
 
-        // Clean up session
-        sessionCacheManager.removeSession(sessionId);
-
-        // Update user status
-        userPresenceService.markOffline(sessionId);
+        // Clean up session via SessionCachePort
+        sessionCachePort.removeSessionCache(sessionId);
     }
 }
 ```
+
+> **Note**: `SessionCachePort` is defined in the `realtime` module and implemented by `PartyroomSessionCacheManager` in the `api` module.
 
 ## Client Examples
 

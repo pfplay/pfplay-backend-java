@@ -4,348 +4,355 @@ This document provides detailed explanation of the architectural patterns, desig
 
 ## Table of Contents
 
-- [Layered Architecture](#layered-architecture)
+- [Hexagonal Architecture](#hexagonal-architecture)
+- [Gradle Multi-Module Structure](#gradle-multi-module-structure)
 - [Domain-Driven Design](#domain-driven-design)
 - [Event-Driven Architecture](#event-driven-architecture)
 - [Distributed Systems Patterns](#distributed-systems-patterns)
 - [Data Flow](#data-flow)
 - [Scalability Considerations](#scalability-considerations)
 
-## Layered Architecture
+## Hexagonal Architecture
 
 ### Overview
 
-The system follows a strict 4-layer architecture with clear dependency rules:
+The system follows a **hexagonal (ports & adapters) architecture** within each domain module:
 
 ```
-┌─────────────────────────────────────────────────┐
-│         Presentation Layer                      │
-│   (Controllers, DTOs, Request/Response)         │
-│                                                 │
-│   Dependencies: ↓ Application Layer             │
-└─────────────────────────────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────┐
-│         Application Layer                       │
-│   (Application Services, Use Case Orchestration)│
-│                                                 │
-│   Dependencies: ↓ Domain Layer                  │
-└─────────────────────────────────────────────────┘
-                      ↓
-┌─────────────────────────────────────────────────┐
-│         Domain Layer                            │
-│   (Domain Models, Business Logic, Events)       │
-│                                                 │
-│   Dependencies: None (Pure business logic)      │
-└─────────────────────────────────────────────────┘
-                      ↑
-┌─────────────────────────────────────────────────┐
-│         Infrastructure Layer                    │
-│   (Repositories, External Services, Messaging)  │
-│                                                 │
-│   Dependencies: → Domain Layer                  │
-└─────────────────────────────────────────────────┘
+┌───────────────────────────────────────────────────────────────┐
+│                      Inbound Adapters                         │
+│  adapter/in/web/      (REST Controllers)                      │
+│  adapter/in/listener/ (Redis Topic Listeners)                 │
+│  adapter/in/stomp/    (WebSocket STOMP Controllers)           │
+│                                                               │
+│  Dependencies: ↓ Application Layer                            │
+└───────────────────────────────────────────────────────────────┘
+                          ↓
+┌───────────────────────────────────────────────────────────────┐
+│                    Application Layer                           │
+│  application/service/  (Use Case Orchestration)               │
+│  application/port/out/ (Outbound Port Interfaces)             │
+│  application/dto/      (Application DTOs)                     │
+│  application/aspect/   (Cross-cutting Aspects)                │
+│                                                               │
+│  Dependencies: ↓ Domain Layer, → Outbound Ports               │
+└───────────────────────────────────────────────────────────────┘
+                          ↓
+┌───────────────────────────────────────────────────────────────┐
+│                      Domain Layer                              │
+│  domain/entity/data/   (JPA Data Entities with business logic)│
+│  domain/service/       (Domain Services)                      │
+│  domain/enums/         (Domain Enums)                         │
+│  domain/value/         (Value Objects)                         │
+│  domain/exception/     (Domain Exceptions)                    │
+│                                                               │
+│  Dependencies: None (Pure business logic + JPA annotations)   │
+└───────────────────────────────────────────────────────────────┘
+                          ↑
+┌───────────────────────────────────────────────────────────────┐
+│                    Outbound Adapters                           │
+│  adapter/out/persistence/  (JPA Repositories, QueryDSL)       │
+│  adapter/out/external/     (Cross-domain Adapters)            │
+│                                                               │
+│  Dependencies: → Domain Layer, implements Outbound Ports      │
+└───────────────────────────────────────────────────────────────┘
+```
+
+### Package Structure per Domain
+
+Each domain module follows this consistent hexagonal structure:
+
+```
+com.pfplaybackend.api.{domain}/
+├── adapter/
+│   ├── in/
+│   │   ├── web/                    # REST Controllers
+│   │   │   ├── *Controller.java
+│   │   │   └── payload/
+│   │   │       ├── request/        # Request DTOs
+│   │   │       └── response/       # Response DTOs
+│   │   ├── listener/               # Redis Topic Listeners
+│   │   │   ├── *TopicListener.java
+│   │   │   └── message/            # Inbound/Outbound message DTOs
+│   │   └── stomp/                  # WebSocket STOMP Controllers (optional)
+│   └── out/
+│       ├── persistence/            # JPA Repositories
+│       │   ├── *Repository.java    # Spring Data interfaces
+│       │   ├── custom/             # Custom query interfaces
+│       │   │   └── *RepositoryCustom.java
+│       │   └── impl/               # QueryDSL implementations
+│       │       └── *RepositoryImpl.java
+│       └── external/               # Cross-domain port adapters
+│           └── *Adapter.java
+├── application/
+│   ├── service/                    # Application Services
+│   │   └── *Service.java
+│   ├── port/
+│   │   └── out/                    # Outbound Port Interfaces
+│   │       └── *Port.java
+│   ├── dto/                        # Application DTOs
+│   └── aspect/                     # Cross-cutting Aspects
+└── domain/
+    ├── entity/
+    │   └── data/                   # JPA Data Entities (*Data.java)
+    │       └── history/            # History entities (optional)
+    ├── service/                    # Domain Services
+    │   └── *DomainService.java
+    ├── enums/                      # Domain Enums
+    ├── value/                      # Value Objects
+    │   └── *Id.java
+    └── exception/                  # Domain Exceptions
 ```
 
 ### Layer Responsibilities
 
-#### 1. Presentation Layer
-**Location**: `presentation/` package in each domain
+#### 1. Inbound Adapters (`adapter/in/`)
 
 **Responsibilities**:
-- HTTP request/response handling
-- Input validation
-- DTO transformation
-- Exception handling
+- HTTP request/response handling (REST controllers)
+- Redis message consumption (topic listeners)
+- WebSocket STOMP message handling
+- Input validation and DTO transformation
 - Security enforcement (@PreAuthorize)
-
-**What belongs here**:
-- `*Controller.java` - REST controllers
-- `*Request.java` - Request DTOs
-- `*Response.java` - Response DTOs
-
-**Example**:
-```java
-api/src/main/java/com/pfplaybackend/api/party/partyroom/presentation/
-├── PartyroomController.java
-├── dto/
-│   ├── request/
-│   │   ├── PartyroomCreateRequest.java
-│   │   └── PartyroomUpdateRequest.java
-│   └── response/
-│       ├── PartyroomInfoResponse.java
-│       └── PartyroomSummaryResponse.java
-```
 
 **Key Patterns**:
 - Controllers are thin, delegating to application services
-- DTOs are anemic (no business logic)
-- Validation via `@Valid` and Bean Validation
-- Exception handling via `@ExceptionHandler`
+- Request/Response DTOs live under `payload/` in each adapter
+- Redis listeners receive messages and broadcast via `SimpMessageSender`
 
-#### 2. Application Layer
-**Location**: `application/service/` package in each domain
+**Example**:
+```java
+adapter/in/web/
+├── PartyroomAccessController.java
+├── PartyroomInfoController.java
+├── PartyroomManagementController.java
+└── payload/
+    ├── request/
+    │   └── CreatePartyroomRequest.java
+    └── response/
+        └── QueryPartyroomListResponse.java
+
+adapter/in/listener/
+├── CrewProfilePreCheckTopicListener.java
+├── PlaybackDurationWaitTopicListener.java
+└── message/
+    ├── PlaybackStartMessage.java
+    └── ReactionAggregationMessage.java
+```
+
+#### 2. Application Layer (`application/`)
 
 **Responsibilities**:
 - Use case orchestration
-- Transaction management
+- Transaction management (@Transactional)
 - Domain service coordination
 - Event publishing
-- Cross-domain coordination
-
-**What belongs here**:
-- `*ApplicationService.java` - Application services
-- Transaction boundaries (@Transactional)
-- Converter classes for DTO ↔ Domain mapping
-
-**Example**:
-```java
-api/src/main/java/com/pfplaybackend/api/party/partyroom/application/service/
-├── PartyroomApplicationService.java
-├── PartyroomQueryService.java
-└── converter/
-    ├── PartyroomConverter.java
-    └── CrewConverter.java
-```
+- Cross-domain coordination via outbound ports
 
 **Key Patterns**:
-- One application service per aggregate root
-- Each method represents a use case
-- @Transactional at this layer
-- Publishes events after successful operations
-
-**Example Flow**:
-```java
-@Service
-@Transactional
-public class PartyroomApplicationService {
-
-    public PartyroomInfoResponse createPartyroom(PartyroomCreateRequest request) {
-        // 1. Convert DTO to domain model
-        Partyroom partyroom = converter.toDomain(request);
-
-        // 2. Execute business logic (domain service)
-        partyroom.initialize(hostUserId);
-
-        // 3. Persist (infrastructure)
-        PartyroomData savedData = partyroomRepository.save(converter.toData(partyroom));
-
-        // 4. Publish events (infrastructure)
-        eventPublisher.publishPartyroomCreated(savedData.getId());
-
-        // 5. Convert back to DTO
-        return converter.toResponse(savedData);
-    }
-}
-```
-
-#### 3. Domain Layer
-**Location**: `domain/` package in each domain
-
-**Responsibilities**:
-- Business logic and rules
-- Domain model behavior
-- Domain events
-- Business validation
-- Pure logic (no infrastructure dependencies)
-
-**What belongs here**:
-- `domainmodel/` - Rich domain models
-- `service/` - Domain services
-- `enums/` - Domain enums
-- `valueobject/` - Value objects
+- Application services define transaction boundaries
+- Outbound port interfaces in `application/port/out/` for cross-domain dependencies
+- Adapters in `adapter/out/external/` implement these ports
 
 **Example**:
 ```java
-api/src/main/java/com/pfplaybackend/api/party/partyroom/domain/
-├── domainmodel/
-│   ├── Partyroom.java
-│   └── Crew.java
+application/
 ├── service/
-│   └── PartyroomDomainService.java
-├── enums/
-│   ├── StageType.java
-│   └── GradeType.java
-└── valueobject/
-    ├── PartyroomId.java
-    └── CrewId.java
+│   ├── PartyroomAccessService.java
+│   ├── PartyroomManagementService.java
+│   └── lock/
+│       └── DistributedLockExecutor.java
+├── port/
+│   └── out/
+│       ├── ProfileQueryPort.java
+│       └── PlaylistQueryPort.java
+├── dto/
+│   ├── crew/CrewDto.java
+│   └── playback/PlaybackDto.java
+└── aspect/
+    └── PartyroomContextAspect.java
 ```
 
-**Key Patterns**:
-- Rich domain models with behavior
-- Value objects for type safety
+#### 3. Domain Layer (`domain/`)
+
+**Responsibilities**:
+- Business logic and rules (within Data entities)
 - Domain services for cross-entity operations
-- No infrastructure dependencies
+- Value objects for type safety
+- Domain exceptions
 
-**Domain Model Example**:
+**Key Pattern: Data Entities with Business Logic**
+
+After Phase 1 refactoring, domain models and JPA entities were merged. `*Data.java` entities contain both JPA persistence annotations and business logic methods. There are no separate `domainmodel/` classes or converters.
+
 ```java
-public class Partyroom {
-    private PartyroomId id;
-    private UserId hostId;
-    private String title;
-    private StageType stageType;
-    private boolean isTerminated;
-    private Set<Crew> crews;
+// domain/entity/data/CrewData.java — JPA entity with business logic
+@Entity
+@Table(name = "CREW")
+@Getter @Setter
+public class CrewData extends BaseEntity {
+    @Id @GeneratedValue
+    private Long id;
 
-    // Business logic methods
-    public void terminate() {
-        if (isTerminated) {
-            throw new PartyroomException(ALREADY_TERMINATED);
-        }
-        this.isTerminated = true;
-    }
+    @Embedded
+    private UserId userId;
 
-    public void addCrew(Crew crew) {
-        validateCanAddCrew(crew);
-        crews.add(crew);
-    }
+    @Enumerated(EnumType.STRING)
+    private GradeType gradeType;
 
-    private void validateCanAddCrew(Crew crew) {
-        if (isTerminated) {
-            throw new PartyroomException(PARTYROOM_TERMINATED);
-        }
-        if (crews.size() >= MAX_CREW_SIZE) {
-            throw new PartyroomException(CREW_LIMIT_EXCEEDED);
-        }
+    private boolean isActive;
+    private boolean isBanned;
+
+    // Business logic directly in the entity
+    public boolean canManagePlayback() {
+        return gradeType.isHigherThanOrEqual(GradeType.MODERATOR);
     }
 }
 ```
 
-#### 4. Infrastructure Layer
-**Location**: `infrastructure/repository/` package in each domain
+#### 4. Outbound Adapters (`adapter/out/`)
 
 **Responsibilities**:
-- Data persistence
-- External service integration
-- Messaging infrastructure
-- Caching
+- Data persistence (JPA repositories with QueryDSL)
+- Cross-domain port implementation (adapter/out/external/)
 
-**What belongs here**:
-- `*Data.java` - JPA entities (anemic)
-- `*Repository.java` - Spring Data repositories
-- Custom repository implementations
-- External API clients
+**Key Patterns**:
+- Spring Data repositories in `adapter/out/persistence/`
+- Custom QueryDSL queries in `impl/` subpackage
+- `JPAQueryFactory` injected as Bean (not `new JPAQueryFactory(em)`)
+- Cross-domain adapters implement port interfaces from other domains
 
 **Example**:
 ```java
-api/src/main/java/com/pfplaybackend/api/party/partyroom/infrastructure/repository/
-├── PartyroomData.java           // JPA entity
-├── PartyroomRepository.java     // Spring Data JPA
-├── PartyroomQueryRepository.java // QueryDSL custom queries
-└── converter/
-    └── PartyroomDataConverter.java // Domain ↔ Data conversion
+adapter/out/persistence/
+├── PartyroomRepository.java          # Spring Data JPA interface
+├── custom/
+│   └── PartyroomRepositoryCustom.java # Custom query interface
+└── impl/
+    └── PartyroomRepositoryImpl.java   # QueryDSL implementation
+
+adapter/out/external/
+└── ProfileQueryAdapter.java           # Implements ProfileQueryPort
 ```
 
-**Key Patterns**:
-- JPA entities are anemic (just getters/setters)
-- Use QueryDSL for complex queries
-- Converter translates Domain Model ↔ Data Entity
-- Repository interface exposed to application layer
+### Cross-Domain Communication: Port/Adapter Pattern
 
-**Data Entity Example**:
+When one domain needs data from another, it uses an outbound port interface (defined in the consuming domain) with an adapter implementation:
+
+```
+party domain                              profile domain
+─────────────────                         ─────────────────
+application/port/out/                     adapter/out/persistence/
+  ProfileQueryPort.java ◄── implements ── ProfileQueryAdapter.java
+                                          (in party/adapter/out/external/)
+```
+
+This pattern ensures domains have no compile-time dependencies on each other's internals.
+
+## Gradle Multi-Module Structure
+
+### Module Layout
+
+```
+pfplay-backend-java/                    (Gradle root project)
+├── settings.gradle                      # rootProject.name = 'pfplay'
+│                                        # include 'api', 'realtime'
+├── build.gradle                         # Shared: Java 17, Lombok, Spring DM BOM
+├── gradlew, gradlew.bat, gradle/
+├── api/
+│   ├── build.gradle                     # implementation project(':realtime')
+│   └── src/                             # All domain code
+└── realtime/
+    ├── build.gradle                     # websocket + spring-security-web only
+    └── src/                             # WebSocket infrastructure
+```
+
+### Module Dependencies
+
+```
+api ──depends on──► realtime
+```
+
+**One-directional**: `api` → `realtime`. No reverse dependency. The `realtime` module has zero domain imports.
+
+### realtime Module (10 files)
+
+The `realtime` module contains WebSocket infrastructure, decoupled from domain logic via port interfaces:
+
+```
+com.pfplaybackend.realtime/
+├── config/WebSocketConfig.java          # STOMP configuration
+├── controller/HeartbeatController.java  # Heartbeat STOMP handler
+├── sender/SimpMessageSender.java        # WebSocket message sender
+├── interceptor/
+│   └── WebSocketHandshakeInterceptor.java  # Auth via WebSocketAuthPort
+├── port/
+│   ├── WebSocketAuthPort.java           # Auth port (implemented by api module)
+│   └── SessionCachePort.java            # Session cache port (implemented by api)
+└── event/
+    ├── ConnectionEventListener.java
+    ├── DisconnectionEventListener.java
+    ├── SubscriptionEventListener.java
+    └── UnsubscriptionEventListener.java
+```
+
+### Port Implementations in api Module
+
+| Port Interface (realtime) | Implementation (api) |
+|---|---|
+| `WebSocketAuthPort` | `common/adapter/realtime/JwtWebSocketAuthAdapter.java` |
+| `SessionCachePort` | `party/application/service/cache/PartyroomSessionCacheManager.java` |
+
+### Build Commands
+
+```bash
+JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11"
+
+# Compile
+./gradlew :api:compileJava
+./gradlew :realtime:compileJava
+
+# Test
+./gradlew :api:test
+
+# Clean build
+./gradlew clean :api:test
+```
+
+## Domain-Driven Design
+
+### Data Entities as Domain Models
+
+After the Phase 1 refactoring, the codebase uses a **unified entity model**: `*Data.java` files serve as both JPA entities and domain models. There are no separate `domainmodel/` classes or `Converter` classes.
+
+**Benefits**:
+- No object mapping overhead
+- JPA relationship navigation works naturally
+- Business rules enforced directly on entities
+- Simpler codebase with fewer files
+
+**Pattern**:
 ```java
 @Entity
 @Table(name = "PARTYROOM")
 @Getter @Setter
 public class PartyroomData extends BaseEntity {
-    @Id
-    @Column(name = "partyroom_id")
-    private String id;
+    @Id @GeneratedValue
+    private Long id;
 
-    @Column(name = "host_id", nullable = false)
-    private String hostId;
+    @Embedded
+    private UserId hostId;
 
-    @Column(name = "title", nullable = false)
     private String title;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "stage_type")
-    private StageType stageType;
-
-    @Column(name = "is_terminated")
+    private boolean isPlaybackActivated;
     private boolean isTerminated;
 
-    @OneToMany(mappedBy = "partyroom", cascade = CascadeType.ALL)
-    private Set<CrewData> crewDataSet = new HashSet<>();
-}
-```
-
-### Dependency Rules
-
-**Strict Rules**:
-1. **Presentation** depends on **Application** only
-2. **Application** depends on **Domain** only
-3. **Domain** has NO dependencies (pure business logic)
-4. **Infrastructure** depends on **Domain** (implements interfaces)
-
-**Violated Pattern Detection**:
-- Domain layer importing Spring, JPA, or other framework annotations = VIOLATION
-- Domain layer importing infrastructure classes = VIOLATION
-- Infrastructure layer not implementing domain interfaces = CODE SMELL
-
-## Domain-Driven Design
-
-### Separation of Concerns: Domain vs Data
-
-This is a critical pattern in this codebase:
-
-**Domain Model** (Business Logic)
-```java
-// Location: domain/domainmodel/Partyroom.java
-public class Partyroom {
-    // Rich behavior
-    public void startPlayback(Track track, UserId djUserId) {
-        validateCanStartPlayback(djUserId);
-        this.currentPlayback = Playback.create(track, djUserId);
-        this.isPlaybackActivated = true;
-    }
-}
-```
-
-**Data Entity** (Persistence)
-```java
-// Location: infrastructure/repository/PartyroomData.java
-@Entity
-@Table(name = "PARTYROOM")
-public class PartyroomData {
-    // Anemic - just data
-    @Id private String id;
-    @Column private String title;
-    @Column private boolean isPlaybackActivated;
-    // Only getters/setters
-}
-```
-
-**Why This Separation?**
-1. **Domain Purity**: Business logic independent of persistence
-2. **Testing**: Easy to unit test domain logic
-3. **Flexibility**: Can change persistence without affecting business rules
-4. **Clarity**: Clear separation between "what" (domain) and "how" (persistence)
-
-### Converters
-
-Converters bridge Domain Models and Data Entities:
-
-```java
-@Component
-public class PartyroomConverter {
-
-    // Domain → Data (for persistence)
-    public PartyroomData toData(Partyroom partyroom) {
-        PartyroomData data = new PartyroomData();
-        data.setId(partyroom.getId().getValue());
-        data.setTitle(partyroom.getTitle());
-        data.setIsPlaybackActivated(partyroom.isPlaybackActivated());
-        return data;
-    }
-
-    // Data → Domain (after retrieval)
-    public Partyroom toDomain(PartyroomData data) {
-        return Partyroom.builder()
-            .id(PartyroomId.from(data.getId()))
-            .title(data.getTitle())
-            .isPlaybackActivated(data.isPlaybackActivated())
-            .build();
+    // Business logic methods on the entity itself
+    public void terminate() {
+        if (isTerminated) {
+            throw new PartyroomException(PartyroomExceptionType.ALREADY_TERMINATED);
+        }
+        this.isTerminated = true;
     }
 }
 ```
@@ -354,68 +361,35 @@ public class PartyroomConverter {
 
 Value Objects provide type safety and encapsulation:
 
-**Example: UserId**
 ```java
+// UUID-based value object
+@Embeddable
 public class UserId {
-    private final String value;
+    private UUID id;
 
-    private UserId(String value) {
-        validateFormat(value);
-        this.value = value;
+    public UserId() {
+        this.id = UUID.randomUUID();
     }
 
-    public static UserId from(String value) {
-        return new UserId(value);
-    }
-
-    private void validateFormat(String value) {
-        if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("UserId cannot be blank");
-        }
-        // Additional validation
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserId)) return false;
-        UserId userId = (UserId) o;
-        return Objects.equals(value, userId.value);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(value);
-    }
+    // equals, hashCode based on value
 }
 ```
 
-**Benefits**:
-- Type safety: Can't mix up UserId and PartyroomId
-- Validation in one place
-- Immutable
-- Value equality semantics
+**Key Value Objects**: `UserId`, `PartyroomId`, `CrewId`, `DjId`, `PlaybackId`, `PlaylistId`
 
 ### Aggregates
 
-**Aggregate Root**: Partyroom
-- Owns: Crew, DJ, Playback
-- All modifications go through Partyroom
-- Transaction boundary
+After Phase 2 refactoring, Crew and DJ were separated from the Partyroom aggregate:
 
-**Example**:
-```java
-// ✅ CORRECT: Modify through aggregate root
-partyroom.addCrew(crew);
-partyroom.removeCrew(crewId);
+| Aggregate | Root Entity | Owned Entities |
+|-----------|-------------|----------------|
+| **Partyroom** | `PartyroomData` | (standalone — no child collections) |
+| **Crew** | `CrewData` | `CrewGradeHistoryData`, `CrewPenaltyHistoryData`, `CrewBlockHistoryData` |
+| **DJ** | `DjData` | (standalone) |
+| **Playback** | `PlaybackData` | `PlaybackReactionHistoryData` |
+| **Playlist** | `PlaylistData` | `TrackData` |
 
-// ❌ WRONG: Don't modify child entities directly
-crew.setGrade(GradeType.MODERATOR); // Bypass business rules!
-```
+Crew/DJ reference Partyroom via `@ManyToOne` FK but are accessed through their own repositories.
 
 ## Event-Driven Architecture
 
@@ -434,7 +408,9 @@ Redis Pub/Sub
       ↓
   [All Server Instances]
       ↓
-  [Message Listeners]
+  [Topic Listeners in adapter/in/listener/]
+      ↓
+  [SimpMessageSender (realtime module)]
       ↓
   [WebSocket Broadcasting]
       ↓
@@ -456,44 +432,23 @@ public class RedisMessagePublisher {
 }
 ```
 
-**Usage in Application Service**:
-```java
-@Service
-@Transactional
-public class PlaybackApplicationService {
-
-    public void startPlayback(PartyroomId partyroomId, Track track) {
-        // 1. Business logic
-        Partyroom partyroom = partyroomRepository.findById(partyroomId);
-        partyroom.startPlayback(track);
-
-        // 2. Persist
-        partyroomRepository.save(partyroom);
-
-        // 3. Publish event (after successful transaction)
-        PlaybackStartMessage message = createMessage(partyroom, track);
-        redisMessagePublisher.publishPlaybackStart(partyroomId, message);
-    }
-}
-```
-
 ### Event Subscription
 
-**Listener**:
+**Topic Listener** (in `adapter/in/listener/`):
 ```java
 @Component
-public class PlaybackEventListener {
+@RequiredArgsConstructor
+public class PlaybackStartTopicListener implements MessageListener {
 
-    @RedisMessageListener(topics = "partyroom:*:playback-start")
-    public void handlePlaybackStart(PlaybackStartMessage message) {
-        // Broadcast to WebSocket clients in this server instance
-        messagingTemplate.convertAndSend(
-            "/sub/events/" + message.getPartyroomId() + "/playback-start",
-            message
+    private final SimpMessageSender simpMessageSender;
+
+    @Override
+    public void onMessage(Message message, byte[] pattern) {
+        PlaybackStartMessage parsed = deserialize(message);
+        simpMessageSender.sendToTopic(
+            "/sub/events/" + parsed.getPartyroomId() + "/playback-start",
+            parsed
         );
-
-        // Schedule playback end task
-        taskScheduler.schedulePlaybackEnd(message);
     }
 }
 ```
@@ -518,11 +473,6 @@ public class PlaybackEventListener {
 
 ### 1. Distributed Locking
 
-**Why Needed**:
-- Multiple server instances
-- Concurrent requests to same resource
-- Race conditions in critical sections
-
 **Implementation**:
 ```java
 @Service
@@ -532,40 +482,16 @@ public class DistributedLockExecutor {
     public <T> T execute(String lockKey, Supplier<T> operation) {
         String lock = null;
         try {
-            // Acquire lock
             lock = redisLockService.lock(lockKey, Duration.ofSeconds(10));
             if (lock == null) {
                 throw new ConcurrentAccessException("Could not acquire lock");
             }
-
-            // Execute critical section
             return operation.get();
-
         } finally {
-            // Release lock
             if (lock != null) {
                 redisLockService.unlock(lockKey, lock);
             }
         }
-    }
-}
-```
-
-**Usage Example**:
-```java
-@Service
-public class DjQueueApplicationService {
-
-    public void enqueueDj(PartyroomId partyroomId, UserId userId, PlaylistId playlistId) {
-        String lockKey = "partyroom:" + partyroomId.getValue() + ":dj-queue";
-
-        distributedLockExecutor.execute(lockKey, () -> {
-            // Critical section: modifying DJ queue
-            Partyroom partyroom = partyroomRepository.findById(partyroomId);
-            partyroom.enqueueDj(userId, playlistId);
-            partyroomRepository.save(partyroom);
-            return null;
-        });
     }
 }
 ```
@@ -580,44 +506,22 @@ public class DjQueueApplicationService {
 
 ### 2. Redis Pub/Sub for Cross-Instance Communication
 
-**Problem**: WebSocket clients connected to different server instances
-
-**Solution**: Redis Pub/Sub broadcasts events to all instances
-
 ```
 Client A → Server 1 → Redis Pub/Sub → Server 1 → Client A ✅
-                                    → Server 2 → Client B ✅
-                                    → Server 3 → Client C ✅
+                                     → Server 2 → Client B ✅
+                                     → Server 3 → Client C ✅
 ```
 
 ### 3. Session Management
 
-**WebSocket Sessions in Redis**:
-```java
-@Service
-public class SessionCacheManager {
-    private final RedisTemplate<String, SessionInfo> redisTemplate;
+WebSocket session management uses the **Port/Adapter pattern** across modules:
 
-    public void saveSession(String sessionId, SessionInfo sessionInfo) {
-        String key = "session:" + sessionId;
-        redisTemplate.opsForValue().set(key, sessionInfo, Duration.ofHours(24));
-    }
-
-    public SessionInfo getSession(String sessionId) {
-        String key = "session:" + sessionId;
-        return redisTemplate.opsForValue().get(key);
-    }
-}
-```
-
-**Why Redis?**:
-- Sessions accessible from any server instance
-- Automatic expiration (TTL)
-- Fast in-memory access
+- `realtime` module defines `SessionCachePort` interface
+- `api` module implements it via `PartyroomSessionCacheManager`
+- Sessions stored in Redis with 24h TTL
 
 ### 4. Task Scheduling
 
-**Dynamic Scheduling for Playback**:
 ```java
 @Service
 public class ExpirationTaskScheduler {
@@ -626,22 +530,12 @@ public class ExpirationTaskScheduler {
 
     public void schedulePlaybackEnd(String partyroomId, Duration duration) {
         String taskKey = "playback:" + partyroomId;
-
-        // Cancel existing task if any
         cancelTask(taskKey);
-
-        // Schedule new task
         ScheduledFuture<?> future = taskScheduler.schedule(
             () -> handlePlaybackEnd(partyroomId),
             Instant.now().plus(duration)
         );
-
         scheduledTasks.put(taskKey, future);
-    }
-
-    private void handlePlaybackEnd(String partyroomId) {
-        // Move to next DJ, start next track
-        playbackService.handleTrackEnd(partyroomId);
     }
 }
 ```
@@ -653,19 +547,17 @@ public class ExpirationTaskScheduler {
 ```
 Client Request
     ↓
-Controller (Presentation)
+Controller (adapter/in/web/)
     ↓
-QueryService (Application)
+Application Service (application/service/)
     ↓
-Repository (Infrastructure)
+Repository (adapter/out/persistence/)
     ↓
-Database
+Database → Data Entity (*Data.java)
     ↓
-Data Entity
+Application DTO (application/dto/)
     ↓
-Converter → Domain Model
-    ↓
-Converter → Response DTO
+Response DTO (adapter/in/web/payload/response/)
     ↓
 Client Response
 ```
@@ -675,23 +567,19 @@ Client Response
 ```
 Client Request
     ↓
-Controller (Presentation)
+Controller (adapter/in/web/)
     ↓
-ApplicationService (Application)
+Application Service (application/service/)
     ↓
-Domain Model (Business Logic)
+Data Entity business logic (domain/entity/data/)
     ↓
-Converter → Data Entity
-    ↓
-Repository (Infrastructure)
+Repository (adapter/out/persistence/)
     ↓
 Database
     ↓
-Event Publisher
+Redis Event Publisher
     ↓
-Redis Pub/Sub
-    ↓
-All Server Instances
+Topic Listeners (adapter/in/listener/) → SimpMessageSender (realtime)
     ↓
 WebSocket Clients
 ```
@@ -700,42 +588,23 @@ WebSocket Clients
 
 ### Horizontal Scaling
 
-The application is designed for horizontal scaling:
-
 1. **Stateless API**: No server-side session state
 2. **Redis for Shared State**: Sessions, locks, cache
 3. **Pub/Sub for Events**: Cross-instance communication
 4. **Database Connection Pooling**: HikariCP
 5. **Load Balancer Ready**: Any instance can handle any request
 
-### Caching Strategy
-
-```java
-@Service
-public class PartyroomQueryService {
-
-    @Cacheable(value = "partyroom", key = "#partyroomId")
-    public PartyroomInfoResponse getPartyroomInfo(String partyroomId) {
-        // Cache miss: query database
-        // Cache hit: return from Redis
-    }
-
-    @CacheEvict(value = "partyroom", key = "#partyroomId")
-    public void evictCache(String partyroomId) {
-        // Invalidate cache when data changes
-    }
-}
-```
-
 ### Performance Patterns
 
-1. **QueryDSL for Efficient Queries**: Avoid N+1 problems
-2. **Fetch Joins**: Load related entities in one query
+1. **QueryDSL with fetchJoin**: Prevent N+1 problems (Phase 5 applied)
+2. **Single-table queries**: Avoid unnecessary cross-joins
 3. **Indexes**: On foreign keys and frequently queried columns
 4. **Connection Pooling**: Reuse database connections
 5. **Redis for Hot Data**: Frequently accessed data in Redis
 
 ---
+
+**Last Updated**: 2026-02-20
 
 **Related Documents**:
 - [DOMAIN_MODELS.md](DOMAIN_MODELS.md) - Domain entities and relationships

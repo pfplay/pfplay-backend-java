@@ -657,16 +657,27 @@ public class PartyroomSecurityService {
 
 ## WebSocket Security
 
+### Module Separation
+
+WebSocket security is split across two Gradle modules:
+
+| Component | Module | Purpose |
+|---|---|---|
+| `WebSocketHandshakeInterceptor` | `realtime` | Intercepts handshake, delegates auth to port |
+| `WebSocketAuthPort` | `realtime` | Port interface for auth abstraction |
+| `JwtWebSocketAuthAdapter` | `api` | Implements WebSocketAuthPort using JwtCookieValidator |
+| `SessionCachePort` | `realtime` | Port interface for session management |
+| `PartyroomSessionCacheManager` | `api` | Implements SessionCachePort using Redis |
+
 ### Handshake Authentication
 
-**JwtHandshakeInterceptor**:
+**WebSocketHandshakeInterceptor** (in `realtime` module):
 ```java
 @Component
 @RequiredArgsConstructor
-public class JwtHandshakeInterceptor implements HandshakeInterceptor {
+public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
 
-    private final JwtService jwtService;
-    private final CookieBearerTokenResolver tokenResolver;
+    private final WebSocketAuthPort webSocketAuthPort;
 
     @Override
     public boolean beforeHandshake(
@@ -675,53 +686,40 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
             WebSocketHandler wsHandler,
             Map<String, Object> attributes) {
 
-        // Extract JWT from cookie
-        String token = tokenResolver.resolve(
-            ((ServletServerHttpRequest) request).getServletRequest()
-        );
+        // Delegate JWT extraction/validation to WebSocketAuthPort
+        Optional<String> userId = webSocketAuthPort.extractUserId(request);
 
-        if (token == null) {
+        if (userId.isEmpty()) {
             return false; // Reject connection
         }
 
-        // Validate JWT
-        if (!jwtService.validateToken(token)) {
-            return false;
-        }
-
-        // Extract user info and store in attributes
-        try {
-            Claims claims = jwtService.getClaimsFromToken(token);
-            UserId userId = UserId.from(claims.getSubject());
-            String email = claims.get("email", String.class);
-            String role = claims.get("role", String.class);
-
-            attributes.put("userId", userId);
-            attributes.put("email", email);
-            attributes.put("role", role);
-
-            return true; // Accept connection
-
-        } catch (Exception e) {
-            log.error("Failed to extract JWT claims", e);
-            return false;
-        }
-    }
-
-    @Override
-    public void afterHandshake(
-            ServerHttpRequest request,
-            ServerHttpResponse response,
-            WebSocketHandler wsHandler,
-            Exception exception) {
-        // Optional: Log successful handshake
+        attributes.put("userId", userId.get());
+        return true;
     }
 }
 ```
 
-### Message-Level Security
+**JwtWebSocketAuthAdapter** (in `api` module, implements the port):
+```java
+@Component
+@RequiredArgsConstructor
+public class JwtWebSocketAuthAdapter implements WebSocketAuthPort {
 
-**WebSocket Configuration**:
+    private final JwtCookieValidator jwtCookieValidator;
+
+    @Override
+    public Optional<String> extractUserId(ServerHttpRequest request) {
+        // Extract JWT from cookie, validate, and return userId
+        return jwtCookieValidator.validateAndExtractUserId(request);
+    }
+}
+```
+
+> **Key Design**: The `realtime` module has zero domain imports. JWT/cookie logic stays in `api` module; `realtime` only depends on the port interface.
+
+### STOMP Configuration
+
+**WebSocketConfig** (in `realtime` module):
 ```java
 @Configuration
 @EnableWebSocketMessageBroker
@@ -737,26 +735,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
             .setAllowedOriginPatterns("*")
-            .addInterceptors(jwtHandshakeInterceptor())
+            .addInterceptors(webSocketHandshakeInterceptor)
             .withSockJS();
-    }
-
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new ChannelInterceptor() {
-            @Override
-            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor =
-                    MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
-
-                if (StompCommand.CONNECT.equals(accessor.getCommand())) {
-                    // Validate session on CONNECT
-                    validateSession(accessor);
-                }
-
-                return message;
-            }
-        });
     }
 }
 ```

@@ -182,12 +182,12 @@ public class PartyroomApplicationService {
             .build();
 
         // 4. Save partyroom
-        PartyroomData savedData = partyroomRepository.save(converter.toData(partyroom));
+        PartyroomData savedData = partyroomRepository.save(partyroom);
 
         // 5. Add host as Crew with HOST grade
         crewService.addCrew(savedData.getId(), hostId, GradeType.HOST);
 
-        return converter.toResponse(savedData);
+        return toResponse(savedData);
     }
 }
 ```
@@ -239,13 +239,13 @@ public class PartyroomAccessApplicationService {
             .enteredAt(LocalDateTime.now())
             .build();
 
-        CrewData savedCrew = crewRepository.save(converter.toData(crew));
+        CrewData savedCrew = crewRepository.save(crew);
 
         // 5. Publish event
         AccessEventMessage message = createAccessMessage(savedCrew);
         redisMessagePublisher.publishPartyroomAccess(partyroomId, message);
 
-        return converter.toResponse(savedCrew);
+        return toResponse(savedCrew);
     }
 }
 ```
@@ -325,12 +325,12 @@ public class DjQueueApplicationService {
                 .isQueued(true)
                 .build();
 
-            DjData savedDj = djRepository.save(converter.toData(dj));
+            DjData savedDj = djRepository.save(dj);
 
             // 8. Publish event
             redisMessagePublisher.publishDjEnqueued(partyroomId, savedDj);
 
-            return converter.toResponse(savedDj);
+            return toResponse(savedDj);
         });
     }
 }
@@ -376,13 +376,13 @@ public class DjQueueRotationService {
             // 3. Move current DJ to end
             Integer maxOrder = djQueue.get(djQueue.size() - 1).getOrderNumber();
             currentDj.setOrderNumber(maxOrder + 1);
-            djRepository.save(converter.toData(currentDj));
+            djRepository.save(currentDj);
 
             // 4. Shift all other DJs up
             for (int i = 1; i < djQueue.size(); i++) {
                 Dj dj = djQueue.get(i);
                 dj.setOrderNumber(i);
-                djRepository.save(converter.toData(dj));
+                djRepository.save(dj);
             }
 
             // 5. Start next DJ's first track
@@ -458,12 +458,12 @@ public class PlaybackApplicationService {
                 .endTime(endTime)
                 .build();
 
-            PlaybackData savedPlayback = playbackRepository.save(converter.toData(playback));
+            PlaybackData savedPlayback = playbackRepository.save(playback);
 
             // 7. Update partyroom
             partyroom.setIsPlaybackActivated(true);
             partyroom.setCurrentPlaybackId(savedPlayback.getId());
-            partyroomRepository.save(converter.toData(partyroom));
+            partyroomRepository.save(partyroom);
 
             // 8. Publish event
             PlaybackStartMessage message = createMessage(savedPlayback, currentDj);
@@ -472,7 +472,7 @@ public class PlaybackApplicationService {
             // 9. Schedule playback end
             taskScheduler.schedulePlaybackEnd(partyroomId, Duration.ofSeconds(track.getDuration()));
 
-            return converter.toResponse(savedPlayback);
+            return toResponse(savedPlayback);
         });
     }
 }
@@ -531,7 +531,7 @@ public class PlaybackSkipService {
             // 4. Update partyroom
             partyroom.setIsPlaybackActivated(false);
             partyroom.setCurrentPlaybackId(null);
-            partyroomRepository.save(converter.toData(partyroom));
+            partyroomRepository.save(partyroom);
 
             // 5. Cancel scheduled task
             taskScheduler.cancelPlaybackEnd(partyroomId);
@@ -602,7 +602,7 @@ public class ReactionApplicationService {
 
             // 3. Increment new reaction count
             incrementCount(playback, reactionType);
-            playbackRepository.save(converter.toData(playback));
+            playbackRepository.save(playback);
 
             // 4. Handle GRAB - add to user's playlist
             if (reactionType == ReactionType.GRAB) {
@@ -661,7 +661,7 @@ public class CrewGradeApplicationService {
 
         // 5. Change grade
         crew.setGradeType(newGrade);
-        crewRepository.save(converter.toData(crew));
+        crewRepository.save(crew);
 
         // 6. Create history
         CrewGradeHistory history = CrewGradeHistory.builder()
@@ -757,55 +757,44 @@ Client A                Backend                      Redis               All Cli
 
 **Implementation**:
 
-**Send Message**:
+**Send Message** (in `party/adapter/in/stomp/PartyroomChatController.java`):
 ```java
 @Controller
-public class ChatMessageController {
+public class PartyroomChatController {
 
     @MessageMapping("/groups/{chatroomId}/send")
     public void sendGroupMessage(@DestinationVariable String chatroomId,
-                                  GroupChatMessageRequest request,
-                                  @AuthenticationPrincipal UserPrincipal principal) {
-        // 1. Validate user is crew
-        UserId userId = principal.getUserId();
-        Crew crew = crewRepository.findActiveCrewByChatroom(chatroomId, userId)
-            .orElseThrow(() -> new ForbiddenException("Not in chatroom"));
-
-        // 2. Check chat ban
-        if (crew.isChatBanned()) {
-            throw new ForbiddenException("Chat banned");
-        }
-
-        // 3. Create message
-        GroupChatMessage message = GroupChatMessage.builder()
-            .id(UUID.randomUUID().toString())
-            .chatroomId(chatroomId)
-            .senderId(userId.getValue())
-            .content(request.getContent())
-            .timestamp(LocalDateTime.now())
-            .build();
-
-        // 4. Publish to Redis (will be received by all instances)
+                                  IncomingGroupChatMessage request,
+                                  StompHeaderAccessor accessor) {
+        // 1. Extract user from session
+        // 2. Validate sender and chat ban
+        // 3. Publish to Redis (will be received by all instances)
         redisMessagePublisher.publishChatMessage(chatroomId, message);
     }
 }
 ```
 
-**Receive and Broadcast**:
+**Receive and Broadcast** (in `party/adapter/in/listener/ChatTopicListener.java`):
 ```java
 @Component
-public class ChatMessageListener {
+@RequiredArgsConstructor
+public class ChatTopicListener implements MessageListener {
 
-    @RedisMessageListener(topics = "chatroom:*:message")
-    public void handleChatMessage(GroupChatMessage message) {
-        // Broadcast to all WebSocket clients connected to this instance
-        messagingTemplate.convertAndSend(
-            "/sub/groups/" + message.getChatroomId(),
-            message
+    private final SimpMessageSender simpMessageSender;  // from realtime module
+
+    @Override
+    public void onMessage(Message message, byte[] pattern) {
+        OutgoingGroupChatMessage parsed = deserialize(message);
+        // Broadcast via realtime module's SimpMessageSender
+        simpMessageSender.sendToTopic(
+            "/sub/groups/" + parsed.getChatroomId(),
+            parsed
         );
     }
 }
 ```
+
+> **Note**: Chat files were moved from the `liveconnect` package to `party/adapter/in/stomp/` and `party/adapter/in/listener/` as part of Phase 4 refactoring.
 
 ## Playlist Flows
 
@@ -856,9 +845,9 @@ public class PlaylistApplicationService {
             .orderNumber(maxOrder + 1)
             .build();
 
-        PlaylistData saved = playlistRepository.save(converter.toData(playlist));
+        PlaylistData saved = playlistRepository.save(playlist);
 
-        return converter.toResponse(saved);
+        return toResponse(saved);
     }
 
     public TrackInfoResponse addTrack(PlaylistId playlistId, String linkId) {
@@ -883,9 +872,9 @@ public class PlaylistApplicationService {
             .orderNumber(maxOrder + 1)
             .build();
 
-        TrackData saved = trackRepository.save(converter.toData(track));
+        TrackData saved = trackRepository.save(track);
 
-        return converter.toResponse(saved);
+        return toResponse(saved);
     }
 }
 ```
