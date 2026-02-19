@@ -159,14 +159,12 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     @Override
     public List<PlaybackData> getRecentPlaybackHistory(PartyroomId partyroomId) {
-        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QPlaybackData qPlaybackData = QPlaybackData.playbackData;
 
         return queryFactory
                 .select(qPlaybackData)
-                .from(qPartyroomData, qPlaybackData)
-                .where(qPartyroomData.id.eq(partyroomId.getId())
-                        .and(qPartyroomData.id.eq(qPlaybackData.partyroomId.id)))
+                .from(qPlaybackData)
+                .where(qPlaybackData.partyroomId.id.eq(partyroomId.getId()))
                 .orderBy(qPlaybackData.createdAt.desc())
                 .limit(20)
                 .fetch();

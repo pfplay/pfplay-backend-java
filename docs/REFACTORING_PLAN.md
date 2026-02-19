@@ -1,6 +1,6 @@
 # PFPlay Backend - DDD Cleanup Refactoring Plan
 
-> **작성일**: 2026-02-18 (갱신: 2026-02-19)
+> **작성일**: 2026-02-18 (갱신: 2026-02-20)
 > **브랜치**: `refactor/ddd-cleanup` (`chore/playlist-tests` 에서 분기)
 > **목표**: 현재 구조를 DDD + 헥사고널 아키텍처 기반의 모듈러 모놀리스로 개편
 
@@ -54,7 +54,7 @@
 
 ---
 
-## Phase 0: 기반 정비
+## Phase 0: 기반 정비 ✅ 완료
 
 ### 목표
 어떤 리팩토링을 하든 방해가 되는 버그/안티패턴을 먼저 제거
@@ -125,7 +125,7 @@ cd api && ./gradlew compileJava && ./gradlew test
 
 ---
 
-## Phase 1: Data 엔티티 통합
+## Phase 1: Data 엔티티 통합 ✅ 완료
 
 ### 목표
 Domain Model 비즈니스 로직을 Data 엔티티로 병합하고, Converter를 제거하여 JPA 이점을 구조적으로 활용
@@ -225,7 +225,7 @@ cd api && ./gradlew compileJava && ./gradlew test
 
 ---
 
-## Phase 2: Aggregate 분리
+## Phase 2: Aggregate 분리 ✅ 완료
 
 ### 목표
 비대한 Partyroom 어그리게잇에서 Crew, DJ를 독립 어그리게잇으로 분리
@@ -265,7 +265,7 @@ Crew/DJ는 독립 Repository를 통해서만 접근.
 
 ---
 
-## Phase 3: 헥사고널 패키지 구조 개편
+## Phase 3: 헥사고널 패키지 구조 개편 ✅ 완료
 
 ### 목표
 각 도메인을 port/adapter 구조로 정리하고, 도메인 간 인터페이스를 명확히 정의
@@ -363,40 +363,111 @@ user/profile처럼 party를 partyroom/crew/dj/playback으로 최상위 분리할
 
 ---
 
-## Phase 4: 채팅 모듈 WebFlux 분리
+## Phase 4: Gradle 멀티모듈 분리 (STOMP 유지) ✅ 완료 (2026-02-20)
 
 ### 목표
-liveconnect 도메인을 별도 Gradle 모듈로 분리하고 WebFlux 기반으로 전환
+liveconnect 패키지의 WebSocket 인프라를 독립 Gradle 모듈(`realtime`)로 분리하여 도메인 코드와 컴파일 타임 경계를 만든다. STOMP 프로토콜은 유지.
 
-### 현재 상태
-`api/src/main/java/com/pfplaybackend/api/liveconnect/` 안에 chat + websocket 패키지가 존재.
-STOMP 기반 WebSocket + Redis pub/sub 구조.
+### 실제 수행 내역
 
-### 4-1. Gradle 멀티 모듈 구성
+#### 4-1. Gradle 멀티모듈 구조 설정
 
 ```
-pfplay-backend-java/
-├── api/                    # 기존 Servlet 기반 모듈
-├── chat/                   # 새로운 WebFlux 모듈
-│   └── src/main/java/com/pfplaybackend/chat/
-├── common/                 # 공유 모듈 (DTO, Value Objects)
-└── settings.gradle         # include 'api', 'chat', 'common'
+pfplay-backend-java/           (새 Gradle root)
+├── settings.gradle             # rootProject.name = 'pfplay', include 'api', 'realtime'
+├── build.gradle                # 공유 설정 (Java 17, Lombok, Spring DM BOM)
+├── gradlew, gradlew.bat, gradle/   (api/에서 루트로 이동)
+├── api/
+│   ├── build.gradle            # implementation project(':realtime') + 도메인 의존성
+│   └── src/
+└── realtime/
+    ├── build.gradle            # websocket + spring-security-web만
+    └── src/main/java/com/pfplaybackend/realtime/
 ```
 
-### 4-2. WebFlux 전환 대상
+- `api/settings.gradle` 삭제 → 루트 `settings.gradle`로 교체
+- `api/gradlew`, `api/gradlew.bat`, `api/gradle/` → 루트로 이동
+- 루트 `build.gradle` 신규 (subprojects 공유 설정)
+- `api/build.gradle` 수정 (공유 설정 제거, `implementation project(':realtime')` 추가)
 
-| 현재 (Blocking) | 목표 (Reactive) |
-|---|---|
-| `SimpMessagingTemplate` | `WebSocketHandler` + `WebSocketSession` |
-| `RedisTemplate` | `ReactiveRedisTemplate` |
-| `@MessageMapping` (STOMP) | Reactor Netty WebSocket |
-| `ChatTopicListener` (blocking) | `ReactiveRedisOperations.listenTo()` |
+#### 4-2. realtime 모듈 생성 (10파일, 도메인 import 제로)
+
+**Port 인터페이스 (신규):**
+- `realtime/.../port/WebSocketAuthPort.java` — 인증 추상화 (`Optional<String> extractUserId`)
+- `realtime/.../port/SessionCachePort.java` — 세션 캐시 추상화 (`String userId` 기반, UserId 제거)
+
+**WebSocket 인프라 (liveconnect에서 이동+수정):**
+
+| 원본 (api/liveconnect/) | 이동 (realtime/) | 변경 사항 |
+|---|---|---|
+| `websocket/WebSocketConfig.java` | `config/WebSocketConfig.java` | `JwtHandshakeInterceptor` → `WebSocketHandshakeInterceptor` (WebSocketAuthPort 기반) |
+| `websocket/SimpMessageSender.java` | `sender/SimpMessageSender.java` | 패키지명만 변경 |
+| `websocket/HeartbeatController.java` | `controller/HeartbeatController.java` | SimpMessageSender import 경로 변경 |
+| `websocket/interceptor/JwtHandshakeInterceptor.java` | `interceptor/WebSocketHandshakeInterceptor.java` | `JwtCookieValidator` 제거 → `WebSocketAuthPort` 사용 |
+| `websocket/cache/SessionCacheManager.java` | 삭제 (SessionCachePort로 대체) | — |
+| `websocket/exception/SessionException.java` | 삭제 (AuthenticationServiceException 직접 사용) | — |
+| `websocket/event/listener/ConnectionEventListener.java` | `event/ConnectionEventListener.java` | 패키지만 변경 |
+| `websocket/event/listener/DisconnectionEventListener.java` | `event/DisconnectionEventListener.java` | `SessionCacheManager` → `SessionCachePort` |
+| `websocket/event/listener/SubscriptionEventListener.java` | `event/SubscriptionEventListener.java` | `SessionCacheManager`+`UserId`+`ExceptionCreator` → `SessionCachePort`+`String`+`AuthenticationServiceException` |
+| `websocket/event/listener/UnsubscriptionEventListener.java` | `event/UnsubscriptionEventListener.java` | 동일 패턴 |
+
+#### 4-3. api 모듈 — Port 구현체 등록
+
+**WebSocketAuthPort 구현 (신규):**
+- `api/.../common/adapter/realtime/JwtWebSocketAuthAdapter.java` — `JwtCookieValidator` 위임
+
+**SessionCachePort 구현 (기존 수정):**
+- `api/.../party/application/service/cache/PartyroomSessionCacheManager.java`
+  - `implements SessionCacheManager` → `implements SessionCachePort`
+  - `saveSessionCache(String, UserId, String)` → `saveSessionCache(String, String, String)` (내부에서 `UserId.fromString()` 변환)
+
+**SimpMessageSender import 경로 변경 (15파일):**
+- `common/config/redis/RedisConfig.java`
+- `party/adapter/in/listener/` 하위 12개 토픽 리스너
+- `party/adapter/in/listener/ChatTopicListener.java` (이동된 파일)
+- `party/application/service/chat/PartyroomChatService.java` (`SessionCachePort`로도 변경)
+
+#### 4-4. liveconnect 패키지 정리 → party로 통합
+
+| 원본 | 이동 |
+|------|------|
+| `liveconnect/chat/adapter/in/stomp/PartyroomChatController.java` | `party/adapter/in/stomp/PartyroomChatController.java` |
+| `liveconnect/chat/adapter/in/listener/ChatTopicListener.java` | `party/adapter/in/listener/ChatTopicListener.java` |
+| `liveconnect/chat/adapter/in/listener/message/OutgoingGroupChatMessage.java` | `party/adapter/in/listener/message/OutgoingGroupChatMessage.java` |
+
+- `admin/application/service/ChatSimulationService.java` — OutgoingGroupChatMessage import 경로 변경
+- `liveconnect/` 패키지 완전 삭제
+
+### 수치 요약
+
+| 항목 | 수량 |
+|------|------|
+| 신규 생성 (realtime 모듈) | 10파일 |
+| 신규 생성 (api 모듈) | 1파일 (JwtWebSocketAuthAdapter) |
+| liveconnect → party 이동 | 3파일 |
+| import 경로 수정 | 15파일 |
+| 삭제 | liveconnect 전체 (13파일) + api/settings.gradle |
+| Gradle 구조 변경 | 5파일 (settings, build x2, gradlew 이동) |
+
+### 빌드 명령어 변경
+
+```bash
+# Before (api 디렉토리에서)
+cd api && ./gradlew compileJava
+cd api && ./gradlew test
+
+# After (루트에서)
+JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11" ./gradlew :api:compileJava
+JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11" ./gradlew :api:test
+JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11" ./gradlew :realtime:compileJava
+```
 
 ### 완료 기준
-- [ ] `chat` 모듈이 독립적으로 빌드됨
-- [ ] WebSocket 연결이 WebFlux 기반으로 동작
-- [ ] `api` 모듈에서 liveconnect 패키지 제거
-- [ ] 전체 테스트 통과
+- [x] `realtime` 모듈이 독립적으로 컴파일됨 (도메인 import 제로)
+- [x] `api` → `realtime` 단방향 의존 (역방향 없음)
+- [x] `api` 모듈에서 `liveconnect/` 패키지 완전 삭제
+- [x] chat 파일이 `party/adapter/in/` 하위로 통합
+- [x] 전체 테스트 통과 (0 failures)
 
 ---
 
@@ -427,17 +498,17 @@ pfplay-backend-java/
 ## Phase 간 의존 관계
 
 ```
-Phase 0 (기반 정비)
+Phase 0 (기반 정비)               ✅ 완료
     ↓
-Phase 1 (Data 엔티티 통합)     ← 가장 큰 작업, Phase 0 완료 필수
+Phase 1 (Data 엔티티 통합)         ✅ 완료
     ↓
-Phase 2 (Aggregate 분리)       ← Phase 1 완료 후에만 가능
+Phase 2 (Aggregate 분리)           ✅ 완료
     ↓
-Phase 3 (헥사고널 패키지 구조)  ← Phase 2와 병행 가능하나 순차 권장
+Phase 3 (헥사고널 패키지 구조)      ✅ 완료
     ↓
-Phase 4 (채팅 WebFlux 분리)    ← Phase 3 완료 후 권장
+Phase 4 (Gradle 멀티모듈 분리)     ✅ 완료 (2026-02-20)
     ↓
-Phase 5 (QueryDSL 정비)        ← 마지막, 구조 안정화 후
+Phase 5 (QueryDSL 정비)           ⬜ 다음 작업
 ```
 
 ---
@@ -459,20 +530,24 @@ Phase 5 (QueryDSL 정비)        ← 마지막, 구조 안정화 후
 # 환경 설정
 export JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11"
 
-# 컴파일 확인
-cd api && ./gradlew compileJava
+# 컴파일 확인 (루트에서)
+./gradlew :api:compileJava
+./gradlew :realtime:compileJava
 
 # 전체 테스트
-cd api && ./gradlew test
+./gradlew :api:test
 
 # 특정 도메인 테스트
-cd api && ./gradlew test --tests "com.pfplaybackend.api.party.*"
-cd api && ./gradlew test --tests "com.pfplaybackend.api.playlist.*"
+./gradlew :api:test --tests "com.pfplaybackend.api.party.*"
+./gradlew :api:test --tests "com.pfplaybackend.api.playlist.*"
 
 # 빠른 빌드 확인 (테스트 제외)
-cd api && ./gradlew build -x test
+./gradlew :api:build -x test
+
+# 클린 빌드
+./gradlew clean :api:test
 ```
 
 ---
 
-**문서 최종 업데이트**: 2026-02-19
+**문서 최종 업데이트**: 2026-02-20

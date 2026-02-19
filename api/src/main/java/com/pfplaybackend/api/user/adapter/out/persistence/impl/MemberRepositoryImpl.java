@@ -25,11 +25,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
         MemberData memberData = queryFactory
                 .select(qMemberData)
                 .from(qMemberData)
-                .join(qMemberData.profileData, qProfileData)
-                .join(qMemberData.activityDataMap, qActivityData)
-                .where(qMemberData.userId.eq(userId)
-                        .and(qActivityData.userId.eq(userId))
-                        .and(qProfileData.userId.eq(userId)))
+                .leftJoin(qMemberData.profileData, qProfileData).fetchJoin()
+                .leftJoin(qMemberData.activityDataMap, qActivityData).fetchJoin()
+                .where(qMemberData.userId.eq(userId))
                 .fetchOne();
 
         return Optional.ofNullable(memberData);

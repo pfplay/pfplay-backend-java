@@ -26,7 +26,7 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom {
                                 qPlaylistData.name,
                                 qPlaylistData.orderNumber,
                                 qPlaylistData.type,
-                                qTrackData.id.count().as("memberCount")
+                                qTrackData.id.count().as("musicCount")
                         )
                 )
                 .from(qPlaylistData)

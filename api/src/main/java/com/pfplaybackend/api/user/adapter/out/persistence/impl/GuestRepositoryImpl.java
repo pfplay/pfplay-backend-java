@@ -23,9 +23,8 @@ public class GuestRepositoryImpl implements GuestRepositoryCustom {
         GuestData guestData = queryFactory
                 .select(qGuestData)
                 .from(qGuestData)
-                .join(qGuestData.profileData, qProfileData)
-                .where(qProfileData.userId.eq(qGuestData.userId)
-                        .and(qGuestData.userId.eq(userId)))
+                .leftJoin(qGuestData.profileData, qProfileData).fetchJoin()
+                .where(qGuestData.userId.eq(userId))
                 .fetchOne();
 
         return Optional.ofNullable(guestData);
