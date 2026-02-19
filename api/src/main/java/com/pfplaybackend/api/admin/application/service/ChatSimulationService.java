@@ -251,6 +251,6 @@ public class ChatSimulationService {
                 message
         );
 
-        messagePublisher.publish(MessageTopic.CHAT, chatMessage);
+        messagePublisher.publish(MessageTopic.CHAT.topic(), chatMessage);
     }
 }

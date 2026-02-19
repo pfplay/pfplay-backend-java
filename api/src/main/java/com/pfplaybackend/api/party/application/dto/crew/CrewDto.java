@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.dto.crew;
 
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

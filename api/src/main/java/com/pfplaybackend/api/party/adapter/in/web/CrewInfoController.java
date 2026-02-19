@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.adapter.in.web;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.application.service.CrewInfoService;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.adapter.in.web.payload.request.GetOtherProfileSummaryRequest;
 import com.pfplaybackend.api.user.adapter.in.web.payload.response.OtherProfileSummaryResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;

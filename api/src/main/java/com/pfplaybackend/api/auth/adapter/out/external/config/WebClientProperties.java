@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.common.config.security.jwt.properties;
+package com.pfplaybackend.api.auth.adapter.out.external.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

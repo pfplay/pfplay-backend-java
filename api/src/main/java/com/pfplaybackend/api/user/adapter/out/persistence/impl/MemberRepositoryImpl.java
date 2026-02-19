@@ -4,7 +4,7 @@ import com.pfplaybackend.api.profile.domain.QProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.data.QActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.QMemberData;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.adapter.out.persistence.custom.MemberRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

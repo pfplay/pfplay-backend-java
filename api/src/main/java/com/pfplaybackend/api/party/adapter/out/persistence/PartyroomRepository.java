@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.adapter.out.persistence;
 
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

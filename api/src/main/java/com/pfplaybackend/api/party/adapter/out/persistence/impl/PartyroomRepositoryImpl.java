@@ -8,7 +8,7 @@ import com.pfplaybackend.api.party.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.party.domain.entity.data.*;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.custom.PartyroomRepositoryCustom;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;

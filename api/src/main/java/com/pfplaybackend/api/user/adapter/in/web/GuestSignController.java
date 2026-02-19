@@ -1,8 +1,11 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
+import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.application.service.GuestSignService;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +29,12 @@ public class GuestSignController {
             HttpServletResponse response
     ) {
         GuestData guest = guestSignService.getGuestOrCreate();
-        cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessTokenForGuest(guest));
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessToken(TokenClaimsRequest.builder()
+                .uid(guest.getUserId().getUid().toString())
+                .email("N/A")
+                .accessLevel(AccessLevel.ROLE_GUEST)
+                .authorityTier(AuthorityTier.GT)
+                .build()));
 
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));

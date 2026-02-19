@@ -6,6 +6,7 @@ import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.profile.domain.vo.Avatar;
 import com.pfplaybackend.api.profile.domain.vo.AvatarBody;
 import com.pfplaybackend.api.profile.domain.vo.AvatarFace;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
 import lombok.Builder;

@@ -13,7 +13,7 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

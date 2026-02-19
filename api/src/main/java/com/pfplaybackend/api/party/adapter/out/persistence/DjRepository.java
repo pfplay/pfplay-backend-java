@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.adapter.out.persistence;
 
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

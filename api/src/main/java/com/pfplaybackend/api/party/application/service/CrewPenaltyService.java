@@ -24,7 +24,7 @@ import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.PunishPenaltyRequest;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -141,6 +141,6 @@ public class CrewPenaltyService {
     }
 
     private void publishCrewPenaltyChangedEvent(CrewPenaltyMessage message) {
-        messagePublisher.publish(MessageTopic.CREW_PENALTY, message);
+        messagePublisher.publish(MessageTopic.CREW_PENALTY.topic(), message);
     }
 }

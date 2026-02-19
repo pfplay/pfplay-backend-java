@@ -2,7 +2,7 @@ package com.pfplaybackend.api.user.adapter.out.external;
 
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

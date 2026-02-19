@@ -1,8 +1,10 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
+import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
 import com.pfplaybackend.api.user.application.dto.command.UpdateWalletCommand;
 import com.pfplaybackend.api.user.application.service.UserWalletService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
@@ -39,7 +41,12 @@ public class UserWalletController {
                 .walletAddress(request.getWalletAddress())
                 .build()
         );
-        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessTokenForMember(member));
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder()
+                .uid(member.getUserId().getUid().toString())
+                .email(member.getEmail())
+                .accessLevel(AccessLevel.ROLE_MEMBER)
+                .authorityTier(member.getAuthorityTier())
+                .build()));
 
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));

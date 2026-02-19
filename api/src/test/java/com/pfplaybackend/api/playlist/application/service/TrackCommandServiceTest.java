@@ -15,7 +15,7 @@ import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MoveTrackRe
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdateTrackOrderRequest;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

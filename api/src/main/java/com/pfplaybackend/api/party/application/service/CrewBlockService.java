@@ -16,7 +16,7 @@ import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.AddBlockRequest;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.profile.application.service.UserProfileService;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -28,6 +28,6 @@ public class UserProfileEventService {
                 profile.getOffsetY(),
                 profile.getScale()
         );
-        messagePublisher.publish(MessageTopic.CREW_PROFILE_PRE_CHECK, crewProfilePreCheckMessage);
+        messagePublisher.publish(MessageTopic.CREW_PROFILE_PRE_CHECK.topic(), crewProfilePreCheckMessage);
     }
 }

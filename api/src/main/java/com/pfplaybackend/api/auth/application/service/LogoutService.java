@@ -5,7 +5,7 @@ import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWith
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.common.config.security.model;
+package com.pfplaybackend.api.auth.domain.value;
 
-import com.pfplaybackend.api.common.config.security.properties.OAuth2ProviderConfig;
+import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2ProviderConfig;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 
 import java.util.Map;

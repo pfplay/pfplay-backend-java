@@ -7,7 +7,7 @@ import com.pfplaybackend.api.admin.adapter.in.web.dto.response.VirtualMemberResp
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

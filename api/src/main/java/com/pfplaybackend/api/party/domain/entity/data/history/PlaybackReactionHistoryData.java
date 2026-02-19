@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.domain.entity.data.history;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;

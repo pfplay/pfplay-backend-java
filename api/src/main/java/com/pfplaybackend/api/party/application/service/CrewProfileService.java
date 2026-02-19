@@ -27,7 +27,7 @@ public class CrewProfileService {
      * 같은 파티 멤버들에게 해당 변경 상태를 통지한다.
      */
     private void publishProfileChangedEvent(ActivePartyroomWithCrewDto dto, CrewProfilePreCheckMessage message) {
-        messagePublisher.publish(MessageTopic.CREW_PROFILE,
+        messagePublisher.publish(MessageTopic.CREW_PROFILE.topic(),
                 CrewProfileMessage.from(new PartyroomId(dto.getId()), dto.getCrewId(), message));
     }
 

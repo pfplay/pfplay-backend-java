@@ -1,13 +1,12 @@
 package com.pfplaybackend.api.common.config.security.jwt;
 
 import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
+import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
 import com.pfplaybackend.api.common.config.security.jwt.enums.TokenClaim;
 import com.pfplaybackend.api.common.config.security.jwt.enums.TokenSubject;
 import com.pfplaybackend.api.common.config.security.jwt.properties.JwtProperties;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.AuthenticationException;
-import com.pfplaybackend.api.user.domain.entity.data.GuestData;
-import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -35,70 +34,28 @@ public class JwtService {
         return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
     }
 
-    /**
-     * Member용 AccessToken 생성
-     */
-    public String generateAccessTokenForMember(MemberData member) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(TokenClaim.UID.getValue(), member.getUserId().getUid().toString());
-        claims.put(TokenClaim.EMAIL.getValue(), member.getEmail());
-        claims.put(TokenClaim.ACCESS_LEVEL.getValue(), AccessLevel.ROLE_MEMBER.toString());
-        claims.put(TokenClaim.AUTHORITY_TIER.getValue(), member.getAuthorityTier().toString());
-        claims.put("type", "access");
-
-        // FIXME sub(subject)는 "누구를 위한 토큰인가?"를 나타내는 값이다.
+    public String generateAccessToken(TokenClaimsRequest claims) {
+        Map<String, Object> tokenClaims = buildClaims(claims);
         return createToken(
-                claims,
+                tokenClaims,
                 TokenSubject.ACCESS_TOKEN_SUBJECT.getValue(),
                 jwtProperties.getExpirationMs()
         );
     }
 
-    /**
-     * Guest용 AccessToken 생성
-     */
-    public String generateAccessTokenForGuest(GuestData guest) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(TokenClaim.UID.getValue(), guest.getUserId().getUid().toString());
-        claims.put(TokenClaim.EMAIL.getValue(), "N/A");
-        claims.put(TokenClaim.ACCESS_LEVEL.getValue(), AccessLevel.ROLE_GUEST.toString());
-        claims.put(TokenClaim.AUTHORITY_TIER.getValue(), AuthorityTier.GT.toString());
-        claims.put("type", "access");
-
-        // FIXME sub(subject)는 "누구를 위한 토큰인가?"를 나타내는 값이다.
-        return createToken(
-                claims,
-                TokenSubject.ACCESS_TOKEN_SUBJECT.getValue(),
-                jwtProperties.getExpirationMs()
-        );
+    public String generateNonExpiringAccessToken(TokenClaimsRequest claims) {
+        Map<String, Object> tokenClaims = buildClaims(claims);
+        return createNonExpiringToken(tokenClaims, TokenSubject.ACCESS_TOKEN_SUBJECT.getValue());
     }
 
-    /**
-     * Member용 만료되지 않는 AccessToken 생성
-     */
-    public String generateNonExpiringAccessTokenForMember(MemberData member) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(TokenClaim.UID.getValue(), member.getUserId().getUid().toString());
-        claims.put(TokenClaim.EMAIL.getValue(), member.getEmail());
-        claims.put(TokenClaim.ACCESS_LEVEL.getValue(), AccessLevel.ROLE_MEMBER.toString());
-        claims.put(TokenClaim.AUTHORITY_TIER.getValue(), member.getAuthorityTier().toString());
-        claims.put("type", "access");
-
-        return createNonExpiringToken(claims, TokenSubject.ACCESS_TOKEN_SUBJECT.getValue());
-    }
-
-    /**
-     * Guest용 만료되지 않는 AccessToken 생성
-     */
-    public String generateNonExpiringAccessTokenForGuest(GuestData guest) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(TokenClaim.UID.getValue(), guest.getUserId().getUid().toString());
-        claims.put(TokenClaim.EMAIL.getValue(), "N/A");
-        claims.put(TokenClaim.ACCESS_LEVEL.getValue(), AccessLevel.ROLE_GUEST.toString());
-        claims.put(TokenClaim.AUTHORITY_TIER.getValue(), AuthorityTier.GT.toString());
-        claims.put("type", "access");
-
-        return createNonExpiringToken(claims, TokenSubject.ACCESS_TOKEN_SUBJECT.getValue());
+    private Map<String, Object> buildClaims(TokenClaimsRequest claims) {
+        Map<String, Object> tokenClaims = new HashMap<>();
+        tokenClaims.put(TokenClaim.UID.getValue(), claims.getUid());
+        tokenClaims.put(TokenClaim.EMAIL.getValue(), claims.getEmail());
+        tokenClaims.put(TokenClaim.ACCESS_LEVEL.getValue(), claims.getAccessLevel().toString());
+        tokenClaims.put(TokenClaim.AUTHORITY_TIER.getValue(), claims.getAuthorityTier().toString());
+        tokenClaims.put("type", "access");
+        return tokenClaims;
     }
 
     private String createToken(Map<String, Object> claims, String subject, long expiration) {
@@ -152,7 +109,6 @@ public class JwtService {
 
     public String getUserIdFromToken(String token) {
         Claims claims = extractClaims(token);
-        // UID 클레임에서 사용자 ID 추출
         return claims.get(TokenClaim.UID.getValue(), String.class);
     }
 
@@ -182,35 +138,24 @@ public class JwtService {
         return jwtProperties.getExpirationMs();
     }
 
-    /**
-     * 토큰이 곧 만료될 예정인지 확인 (만료 10분 전)
-     */
     public boolean isTokenNearExpiry(String token) {
         try {
             Claims claims = extractClaims(token);
             Date expiration = claims.getExpiration();
             Date now = new Date();
             long timeUntilExpiry = expiration.getTime() - now.getTime();
-
-            // 10분 = 600,000ms
             return timeUntilExpiry < 600_000L;
         } catch (Exception e) {
             log.debug("Cannot check token expiry: {}", e.getMessage());
-            return true; // 파싱 실패시 만료로 간주
+            return true;
         }
     }
 
-    /**
-     * 토큰에서 모든 클레임을 추출
-     */
     public Map<String, Object> getAllClaimsFromToken(String token) {
         Claims claims = extractClaims(token);
         return new HashMap<>(claims);
     }
 
-    /**
-     * 토큰이 Member 토큰인지 확인
-     */
     public boolean isMemberToken(String token) {
         try {
             AccessLevel accessLevel = getAccessLevelFromToken(token);
@@ -221,9 +166,6 @@ public class JwtService {
         }
     }
 
-    /**
-     * 토큰이 Guest 토큰인지 확인
-     */
     public boolean isGuestToken(String token) {
         try {
             AccessLevel accessLevel = getAccessLevelFromToken(token);
@@ -236,7 +178,6 @@ public class JwtService {
 
     private Claims extractClaims(String token) {
         try {
-            // JJWT 0.12.x 방식
             return Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()

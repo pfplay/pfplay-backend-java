@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence.custom;
 
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 
 import java.util.List;
 

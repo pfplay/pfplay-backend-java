@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.adapter.out.external;
 
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

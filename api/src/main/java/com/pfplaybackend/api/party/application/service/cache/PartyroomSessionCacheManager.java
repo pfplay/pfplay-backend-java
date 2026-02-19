@@ -6,7 +6,7 @@ import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.realtime.port.SessionCachePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;

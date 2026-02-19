@@ -143,7 +143,7 @@ public class DjManagementService {
     }
 
     private void publishDjQueueChangeEvent(PartyroomData partyroom) {
-        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
+        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE.topic(),
                 DjQueueChangeMessage.create(
                         partyroom.getPartyroomId(),
                         partyroomInfoService.getDjs(partyroom.getId())

@@ -60,6 +60,6 @@ public class CrewGradeService {
     }
 
     private void publishCrewGradeChangedEvent(CrewGradeMessage message) {
-        messagePublisher.publish(MessageTopic.CREW_GRADE, message);
+        messagePublisher.publish(MessageTopic.CREW_GRADE.topic(), message);
     }
 }

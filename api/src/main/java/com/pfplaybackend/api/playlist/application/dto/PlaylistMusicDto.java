@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.application.dto;
 
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

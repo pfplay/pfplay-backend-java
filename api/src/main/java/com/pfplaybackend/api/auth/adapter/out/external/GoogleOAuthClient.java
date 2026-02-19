@@ -3,7 +3,7 @@ package com.pfplaybackend.api.auth.adapter.out.external;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pfplaybackend.api.auth.application.dto.OAuthTokenResponse;
 import com.pfplaybackend.api.auth.application.dto.OAuthUserProfile;
-import com.pfplaybackend.api.common.config.security.jwt.properties.OAuth2Properties;
+import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
 import com.pfplaybackend.api.common.exception.OAuthException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class GoogleOAuthClient {
     }
 
     public OAuthTokenResponse exchangeCodeForToken(String code, String codeVerifier) {
-        log.debug("Exchanging Google authorization code for token");
+        log.debug("Exchanging Google OAuth code for token");
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("code", code);

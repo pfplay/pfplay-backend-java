@@ -17,7 +17,7 @@ import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -104,7 +104,7 @@ class DjManagementServiceDjQueueChangeTest {
         djManagementService.enqueueDj(partyroomId, playlistId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
+        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
     }
 
     @Test
@@ -143,7 +143,7 @@ class DjManagementServiceDjQueueChangeTest {
         djManagementService.dequeueDj(partyroomId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
+        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
         // 대기 DJ(orderNumber != 1)이므로 skipBySystem은 호출되지 않아야 한다
         verify(playbackManagementService, never()).skipBySystem(any());
     }
@@ -184,7 +184,7 @@ class DjManagementServiceDjQueueChangeTest {
         djManagementService.dequeueDj(partyroomId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
+        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
         verify(playbackManagementService).skipBySystem(partyroomId);
     }
 
@@ -222,6 +222,6 @@ class DjManagementServiceDjQueueChangeTest {
         djManagementService.dequeueDj(partyroomId, djId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
+        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
     }
 }

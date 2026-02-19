@@ -2,7 +2,7 @@ package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

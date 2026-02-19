@@ -17,7 +17,7 @@ import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -105,8 +105,8 @@ class PartyroomAccessServiceDjQueueChangeTest {
         partyroomAccessService.exit(partyroomId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
-        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS), any());
+        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS.topic()), any());
     }
 
     @Test
@@ -136,8 +136,8 @@ class PartyroomAccessServiceDjQueueChangeTest {
         partyroomAccessService.exit(partyroomId);
 
         // then
-        verify(messagePublisher, never()).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
-        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS), any());
+        verify(messagePublisher, never()).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS.topic()), any());
     }
 
     @Test
@@ -177,8 +177,8 @@ class PartyroomAccessServiceDjQueueChangeTest {
         partyroomAccessService.expel(partyroomData, targetCrew, false);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
-        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS), any());
+        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS.topic()), any());
     }
 
     @Test
@@ -208,7 +208,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
         partyroomAccessService.expel(partyroomData, targetCrew, false);
 
         // then
-        verify(messagePublisher, never()).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
-        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS), any());
+        verify(messagePublisher, never()).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS.topic()), any());
     }
 }

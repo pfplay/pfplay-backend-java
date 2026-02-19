@@ -1,10 +1,10 @@
-package com.pfplaybackend.api.common.config.setup;
+package com.pfplaybackend.api.bootstrap;
 
 import com.pfplaybackend.api.party.application.service.initialize.PartyroomInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.AdminUserInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.AvatarResourceInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;

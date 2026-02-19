@@ -3,7 +3,7 @@ package com.pfplaybackend.api.playlist.adapter.out.persistence;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.custom.PlaylistRepositoryCustom;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

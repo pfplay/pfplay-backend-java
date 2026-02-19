@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

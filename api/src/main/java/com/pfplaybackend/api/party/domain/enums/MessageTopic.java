@@ -14,5 +14,9 @@ public enum MessageTopic {
     PLAYBACK_SKIP,
     DJ_QUEUE_CHANGE,
     CHAT,
-    PARTYROOM_CLOSED
+    PARTYROOM_CLOSED;
+
+    public String topic() {
+        return name().toLowerCase();
+    }
 }

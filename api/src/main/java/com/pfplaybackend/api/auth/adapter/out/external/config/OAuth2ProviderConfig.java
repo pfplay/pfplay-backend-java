@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.common.config.security.properties;
+package com.pfplaybackend.api.auth.adapter.out.external.config;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -27,7 +27,7 @@ import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -129,7 +129,7 @@ public class PartyroomAccessService {
 
     private void publishAccessChangedEvent(PartyroomId partyroomId, CrewData crew, UserId userId) {
         ProfileSettingDto profileSettingDto = userProfileService.getUserProfileSetting(userId);
-        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS,
+        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(),
                 PartyroomAccessMessage.create(
                         partyroomId,
                         AccessType.ENTER,
@@ -194,7 +194,7 @@ public class PartyroomAccessService {
                 MessageTopic.PARTYROOM_ACCESS,
                 AccessType.EXIT,
                 crewSummaryDto);
-        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
+        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(), partyroomAccessMessage);
     }
 
     @Transactional
@@ -230,7 +230,7 @@ public class PartyroomAccessService {
                 MessageTopic.PARTYROOM_ACCESS,
                 AccessType.EXIT,
                 crewSummaryDto);
-        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
+        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(), partyroomAccessMessage);
     }
 
     private void removeFromDjQueue(Long partyroomId, CrewId crewId) {
@@ -247,7 +247,7 @@ public class PartyroomAccessService {
     }
 
     private void publishDjQueueChangeEvent(PartyroomData partyroom) {
-        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
+        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE.topic(),
                 DjQueueChangeMessage.create(
                         partyroom.getPartyroomId(),
                         partyroomInfoService.getDjs(partyroom.getId())

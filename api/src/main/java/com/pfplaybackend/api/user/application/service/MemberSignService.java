@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.common.config.security.model.OAuth2Redirection;
-import com.pfplaybackend.api.common.config.security.properties.OAuth2ProviderConfig;
+import com.pfplaybackend.api.auth.domain.value.OAuth2Redirection;
+import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2ProviderConfig;
 import com.pfplaybackend.api.profile.application.service.UserProfileService;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
 import com.pfplaybackend.api.profile.domain.ProfileData;

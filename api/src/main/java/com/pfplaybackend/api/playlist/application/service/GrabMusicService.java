@@ -8,7 +8,7 @@ import com.pfplaybackend.api.playlist.domain.exception.TrackException;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

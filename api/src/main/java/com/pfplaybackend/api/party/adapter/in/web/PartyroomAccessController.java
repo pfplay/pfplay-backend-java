@@ -1,8 +1,11 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
+import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -57,7 +60,12 @@ public class PartyroomAccessController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
             GuestData guest = guestSignService.getGuestOrCreate();
-            cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessTokenForGuest(guest));
+            cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessToken(TokenClaimsRequest.builder()
+                    .uid(guest.getUserId().getUid().toString())
+                    .email("N/A")
+                    .accessLevel(AccessLevel.ROLE_GUEST)
+                    .authorityTier(AuthorityTier.GT)
+                    .build()));
         }
         return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomAccessService.getRedirectUri(linkDomain)));
     }

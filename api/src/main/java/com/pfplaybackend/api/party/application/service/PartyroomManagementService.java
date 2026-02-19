@@ -16,7 +16,7 @@ import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateDjQueueStatusRequest;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdatePartyroomRequest;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -84,7 +84,7 @@ public class PartyroomManagementService {
         partyroom.terminate();
         partyroomRepository.save(partyroom);
         messagePublisher.publish(
-                MessageTopic.PARTYROOM_CLOSED,
+                MessageTopic.PARTYROOM_CLOSED.topic(),
                 new PartyroomClosedMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
         );
     }
@@ -97,7 +97,7 @@ public class PartyroomManagementService {
             partyroom.terminate();
             partyroomRepository.save(partyroom);
             messagePublisher.publish(
-                    MessageTopic.PARTYROOM_CLOSED,
+                    MessageTopic.PARTYROOM_CLOSED.topic(),
                     new PartyroomClosedMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
             );
         });

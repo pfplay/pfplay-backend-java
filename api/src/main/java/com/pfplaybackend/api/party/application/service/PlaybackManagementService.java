@@ -28,7 +28,7 @@ import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -146,7 +146,7 @@ public class PlaybackManagementService {
     }
 
     private void publishDjQueueChangeEvent(PartyroomData partyroom) {
-        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
+        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE.topic(),
                 DjQueueChangeMessage.create(
                         partyroom.getPartyroomId(),
                         partyroomInfoService.getDjs(partyroom.getId())
@@ -155,7 +155,7 @@ public class PlaybackManagementService {
     }
 
     private void publishPlaybackChangedEvent(PartyroomId partyroomId, long crewId, PlaybackData playbackData) {
-        messagePublisher.publish(MessageTopic.PLAYBACK_START,
+        messagePublisher.publish(MessageTopic.PLAYBACK_START.topic(),
                 new PlaybackStartMessage(partyroomId, MessageTopic.PLAYBACK_START, crewId,
                         new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(), playbackData.getDuration(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
     }
@@ -167,7 +167,7 @@ public class PlaybackManagementService {
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
         queuedDjs.forEach(DjData::applyDequeued);
         djRepository.saveAll(queuedDjs);
-        messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION, new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION));
+        messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION.topic(), new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION));
     }
 
     private void rotateDjQueue(PartyroomData partyroom) {

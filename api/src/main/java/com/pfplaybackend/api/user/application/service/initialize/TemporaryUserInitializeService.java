@@ -11,7 +11,7 @@ import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.WalletAddress;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
@@ -52,7 +52,7 @@ public class TemporaryUserInitializeService {
         GuestData guest = GuestData.createWithFixedUserId(userId, "Firefox/MacOS");
         ProfileData profile = userProfileService.createProfileDataForGuest(guest.getUserId());
         guest.initiateProfile(profile);
-        // System.out.println("GT JWT: " + jwtService.generateNonExpiringAccessTokenForGuest(guest));
+        // System.out.println("GT JWT: " + jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder().uid(guest.getUserId().getUid().toString()).email("N/A").accessLevel(AccessLevel.ROLE_GUEST).authorityTier(AuthorityTier.GT).build()));
         guestRepository.save(guest);
     }
 
@@ -65,7 +65,7 @@ public class TemporaryUserInitializeService {
 
         MemberData memberData = memberRepository.save(member);
         playlistCommandService.createDefaultPlaylist(member.getUserId());
-        // System.out.println("AM JWT: " + jwtService.generateNonExpiringAccessTokenForMember(member));
+        // System.out.println("AM JWT: " + jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder().uid(member.getUserId().getUid().toString()).email(member.getEmail()).accessLevel(AccessLevel.ROLE_MEMBER).authorityTier(member.getAuthorityTier()).build()));
         return memberData;
     }
 
@@ -76,7 +76,7 @@ public class TemporaryUserInitializeService {
         // 2. Wallet Update
         member.updateWalletAddress(new WalletAddress("wallet-address"));
         memberRepository.save(member);
-        // System.out.println("FM JWT: " + jwtService.generateNonExpiringAccessTokenForMember(member));
+        // System.out.println("FM JWT: " + jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder().uid(member.getUserId().getUid().toString()).email(member.getEmail()).accessLevel(AccessLevel.ROLE_MEMBER).authorityTier(member.getAuthorityTier()).build()));
         return member;
     }
 }

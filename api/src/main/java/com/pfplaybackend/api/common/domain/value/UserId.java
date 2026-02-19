@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.user.domain.value;
+package com.pfplaybackend.api.common.domain.value;
 
 import com.pfplaybackend.api.common.util.TsidGenerator;
 import jakarta.persistence.Embeddable;

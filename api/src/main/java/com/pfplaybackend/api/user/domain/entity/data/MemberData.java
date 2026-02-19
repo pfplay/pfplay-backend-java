@@ -11,6 +11,7 @@ import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
 import lombok.Builder;

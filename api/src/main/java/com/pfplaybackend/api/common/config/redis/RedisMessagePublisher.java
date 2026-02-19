@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.common.config.redis;
 
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -10,12 +9,8 @@ import org.springframework.stereotype.Component;
 public class RedisMessagePublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
-    /**
-     *
-     * @param topicType
-     * @param object
-     */
-    public void publish(MessageTopic topicType, Object object) {
-        redisTemplate.convertAndSend(topicType.toString().toLowerCase(), object);
+
+    public void publish(String topic, Object object) {
+        redisTemplate.convertAndSend(topic, object);
     }
 }

@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.domain.entity.domainmodel;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -9,7 +9,7 @@ import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

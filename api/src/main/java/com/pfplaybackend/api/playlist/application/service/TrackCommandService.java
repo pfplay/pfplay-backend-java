@@ -11,7 +11,7 @@ import com.pfplaybackend.api.playlist.domain.exception.TrackException;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MoveTrackRequest;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdateTrackOrderRequest;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
 import jakarta.transaction.Transactional;

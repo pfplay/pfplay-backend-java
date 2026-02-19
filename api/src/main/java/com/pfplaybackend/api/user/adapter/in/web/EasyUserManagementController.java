@@ -1,11 +1,13 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
+import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
 import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +29,12 @@ public class EasyUserManagementController {
     public ResponseEntity<?> createAssociateMember(HttpServletResponse response) {
         UserId userId = new UserId();
         MemberData member = temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com");
-        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessTokenForMember(member));
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder()
+                .uid(member.getUserId().getUid().toString())
+                .email(member.getEmail())
+                .accessLevel(AccessLevel.ROLE_MEMBER)
+                .authorityTier(member.getAuthorityTier())
+                .build()));
 
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));
@@ -38,7 +45,12 @@ public class EasyUserManagementController {
         UserId userId = new UserId();
         MemberData member = temporaryUserInitializeService.upgradeMember(
                 temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com"));
-        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessTokenForMember(member));
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder()
+                .uid(member.getUserId().getUid().toString())
+                .email(member.getEmail())
+                .accessLevel(AccessLevel.ROLE_MEMBER)
+                .authorityTier(member.getAuthorityTier())
+                .build()));
 
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));

@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.auth.adapter.out.external.config;
 
-import com.pfplaybackend.api.common.config.security.jwt.properties.WebClientProperties;
+import com.pfplaybackend.api.auth.adapter.out.external.config.WebClientProperties;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;

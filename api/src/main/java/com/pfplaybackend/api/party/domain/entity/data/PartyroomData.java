@@ -7,7 +7,7 @@ import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateDjQueueStatusRequest;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdatePartyroomRequest;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;

@@ -13,7 +13,7 @@ import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.service.GuestDomainService;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.service.UserDomainService;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;

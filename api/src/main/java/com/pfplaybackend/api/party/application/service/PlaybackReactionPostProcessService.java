@@ -16,7 +16,7 @@ import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.adapter.in.listener.message.ReactionAggregationMessage;
 import com.pfplaybackend.api.party.adapter.in.listener.message.ReactionMotionMessage;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -51,7 +51,7 @@ public class PlaybackReactionPostProcessService {
     // PostProcess After Playback Reaction
     public void publishMotionChangedEvent(PartyroomId partyroomId, ReactionType reactionType, MotionType motionType, CrewId crewId) {
         ReactionMotionMessage reactionMotionMessage = ReactionMotionMessage.from(partyroomId, reactionType, motionType, crewId);
-        messagePublisher.publish(MessageTopic.REACTION_MOTION, reactionMotionMessage);
+        messagePublisher.publish(MessageTopic.REACTION_MOTION.topic(), reactionMotionMessage);
     }
 
     public void updateDjActivityScore(UserId djUserId, int deltaScore) {
@@ -64,7 +64,7 @@ public class PlaybackReactionPostProcessService {
 
     public void publishAggregationChangedEvent(PartyroomId partyroomId, PlaybackData playback) {
         AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
-        messagePublisher.publish(MessageTopic.REACTION_AGGREGATION,
+        messagePublisher.publish(MessageTopic.REACTION_AGGREGATION.topic(),
                 new ReactionAggregationMessage(partyroomId, MessageTopic.REACTION_AGGREGATION, aggregationDto));
     }
 

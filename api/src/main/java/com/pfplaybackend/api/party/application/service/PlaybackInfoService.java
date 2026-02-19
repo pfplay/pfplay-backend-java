@@ -11,7 +11,7 @@ import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
