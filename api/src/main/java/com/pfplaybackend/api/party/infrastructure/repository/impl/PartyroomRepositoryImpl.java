@@ -3,9 +3,6 @@ package com.pfplaybackend.api.party.infrastructure.repository.impl;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
-import com.pfplaybackend.api.party.application.dto.base.CrewDataDto;
-import com.pfplaybackend.api.party.application.dto.base.DjDataDto;
-import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.party.domain.entity.data.*;
@@ -173,48 +170,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 .orderBy(qPlaybackData.createdAt.desc())
                 .limit(20)
                 .fetch();
-    }
-
-    @Override
-    public Optional<PartyroomDataDto> findPartyroomDto(PartyroomId partyroomId) {
-        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
-        QCrewData qCrewData = QCrewData.crewData;
-        QDjData qDjData = QDjData.djData;
-
-        List<Tuple> result = queryFactory
-                .select(qPartyroomData,
-                        qCrewData, qDjData)
-                .from(qPartyroomData)
-                .leftJoin(qPartyroomData.crewDataSet, qCrewData)
-                .on(qPartyroomData.eq(qCrewData.partyroomData)
-                        .and(qCrewData.isActive.eq(true))
-                        .and(qCrewData.isBanned.eq(false))
-                )
-                .leftJoin(qPartyroomData.djDataSet, qDjData)
-                .on(qPartyroomData.eq(qDjData.partyroomData)
-                        .and(qDjData.isQueued.eq(true))
-                )
-                .where(qPartyroomData.id.eq(partyroomId.getId()))
-                .distinct()
-                .fetch();
-
-        if(result.isEmpty()) return Optional.empty();
-
-        PartyroomDataDto partyroomDataDto = PartyroomDataDto.create(Objects.requireNonNull(result.get(0).get(qPartyroomData)));
-
-        Map<Long, Set<CrewDataDto>> crewDataMap = result.stream()
-                .filter(tuple -> Optional.ofNullable(tuple.get(qCrewData)).isPresent())
-                .map(tuple -> CrewDataDto.from(Objects.requireNonNull(tuple.get(qCrewData))))
-                .collect(Collectors.groupingBy(CrewDataDto::getId, Collectors.toSet()));
-
-        Map<Long, Set<DjDataDto>> djDataMap = result.stream()
-                .filter(tuple -> Optional.ofNullable(tuple.get(qDjData)).isPresent())
-                .map(tuple -> DjDataDto.from(Objects.requireNonNull(tuple.get(qDjData))))
-                .collect(Collectors.groupingBy(DjDataDto::getId, Collectors.toSet()));
-
-        partyroomDataDto.setCrewDataSet(crewDataMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet()));
-        partyroomDataDto.setDjDataSet(djDataMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet()));
-        return Optional.of(partyroomDataDto);
     }
 
     @Override

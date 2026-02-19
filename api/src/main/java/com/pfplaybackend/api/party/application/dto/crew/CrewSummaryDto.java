@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.application.dto.crew;
 
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
@@ -31,7 +31,7 @@ public class CrewSummaryDto {
         this.crewId = crewId;
     }
 
-    public static CrewSummaryDto from(Crew crew, ProfileSettingDto profileSettingDto) {
+    public static CrewSummaryDto from(CrewData crew, ProfileSettingDto profileSettingDto) {
         return new CrewSummaryDto(
                 crew.getId(),
                 crew.getGradeType(),

@@ -11,6 +11,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @DynamicInsert
@@ -74,5 +75,40 @@ public class DjData extends BaseEntity {
     public DjData assignPartyroomData(PartyroomData partyroomData) {
         this.partyroomData = partyroomData;
         return this;
+    }
+
+    // ── Business Methods ──
+
+    public static DjData create(PartyroomData partyroomData, PlaylistId playlistId, UserId userId, CrewId crewId, int orderNumber) {
+        DjData dj = DjData.builder()
+                .playlistId(playlistId)
+                .userId(userId)
+                .crewId(crewId)
+                .orderNumber(orderNumber)
+                .isQueued(true)
+                .build();
+        dj.assignPartyroomData(partyroomData);
+        return dj;
+    }
+
+    public void updateOrderNumber(int orderNumber) {
+        this.orderNumber = orderNumber;
+    }
+
+    public void applyDequeued() {
+        this.isQueued = false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DjData djData = (DjData) o;
+        return Objects.equals(id, djData.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

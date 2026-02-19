@@ -12,6 +12,7 @@ import lombok.Getter;
 import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 
 @Getter
@@ -81,5 +82,55 @@ public class CrewData extends BaseEntity {
     public CrewData assignPartyroomData(PartyroomData partyroomData) {
         this.partyroomData = partyroomData;
         return this;
+    }
+
+    // ── Business Methods ──
+
+    public static CrewData create(PartyroomData partyroomData, UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
+        CrewData crew = CrewData.builder()
+                .userId(userId)
+                .authorityTier(authorityTier)
+                .gradeType(gradeType)
+                .isActive(true)
+                .isBanned(false)
+                .enteredAt(LocalDateTime.now())
+                .build();
+        crew.assignPartyroomData(partyroomData);
+        return crew;
+    }
+
+    public void deactivatePresence() {
+        this.isActive = false;
+        this.exitedAt = LocalDateTime.now();
+    }
+
+    public void activatePresence() {
+        this.isActive = true;
+        this.enteredAt = LocalDateTime.now();
+    }
+
+    public void updateGrade(GradeType gradeType) {
+        this.gradeType = gradeType;
+    }
+
+    public void enforceBan() {
+        this.isBanned = true;
+    }
+
+    public void releaseBan() {
+        this.isBanned = false;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CrewData crewData = (CrewData) o;
+        return Objects.equals(id, crewData.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -4,14 +4,11 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.result.PenaltyResult;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
-import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewPenaltyHistoryData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.PenaltyType;
 import com.pfplaybackend.api.party.domain.exception.PenaltyException;
@@ -36,7 +33,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +40,6 @@ public class CrewPenaltyService {
 
     private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
-    private final PartyroomConverter partyroomConverter;
     private final CrewDomainService crewDomainService;
     private final PartyroomAccessService partyroomAccessService;
     private final CrewPenaltyHistoryRepository crewPenaltyHistoryRepository;
@@ -53,9 +48,7 @@ public class CrewPenaltyService {
 
     public List<PenaltyResult> getPenalties(PartyroomId partyroomId) {
         List<CrewPenaltyHistoryData> crewPenaltyHistoryDataList = crewPenaltyHistoryRepository.findAllByPartyroomIdAndReleasedIsFalse(partyroomId);
-        // TODO 강제퇴장
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
 
         List<UserId> PunishedUserIds = crewPenaltyHistoryDataList.stream().map(history ->
                 partyroom.getCrew(history.getPunishedCrewId()).getUserId()).toList();
@@ -69,24 +62,16 @@ public class CrewPenaltyService {
         }).toList();
     }
 
-    // TODO '권한 검증' 전용 어노테이션 부착 필요
     @Transactional
     public void addPenalty(PartyroomId partyroomId, PunishPenaltyRequest request) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
-        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomDataDto partyroomDataDto = optional.get();
-        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
-        // FIXME 1. 파티룸 조회
-        // partyroomRepository.findPartyroomDto(PartyroomId partyroomId, UserId userId);
-        // TODO 2. 같은 파티룸에 위치하는가?
-        // crewDomainService.isExistIn();
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
         CrewId punishedCrewId = new CrewId(request.getCrewId());
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-        Crew punisherCrew = partyroom.getCrewByUserId(authContext.getUserId()).orElseThrow();
-        Crew punishedCrew = partyroom.getCrew(punishedCrewId);
-        GradeType punishedGradeType = partyroom.getCrew(punishedCrewId).getGradeType();
+        CrewData punisherCrew = partyroom.getCrewByUserId(authContext.getUserId()).orElseThrow();
+        CrewData punishedCrew = partyroom.getCrew(punishedCrewId);
+        GradeType punishedGradeType = punishedCrew.getGradeType();
         PenaltyType penaltyType = request.getPenaltyType();
 
         // 권한 검증
@@ -102,7 +87,6 @@ public class CrewPenaltyService {
         CrewPenaltyMessage message = CrewPenaltyMessage.from(partyroomId, new CrewId(punisherCrew.getId()), punishedCrewId, request.getDetail(), request.getPenaltyType());
         publishCrewPenaltyChangedEvent(message);
 
-        // TODO 타겟의 페널티 중복 부과 여부 검증 필요
         if(PenaltyType.PERMANENT_EXPULSION.equals(penaltyType)) {
             CrewPenaltyHistoryData crewPenaltyHistoryData = CrewPenaltyHistoryData.builder()
                     .partyroomId(partyroomId)
@@ -122,20 +106,11 @@ public class CrewPenaltyService {
         redisTemplate.opsForValue().set(key, 30, Duration.ofSeconds(30));
     }
 
-    // CHAT_BAN_30_SECONDS("채팅 금지", 30), // 채팅 금지 이벤트
-    // 채팅 금지 페널티는 '실제 채팅 내용 자체'를 아예 전파하지도 않아야 한다.
-    // CHAT_MESSAGE_REMOVAL("채팅 메시지 삭제", 0), // 채팅 메시지 삭제 이벤트
-    // EXPULSION_ONE_TIME("일회성 강제 퇴장", 0), // 지속 시간이 필요 없으므로 0으로 설정
-    // EXPULSION_PERMANENT("영구 강제 퇴장", -1); // 영구 강제 퇴장을 -1로 설정
-
     public void releaseCrewPenalty(PartyroomId partyroomId, Long penaltyId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        // TODO 호출 크루가 타겟 크루와 동일한 파티룸에 위치해야 하며, 권한 검증도 필요하다.
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId())
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
-        // TODO 업무 규칙 확인 필요
         if(crewDomainService.isBelowManagerGrade(partyroom, authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
 
         CrewPenaltyHistoryData historyData = crewPenaltyHistoryRepository.findByIdAndPartyroomIdAndReleasedIsFalse(penaltyId, partyroomId)
@@ -143,7 +118,7 @@ public class CrewPenaltyService {
 
         // 1.
         partyroom.removePermanentBan(historyData.getPunishedCrewId());
-        partyroomRepository.save(partyroomConverter.toData(partyroom));
+        partyroomRepository.save(partyroom);
         // 2.
         historyData.setReleased(true);
         historyData.setReleasedByCrewId(new CrewId(partyroom.getCrewByUserId(authContext.getUserId()).orElseThrow().getId()));

@@ -3,14 +3,11 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.peer.MusicQueryPeerService;
-import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
@@ -32,7 +29,6 @@ import java.util.Optional;
 public class DjManagementService {
 
     private final PartyroomRepository partyroomRepository;
-    private final PartyroomConverter partyroomConverter;
     private final PartyroomDomainService partyroomDomainService;
     private final CrewDomainService crewDomainService;
     private final PartyroomInfoService partyroomInfoService;
@@ -43,81 +39,60 @@ public class DjManagementService {
     @Transactional
     public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        // ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom();
-        // TODO Do not use 'findById'
-        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
-        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomDataDto partyroomDataDto = optional.get();
-        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
         boolean isPostActivationProcessingRequired = !partyroom.isPlaybackActivated();
         if(partyroom.isQueueClosed()) throw ExceptionCreator.create(DjException.QUEUE_CLOSED);
         if(musicQueryService.isEmptyPlaylist(playlistId.getId())) throw ExceptionCreator.create(DjException.EMPTY_PLAYLIST);
 
-        // FIXME Direct Add DjData to PartyroomData
-        Partyroom updatedPartyroom = partyroom.createAndAddDj(playlistId, authContext.getUserId()).applyActivation();
-        PartyroomData updatedPartyroomData = partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
-        publishDjQueueChangeEvent(partyroomConverter.toDomain(updatedPartyroomData));
+        partyroom.createAndAddDj(playlistId, authContext.getUserId()).applyActivation();
+        PartyroomData savedPartyroom = partyroomRepository.save(partyroom);
+        publishDjQueueChangeEvent(savedPartyroom);
 
         if(isPostActivationProcessingRequired) {
-            playbackManagementService.start(partyroomConverter.toDomain(updatedPartyroomData));
+            playbackManagementService.start(savedPartyroom);
         }
     }
 
-    /**
-     * 대기열에 등록된 자신을 제거한다. (무효화한다.)
-     * @param partyroomId
-     */
     @Transactional
     public void dequeueDj(PartyroomId partyroomId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
-        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomDataDto partyroomDataDto = optional.get();
-        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-        Optional<Crew> crewOptional = partyroom.getCrewByUserId(authContext.getUserId());
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        Optional<CrewData> crewOptional = partyroom.getCrewByUserId(authContext.getUserId());
         if(crewOptional.isEmpty()) throw ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM);
-        Crew crew = crewOptional.get();
+        CrewData crew = crewOptional.get();
         boolean wasCurrentDj = partyroom.isCurrentDj(new CrewId(crew.getId()));
         partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
-        partyroomRepository.save(partyroomConverter.toData(partyroom));
+        partyroomRepository.save(partyroom);
         publishDjQueueChangeEvent(partyroom);
         if (wasCurrentDj) {
             playbackManagementService.skipBySystem(partyroomId);
         }
     }
 
-    /**
-     * 대기열에 등록된 특정 Dj를 제거한다. (무효화한다.)
-     * @param partyroomId
-     * @param djId
-     */
     @Transactional
     public void dequeueDj(PartyroomId partyroomId, DjId djId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
-        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomDataDto partyroomDataDto = optional.get();
-        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         // 관리자 등급 체크
         if(crewDomainService.isBelowManagerGrade(partyroom, authContext.getUserId()))
             throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
         // 대상 DJ 조회
-        Dj targetDj = partyroom.getDjById(djId.getId())
+        DjData targetDj = partyroom.getDjById(djId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(DjException.NOT_FOUND_DJ));
         boolean wasCurrentDj = partyroom.isCurrentDj(targetDj.getCrewId());
         partyroom.tryRemoveInDjQueue(targetDj.getCrewId());
-        partyroomRepository.save(partyroomConverter.toData(partyroom));
+        partyroomRepository.save(partyroom);
         publishDjQueueChangeEvent(partyroom);
         if (wasCurrentDj) {
             playbackManagementService.skipBySystem(partyroomId);
         }
     }
 
-    private void publishDjQueueChangeEvent(Partyroom partyroom) {
+    private void publishDjQueueChangeEvent(PartyroomData partyroom) {
         messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
                 DjQueueChangeMessage.create(
                         partyroom.getPartyroomId(),

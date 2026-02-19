@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.party.domain.entity.domainmodel;
 
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class PlaybackParseDurationTest {
 
     private Duration invokeParseDuration(String durationStr) throws Exception {
-        Method method = Playback.class.getDeclaredMethod("parseDuration", String.class);
+        Method method = PlaybackData.class.getDeclaredMethod("parseDuration", String.class);
         method.setAccessible(true);
         return (Duration) method.invoke(null, durationStr);
     }

@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.party.application.dto.playback.MusicDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -8,6 +9,10 @@ import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.time.format.DateTimeParseException;
 
 @Getter
 @DynamicInsert
@@ -68,4 +73,52 @@ public class PlaybackData extends BaseEntity {
         this.dislikeCount = dislikeCount;
         this.endTime = endTime;
     }
- }
+
+    // ── Business Methods ──
+
+    public static PlaybackData create(PartyroomId partyroomId, UserId userId, MusicDto musicDto) {
+        return PlaybackData.builder()
+                .partyroomId(partyroomId)
+                .userId(userId)
+                .name(musicDto.getName())
+                .duration(musicDto.getDuration())
+                .linkId(musicDto.getLinkId())
+                .thumbnailImage(musicDto.getThumbnailImage())
+                .grabCount(0)
+                .likeCount(0)
+                .dislikeCount(0)
+                .endTime(calculateEndTime(musicDto.getDuration()))
+                .build();
+    }
+
+    private static long calculateEndTime(String duration) {
+        Instant now = Instant.now();
+        Duration parsed = parseDuration(duration);
+        return now.plus(parsed).toEpochMilli();
+    }
+
+    static Duration parseDuration(String durationStr) {
+        String[] parts = durationStr.split(":");
+        return switch (parts.length) {
+            case 2 -> {
+                int minutes = Integer.parseInt(parts[0]);
+                int seconds = Integer.parseInt(parts[1]);
+                yield Duration.ofMinutes(minutes).plusSeconds(seconds);
+            }
+            case 3 -> {
+                int hours = Integer.parseInt(parts[0]);
+                int minutes = Integer.parseInt(parts[1]);
+                int seconds = Integer.parseInt(parts[2]);
+                yield Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
+            }
+            default -> throw new DateTimeParseException("Invalid duration format", durationStr, 0);
+        };
+    }
+
+    public PlaybackData updateAggregation(int deltaLikeCount, int deltaDislikeCount, int deltaGrabCount) {
+        this.likeCount += deltaLikeCount;
+        this.grabCount += deltaGrabCount;
+        this.dislikeCount += deltaDislikeCount;
+        return this;
+    }
+}

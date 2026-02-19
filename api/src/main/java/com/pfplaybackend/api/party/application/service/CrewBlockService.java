@@ -3,13 +3,10 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.result.BlockedCrewResult;
-import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewBlockHistoryData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.exception.BlockException;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
@@ -38,7 +35,6 @@ public class CrewBlockService {
     private final CrewBlockHistoryRepository blockHistoryRepository;
     private final UserProfileService userProfileService;
     private final CrewBlockHistoryRepository crewBlockHistoryRepository;
-    private final PartyroomConverter partyroomConverter;
 
     public List<BlockedCrewResult> getBlocks() {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
@@ -57,18 +53,12 @@ public class CrewBlockService {
         ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
+        PartyroomData partyroom = partyroomRepository.findById(dto.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
-        // 차단할 때는 '같은 파티룸'에 위치해야 함을 전제로 한다.
-        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(PartyroomId.of(dto.getId()));
-        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomDataDto partyroomDataDto = optional.get();
-        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
-        
         CrewId blockerCrewId = new CrewId(dto.getCrewId());
         System.out.println(blockerCrewId);
         CrewId blockedCrewId = new CrewId(request.getCrewId());
-        // TODO 기존 차단 내역 조회
         Optional<CrewBlockHistoryData> historyDataOptional = blockHistoryRepository.findByBlockerCrewIdAndBlockedCrewIdAndUnblockedIsFalse(blockerCrewId, blockedCrewId);
         if(historyDataOptional.isPresent()) throw ExceptionCreator.create(BlockException.ALREADY_BLOCKED_CREW);
 

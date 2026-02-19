@@ -6,7 +6,7 @@ import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
 import com.pfplaybackend.api.party.application.peer.GrabMusicPeerService;
 import com.pfplaybackend.api.party.application.peer.UserActivityPeerService;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Playback;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.enums.MotionType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
@@ -34,7 +34,7 @@ public class PlaybackReactionPostProcessService {
 
     public void postProcess(ReactionPostProcessDto postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        Playback playback = playbackInfoService.getPlaybackById(playbackId);
+        PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
         if(postProcessDto.isGrabStatusChanged()) {
             grabMusic(authContext.getUserId(), playback);
         }
@@ -58,17 +58,17 @@ public class PlaybackReactionPostProcessService {
         userActivityService.updateDjPointScore(djUserId, deltaScore);
     }
 
-    public void updatePlaybackAggregation(Playback playback, List<Integer> deltaRecord) {
+    public void updatePlaybackAggregation(PlaybackData playback, List<Integer> deltaRecord) {
         playbackInfoService.updatePlaybackAggregation(playback, deltaRecord);
     }
 
-    public void publishAggregationChangedEvent(PartyroomId partyroomId, Playback playback) {
+    public void publishAggregationChangedEvent(PartyroomId partyroomId, PlaybackData playback) {
         AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
         messagePublisher.publish(MessageTopic.REACTION_AGGREGATION,
                 new ReactionAggregationMessage(partyroomId, MessageTopic.REACTION_AGGREGATION, aggregationDto));
     }
 
-    public void grabMusic(UserId userId, Playback playback) {
+    public void grabMusic(UserId userId, PlaybackData playback) {
         // TODO 이미 동일한 LinkId를 보유하고 있다면 예외 발생
         grabMusicService.grabMusic(userId, playback.getLinkId());
     }

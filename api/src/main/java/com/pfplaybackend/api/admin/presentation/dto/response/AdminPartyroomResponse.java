@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.admin.presentation.dto.response;
 
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -25,7 +25,7 @@ public class AdminPartyroomResponse {
     private Boolean isActive;
     private LocalDateTime createdAt;
 
-    public static AdminPartyroomResponse from(Partyroom partyroom, String hostUserId) {
+    public static AdminPartyroomResponse from(PartyroomData partyroom, String hostUserId) {
         return AdminPartyroomResponse.builder()
                 .partyroomId(partyroom.getPartyroomId().getId())
                 .hostUserId(hostUserId)

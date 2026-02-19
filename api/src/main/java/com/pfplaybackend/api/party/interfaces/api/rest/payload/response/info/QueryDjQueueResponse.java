@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.interfaces.api.rest.payload.response.info;
 
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Playback;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,7 +21,7 @@ public class QueryDjQueueResponse {
     private List<DjWithProfileDto> djs;
 
     public static QueryDjQueueResponse from(boolean isPlaybackActivated, QueueStatus queueStatus,
-                                            boolean isRegistered, Playback playback, List<DjWithProfileDto> djs) {
+                                            boolean isRegistered, PlaybackData playback, List<DjWithProfileDto> djs) {
 
         Map<String, Object> map = null;
         if(Objects.nonNull(playback)) {

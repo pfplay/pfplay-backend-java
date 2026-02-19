@@ -7,17 +7,13 @@ import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewSetupDto;
-import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
-import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Playback;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
@@ -37,7 +33,6 @@ import java.util.stream.Collectors;
 public class PartyroomInfoService {
 
     private final PartyroomRepository partyroomRepository;
-    private final PartyroomConverter partyroomConverter;
     private final UserProfilePeerService userProfileService;
     private final PlaybackInfoService playbackInfoService;
 
@@ -62,16 +57,13 @@ public class PartyroomInfoService {
     }
 
     // 초기화를 위한 파티멤버 목록 조회
+    @Transactional(readOnly = true)
     public List<CrewSetupDto> getCrewsForSetup(PartyroomId partyroomId) {
-        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
-        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomDataDto partyroomDataDto = optional.get();
-        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
-        // FIXME Remove Field AuthorityTier, Uid
-        Set<Crew> crews = partyroom.getCrewSet();
-        List<UserId> userIds = crews.stream().map(Crew::getUserId).toList();
+        Set<CrewData> crews = partyroom.getActiveCrewDataSet();
+        List<UserId> userIds = crews.stream().map(CrewData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileService.getUsersProfileSetting(userIds);
 
         return crews.stream().map(crew -> {
@@ -82,29 +74,27 @@ public class PartyroomInfoService {
 
     // DjQueue 조회
     public void getDjQueueInfo(PartyroomId partyroomId) {
-        // TODO Filter Deleted Djs
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
     }
 
-    @Transactional
-    public Partyroom getPartyroomById(PartyroomId partyroomId) {
-        PartyroomData partyroomData = getPartyroom(partyroomId);
-        return partyroomConverter.toDomain(partyroomData);
+    @Transactional(readOnly = true)
+    public PartyroomData getPartyroomById(PartyroomId partyroomId) {
+        return partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
     }
 
-    public boolean isAlreadyRegistered(Partyroom partyroom) {
+    public boolean isAlreadyRegistered(PartyroomData partyroom) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        return partyroom.getDjSet().stream().anyMatch(dj -> dj.getUserId().equals(authContext.getUserId()));
+        return partyroom.getDjDataSet().stream().anyMatch(dj -> dj.getUserId().equals(authContext.getUserId()));
     }
 
-    @Transactional
-    public List<DjWithProfileDto> getDjs(Partyroom partyroom) {
-        List<Dj> queuedDjs = partyroom.getDjSet().stream()
-                .filter(Dj::isQueued)
-                .sorted(Comparator.comparingInt(Dj::getOrderNumber))
+    @Transactional(readOnly = true)
+    public List<DjWithProfileDto> getDjs(PartyroomData partyroom) {
+        List<DjData> queuedDjs = partyroom.getDjDataSet().stream()
+                .filter(DjData::isQueued)
+                .sorted(Comparator.comparingInt(DjData::getOrderNumber))
                 .toList();
-        List<UserId> userIds = queuedDjs.stream().map(Dj::getUserId).toList();
+        List<UserId> userIds = queuedDjs.stream().map(DjData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileService.getUsersProfileSetting(userIds);
 
         return queuedDjs.stream().map(dj -> {
@@ -132,23 +122,18 @@ public class PartyroomInfoService {
         return partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(userId);
     }
 
-    // TODO 우측 사이드 바의 두번째 탭 클릭 시 호출
-    // 1. 전체 목록
-    // 2. 제재 목록
     public void getCrews(PartyroomId partyroomId) {
-        // TODO 내가 차단한 목록은 글로벌 수준으로 유지
         PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         List<UserId> crewUserIds = partyroomData.getCrewDataSet().stream().map(CrewData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettings = userProfileService.getUsersProfileSetting(crewUserIds);
     }
 
     public QueryPartyroomSummaryResponse getSummaryInfo(PartyroomId partyroomId) {
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         if(partyroom.isPlaybackActivated()) {
-            // Extract Current Djs
-            Playback playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
-            Crew djCrew = partyroom.getCrewByUserId(playback.getUserId()).orElseThrow();
+            PlaybackData playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
+            CrewData djCrew = partyroom.getCrewByUserId(playback.getUserId()).orElseThrow();
             UserId djUserId = djCrew.getUserId();
             ProfileSettingDto profileSettingDto = userProfileService.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
             return QueryPartyroomSummaryResponse.from(partyroom, djCrew, profileSettingDto);
@@ -157,36 +142,14 @@ public class PartyroomInfoService {
         }
     }
 
-    @Transactional
-    public Optional<Crew> getCrewByUserId(PartyroomId partyroomId, UserId userId) {
+    @Transactional(readOnly = true)
+    public Optional<CrewData> getCrewByUserId(PartyroomId partyroomId, UserId userId) {
         Optional<PartyroomData> optional = partyroomRepository.findById(partyroomId.getId());
         if(optional.isPresent()) {
-            PartyroomData partyroomData = optional.get();
-            Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+            PartyroomData partyroom = optional.get();
             return partyroom.getCrewByUserId(userId);
         }else {
             return Optional.empty();
         }
-    }
-
-    @Transactional
-    public PartyroomData getPartyroom(PartyroomId partyroomId) {
-        // 두 개의 자녀 엔티티의 LEFT JOIN 이 필요하므로, 중복 제거를 위해서 QueryDSL 을 사용해야 한다.
-        // PartyroomData partyroomData = partyroomRepository.findByPartyroomId(partyroomId.getId()).orElseThrow();
-        Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
-        if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        return partyroomConverter.toEntity(optional.get());
-
-        // Projections 으로 읽어온 데이터(DTO)를 엔티티 객체로 변환해서 필드를 변경하지 않고
-        // 저장한다면 updatedAt이 변동될까?
-        // 변인 1. 영속성 컨텍스트에 엔티티가 없는 경우
-        // System.out.println(partyroomDataDto);
-        // partyroomRepository.save(partyroomData);
-
-        // 변인 2. 영속성 컨텍스트에 엔티티가 이미 있는 경우
-
-        // Dj 대기열에서 삭제된 크루를 조회에 계속 포함시켜야 할까?
-        // Partyroom 에서 나간 크루를 조회에 계속 포함시켜야 할까?
-        // └ 포함시켜야 하는 요건이 있을까?
     }
 }

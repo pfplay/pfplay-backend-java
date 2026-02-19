@@ -2,8 +2,8 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
@@ -33,9 +33,9 @@ class PartyroomInfoServiceGetDjsTest {
     @Mock private UserProfilePeerService userProfileService;
     @InjectMocks private PartyroomInfoService partyroomInfoService;
 
-    private Dj createDj(long crewId, int orderNumber, boolean isQueued, UserId userId) {
-        return Dj.builder()
-                .partyroomId(new PartyroomId(1L))
+    private DjData createDj(long crewId, int orderNumber, boolean isQueued, UserId userId) {
+        return DjData.builder()
+                .id(crewId * 100)
                 .userId(userId)
                 .crewId(new CrewId(crewId))
                 .playlistId(new PlaylistId(1L))
@@ -59,19 +59,20 @@ class PartyroomInfoServiceGetDjsTest {
         UserId user2 = new UserId();
         UserId user3 = new UserId();
 
-        Dj queuedDj1 = createDj(1L, 1, true, user1);
-        Dj dequeuedDj = createDj(2L, 0, false, user2);
-        Dj queuedDj2 = createDj(3L, 2, true, user3);
+        DjData queuedDj1 = createDj(1L, 1, true, user1);
+        DjData dequeuedDj = createDj(2L, 0, false, user2);
+        DjData queuedDj2 = createDj(3L, 2, true, user3);
 
-        Set<Dj> djSet = new HashSet<>();
+        Set<DjData> djSet = new HashSet<>();
         djSet.add(queuedDj1);
         djSet.add(dequeuedDj);
         djSet.add(queuedDj2);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroom = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(new PartyroomId(1L))
                 .build();
-        partyroom.assignDjSet(djSet);
+        partyroom.assignDjDataSet(djSet);
 
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
         profileMap.put(user1, mockProfile("nick1", "icon1"));
@@ -94,19 +95,20 @@ class PartyroomInfoServiceGetDjsTest {
         UserId user2 = new UserId();
         UserId user3 = new UserId();
 
-        Dj dj3 = createDj(3L, 3, true, user3);
-        Dj dj1 = createDj(1L, 1, true, user1);
-        Dj dj2 = createDj(2L, 2, true, user2);
+        DjData dj3 = createDj(3L, 3, true, user3);
+        DjData dj1 = createDj(1L, 1, true, user1);
+        DjData dj2 = createDj(2L, 2, true, user2);
 
-        Set<Dj> djSet = new HashSet<>();
+        Set<DjData> djSet = new HashSet<>();
         djSet.add(dj3);
         djSet.add(dj1);
         djSet.add(dj2);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroom = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(new PartyroomId(1L))
                 .build();
-        partyroom.assignDjSet(djSet);
+        partyroom.assignDjDataSet(djSet);
 
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
         profileMap.put(user1, mockProfile("nick1", "icon1"));
@@ -129,15 +131,16 @@ class PartyroomInfoServiceGetDjsTest {
     void getDjs_shouldReturnEmptyList_whenAllDjsDequeued() {
         // given
         UserId user1 = new UserId();
-        Dj dequeuedDj = createDj(1L, 0, false, user1);
+        DjData dequeuedDj = createDj(1L, 0, false, user1);
 
-        Set<Dj> djSet = new HashSet<>();
+        Set<DjData> djSet = new HashSet<>();
         djSet.add(dequeuedDj);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroom = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(new PartyroomId(1L))
                 .build();
-        partyroom.assignDjSet(djSet);
+        partyroom.assignDjDataSet(djSet);
 
         when(userProfileService.getUsersProfileSetting(anyList())).thenReturn(new HashMap<>());
 

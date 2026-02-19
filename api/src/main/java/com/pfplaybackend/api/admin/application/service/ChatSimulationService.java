@@ -3,10 +3,8 @@ package com.pfplaybackend.api.admin.application.service;
 import com.pfplaybackend.api.admin.domain.enums.ChatScriptType;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.liveconnect.chat.interfaces.listener.redis.message.OutgoingGroupChatMessage;
-import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
@@ -27,7 +25,6 @@ import java.util.concurrent.*;
 public class ChatSimulationService {
 
     private final PartyroomRepository partyroomRepository;
-    private final PartyroomConverter partyroomConverter;
     private final RedisMessagePublisher messagePublisher;
 
     // ExecutorService for background chat simulation
@@ -173,11 +170,10 @@ public class ChatSimulationService {
         }
 
         // Load partyroom
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId)
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId)
                 .orElseThrow(() -> new IllegalArgumentException("Partyroom not found: " + partyroomId));
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
 
-        List<Crew> crewList = new ArrayList<>(partyroom.getCrewSet());
+        List<CrewData> crewList = new ArrayList<>(partyroom.getActiveCrewDataSet());
         if (crewList.isEmpty()) {
             throw new IllegalStateException("No crew members in partyroom: " + partyroomId);
         }
@@ -232,12 +228,12 @@ public class ChatSimulationService {
      */
     private class ChatSimulationTask implements Runnable {
         private final Long partyroomId;
-        private final List<Crew> crewList;
+        private final List<CrewData> crewList;
         private final List<String> scripts;
         private int currentIndex = 0;
         private long nextMessageTime = System.currentTimeMillis();
 
-        public ChatSimulationTask(Long partyroomId, List<Crew> crewList, List<String> scripts) {
+        public ChatSimulationTask(Long partyroomId, List<CrewData> crewList, List<String> scripts) {
             this.partyroomId = partyroomId;
             this.crewList = crewList;
             this.scripts = scripts;
@@ -254,7 +250,7 @@ public class ChatSimulationService {
                 }
 
                 // Select random crew member
-                Crew randomCrew = crewList.get(ThreadLocalRandom.current().nextInt(crewList.size()));
+                CrewData randomCrew = crewList.get(ThreadLocalRandom.current().nextInt(crewList.size()));
 
                 // Get current message
                 String message = scripts.get(currentIndex);

@@ -7,8 +7,8 @@ import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDt
 import com.pfplaybackend.api.party.application.service.DisplayInfoService;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Playback;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.response.info.*;
@@ -74,11 +74,11 @@ public class PartyroomInfoController {
 
     @GetMapping("/{partyroomId}/dj-queue")
     public ResponseEntity<?> getDjQueueInfo(@PathVariable Long partyroomId) {
-        Partyroom partyroom = partyroomInfoService.getPartyroomById(new PartyroomId(partyroomId));
+        PartyroomData partyroom = partyroomInfoService.getPartyroomById(new PartyroomId(partyroomId));
         boolean isPlaybackActivated = partyroom.isPlaybackActivated();
         QueueStatus queueStatus = partyroom.isQueueClosed() ? QueueStatus.CLOSE :  QueueStatus.OPEN;
         boolean isRegistered = partyroomInfoService.isAlreadyRegistered(partyroom);
-        Playback playback = null;
+        PlaybackData playback = null;
         if(isPlaybackActivated) {
             playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
         }

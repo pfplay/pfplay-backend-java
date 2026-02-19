@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.interfaces.api.rest;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.application.service.PartyroomManagementService;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.UpdateDjQueueStatusRequest;
@@ -26,7 +26,7 @@ public class PartyroomManagementController {
 
     @PostMapping
     public ResponseEntity<?> createPartyroom(@RequestBody CreatePartyroomRequest createPartyroomRequest) {
-        Partyroom partyRoom = partyRoomManagementService.createGeneralPartyRoom(createPartyroomRequest);
+        PartyroomData partyRoom = partyRoomManagementService.createGeneralPartyRoom(createPartyroomRequest);
         return ResponseEntity.ok().body(CreatePartyroomResponse.from(partyRoom));
     }
 

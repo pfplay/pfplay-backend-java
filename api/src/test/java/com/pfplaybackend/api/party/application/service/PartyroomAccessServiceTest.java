@@ -4,13 +4,10 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
-import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -30,8 +27,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +36,6 @@ class PartyroomAccessServiceTest {
 
     @Mock private RedisMessagePublisher messagePublisher;
     @Mock private PartyroomRepository partyroomRepository;
-    @Mock private PartyroomConverter partyroomConverter;
     @Mock private PartyroomDomainService partyroomDomainService;
     @Mock private PartyroomInfoService partyroomInfoService;
     @Mock private UserProfilePeerService userProfileService;
@@ -71,28 +67,26 @@ class PartyroomAccessServiceTest {
     @DisplayName("같은 룸 재진입 시 publishAccessChangedEvent가 호출되어야 한다")
     void tryEnter_sameRoomReEntry_shouldPublishAccessEvent() {
         // given
-        Crew crew = Crew.builder()
+        CrewData crew = CrewData.builder()
                 .id(10L)
-                .partyroomId(partyroomId)
                 .userId(userId)
+                .authorityTier(AuthorityTier.FM)
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
 
-        Set<Crew> crewSet = new HashSet<>();
+        Set<CrewData> crewSet = new HashSet<>();
         crewSet.add(crew);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroomData = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(partyroomId)
                 .isTerminated(false)
                 .build();
-        partyroom.assignCrewSet(crewSet);
-        partyroom.assignDjSet(new HashSet<>());
-
-        PartyroomData partyroomData = mock(PartyroomData.class);
+        partyroomData.assignCrewDataSet(crewSet);
+        partyroomData.assignDjDataSet(new HashSet<>());
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(partyroomConverter.toDomain(partyroomData)).thenReturn(partyroom);
 
         // 같은 룸에 이미 active
         ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
@@ -117,16 +111,27 @@ class PartyroomAccessServiceTest {
         PartyroomId newRoomId = new PartyroomId(2L);
         PartyroomId oldRoomId = new PartyroomId(1L);
 
-        Partyroom newPartyroom = Partyroom.builder()
+        // 새 룸 PartyroomData — 사용자가 inactive crew로 존재; addOrActivateCrew가 in-place로 reactivate
+        CrewData newRoomCrew = CrewData.builder()
+                .id(20L)
+                .userId(userId)
+                .authorityTier(AuthorityTier.FM)
+                .gradeType(GradeType.LISTENER)
+                .isActive(false)
+                .build();
+
+        Set<CrewData> newRoomCrewSet = new HashSet<>();
+        newRoomCrewSet.add(newRoomCrew);
+
+        PartyroomData newPartyroomData = PartyroomData.builder()
+                .id(2L)
                 .partyroomId(newRoomId)
                 .isTerminated(false)
                 .build();
-        newPartyroom.assignCrewSet(new HashSet<>());
-        newPartyroom.assignDjSet(new HashSet<>());
+        newPartyroomData.assignCrewDataSet(newRoomCrewSet);
+        newPartyroomData.assignDjDataSet(new HashSet<>());
 
-        PartyroomData newPartyroomData = mock(PartyroomData.class);
         when(partyroomRepository.findById(newRoomId.getId())).thenReturn(Optional.of(newPartyroomData));
-        when(partyroomConverter.toDomain(newPartyroomData)).thenReturn(newPartyroom);
 
         // 다른 룸에 이미 active
         ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
@@ -135,54 +140,29 @@ class PartyroomAccessServiceTest {
         when(partyroomDomainService.isActiveInAnotherRoom(eq(newRoomId), any())).thenReturn(true);
 
         // exit() 호출 시 필요한 mock — 기존 룸 조회
-        Crew oldCrew = Crew.builder()
+        CrewData oldCrew = CrewData.builder()
                 .id(5L)
-                .partyroomId(oldRoomId)
                 .userId(userId)
+                .authorityTier(AuthorityTier.FM)
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
 
-        Set<Crew> oldCrewSet = new HashSet<>();
+        Set<CrewData> oldCrewSet = new HashSet<>();
         oldCrewSet.add(oldCrew);
 
-        Partyroom oldPartyroom = Partyroom.builder()
+        PartyroomData oldPartyroomData = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(oldRoomId)
                 .isTerminated(false)
                 .build();
-        oldPartyroom.assignCrewSet(oldCrewSet);
-        oldPartyroom.assignDjSet(new HashSet<>());
+        oldPartyroomData.assignCrewDataSet(oldCrewSet);
+        oldPartyroomData.assignDjDataSet(new HashSet<>());
 
-        PartyroomDataDto oldPartyroomDataDto = mock(PartyroomDataDto.class);
-        PartyroomData oldPartyroomData = mock(PartyroomData.class);
+        when(partyroomRepository.findById(oldRoomId.getId())).thenReturn(Optional.of(oldPartyroomData));
 
-        when(partyroomRepository.findPartyroomDto(oldRoomId)).thenReturn(Optional.of(oldPartyroomDataDto));
-        when(partyroomConverter.toEntity(oldPartyroomDataDto)).thenReturn(oldPartyroomData);
-        when(partyroomConverter.toDomain(oldPartyroomData)).thenReturn(oldPartyroom);
-        when(partyroomConverter.toData(any(Partyroom.class))).thenReturn(oldPartyroomData);
-
-        // 새 룸 enter 시 필요한 mock
-        Crew newCrew = Crew.builder()
-                .id(20L)
-                .partyroomId(newRoomId)
-                .userId(userId)
-                .gradeType(GradeType.LISTENER)
-                .isActive(true)
-                .build();
-
-        Set<Crew> newCrewSet = new HashSet<>();
-        newCrewSet.add(newCrew);
-
-        Partyroom savedNewPartyroom = Partyroom.builder()
-                .partyroomId(newRoomId)
-                .build();
-        savedNewPartyroom.assignCrewSet(newCrewSet);
-        savedNewPartyroom.assignDjSet(new HashSet<>());
-
-        PartyroomData savedNewPartyroomData = mock(PartyroomData.class);
-        when(partyroomConverter.toDomain(savedNewPartyroomData)).thenReturn(savedNewPartyroom);
-        // 첫 번째 save(exit) → oldPartyroomData, 두 번째 save(enter) → savedNewPartyroomData
-        when(partyroomRepository.save(any())).thenReturn(oldPartyroomData, savedNewPartyroomData);
+        // 첫 번째 save(exit) → oldPartyroomData, 두 번째 save(enter) → newPartyroomData (crew already added in-place)
+        when(partyroomRepository.save(any())).thenReturn(oldPartyroomData, newPartyroomData);
 
         ProfileSettingDto profileSettingDto = mock(ProfileSettingDto.class);
         when(userProfileService.getUserProfileSetting(userId)).thenReturn(profileSettingDto);

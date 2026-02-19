@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.domain.service;
 
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
@@ -48,7 +48,7 @@ public class PartyroomDomainService {
     }
 
     // 파티룸의 호스트가 맞는지 확인
-    public void checkIsHost(Partyroom partyroom, UserId userId) {
+    public void checkIsHost(PartyroomData partyroom, UserId userId) {
         if(!partyroom.getHostId().equals(userId)) {
             throw ExceptionCreator.create(GradeException.GRADE_INSUFFICIENT_FOR_OPERATION);
         }

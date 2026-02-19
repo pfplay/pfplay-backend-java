@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.response.access.EnterPartyroomResponse;
 import com.pfplaybackend.api.user.application.service.GuestSignService;
@@ -38,7 +38,7 @@ public class PartyroomAccessController {
     @PostMapping("/{partyroomId}/enter")
     public ResponseEntity<?> enterPartyroom(
             @PathVariable Long partyroomId) {
-        Crew crew = partyroomAccessService.tryEnter(new PartyroomId(partyroomId));
+        CrewData crew = partyroomAccessService.tryEnter(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success(EnterPartyroomResponse.from(crew)));
     }
 

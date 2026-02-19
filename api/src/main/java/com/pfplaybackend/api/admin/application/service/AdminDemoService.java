@@ -12,9 +12,7 @@ import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
-import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
@@ -59,7 +57,6 @@ public class AdminDemoService {
     private final AdminUserService adminUserService;
     private final MemberRepository memberRepository;
     private final PartyroomRepository partyroomRepository;
-    private final PartyroomConverter partyroomConverter;
     private final PartyroomAccessService partyroomAccessService;
     private final PlaylistRepository playlistRepository;
     private final TrackRepository trackRepository;
@@ -96,7 +93,7 @@ public class AdminDemoService {
 
         // Step 0: Find existing main stage
         log.info("Step 0: Finding existing main stage...");
-        Partyroom mainStage = findMainStage();
+        PartyroomData mainStage = findMainStage();
 
         // Get available avatar resources
         List<AvatarBodyResourceData> avatarBodies = avatarBodyResourceRepository.findAll();
@@ -115,7 +112,7 @@ public class AdminDemoService {
 
         // Step 2: Create general partyrooms only (main stage already exists)
         log.info("Step 2: Creating {} general partyrooms...", GENERAL_ROOMS_COUNT);
-        List<Partyroom> generalRooms = createGeneralRooms(request, specialMembers);
+        List<PartyroomData> generalRooms = createGeneralRooms(request, specialMembers);
 
         // Step 3: Enter members into rooms
         log.info("Step 3: Entering members into rooms...");
@@ -188,18 +185,13 @@ public class AdminDemoService {
      * Find existing main stage
      * Main stage is created during application initialization
      */
-    private Partyroom findMainStage() {
-        Optional<PartyroomData> mainStageOpt = partyroomRepository.findAll().stream()
+    private PartyroomData findMainStage() {
+        PartyroomData mainStage = partyroomRepository.findAll().stream()
                 .filter(p -> p.getStageType() == StageType.MAIN)
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Main stage not found. It should be created during application initialization."));
 
-        if (mainStageOpt.isEmpty()) {
-            throw new IllegalStateException("Main stage not found. It should be created during application initialization.");
-        }
-
-        PartyroomData mainStageData = mainStageOpt.get();
-        Partyroom mainStage = partyroomConverter.toDomain(mainStageData);
-        log.info("Found existing main stage: partyroomId={}", mainStageData.getId());
+        log.info("Found existing main stage: partyroomId={}", mainStage.getId());
         return mainStage;
     }
 
@@ -229,11 +221,11 @@ public class AdminDemoService {
      * Step 2: Create general rooms
      * First special member is for main stage DJ, so hosts start from index 1
      */
-    private List<Partyroom> createGeneralRooms(
+    private List<PartyroomData> createGeneralRooms(
             InitializeDemoEnvironmentRequest request,
             List<Member> specialMembers) {
 
-        List<Partyroom> rooms = new ArrayList<>();
+        List<PartyroomData> rooms = new ArrayList<>();
 
         for (int i = 0; i < GENERAL_ROOMS_COUNT; i++) {
             // First special member (index 0) is main stage DJ
@@ -249,16 +241,15 @@ public class AdminDemoService {
                     request.getPlaybackTimeLimit()
             );
 
-            Partyroom partyroom = Partyroom.create(createRequest, StageType.GENERAL, hostUserId);
-            PartyroomData savedData = partyroomRepository.save(partyroomConverter.toData(partyroom));
-            Partyroom savedPartyroom = partyroomConverter.toDomain(savedData);
+            PartyroomData partyroom = PartyroomData.create(createRequest, StageType.GENERAL, hostUserId);
+            PartyroomData savedPartyroom = partyroomRepository.save(partyroom);
 
             // Enter host
             partyroomAccessService.enterByHost(hostUserId, savedPartyroom);
 
             rooms.add(savedPartyroom);
             log.info("Created general room {}/{}: partyroomId={}, title={}, host={}",
-                    i + 1, GENERAL_ROOMS_COUNT, savedData.getId(), title, hostUserId.getUid());
+                    i + 1, GENERAL_ROOMS_COUNT, savedPartyroom.getId(), title, hostUserId.getUid());
         }
 
         return rooms;
@@ -268,8 +259,8 @@ public class AdminDemoService {
      * Step 3: Enter members into rooms
      */
     private void enterMembersIntoRooms(
-            Partyroom mainStage,
-            List<Partyroom> generalRooms,
+            PartyroomData mainStage,
+            List<PartyroomData> generalRooms,
             List<Member> specialMembers,
             List<Member> regularMembers) {
 
@@ -288,7 +279,7 @@ public class AdminDemoService {
 
         // Enter members into general rooms (30 each, host already entered, so 29 more each)
         for (int roomIdx = 0; roomIdx < generalRooms.size(); roomIdx++) {
-            Partyroom room = generalRooms.get(roomIdx);
+            PartyroomData room = generalRooms.get(roomIdx);
 
             for (int i = 0; i < GENERAL_ROOM_CREW - 1 && memberIndex < regularMembers.size(); i++) {
                 Member member = regularMembers.get(memberIndex++);
@@ -304,21 +295,20 @@ public class AdminDemoService {
     /**
      * Enter a member as regular crew (not HOST)
      */
-    private void enterMemberAsRegularCrew(Partyroom partyroom, UserId userId) {
-        PartyroomData partyroomData = partyroomRepository.findById(partyroom.getPartyroomId().getId())
+    private void enterMemberAsRegularCrew(PartyroomData partyroom, UserId userId) {
+        PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
-        Partyroom loadedPartyroom = partyroomConverter.toDomain(partyroomData);
 
-        Partyroom updatedPartyroom = loadedPartyroom.addNewCrew(userId, AuthorityTier.FM, GradeType.LISTENER);
-        partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
+        loadedPartyroom.addNewCrew(userId, AuthorityTier.FM, GradeType.LISTENER);
+        partyroomRepository.save(loadedPartyroom);
     }
 
     /**
      * Step 4: Register DJs in queues
      */
     private int registerDjsInQueues(
-            Partyroom mainStage,
-            List<Partyroom> generalRooms,
+            PartyroomData mainStage,
+            List<PartyroomData> generalRooms,
             List<Member> specialMembers) {
 
         int djCount = 0;
@@ -329,7 +319,7 @@ public class AdminDemoService {
 
         // Register DJs in general rooms
         for (int i = 0; i < generalRooms.size(); i++) {
-            Partyroom room = generalRooms.get(i);
+            PartyroomData room = generalRooms.get(i);
             UserId hostUserId = specialMembers.get(i + 1).getUserId();
             registerDjInRoom(room, hostUserId);
             djCount++;
@@ -343,7 +333,7 @@ public class AdminDemoService {
      * Register DJ in room queue
      * Mimics DjManagementService.enqueueDj() logic
      */
-    private void registerDjInRoom(Partyroom partyroom, UserId userId) {
+    private void registerDjInRoom(PartyroomData partyroom, UserId userId) {
         // Find user's playlist
         Optional<PlaylistData> playlistOpt = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(
                 userId, PlaylistType.PLAYLIST).stream().findFirst();
@@ -356,23 +346,20 @@ public class AdminDemoService {
         PlaylistData playlist = playlistOpt.get();
 
         // Load latest partyroom state
-        PartyroomData partyroomData = partyroomRepository.findById(partyroom.getPartyroomId().getId())
+        PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
-        Partyroom loadedPartyroom = partyroomConverter.toDomain(partyroomData);
 
         // Check if playback activation is required (first DJ)
         boolean isPostActivationProcessingRequired = !loadedPartyroom.isPlaybackActivated();
 
         // Create and add DJ
-        Partyroom updatedPartyroom = loadedPartyroom
-                .createAndAddDj(new PlaylistId(playlist.getId()), userId)
-                .applyActivation();
+        loadedPartyroom.createAndAddDj(new PlaylistId(playlist.getId()), userId).applyActivation();
 
-        PartyroomData savedPartyroomData = partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
+        PartyroomData savedPartyroomData = partyroomRepository.save(loadedPartyroom);
 
         // Start playback if this is the first DJ
         if (isPostActivationProcessingRequired) {
-            playbackManagementService.start(partyroomConverter.toDomain(savedPartyroomData));
+            playbackManagementService.start(savedPartyroomData);
             log.info("Started playback for partyroom: partyroomId={}, djUserId={}",
                     partyroom.getPartyroomId().getId(), userId.getUid());
         }
@@ -385,8 +372,8 @@ public class AdminDemoService {
      * Build response
      */
     private DemoEnvironmentResponse buildResponse(
-            Partyroom mainStage,
-            List<Partyroom> generalRooms,
+            PartyroomData mainStage,
+            List<PartyroomData> generalRooms,
             List<Member> specialMembers,
             int djsRegistered,
             long executionTime) {
@@ -409,7 +396,7 @@ public class AdminDemoService {
         // Build general rooms details (each has host who is also DJ)
         List<DemoEnvironmentResponse.PartyroomDetail> generalRoomDetails = new ArrayList<>();
         for (int i = 0; i < generalRooms.size(); i++) {
-            Partyroom room = generalRooms.get(i);
+            PartyroomData room = generalRooms.get(i);
             UserId hostUserId = specialMembers.get(i + 1).getUserId();
             Long playlistId = findPlaylistId(hostUserId);
 

@@ -6,8 +6,8 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.exception.ReactionException;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
@@ -27,7 +27,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class PlaybackReactionService {
-    
+
     private final PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
     private final PlaybackReactionDomainService playbackReactionDomainService;
     private final PartyroomInfoService partyroomInfoService;
@@ -36,23 +36,19 @@ public class PlaybackReactionService {
     @Transactional
     public Map<String, Boolean> reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        // TODO GT → GRAB 불가능하게 만들기
         if(AuthorityTier.GT.equals(authContext.getAuthorityTier()) && reactionType.equals(ReactionType.GRAB)) {
             throw ExceptionCreator.create(ReactionException.INVALID_REACTION);
         }
 
         ActivePartyroomDto myActivePartyroom = partyroomInfoService.getMyActivePartyroom().orElseThrow();
-        // TODO [Check] MyActivePartyroom.getId() == partyroomId
         PlaybackId playbackId = myActivePartyroom.getCurrentPlaybackId();
-        // Find whether existing history exists
         PlaybackReactionHistoryData historyData = getValidReactionHistoryData(authContext, playbackId);
         ReactionState existingState = getExistingState(historyData);
         ReactionState targetState = getTargetState(existingState, reactionType);
 
         ReactionPostProcessDto reactionPostProcessDto = executeProcess(historyData, existingState, targetState);
-        // Get CrewId for Event Propagation
-        Optional<Crew> optional  = partyroomInfoService.getCrewByUserId(partyroomId, authContext.getUserId());
-        Crew crew = optional.orElseThrow();
+        Optional<CrewData> optional = partyroomInfoService.getCrewByUserId(partyroomId, authContext.getUserId());
+        CrewData crew = optional.orElseThrow();
         playbackReactionPostProcessService.postProcess(reactionPostProcessDto, reactionType, partyroomId, playbackId, new CrewId(crew.getId()));
         return Map.of(
             "isLiked", targetState.isLiked(),
@@ -83,7 +79,6 @@ public class PlaybackReactionService {
         return playbackReactionDomainService.getTargetReactionState(existingState, reactionType);
     }
 
-    // FIXME Change Method Name
     private ReactionPostProcessDto executeProcess(PlaybackReactionHistoryData historyData,
                                                   ReactionState existingState,
                                                   ReactionState targetState) {

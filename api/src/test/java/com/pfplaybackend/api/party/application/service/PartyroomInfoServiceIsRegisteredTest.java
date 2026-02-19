@@ -2,8 +2,8 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
@@ -51,8 +51,8 @@ class PartyroomInfoServiceIsRegisteredTest {
     @DisplayName("DJ 2명 이상일 때 내가 등록되어 있으면 true 반환 (anyMatch)")
     void isAlreadyRegistered_shouldReturnTrue_whenMyUserIsAmongMultipleDjs() {
         // given
-        Dj myDj = Dj.builder()
-                .partyroomId(new PartyroomId(1L))
+        DjData myDj = DjData.builder()
+                .id(100L)
                 .userId(myUserId)
                 .crewId(new CrewId(1L))
                 .playlistId(new PlaylistId(1L))
@@ -60,8 +60,8 @@ class PartyroomInfoServiceIsRegisteredTest {
                 .isQueued(true)
                 .build();
 
-        Dj otherDj = Dj.builder()
-                .partyroomId(new PartyroomId(1L))
+        DjData otherDj = DjData.builder()
+                .id(200L)
                 .userId(otherUserId)
                 .crewId(new CrewId(2L))
                 .playlistId(new PlaylistId(2L))
@@ -69,14 +69,15 @@ class PartyroomInfoServiceIsRegisteredTest {
                 .isQueued(true)
                 .build();
 
-        Set<Dj> djSet = new HashSet<>();
+        Set<DjData> djSet = new HashSet<>();
         djSet.add(myDj);
         djSet.add(otherDj);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroom = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(new PartyroomId(1L))
                 .build();
-        partyroom.assignDjSet(djSet);
+        partyroom.assignDjDataSet(djSet);
 
         // when
         boolean result = partyroomInfoService.isAlreadyRegistered(partyroom);
@@ -89,8 +90,8 @@ class PartyroomInfoServiceIsRegisteredTest {
     @DisplayName("내가 등록되어 있지 않으면 false 반환")
     void isAlreadyRegistered_shouldReturnFalse_whenMyUserIsNotRegistered() {
         // given
-        Dj otherDj = Dj.builder()
-                .partyroomId(new PartyroomId(1L))
+        DjData otherDj = DjData.builder()
+                .id(200L)
                 .userId(otherUserId)
                 .crewId(new CrewId(2L))
                 .playlistId(new PlaylistId(2L))
@@ -98,13 +99,14 @@ class PartyroomInfoServiceIsRegisteredTest {
                 .isQueued(true)
                 .build();
 
-        Set<Dj> djSet = new HashSet<>();
+        Set<DjData> djSet = new HashSet<>();
         djSet.add(otherDj);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroom = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(new PartyroomId(1L))
                 .build();
-        partyroom.assignDjSet(djSet);
+        partyroom.assignDjDataSet(djSet);
 
         // when
         boolean result = partyroomInfoService.isAlreadyRegistered(partyroom);

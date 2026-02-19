@@ -4,10 +4,8 @@ import com.pfplaybackend.api.party.application.dto.playback.MusicDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
 import com.pfplaybackend.api.party.application.peer.MusicQueryPeerService;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
-import com.pfplaybackend.api.party.domain.entity.converter.PlaybackConverter;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
@@ -27,26 +25,24 @@ public class PlaybackInfoService {
 
     private final PartyroomRepository partyroomRepository;
     private final PlaybackRepository playbackRepository;
-    private final PlaybackConverter playbackConverter;
     private final MusicQueryPeerService musicQueryService;
     private final UserProfilePeerService userProfileService;
 
     @Transactional
-    public Playback getNextPlaybackInPlaylist(PartyroomId partyroomId, Dj dj) {
+    public PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj) {
         MusicDto musicDto = musicQueryService.getFirstMusic(dj.getPlaylistId());
-        return Playback.create(partyroomId , dj.getUserId(), musicDto);
+        return PlaybackData.create(partyroomId, dj.getUserId(), musicDto);
     }
 
     @Transactional
-    public void updatePlaybackAggregation(Playback playback, List<Integer> deltaRecord) {
-        Playback updatedPlayback = playback.updateAggregation(deltaRecord.get(0), deltaRecord.get(1), deltaRecord.get(2));
-        playbackRepository.save(playbackConverter.toData(updatedPlayback));
+    public void updatePlaybackAggregation(PlaybackData playback, List<Integer> deltaRecord) {
+        playback.updateAggregation(deltaRecord.get(0), deltaRecord.get(1), deltaRecord.get(2));
+        playbackRepository.save(playback);
     }
 
     @Transactional
-    public Playback getPlaybackById(PlaybackId playbackId) {
-        PlaybackData playbackData = playbackRepository.findById(playbackId.getId()).orElseThrow();
-        return playbackConverter.toDomain(playbackData);
+    public PlaybackData getPlaybackById(PlaybackId playbackId) {
+        return playbackRepository.findById(playbackId.getId()).orElseThrow();
     }
 
     @Transactional

@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.domain.service;
 
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -16,19 +16,19 @@ public class CrewDomainService {
         return false;
     }
 
-    public boolean isBelowManagerGrade(Partyroom partyroom, UserId adjuster) {
-        Crew aCrew = partyroom.getCrewByUserId(adjuster).orElseThrow();
+    public boolean isBelowManagerGrade(PartyroomData partyroom, UserId adjuster) {
+        CrewData aCrew = partyroom.getCrewByUserId(adjuster).orElseThrow();
         return aCrew.getGradeType().isLowerThan(GradeType.MODERATOR);
     }
 
-    public boolean isAdjusterGradeLowerThanSubject(Partyroom partyroom, UserId adjuster, CrewId subject) {
-        Crew aCrew = partyroom.getCrewByUserId(adjuster).orElseThrow();
-        Crew sCrew = partyroom.getCrew(subject);
+    public boolean isAdjusterGradeLowerThanSubject(PartyroomData partyroom, UserId adjuster, CrewId subject) {
+        CrewData aCrew = partyroom.getCrewByUserId(adjuster).orElseThrow();
+        CrewData sCrew = partyroom.getCrew(subject);
         return aCrew.getGradeType().isLowerThan(sCrew.getGradeType());
     }
 
-    public boolean isTargetGradeExceedingAdjuster(Partyroom partyroom, UserId adjuster, GradeType targetGradeType) {
-        Crew aCrew = partyroom.getCrewByUserId(adjuster).orElseThrow();
+    public boolean isTargetGradeExceedingAdjuster(PartyroomData partyroom, UserId adjuster, GradeType targetGradeType) {
+        CrewData aCrew = partyroom.getCrewByUserId(adjuster).orElseThrow();
         return targetGradeType.isEqualOrHigherThan(aCrew.getGradeType());
     }
 }

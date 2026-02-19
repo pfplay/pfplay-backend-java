@@ -5,8 +5,8 @@ import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessD
 import com.pfplaybackend.api.party.application.peer.UserActivityPeerService;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackReactionPostProcessService;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
 import com.pfplaybackend.api.party.domain.service.PlaybackReactionDomainService;
@@ -77,7 +77,7 @@ public class ReactionSimulationService {
                 .determinePostProcessing(existingState, targetState);
 
         // 6. Execute post-processing manually (avoid ThreadLocalContext dependency)
-        Playback playback = playbackInfoService.getPlaybackById(playbackId);
+        PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
 
         // Note: Skip actual grab music operation for simulation
         // Only events and aggregation will be updated

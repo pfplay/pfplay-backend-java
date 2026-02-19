@@ -9,9 +9,9 @@ import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.dto.playback.DisplayDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionDto;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Playback;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
@@ -41,8 +41,8 @@ public class DisplayInfoService {
         boolean isPlaybackActivated = activePartyroom.isPlaybackActivated();
 
         if(isPlaybackActivated) {
-            Playback playback = playbackInfoService.getPlaybackById(activePartyroom.getCurrentPlaybackId());
-            Crew djInfo = getCurrentDjInfo(partyroomId, playback);
+            PlaybackData playback = playbackInfoService.getPlaybackById(activePartyroom.getCurrentPlaybackId());
+            CrewData djInfo = getCurrentDjInfo(partyroomId, playback);
             CurrentDjDto currentDjDto = new CurrentDjDto(djInfo.getId());
             //
             Optional<PlaybackReactionHistoryData> optional = playbackReactionService.findPrevHistoryData(new PlaybackId(playback.getId()), authContext.getUserId());
@@ -58,7 +58,7 @@ public class DisplayInfoService {
         // 2.   ResolvedReaction existingResolved = ReactionStateResolver.resolve(existingState);
     }
 
-    private Crew getCurrentDjInfo(PartyroomId partyroomId, Playback playback) {
+    private CrewData getCurrentDjInfo(PartyroomId partyroomId, PlaybackData playback) {
         // FIXME Dj 대기열에서의 Dj 아이템
         // FIXME Crew 목록에서의 아이템
         // crewSet 에서 조회하기 때문에 처리는 정상적으로 된다.

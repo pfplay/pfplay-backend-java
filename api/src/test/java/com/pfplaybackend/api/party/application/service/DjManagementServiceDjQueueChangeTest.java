@@ -4,14 +4,11 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.peer.MusicQueryPeerService;
-import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
-import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.service.CrewDomainService;
@@ -42,7 +39,6 @@ import static org.mockito.Mockito.*;
 class DjManagementServiceDjQueueChangeTest {
 
     @Mock private PartyroomRepository partyroomRepository;
-    @Mock private PartyroomConverter partyroomConverter;
     @Mock private PartyroomDomainService partyroomDomainService;
     @Mock private CrewDomainService crewDomainService;
     @Mock private PartyroomInfoService partyroomInfoService;
@@ -77,37 +73,30 @@ class DjManagementServiceDjQueueChangeTest {
         // given
         PlaylistId playlistId = new PlaylistId(10L);
 
-        Crew crew = Crew.builder()
+        CrewData crew = CrewData.builder()
                 .id(1L)
-                .partyroomId(partyroomId)
                 .userId(userId)
+                .authorityTier(AuthorityTier.FM)
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
 
-        Set<Crew> crewSet = new HashSet<>();
+        Set<CrewData> crewSet = new HashSet<>();
         crewSet.add(crew);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroomData = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .isQueueClosed(false)
                 .build();
-        partyroom.assignCrewSet(crewSet);
-        partyroom.assignDjSet(new HashSet<>());
+        partyroomData.assignCrewDataSet(crewSet);
+        partyroomData.assignDjDataSet(new HashSet<>());
 
-        PartyroomDataDto partyroomDataDto = mock(PartyroomDataDto.class);
-        PartyroomData partyroomData = mock(PartyroomData.class);
-        PartyroomData savedPartyroomData = mock(PartyroomData.class);
-
-        when(partyroomRepository.findPartyroomDto(partyroomId)).thenReturn(Optional.of(partyroomDataDto));
-        when(partyroomConverter.toEntity(partyroomDataDto)).thenReturn(partyroomData);
-        when(partyroomConverter.toDomain(partyroomData)).thenReturn(partyroom);
+        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
         when(musicQueryService.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
-        when(partyroomConverter.toData(any(Partyroom.class))).thenReturn(savedPartyroomData);
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(savedPartyroomData);
-        when(partyroomConverter.toDomain(savedPartyroomData)).thenReturn(partyroom);
-        when(partyroomInfoService.getDjs(any(Partyroom.class))).thenReturn(List.of(
+        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
+        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(List.of(
                 new DjWithProfileDto(1L, 1, "nick1", "icon1")
         ));
 
@@ -122,17 +111,16 @@ class DjManagementServiceDjQueueChangeTest {
     @DisplayName("dequeueDj(자진) - 대기 DJ 삭제 후 DJ_QUEUE_CHANGE 이벤트가 발행되어야 한다")
     void dequeueDjSelf_shouldPublishDjQueueChangeEvent() {
         // given
-        Crew crew = Crew.builder()
+        CrewData crew = CrewData.builder()
                 .id(1L)
-                .partyroomId(partyroomId)
                 .userId(userId)
+                .authorityTier(AuthorityTier.FM)
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
 
-        Dj dj = Dj.builder()
+        DjData dj = DjData.builder()
                 .id(100L)
-                .partyroomId(partyroomId)
                 .userId(userId)
                 .crewId(new CrewId(1L))
                 .playlistId(new PlaylistId(10L))
@@ -140,27 +128,22 @@ class DjManagementServiceDjQueueChangeTest {
                 .isQueued(true)
                 .build();
 
-        Set<Crew> crewSet = new HashSet<>();
+        Set<CrewData> crewSet = new HashSet<>();
         crewSet.add(crew);
-        Set<Dj> djSet = new HashSet<>();
+        Set<DjData> djSet = new HashSet<>();
         djSet.add(dj);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroomData = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .build();
-        partyroom.assignCrewSet(crewSet);
-        partyroom.assignDjSet(djSet);
+        partyroomData.assignCrewDataSet(crewSet);
+        partyroomData.assignDjDataSet(djSet);
 
-        PartyroomDataDto partyroomDataDto = mock(PartyroomDataDto.class);
-        PartyroomData partyroomData = mock(PartyroomData.class);
-
-        when(partyroomRepository.findPartyroomDto(partyroomId)).thenReturn(Optional.of(partyroomDataDto));
-        when(partyroomConverter.toEntity(partyroomDataDto)).thenReturn(partyroomData);
-        when(partyroomConverter.toDomain(partyroomData)).thenReturn(partyroom);
-        when(partyroomConverter.toData(any(Partyroom.class))).thenReturn(partyroomData);
+        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
         when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(Partyroom.class))).thenReturn(Collections.emptyList());
+        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(Collections.emptyList());
 
         // when
         djManagementService.dequeueDj(partyroomId);
@@ -175,17 +158,16 @@ class DjManagementServiceDjQueueChangeTest {
     @DisplayName("dequeueDj(자진) - 현재 DJ 삭제 시 DJ_QUEUE_CHANGE 이벤트 발행 후 skipBySystem 호출")
     void dequeueDjSelf_currentDj_shouldPublishEventThenSkip() {
         // given
-        Crew crew = Crew.builder()
+        CrewData crew = CrewData.builder()
                 .id(1L)
-                .partyroomId(partyroomId)
                 .userId(userId)
+                .authorityTier(AuthorityTier.FM)
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
 
-        Dj dj = Dj.builder()
+        DjData dj = DjData.builder()
                 .id(100L)
-                .partyroomId(partyroomId)
                 .userId(userId)
                 .crewId(new CrewId(1L))
                 .playlistId(new PlaylistId(10L))
@@ -193,27 +175,22 @@ class DjManagementServiceDjQueueChangeTest {
                 .isQueued(true)
                 .build();
 
-        Set<Crew> crewSet = new HashSet<>();
+        Set<CrewData> crewSet = new HashSet<>();
         crewSet.add(crew);
-        Set<Dj> djSet = new HashSet<>();
+        Set<DjData> djSet = new HashSet<>();
         djSet.add(dj);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroomData = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .build();
-        partyroom.assignCrewSet(crewSet);
-        partyroom.assignDjSet(djSet);
+        partyroomData.assignCrewDataSet(crewSet);
+        partyroomData.assignDjDataSet(djSet);
 
-        PartyroomDataDto partyroomDataDto = mock(PartyroomDataDto.class);
-        PartyroomData partyroomData = mock(PartyroomData.class);
-
-        when(partyroomRepository.findPartyroomDto(partyroomId)).thenReturn(Optional.of(partyroomDataDto));
-        when(partyroomConverter.toEntity(partyroomDataDto)).thenReturn(partyroomData);
-        when(partyroomConverter.toDomain(partyroomData)).thenReturn(partyroom);
-        when(partyroomConverter.toData(any(Partyroom.class))).thenReturn(partyroomData);
+        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
         when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(Partyroom.class))).thenReturn(Collections.emptyList());
+        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(Collections.emptyList());
 
         // when
         djManagementService.dequeueDj(partyroomId);
@@ -232,9 +209,8 @@ class DjManagementServiceDjQueueChangeTest {
         UserId targetUserId = new UserId();
         DjId djId = new DjId(100L);
 
-        Dj targetDj = Dj.builder()
+        DjData targetDj = DjData.builder()
                 .id(100L)
-                .partyroomId(partyroomId)
                 .userId(targetUserId)
                 .crewId(new CrewId(2L))
                 .playlistId(new PlaylistId(10L))
@@ -242,26 +218,21 @@ class DjManagementServiceDjQueueChangeTest {
                 .isQueued(true)
                 .build();
 
-        Set<Dj> djSet = new HashSet<>();
+        Set<DjData> djSet = new HashSet<>();
         djSet.add(targetDj);
 
-        Partyroom partyroom = Partyroom.builder()
+        PartyroomData partyroomData = PartyroomData.builder()
+                .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .build();
-        partyroom.assignDjSet(djSet);
-        partyroom.assignCrewSet(new HashSet<>());
+        partyroomData.assignDjDataSet(djSet);
+        partyroomData.assignCrewDataSet(new HashSet<>());
 
-        PartyroomDataDto partyroomDataDto = mock(PartyroomDataDto.class);
-        PartyroomData partyroomData = mock(PartyroomData.class);
-
-        when(partyroomRepository.findPartyroomDto(partyroomId)).thenReturn(Optional.of(partyroomDataDto));
-        when(partyroomConverter.toEntity(partyroomDataDto)).thenReturn(partyroomData);
-        when(partyroomConverter.toDomain(partyroomData)).thenReturn(partyroom);
-        when(crewDomainService.isBelowManagerGrade(partyroom, adminUserId)).thenReturn(false);
-        when(partyroomConverter.toData(any(Partyroom.class))).thenReturn(partyroomData);
+        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
+        when(crewDomainService.isBelowManagerGrade(any(PartyroomData.class), eq(adminUserId))).thenReturn(false);
         when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(Partyroom.class))).thenReturn(Collections.emptyList());
+        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(Collections.emptyList());
 
         // when
         djManagementService.dequeueDj(partyroomId, djId);
