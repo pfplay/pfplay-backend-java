@@ -17,6 +17,8 @@ import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.service.CrewDomainService;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.*;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -42,6 +44,7 @@ import static org.mockito.Mockito.*;
 class DjManagementServiceDjQueueChangeTest {
 
     @Mock private PartyroomRepository partyroomRepository;
+    @Mock private DjRepository djRepository;
     @Mock private PartyroomConverter partyroomConverter;
     @Mock private PartyroomDomainService partyroomDomainService;
     @Mock private CrewDomainService crewDomainService;
@@ -98,15 +101,17 @@ class DjManagementServiceDjQueueChangeTest {
 
         PartyroomDataDto partyroomDataDto = mock(PartyroomDataDto.class);
         PartyroomData partyroomData = mock(PartyroomData.class);
-        PartyroomData savedPartyroomData = mock(PartyroomData.class);
+        PartyroomData partyroomRef = mock(PartyroomData.class);
 
+        // 첫 번째 findPartyroomDto (검증용)
         when(partyroomRepository.findPartyroomDto(partyroomId)).thenReturn(Optional.of(partyroomDataDto));
         when(partyroomConverter.toEntity(partyroomDataDto)).thenReturn(partyroomData);
         when(partyroomConverter.toDomain(partyroomData)).thenReturn(partyroom);
         when(musicQueryService.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
-        when(partyroomConverter.toData(any(Partyroom.class))).thenReturn(savedPartyroomData);
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(savedPartyroomData);
-        when(partyroomConverter.toDomain(savedPartyroomData)).thenReturn(partyroom);
+        // DJ 직접 저장
+        when(partyroomRepository.getReferenceById(partyroomId.getId())).thenReturn(partyroomRef);
+        when(djRepository.saveAndFlush(any(DjData.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        // 이벤트 발행용 getDjs
         when(partyroomInfoService.getDjs(any(Partyroom.class))).thenReturn(List.of(
                 new DjWithProfileDto(1L, 1, "nick1", "icon1")
         ));
@@ -115,6 +120,7 @@ class DjManagementServiceDjQueueChangeTest {
         djManagementService.enqueueDj(partyroomId, playlistId);
 
         // then
+        verify(djRepository).saveAndFlush(any(DjData.class));
         verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE), any());
     }
 

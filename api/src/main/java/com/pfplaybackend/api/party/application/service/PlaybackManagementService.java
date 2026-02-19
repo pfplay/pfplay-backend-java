@@ -146,10 +146,10 @@ public class PlaybackManagementService {
     }
 
     private boolean exceedsPlaybackTimeLimit(Partyroom partyroom, Playback playback) {
-        int limitSeconds = partyroom.getPlaybackTimeLimit();
-        if (limitSeconds <= 0) return false;
+        int limitMinutes = partyroom.getPlaybackTimeLimit();
+        if (limitMinutes <= 0) return false;
         long durationSeconds = playbackDomainService.convertToSeconds(playback.getDuration());
-        return durationSeconds > limitSeconds;
+        return durationSeconds > limitMinutes * 60L;
     }
 
     // FIXME CrewId
