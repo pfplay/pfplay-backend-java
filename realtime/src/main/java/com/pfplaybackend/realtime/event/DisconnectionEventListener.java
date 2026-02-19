@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.liveconnect.websocket.event.listener;
+package com.pfplaybackend.realtime.event;
 
-import com.pfplaybackend.api.liveconnect.websocket.cache.SessionCacheManager;
+import com.pfplaybackend.realtime.port.SessionCachePort;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,20 +10,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
-import java.security.Principal;
-
 @Component
 @RequiredArgsConstructor
 public class DisconnectionEventListener implements ApplicationListener<SessionDisconnectEvent> {
-    private final static Logger logger = LoggerFactory.getLogger(ConnectionEventListener.class);
-    private final SessionCacheManager sessionCacheManager;
+    private final static Logger logger = LoggerFactory.getLogger(DisconnectionEventListener.class);
+    private final SessionCachePort sessionCachePort;
 
     @Override
     public void onApplicationEvent(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
-        Principal principal = headerAccessor.getUser();
-        sessionCacheManager.deleteSessionCache(sessionId);
+        sessionCachePort.deleteSessionCache(sessionId);
         logger.info("Web socket connection closed: " + sessionId);
 
         CloseStatus closeStatus = event.getCloseStatus();

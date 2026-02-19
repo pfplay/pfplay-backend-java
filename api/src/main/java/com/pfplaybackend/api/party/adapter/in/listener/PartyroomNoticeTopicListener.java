@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pfplaybackend.api.liveconnect.websocket.SimpMessageSender;
+import com.pfplaybackend.realtime.sender.SimpMessageSender;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;

@@ -1,24 +1,13 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.2.3'
-	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.springframework.boot'
 }
 
-group = 'com.pfplay-backend.api'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
-
-repositories {
-	mavenCentral()
-}
-
-// ✅ 버전 변수 정리
 def queryDslVersion = '5.0.0'
-def lombokVersion = '1.18.22'
 
 dependencies {
+	implementation project(':realtime')
 
-	// 🔶 Core Spring Boot Starters
+	// Core Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
@@ -30,30 +19,22 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-	// 🔧 개발 편의성
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
-	// ✅ MySQL Driver
 	runtimeOnly 'com.mysql:mysql-connector-j'
 
-	// 🧪 테스트
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
-	testImplementation "org.assertj:assertj-core:3.24.2"
+	testImplementation 'org.assertj:assertj-core:3.24.2'
 
-	// ✅ Lombok
-	compileOnly "org.projectlombok:lombok:${lombokVersion}"
-	annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-
-	//
+	// MapStruct
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
-	// 🔐 OAuth2 + JWT
-	implementation 'com.auth0:java-jwt:4.4.0'         // Auth0 JWT 라이브러리
-	implementation 'org.passay:passay:1.6.4'          // 비밀번호 정책 유효성
+	// OAuth2 + JWT
+	implementation 'com.auth0:java-jwt:4.4.0'
+	implementation 'org.passay:passay:1.6.4'
 
-	// 🧩 QueryDSL
+	// QueryDSL
 	implementation "com.querydsl:querydsl-core:${queryDslVersion}"
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}:jakarta"
 	annotationProcessor(
@@ -61,32 +42,28 @@ dependencies {
 			"jakarta.persistence:jakarta.persistence-api:3.1.0"
 	)
 
-	// 🛰️ WebClient 설정용 JSON 관련
+	// Jackson
 	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
 
-	// 📜 Swagger (SpringDoc OpenAPI 3)
+	// Swagger (SpringDoc OpenAPI 3)
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
 
-	// 🧪 설정 프로세서 (application.yml 자동완성)
+	// Configuration processor
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-	// 🔍 P6Spy (SQL 로깅 - local/test 환경에서만 사용 권장)
+	// P6Spy
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
 
-	// 📹 Youtube API
+	// Youtube API
 	implementation 'com.google.api-client:google-api-client:1.23.0'
 	implementation 'com.google.oauth-client:google-oauth-client-jetty:1.23.0'
 	implementation 'com.google.apis:google-api-services-youtube:v3-rev222-1.25.0'
 
-	// JWT - JJWT 라이브러리
+	// JWT - JJWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
-	// 🆔 TSID (Snowflake ID generation)
+	// TSID (Snowflake ID generation)
 	implementation 'io.hypersistence:hypersistence-tsid:2.1.3'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
 }

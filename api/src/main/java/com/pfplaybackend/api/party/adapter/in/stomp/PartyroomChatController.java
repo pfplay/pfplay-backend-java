@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.liveconnect.chat.adapter.in.stomp;
+package com.pfplaybackend.api.party.adapter.in.stomp;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.application.service.chat.PartyroomChatService;

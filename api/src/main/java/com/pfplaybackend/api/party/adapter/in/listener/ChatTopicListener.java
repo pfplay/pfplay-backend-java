@@ -1,9 +1,9 @@
-package com.pfplaybackend.api.liveconnect.chat.adapter.in.listener;
+package com.pfplaybackend.api.party.adapter.in.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pfplaybackend.api.liveconnect.websocket.SimpMessageSender;
-import com.pfplaybackend.api.liveconnect.chat.adapter.in.listener.message.OutgoingGroupChatMessage;
+import com.pfplaybackend.realtime.sender.SimpMessageSender;
+import com.pfplaybackend.api.party.adapter.in.listener.message.OutgoingGroupChatMessage;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;

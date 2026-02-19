@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.liveconnect.chat.adapter.in.listener.message;
+package com.pfplaybackend.api.party.adapter.in.listener.message;
 
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;

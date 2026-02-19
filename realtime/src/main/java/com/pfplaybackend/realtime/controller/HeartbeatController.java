@@ -1,5 +1,6 @@
-package com.pfplaybackend.api.liveconnect.websocket;
+package com.pfplaybackend.realtime.controller;
 
+import com.pfplaybackend.realtime.sender.SimpMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;

@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.liveconnect.websocket;
+package com.pfplaybackend.realtime.config;
 
-import com.pfplaybackend.api.liveconnect.websocket.interceptor.JwtHandshakeInterceptor;
+import com.pfplaybackend.realtime.interceptor.WebSocketHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.ServerHttpRequest;
@@ -19,7 +19,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    private final JwtHandshakeInterceptor jwtHandshakeInterceptor;
+    private final WebSocketHandshakeInterceptor webSocketHandshakeInterceptor;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry brokerRegistry) {
@@ -39,6 +39,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         return () -> attributes.get("uid").toString();
                     }
                 })
-                .addInterceptors(jwtHandshakeInterceptor);
+                .addInterceptors(webSocketHandshakeInterceptor);
     }
 }

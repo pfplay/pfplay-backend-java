@@ -2,7 +2,7 @@ package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.admin.domain.enums.ChatScriptType;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.liveconnect.chat.adapter.in.listener.message.OutgoingGroupChatMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.OutgoingGroupChatMessage;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;

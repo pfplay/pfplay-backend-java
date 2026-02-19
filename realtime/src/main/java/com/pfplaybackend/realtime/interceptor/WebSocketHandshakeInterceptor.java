@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.liveconnect.websocket.interceptor;
+package com.pfplaybackend.realtime.interceptor;
 
-import com.pfplaybackend.api.common.config.security.jwt.JwtCookieValidator;
+import com.pfplaybackend.realtime.port.WebSocketAuthPort;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -17,10 +17,10 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class JwtHandshakeInterceptor implements HandshakeInterceptor {
+public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtHandshakeInterceptor.class);
-    private final JwtCookieValidator jwtCookieValidator;
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketHandshakeInterceptor.class);
+    private final WebSocketAuthPort webSocketAuthPort;
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
@@ -28,18 +28,16 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
         if (request instanceof ServletServerHttpRequest servletServerRequest) {
             HttpServletRequest servletRequest = servletServerRequest.getServletRequest();
 
-            String uid = jwtCookieValidator.extractUserId(servletRequest).orElseThrow(
+            String uid = webSocketAuthPort.extractUserId(servletRequest).orElseThrow(
                     () -> new AuthenticationServiceException("Invalid Access Token"));
             attributes.put("uid", uid);
-            // TODO return '예외 발생'이 return false;를 대체할 수 있는가?
         }
-        return true;  // JWT 토큰이 유효하지 않은 경우, 연결 거부(=false)
+        return true;
     }
 
     @Override
     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                WebSocketHandler wsHandler, Exception exception) {
-        // 필요 시, 핸드셰이크 이후에 수행할 작업
         logger.info("After Handshake");
     }
 }

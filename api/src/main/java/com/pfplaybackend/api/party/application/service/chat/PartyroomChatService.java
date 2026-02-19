@@ -2,11 +2,11 @@ package com.pfplaybackend.api.party.application.service.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.liveconnect.websocket.cache.SessionCacheManager;
+import com.pfplaybackend.realtime.port.SessionCachePort;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.liveconnect.chat.adapter.in.listener.message.OutgoingGroupChatMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.OutgoingGroupChatMessage;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.in.web.dto.IncomingGroupChatMessage;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +26,12 @@ public class PartyroomChatService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedisMessagePublisher messagePublisher;
-    private final SessionCacheManager sessionCacheManager;
+    private final SessionCachePort sessionCachePort;
 
     private final ObjectMapper objectMapper;
 
     public void sendMessage(String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) {
-        Optional<Object> optional = sessionCacheManager.getSessionCache(sessionId);
+        Optional<Object> optional = sessionCachePort.getSessionCache(sessionId);
 
         if (optional.isEmpty()) {
             throw ExceptionCreator.create(PartyroomException.CACHE_MISSED_SESSION);

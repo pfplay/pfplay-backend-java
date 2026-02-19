@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.liveconnect.websocket.event.listener;
+package com.pfplaybackend.realtime.event;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
