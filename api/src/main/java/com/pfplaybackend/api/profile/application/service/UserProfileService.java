@@ -6,13 +6,11 @@ import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.domain.service.GuestDomainService;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -38,52 +36,51 @@ public class UserProfileService {
     private final GuestDomainService guestDomainService;
     private final UserAvatarService userAvatarService;
 
-    public Profile createProfileForGuest(Guest guest) {
-        Profile profile = new Profile(guest.getUserId());
-        AvatarBodyResource avatarBodyResource = userAvatarService.getDefaultAvatarBodyResource();
-        return profile
-                .withNickname(guestDomainService.generateRandomNickname())
-                .withAvatarCompositionType(AvatarCompositionType.BODY_WITH_FACE)
-                .withFaceSourceType(FaceSourceType.INTERNAL_IMAGE)
-                .withAvatarBodyUri(userAvatarService.getDefaultAvatarBodyUri())
-                .withAvatarFaceUri(userAvatarService.getDefaultAvatarFaceUri())
-                .withAvatarIconUri(userAvatarService.getDefaultAvatarIconUri())
-                .withCombinePositionX(avatarBodyResource.getCombinePositionX())
-                .withCombinePositionY(avatarBodyResource.getCombinePositionY());
+    public ProfileData createProfileDataForGuest(UserId userId) {
+        AvatarBodyResourceData avatarBodyResource = userAvatarService.getDefaultAvatarBodyResourceData();
+        return ProfileData.builder()
+                .userId(userId)
+                .nickname(guestDomainService.generateRandomNickname())
+                .avatarCompositionType(AvatarCompositionType.BODY_WITH_FACE)
+                .faceSourceType(FaceSourceType.INTERNAL_IMAGE)
+                .avatarBodyUri(userAvatarService.getDefaultAvatarBodyUri())
+                .avatarFaceUri(userAvatarService.getDefaultAvatarFaceUri())
+                .avatarIconUri(userAvatarService.getDefaultAvatarIconUri())
+                .combinePositionX(avatarBodyResource.getCombinePositionX())
+                .combinePositionY(avatarBodyResource.getCombinePositionY())
+                .build();
     }
 
-    public Profile createProfileForMember(Member member) {
-        return new Profile(member.getUserId());
+    public ProfileData createProfileDataForMember(UserId userId) {
+        return ProfileData.builder()
+                .userId(userId)
+                .build();
     }
 
     public ProfileSummaryDto getMyProfileSummary() {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         if(userDomainService.isGuest(authContext)) {
             GuestData guestData = guestRepository.findByUserId(authContext.getUserId()).orElseThrow();
-            return guestData.toDomain().getProfileSummary();
+            return guestData.getProfileSummary();
         }else {
             MemberData memberData = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
-            return memberData.toDomain().getProfileSummary();
+            return memberData.getProfileSummary();
         }
     }
 
     public ProfileSummaryDto getOtherProfileSummary(UserId otherUserId, AuthorityTier authorityTier) {
-        // TODO 타인의 프로필을 조회할 수 있는 공간은 파티룸 내에서만 가능하다.
-        // TODO 즉, 타인의 프로필을 조회할 때 대상의 'Guest 여부'를 지정해서 보내줘야 한다.
-        // TODO 위 조건이 가능하려면 파티룸 내의 모든 사람을 조회할 때 게스트 여부를 지정해서 리턴해주면 된다.
         if(userDomainService.isGuest(authorityTier)) {
             GuestData guestData = guestRepository.findByUserId(otherUserId).orElseThrow();
-            return guestData.toDomain().getProfileSummary();
+            return guestData.getProfileSummary();
         }else {
             MemberData memberData = memberRepository.findByUserId(otherUserId).orElseThrow();
-            return memberData.toDomain().getProfileSummary();
+            return memberData.getProfileSummary();
         }
     }
 
     // 다수 사용자에 대한 프로필 설정 정보 조회
     @Transactional
     public Map<UserId, ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds) {
-        // FIXME 쿼리 결과가 예상과 다르다.
         List<ProfileData> list = userProfileRepository.findAllByUserIdIn(userIds);
         return userProfileRepository.findAllByUserIdIn(userIds).stream()
                 .collect(Collectors.toMap(ProfileData::getUserId, profileData ->

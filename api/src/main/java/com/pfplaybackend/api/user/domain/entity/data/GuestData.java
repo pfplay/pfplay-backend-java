@@ -2,7 +2,7 @@ package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.profile.domain.ProfileData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -54,14 +54,42 @@ public class GuestData extends BaseEntity {
         this.updatedAt = updatedAt;
     }
 
-    public Guest toDomain() {
-        return Guest.builder()
-                .userId(this.userId)
-                .authorityTier(this.authorityTier)
-                .profile(this.profileData.toDomain())
-                .isProfileUpdated(this.isProfileUpdated)
-                .createdAt(this.createdAt)
-                .updatedAt(this.updatedAt)
+    public static GuestData create() {
+        return GuestData.builder()
+                .userId(new UserId())
+                .authorityTier(AuthorityTier.GT)
+                .isProfileUpdated(false)
+                .build();
+    }
+
+    public static GuestData createWithFixedUserId(UserId userId, String agent) {
+        return GuestData.builder()
+                .userId(userId)
+                .agent(agent)
+                .authorityTier(AuthorityTier.GT)
+                .isProfileUpdated(false)
+                .build();
+    }
+
+    public void initiateProfile(ProfileData profileData) {
+        this.profileData = profileData;
+        this.isProfileUpdated = true;
+    }
+
+    public ProfileSummaryDto getProfileSummary() {
+        return ProfileSummaryDto.builder()
+                .nickname(this.profileData.getNickname())
+                .introduction(this.profileData.getIntroduction())
+                .avatarBodyUri(this.profileData.getAvatarBodyUri().getAvatarBodyUri())
+                .avatarFaceUri(this.profileData.getAvatarFaceUri().getAvatarFaceUri())
+                .avatarIconUri(this.profileData.getAvatarIconUri().getAvatarIconUri())
+                .avatarCompositionType(this.profileData.getAvatarCompositionType())
+                .combinePositionX(this.profileData.getCombinePositionX())
+                .combinePositionY(this.profileData.getCombinePositionY())
+                .offsetX(this.profileData.getOffsetX())
+                .offsetY(this.profileData.getOffsetY())
+                .scale(this.profileData.getScale())
+                .walletAddress(this.profileData.getWalletAddress().getWalletAddress())
                 .build();
     }
 }

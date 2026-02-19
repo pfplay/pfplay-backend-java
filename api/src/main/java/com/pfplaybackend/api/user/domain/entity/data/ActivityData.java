@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -48,12 +47,15 @@ public class ActivityData extends BaseEntity {
         this.score = score;
     }
 
-    Activity toDomain() {
-        return Activity.builder()
-                .id(this.id)
-                .userId(this.userId)
-                .activityType(this.activityType)
-                .score(this.score)
+    public static ActivityData create(UserId userId, ActivityType activityType, int score) {
+        return ActivityData.builder()
+                .userId(userId)
+                .activityType(activityType)
+                .score(score)
                 .build();
+    }
+
+    public void addScore(int delta) {
+        this.score = this.score + delta;
     }
 }

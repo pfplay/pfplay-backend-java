@@ -8,7 +8,7 @@ import com.pfplaybackend.api.auth.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.common.exception.AuthenticationException;
 import com.pfplaybackend.api.user.application.service.MemberSignService;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -47,7 +47,7 @@ public class AuthService {
             );
 
             // 3. Get or Create Member
-            Member member = memberSignService.getMemberOrCreate(userProfile.getEmail());
+            MemberData member = memberSignService.getMemberOrCreate(userProfile.getEmail());
 
             // 4. Generate JWT tokens
             String accessToken = jwtService.generateAccessTokenForMember(member);

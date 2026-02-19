@@ -4,23 +4,14 @@ import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceSe
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.profile.application.event.UserProfileEventService;
-import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
-import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.profile.domain.repository.UserProfileRepository;
-import com.pfplaybackend.api.profile.domain.vo.*;
-import com.pfplaybackend.api.profile.presentation.dto.request.AvatarFaceRequest;
-import com.pfplaybackend.api.profile.presentation.dto.request.SetAvatarRequest;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarBodyCommand;
-import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
+import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import com.pfplaybackend.api.user.domain.exception.UserAvatarException;
@@ -43,8 +34,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserAvatarService {
 
-    private final UserProfileRepository userProfileRepository;
-
     // TODO Call AvatarResourceService In 'Other Sub Domain'
     private final MemberRepository memberRepository;
     private final UserDomainService userDomainService;
@@ -54,14 +43,14 @@ public class UserAvatarService {
     // Event
     private final UserProfileEventService userProfileEventService;
 
-    public AvatarBodyResource getDefaultAvatarBodyResource() {
+    public AvatarBodyResourceData getDefaultAvatarBodyResourceData() {
         return avatarResourceService.getDefaultSettingResourceAvatarBody();
     }
 
     @Transactional(readOnly = true)
     public AvatarBodyUri getDefaultAvatarBodyUri() {
-        AvatarBodyResource avatarBodyResource = avatarResourceService.getDefaultSettingResourceAvatarBody();
-        return new AvatarBodyUri(avatarBodyResource.getResourceUri());
+        AvatarBodyResourceData data = avatarResourceService.getDefaultSettingResourceAvatarBody();
+        return new AvatarBodyUri(data.getResourceUri());
     }
 
     public AvatarFaceUri getDefaultAvatarFaceUri() {
@@ -84,8 +73,8 @@ public class UserAvatarService {
         if (userDomainService.isGuest(authContext)) {
             return avatarBodyDtoList;
         } else {
-            Member member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow().toDomain();
-            Map<ActivityType, Activity> activityMap = member.getActivityMap();
+            MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
+            Map<ActivityType, ActivityData> activityMap = member.getActivityDataMap();
             return avatarBodyDtoList.stream()
                     .map(avatarBodyDto -> avatarBodyDto.toBuilder()
                             .isAvailable(userAvatarDomainService.isAvailableBody(avatarBodyDto, activityMap))
@@ -95,15 +84,15 @@ public class UserAvatarService {
     }
 
     @Transactional
-    public void setUserAvatar(SetAvatarRequest request) {
+    public void setUserAvatar(com.pfplaybackend.api.profile.presentation.dto.request.SetAvatarRequest request) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        Member member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow().toDomain();
+        MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
 
         // 0. 리소스 접근 권한 유효성 검증
         AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(new AvatarBodyUri(request.getBody().getUri()));
         if (!avatarBodyDto.getObtainableType().equals(ObtainmentType.BASIC)) {
             ActivityType activityType = ActivityType.of(avatarBodyDto.getObtainableType());
-            Activity activity = member.getActivityMap().get(activityType);
+            ActivityData activity = member.getActivityDataMap().get(activityType);
             if (activity.getScore() < avatarBodyDto.getObtainableScore()) {
                 throw ExceptionCreator.create(UserAvatarException.AVATAR_SELECTION_FORBIDDEN);
             }
@@ -111,48 +100,23 @@ public class UserAvatarService {
 
         AvatarFaceUri avatarFaceUri;
         AvatarIconUri avatarIconUri;
-        Member updatedMember = member.updateAvatarBody(avatarBodyDto);
+        member.updateAvatarBody(avatarBodyDto);
 
         if(request.getAvatarCompositionType().equals(AvatarCompositionType.SINGLE_BODY)) {
             avatarFaceUri = new AvatarFaceUri();
             avatarIconUri = userAvatarDomainService.findAvatarIconPairWithSingleBody(avatarBodyDto);
 
-            updatedMember = updatedMember.updateAvatarFace(avatarFaceUri)
-                    .updateAvatarIcon(avatarIconUri);
+            member.updateAvatarFace(avatarFaceUri);
+            member.updateAvatarIcon(avatarIconUri);
         }else {
             avatarFaceUri = new AvatarFaceUri(request.getFace().getUri());
             avatarIconUri = userAvatarDomainService.findAvatarIconByFaceSourceType(request);
 
-            updatedMember = updatedMember.updateAvatarFace(avatarFaceUri, request.getFace())
-                    .updateAvatarIcon(avatarIconUri);
+            member.updateAvatarFace(avatarFaceUri, request.getFace());
+            member.updateAvatarIcon(avatarIconUri);
         }
 
-        memberRepository.save(updatedMember.toData());
-        userProfileEventService.publishProfileChangedEvent(updatedMember);
+        memberRepository.save(member);
+        userProfileEventService.publishProfileChangedEvent(member);
     }
-
-//    private Avatar createAvatarFromRequest(SetAvatarRequest request) {
-//        AvatarBody body = AvatarBody.of(request.getBody().getUri());
-//        return switch (request.getAvatarCompositionType()) {
-//            case SINGLE_BODY -> Avatar.singleBody(body);
-//            case BODY_WITH_FACE -> {
-//                AvatarFace face = createAvatarFaceFromRequest(request.getFace());
-//                yield Avatar.bodyWithFace(body, face);
-//            }
-//        };
-//    }
-//
-//    private AvatarFace createAvatarFaceFromRequest(AvatarFaceRequest faceRequest) {
-//        FaceTransform transform = FaceTransform.of(
-//                faceRequest.getTransform().getOffsetX(),
-//                faceRequest.getTransform().getOffsetY(),
-//                faceRequest.getTransform().getScale()
-//        );
-//
-//        return AvatarFace.of(
-//                faceRequest.getSourceType(),
-//                faceRequest.getUri(),
-//                transform
-//        );
-//    }
 }

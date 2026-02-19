@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.application.dto.shared;
 
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import lombok.*;
 
@@ -20,7 +20,7 @@ public class AvatarBodyDto {
     private final int combinePositionX;
     private final int combinePositionY;
 
-    static public AvatarBodyDto create(AvatarBodyResource avatarBodyResource) {
+    static public AvatarBodyDto create(AvatarBodyResourceData avatarBodyResource) {
         return AvatarBodyDto.builder()
                 .id(avatarBodyResource.getId())
                 .name(avatarBodyResource.getName())

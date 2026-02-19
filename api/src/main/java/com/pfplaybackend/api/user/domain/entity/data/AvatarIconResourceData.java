@@ -32,4 +32,12 @@ public class AvatarIconResourceData {
         this.resourceUri = resourceUri;
         this.pairType = pairType;
     }
+
+    public static AvatarIconResourceData create(String name, String resourceUri, PairType pairType) {
+        return AvatarIconResourceData.builder()
+                .name(name)
+                .resourceUri(resourceUri)
+                .pairType(pairType)
+                .build();
+    }
 }

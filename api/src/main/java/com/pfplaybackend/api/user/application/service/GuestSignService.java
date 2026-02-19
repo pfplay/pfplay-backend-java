@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.profile.application.service.UserProfileService;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
+import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.repository.GuestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,11 +16,10 @@ public class GuestSignService {
     private final UserProfileService userProfileService;
 
     @Transactional
-    public Guest getGuestOrCreate() {
-        Guest guest = Guest.create();
-        Profile profile = userProfileService.createProfileForGuest(guest);
-        Guest updatedGuest = guest.initiateProfile(profile);
-        guestRepository.save(updatedGuest.toData());
-        return updatedGuest;
+    public GuestData getGuestOrCreate() {
+        GuestData guest = GuestData.create();
+        ProfileData profile = userProfileService.createProfileDataForGuest(guest.getUserId());
+        guest.initiateProfile(profile);
+        return guestRepository.save(guest);
     }
 }

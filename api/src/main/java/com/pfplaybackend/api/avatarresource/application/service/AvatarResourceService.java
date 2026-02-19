@@ -6,7 +6,6 @@ import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarFaceResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarIconResourceData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.enums.PairType;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
@@ -26,8 +25,8 @@ public class AvatarResourceService {
     private final AvatarFaceResourceRepository avatarFaceResourceRepository;
     private final AvatarIconResourceRepository avatarIconResourceRepository;
 
-    public AvatarBodyResource getDefaultSettingResourceAvatarBody() {
-        return avatarBodyResourceRepository.getDefaultSettingResource().orElseThrow().toDomain();
+    public AvatarBodyResourceData getDefaultSettingResourceAvatarBody() {
+        return avatarBodyResourceRepository.getDefaultSettingResource().orElseThrow();
     }
 
     public List<AvatarFaceDto> findAllAvatarFaces() {
@@ -43,13 +42,13 @@ public class AvatarResourceService {
     public List<AvatarBodyDto> findAllAvatarBodies() {
         return avatarBodyResourceRepository.findAllAvatarResources().orElseThrow()
                 .stream()
-                .map(avatarResourceData -> AvatarBodyDto.create(avatarResourceData.toDomain())
+                .map(AvatarBodyDto::create
                 ).toList();
     }
 
     public AvatarBodyDto findAvatarBodyByUri(AvatarBodyUri uri) {
         AvatarBodyResourceData avatarBodyResourceData = avatarBodyResourceRepository.findOneAvatarResourceByResourceUri(uri.getAvatarBodyUri());
-        return AvatarBodyDto.create(avatarBodyResourceData.toDomain());
+        return AvatarBodyDto.create(avatarBodyResourceData);
     }
 
     public AvatarIconDto findPairAvatarIconByFaceUri(AvatarFaceUri uri) {

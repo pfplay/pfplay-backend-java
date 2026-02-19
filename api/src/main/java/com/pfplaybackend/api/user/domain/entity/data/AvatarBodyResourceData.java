@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -65,17 +64,18 @@ public class AvatarBodyResourceData {
         this.combinePositionY = combinePositionY;
     }
 
-    public AvatarBodyResource toDomain() {
-        return AvatarBodyResource.builder()
-                .id(this.id)
-                .name(this.name)
-                .resourceUri(this.resourceUri)
-                .obtainableType(this.obtainableType)
-                .obtainableScore(this.obtainableScore)
-                .isCombinable(this.isCombinable)
-                .isDefaultSetting(this.isDefaultSetting)
-                .combinePositionX(this.combinePositionX)
-                .combinePositionY(this.combinePositionY)
+    public static AvatarBodyResourceData create(String name, String resourceUri, ObtainmentType obtainableType,
+                                                   int obtainableScore, boolean isCombinable, boolean isDefaultSetting,
+                                                   int combinePositionX, int combinePositionY) {
+        return AvatarBodyResourceData.builder()
+                .name(name)
+                .resourceUri(resourceUri)
+                .obtainableType(obtainableType)
+                .obtainableScore(obtainableScore)
+                .isCombinable(isCombinable)
+                .isDefaultSetting(isDefaultSetting)
+                .combinePositionX(combinePositionX)
+                .combinePositionY(combinePositionY)
                 .build();
     }
 }

@@ -4,7 +4,7 @@ import com.pfplaybackend.api.admin.application.service.AdminUserService;
 import com.pfplaybackend.api.admin.presentation.dto.request.VirtualMemberAvatarUpdateRequest;
 import com.pfplaybackend.api.admin.presentation.dto.request.VirtualMemberCreateRequest;
 import com.pfplaybackend.api.admin.presentation.dto.response.VirtualMemberResponse;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -26,26 +26,11 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
 
-    /**
-     * Create virtual member
-     *
-     * POST /api/v1/admin/users/virtual
-     *
-     * Creates a new virtual member with:
-     * - Auto-generated email (virtual_{uuid}@pfplay.system)
-     * - FM authority tier
-     * - Auto-generated or specified nickname
-     * - Default or specified avatar
-     *
-     * @param request Virtual member creation request (all fields optional)
-     * @return Created virtual member information
-     */
     @PostMapping("/virtual")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<VirtualMemberResponse> createVirtualMember(
             @Valid @RequestBody(required = false) VirtualMemberCreateRequest request) {
 
-        // Handle empty body
         String nickname = request != null ? request.getNickname() : null;
         AvatarBodyUri avatarBodyUri = request != null && request.getAvatarBodyUri() != null
                 ? new AvatarBodyUri(request.getAvatarBodyUri())
@@ -54,45 +39,22 @@ public class AdminUserController {
                 ? new AvatarFaceUri(request.getAvatarFaceUri())
                 : null;
 
-        // Create virtual member
-        Member member = adminUserService.createVirtualMember(nickname, avatarBodyUri, avatarFaceUri);
-
-        // Build response
+        MemberData member = adminUserService.createVirtualMember(nickname, avatarBodyUri, avatarFaceUri);
         VirtualMemberResponse response = buildResponse(member);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    /**
-     * Get virtual member information
-     *
-     * GET /api/v1/admin/users/virtual/{userId}
-     *
-     * @param userId User ID (UUID format)
-     * @return Virtual member information
-     */
     @GetMapping("/virtual/{userId}")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<VirtualMemberResponse> getVirtualMember(@PathVariable String userId) {
         UserId userIdObj = UserId.fromString(userId);
-        Member member = adminUserService.getVirtualMember(userIdObj);
-
+        MemberData member = adminUserService.getVirtualMember(userIdObj);
         VirtualMemberResponse response = buildResponse(member);
 
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Update virtual member avatar
-     *
-     * PUT /api/v1/admin/users/virtual/{userId}/avatar
-     *
-     * Updates avatar body and face URIs for an existing virtual member
-     *
-     * @param userId User ID (UUID format)
-     * @param request Avatar update request
-     * @return Updated virtual member information
-     */
     @PutMapping("/virtual/{userId}/avatar")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<VirtualMemberResponse> updateVirtualMemberAvatar(
@@ -105,7 +67,7 @@ public class AdminUserController {
                 ? new AvatarFaceUri(request.getAvatarFaceUri())
                 : new AvatarFaceUri();
 
-        Member updatedMember = adminUserService.updateVirtualMemberAvatar(
+        MemberData updatedMember = adminUserService.updateVirtualMemberAvatar(
                 userIdObj,
                 avatarBodyUri,
                 avatarFaceUri
@@ -116,17 +78,6 @@ public class AdminUserController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Delete virtual member
-     *
-     * DELETE /api/v1/admin/users/virtual/{userId}
-     *
-     * Permanently deletes a virtual member
-     * Only virtual members (ADMIN provider type) can be deleted
-     *
-     * @param userId User ID (UUID format)
-     * @return No content
-     */
     @DeleteMapping("/virtual/{userId}")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<Void> deleteVirtualMember(@PathVariable String userId) {
@@ -136,29 +87,23 @@ public class AdminUserController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Build response DTO from Member domain object
-     *
-     * @param member Member domain object
-     * @return VirtualMemberResponse
-     */
-    private VirtualMemberResponse buildResponse(Member member) {
+    private VirtualMemberResponse buildResponse(MemberData member) {
         return VirtualMemberResponse.builder()
                 .userId(member.getUserId().getUid().toString())
                 .email(member.getEmail())
-                .nickname(member.getProfile().getNickname())
-                .introduction(member.getProfile().getIntroduction())
+                .nickname(member.getProfileData().getNickname())
+                .introduction(member.getProfileData().getIntroduction())
                 .providerType(member.getProviderType())
                 .authorityTier(member.getAuthorityTier())
-                .avatarBodyUri(member.getProfile().getAvatarBodyUri().getAvatarBodyUri())
-                .avatarFaceUri(member.getProfile().getAvatarFaceUri().getAvatarFaceUri())
-                .avatarIconUri(member.getProfile().getAvatarIconUri().getAvatarIconUri())
-                .avatarCompositionType(member.getProfile().getAvatarCompositionType())
-                .combinePositionX(member.getProfile().getCombinePositionX())
-                .combinePositionY(member.getProfile().getCombinePositionY())
-                .offsetX(member.getProfile().getOffsetX())
-                .offsetY(member.getProfile().getOffsetY())
-                .scale(member.getProfile().getScale())
+                .avatarBodyUri(member.getProfileData().getAvatarBodyUri().getAvatarBodyUri())
+                .avatarFaceUri(member.getProfileData().getAvatarFaceUri().getAvatarFaceUri())
+                .avatarIconUri(member.getProfileData().getAvatarIconUri().getAvatarIconUri())
+                .avatarCompositionType(member.getProfileData().getAvatarCompositionType())
+                .combinePositionX(member.getProfileData().getCombinePositionX())
+                .combinePositionY(member.getProfileData().getCombinePositionY())
+                .offsetX(member.getProfileData().getOffsetX())
+                .offsetY(member.getProfileData().getOffsetY())
+                .scale(member.getProfileData().getScale())
                 .createdAt(member.getCreatedAt())
                 .updatedAt(member.getUpdatedAt())
                 .build();

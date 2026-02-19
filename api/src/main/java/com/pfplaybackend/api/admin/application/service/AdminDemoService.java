@@ -26,7 +26,7 @@ import com.pfplaybackend.api.playlist.repository.TrackRepository;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarFaceResourceData;
 import com.pfplaybackend.api.user.repository.MemberRepository;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -104,8 +104,8 @@ public class AdminDemoService {
 
         // Step 1: Create virtual members
         log.info("Step 1: Creating {} virtual members...", TOTAL_MEMBERS);
-        List<Member> specialMembers = new ArrayList<>();
-        List<Member> regularMembers = new ArrayList<>();
+        List<MemberData> specialMembers = new ArrayList<>();
+        List<MemberData> regularMembers = new ArrayList<>();
 
         createVirtualMembers(specialMembers, regularMembers, avatarBodies, avatarFaces);
 
@@ -137,8 +137,8 @@ public class AdminDemoService {
      * Step 1: Create virtual members
      */
     private void createVirtualMembers(
-            List<Member> specialMembers,
-            List<Member> regularMembers,
+            List<MemberData> specialMembers,
+            List<MemberData> regularMembers,
             List<AvatarBodyResourceData> avatarBodies,
             List<AvatarFaceResourceData> avatarFaces) {
 
@@ -159,7 +159,7 @@ public class AdminDemoService {
                 avatarFace = new AvatarFaceUri();  // Empty
             }
 
-            Member member = adminUserService.createVirtualMember(nickname, avatarBody, avatarFace);
+            MemberData member = adminUserService.createVirtualMember(nickname, avatarBody, avatarFace);
 
             if (i < SPECIAL_MEMBERS) {
                 // Special members: create playlist and track
@@ -222,7 +222,7 @@ public class AdminDemoService {
      */
     private List<PartyroomData> createGeneralRooms(
             InitializeDemoEnvironmentRequest request,
-            List<Member> specialMembers) {
+            List<MemberData> specialMembers) {
 
         List<PartyroomData> rooms = new ArrayList<>();
 
@@ -260,18 +260,18 @@ public class AdminDemoService {
     private void enterMembersIntoRooms(
             PartyroomData mainStage,
             List<PartyroomData> generalRooms,
-            List<Member> specialMembers,
-            List<Member> regularMembers) {
+            List<MemberData> specialMembers,
+            List<MemberData> regularMembers) {
 
         int memberIndex = 0;
 
         // Enter members into main stage (50 total, no host since it's pre-created)
         // Include first special member (main stage DJ) as regular crew
-        Member mainStageDj = specialMembers.get(0);
+        MemberData mainStageDj = specialMembers.get(0);
         enterMemberAsRegularCrew(mainStage, mainStageDj.getUserId());
 
         for (int i = 0; i < MAIN_STAGE_CREW - 1 && memberIndex < regularMembers.size(); i++) {
-            Member member = regularMembers.get(memberIndex++);
+            MemberData member = regularMembers.get(memberIndex++);
             enterMemberAsRegularCrew(mainStage, member.getUserId());
         }
         log.info("Entered {} crew into main stage (including 1 special member as DJ)", MAIN_STAGE_CREW);
@@ -281,7 +281,7 @@ public class AdminDemoService {
             PartyroomData room = generalRooms.get(roomIdx);
 
             for (int i = 0; i < GENERAL_ROOM_CREW - 1 && memberIndex < regularMembers.size(); i++) {
-                Member member = regularMembers.get(memberIndex++);
+                MemberData member = regularMembers.get(memberIndex++);
                 enterMemberAsRegularCrew(room, member.getUserId());
             }
             log.info("Entered {} crew into room {}/{}", GENERAL_ROOM_CREW, roomIdx + 1, GENERAL_ROOMS_COUNT);
@@ -308,7 +308,7 @@ public class AdminDemoService {
     private int registerDjsInQueues(
             PartyroomData mainStage,
             List<PartyroomData> generalRooms,
-            List<Member> specialMembers) {
+            List<MemberData> specialMembers) {
 
         int djCount = 0;
 
@@ -373,7 +373,7 @@ public class AdminDemoService {
     private DemoEnvironmentResponse buildResponse(
             PartyroomData mainStage,
             List<PartyroomData> generalRooms,
-            List<Member> specialMembers,
+            List<MemberData> specialMembers,
             int djsRegistered,
             long executionTime) {
 

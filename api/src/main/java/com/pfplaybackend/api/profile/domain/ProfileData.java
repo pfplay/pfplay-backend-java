@@ -6,7 +6,6 @@ import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.profile.domain.vo.Avatar;
 import com.pfplaybackend.api.profile.domain.vo.AvatarBody;
 import com.pfplaybackend.api.profile.domain.vo.AvatarFace;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -107,29 +106,37 @@ public class ProfileData extends BaseEntity {
         }
     }
 
-    public Profile toDomain() {
-        return Profile.builder()
-                .id(this.id)
-                .userId(this.userId)
-                .nickname(this.nickname)
-                .introduction(this.introduction)
-                .avatarBodyUri(this.avatarBodyUri)
-                .avatarFaceUrl(this.avatarFaceUri)
-                .avatarIconUri(this.avatarIconUri)
-                .walletAddress(this.walletAddress)
-                .avatarCompositionType(this.avatarCompositionType)
-                .faceSourceType(this.faceSourceType)
-                .combinePositionX(this.combinePositionX)
-                .combinePositionY(this.combinePositionY)
-                .offsetX(this.offsetX)
-                .offsetY(this.offsetY)
-                .scale(this.scale)
-                .build();
+    public void updateBio(String nickname, String introduction) {
+        this.nickname = nickname;
+        this.introduction = introduction;
     }
 
-    public void updateAvatar(Avatar avatar) {
-        AvatarBody body = avatar.body();
-        AvatarFace face = avatar.face();
-        this.avatarBodyUri = new AvatarBodyUri(body.uri());
+    public void updateAvatarBody(AvatarBodyUri avatarBodyUri, int combinePositionX, int combinePositionY) {
+        this.avatarBodyUri = avatarBodyUri;
+        this.combinePositionX = combinePositionX;
+        this.combinePositionY = combinePositionY;
+    }
+
+    public void updateAvatarFaceSingleBody(AvatarFaceUri avatarFaceUri) {
+        this.avatarCompositionType = AvatarCompositionType.SINGLE_BODY;
+        this.avatarFaceUri = avatarFaceUri;
+    }
+
+    public void updateAvatarFaceWithTransform(AvatarFaceUri avatarFaceUri, FaceSourceType faceSourceType,
+                                              double offsetX, double offsetY, double scale) {
+        this.avatarCompositionType = AvatarCompositionType.BODY_WITH_FACE;
+        this.faceSourceType = faceSourceType;
+        this.avatarFaceUri = avatarFaceUri;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.scale = scale;
+    }
+
+    public void updateAvatarIcon(AvatarIconUri avatarIconUri) {
+        this.avatarIconUri = avatarIconUri;
+    }
+
+    public void updateWalletAddress(WalletAddress walletAddress) {
+        this.walletAddress = walletAddress;
     }
 }

@@ -3,11 +3,15 @@ package com.pfplaybackend.api.user.domain.entity.data;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.profile.domain.ProfileData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.profile.presentation.dto.request.AvatarFaceRequest;
+import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
+import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.user.domain.value.UserId;
+import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,6 +20,7 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -75,24 +80,95 @@ public class MemberData extends BaseEntity {
         this.updatedAt = updatedAt;
     }
 
-    public Member toDomain() {
-        Map<ActivityType, Activity> transformedMap = this.activityDataMap.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> entry.getValue().toDomain()
-                ));
+    public static MemberData create(String email, ProviderType providerType) {
+        return MemberData.builder()
+                .userId(new UserId())
+                .email(email)
+                .authorityTier(AuthorityTier.AM)
+                .providerType(providerType)
+                .isProfileUpdated(false)
+                .build();
+    }
 
-        return Member.builder()
-                .userId(this.userId)
-                .authorityTier(this.authorityTier)
-                .profile(this.profileData.toDomain())
-                .activityMap(transformedMap)
-                .isProfileUpdated(this.isProfileUpdated)
-                .email(this.email)
-                .providerType(this.providerType)
-                .createdAt(this.createdAt)
-                .updatedAt(this.updatedAt)
+    public static MemberData createWithFixedUserId(UserId userId, String email, ProviderType providerType) {
+        return MemberData.builder()
+                .userId(userId)
+                .email(email)
+                .authorityTier(AuthorityTier.AM)
+                .providerType(providerType)
+                .isProfileUpdated(false)
+                .build();
+    }
+
+    public void initializeProfile(ProfileData profileData) {
+        this.profileData = profileData;
+    }
+
+    public void initializeActivityMap(Map<ActivityType, ActivityData> activityDataMap) {
+        this.activityDataMap = activityDataMap;
+    }
+
+    public void updateProfileBio(UpdateBioCommand command) {
+        this.profileData.updateBio(command.getNickName(), command.getIntroduction());
+        this.isProfileUpdated = true;
+    }
+
+    public void updateAvatarBody(AvatarBodyDto avatarBodyDto) {
+        this.profileData.updateAvatarBody(
+                new AvatarBodyUri(avatarBodyDto.getResourceUri()),
+                avatarBodyDto.getCombinePositionX(),
+                avatarBodyDto.getCombinePositionY());
+    }
+
+    public void updateAvatarFace(AvatarFaceUri avatarFaceUri) {
+        this.profileData.updateAvatarFaceSingleBody(avatarFaceUri);
+    }
+
+    public void updateAvatarFace(AvatarFaceUri avatarFaceUri, AvatarFaceRequest avatarFaceRequest) {
+        this.profileData.updateAvatarFaceWithTransform(
+                avatarFaceUri,
+                avatarFaceRequest.getSourceType(),
+                avatarFaceRequest.getTransform().getOffsetX(),
+                avatarFaceRequest.getTransform().getOffsetY(),
+                avatarFaceRequest.getTransform().getScale());
+    }
+
+    public void updateAvatarIcon(AvatarIconUri avatarIconUri) {
+        this.profileData.updateAvatarIcon(avatarIconUri);
+    }
+
+    public void updateWalletAddress(WalletAddress walletAddress) {
+        this.profileData.updateWalletAddress(walletAddress);
+        this.authorityTier = AuthorityTier.FM;
+    }
+
+    public void updateDjScore(int deltaScore) {
+        ActivityData djActivity = this.activityDataMap.get(ActivityType.DJ_PNT);
+        djActivity.addScore(deltaScore);
+    }
+
+    public ProfileSummaryDto getProfileSummary() {
+        List<ActivitySummaryDto> activitySummaries = this.activityDataMap.values().stream()
+                .map(a -> ActivitySummaryDto.builder()
+                        .activityType(a.getActivityType())
+                        .score(a.getScore())
+                        .build())
+                .collect(Collectors.toList());
+
+        return ProfileSummaryDto.builder()
+                .nickname(this.profileData.getNickname())
+                .introduction(this.profileData.getIntroduction())
+                .avatarBodyUri(this.profileData.getAvatarBodyUri().getAvatarBodyUri())
+                .avatarFaceUri(this.profileData.getAvatarFaceUri().getAvatarFaceUri())
+                .avatarIconUri(this.profileData.getAvatarIconUri().getAvatarIconUri())
+                .avatarCompositionType(this.profileData.getAvatarCompositionType())
+                .combinePositionX(this.profileData.getCombinePositionX())
+                .combinePositionY(this.profileData.getCombinePositionY())
+                .offsetX(this.profileData.getOffsetX())
+                .offsetY(this.profileData.getOffsetY())
+                .scale(this.profileData.getScale())
+                .walletAddress(this.profileData.getWalletAddress().getWalletAddress())
+                .activitySummaries(activitySummaries)
                 .build();
     }
 }

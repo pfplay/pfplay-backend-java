@@ -6,8 +6,7 @@ import com.pfplaybackend.api.profile.presentation.dto.request.SetAvatarRequest;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
 import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
@@ -23,7 +22,7 @@ import java.util.Map;
 public class UserAvatarDomainService {
     private final AvatarResourceService avatarResourceService;
 
-    public boolean isAvailableBody(AvatarBodyDto avatarBodyDto, Map<ActivityType, Activity> activityMap) {
+    public boolean isAvailableBody(AvatarBodyDto avatarBodyDto, Map<ActivityType, ActivityData> activityMap) {
         ObtainmentType obtainmentType = avatarBodyDto.getObtainableType();
         if(obtainmentType.equals(ObtainmentType.BASIC)) return true;
         // Comparison of Scores

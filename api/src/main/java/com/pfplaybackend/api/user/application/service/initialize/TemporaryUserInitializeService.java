@@ -6,11 +6,10 @@ import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import com.pfplaybackend.api.profile.application.service.UserProfileService;
+import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
+import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.WalletAddress;
@@ -50,35 +49,34 @@ public class TemporaryUserInitializeService {
     }
 
     public void addGuest(UserId userId) {
-        Guest guest = Guest.createWithFixedUserId(userId, "Firefox/MacOS");
-        Profile profile = userProfileService.createProfileForGuest(guest);
-        Guest updatedGuest = guest.initiateProfile(profile);
+        GuestData guest = GuestData.createWithFixedUserId(userId, "Firefox/MacOS");
+        ProfileData profile = userProfileService.createProfileDataForGuest(guest.getUserId());
+        guest.initiateProfile(profile);
         // System.out.println("GT JWT: " + jwtService.generateNonExpiringAccessTokenForGuest(guest));
-        guestRepository.save(updatedGuest.toData());
+        guestRepository.save(guest);
     }
 
-    public Member addAssociateMember(UserId userId, String email) {
-        Member member = Member.createWithFixedUserId(userId, email, ProviderType.GOOGLE);
-        Profile profile = userProfileService.createProfileForMember(member);
-        Map<ActivityType, Activity> activityMap = userActivityService.createUserActivities(member);
-        Member updatedMember = member
-                .initializeProfile(profile)
-                .initializeActivityMap(activityMap);
+    public MemberData addAssociateMember(UserId userId, String email) {
+        MemberData member = MemberData.createWithFixedUserId(userId, email, ProviderType.GOOGLE);
+        ProfileData profile = userProfileService.createProfileDataForMember(member.getUserId());
+        Map<ActivityType, ActivityData> activityMap = userActivityService.createUserActivities(member.getUserId());
+        member.initializeProfile(profile);
+        member.initializeActivityMap(activityMap);
 
-        MemberData memberData = memberRepository.save(updatedMember.toData());
-        playlistCommandService.createDefaultPlaylist(updatedMember.getUserId());
-        // System.out.println("AM JWT: " + jwtService.generateNonExpiringAccessTokenForMember(updatedMember));
-        return memberData.toDomain();
+        MemberData memberData = memberRepository.save(member);
+        playlistCommandService.createDefaultPlaylist(member.getUserId());
+        // System.out.println("AM JWT: " + jwtService.generateNonExpiringAccessTokenForMember(member));
+        return memberData;
     }
 
-    public Member upgradeMember(Member member) {
+    public MemberData upgradeMember(MemberData member) {
         // 1. Profile Update
-        Member profileUpdatedMember = member.updateProfileBio(new UpdateBioCommand("nickname", "introduction"));
-        memberRepository.save(profileUpdatedMember.toData());
+        member.updateProfileBio(new UpdateBioCommand("nickname", "introduction"));
+        memberRepository.save(member);
         // 2. Wallet Update
-        Member walletUpdatedMember = profileUpdatedMember.updateWalletAddress(new WalletAddress("wallet-address"));
-        memberRepository.save(walletUpdatedMember.toData());
-        // System.out.println("FM JWT: " + jwtService.generateNonExpiringAccessTokenForMember(walletUpdatedMember));
-        return walletUpdatedMember;
+        member.updateWalletAddress(new WalletAddress("wallet-address"));
+        memberRepository.save(member);
+        // System.out.println("FM JWT: " + jwtService.generateNonExpiringAccessTokenForMember(member));
+        return member;
     }
 }

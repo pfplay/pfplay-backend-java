@@ -5,10 +5,9 @@ import com.pfplaybackend.api.common.config.security.model.OAuth2Redirection;
 import com.pfplaybackend.api.common.config.security.properties.OAuth2ProviderConfig;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.profile.application.service.UserProfileService;
+import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.presentation.payload.request.SignMemberRequest;
 import com.pfplaybackend.api.user.repository.MemberRepository;
@@ -35,8 +34,8 @@ public class MemberSignService {
     }
 
     @Transactional
-    public Member getMemberOrCreate(String email) {
-        return tryFindMember(email).orElseGet(() -> registerNewMember(email)).toDomain();
+    public MemberData getMemberOrCreate(String email) {
+        return tryFindMember(email).orElseGet(() -> registerNewMember(email));
     }
 
     private Optional<MemberData> tryFindMember(String email) {
@@ -45,16 +44,15 @@ public class MemberSignService {
 
     private MemberData registerNewMember(String email) {
         // TODO Parse ProviderType
-        Member member = Member.create(email, ProviderType.GOOGLE);
-        Profile profile = userProfileService.createProfileForMember(member);
-        Map<ActivityType, Activity> activityMap = userActivityService.createUserActivities(member);
-        Member updatedMember = member
-                .initializeProfile(profile)
-                .initializeActivityMap(activityMap);
+        MemberData member = MemberData.create(email, ProviderType.GOOGLE);
+        ProfileData profile = userProfileService.createProfileDataForMember(member.getUserId());
+        Map<ActivityType, ActivityData> activityMap = userActivityService.createUserActivities(member.getUserId());
+        member.initializeProfile(profile);
+        member.initializeActivityMap(activityMap);
 
         // FIXME Use to Peer Interface
-        playlistCommandService.createDefaultPlaylist(updatedMember.getUserId());
+        playlistCommandService.createDefaultPlaylist(member.getUserId());
 
-        return memberRepository.save(updatedMember.toData());
+        return memberRepository.save(member);
     }
 }

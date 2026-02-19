@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
+import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
@@ -32,7 +32,7 @@ public class AdminProfileService {
      * @param userId User ID
      * @return Initialized profile with default values
      */
-    public Profile createProfileForVirtualMember(UserId userId) {
+    public ProfileData createProfileForVirtualMember(UserId userId) {
         return createProfileForVirtualMember(userId, null, null, null);
     }
 
@@ -45,7 +45,7 @@ public class AdminProfileService {
      * @param avatarFaceUri Optional avatar face URI (default if null)
      * @return Initialized profile
      */
-    public Profile createProfileForVirtualMember(
+    public ProfileData createProfileForVirtualMember(
             UserId userId,
             String nickname,
             AvatarBodyUri avatarBodyUri,
@@ -101,19 +101,24 @@ public class AdminProfileService {
             );
         }
 
-        // Build profile with detected composition type
-        return new Profile(userId)
-                .withNickname(finalNickname)
-                .withAvatarCompositionType(compositionType)
-                .withFaceSourceType(faceSourceType)
-                .withAvatarBodyUri(finalBodyUri)
-                .withAvatarFaceUri(finalFaceUri)
-                .withAvatarIconUri(iconUri)
-                .withCombinePositionX(avatarBodyDto.getCombinePositionX())
-                .withCombinePositionY(avatarBodyDto.getCombinePositionY())
-                .withOffsetX(0)
-                .withOffsetY(0)
-                .withScale(1.0);
+        // Build ProfileData directly
+        ProfileData profileData = ProfileData.builder()
+                .userId(userId)
+                .nickname(finalNickname)
+                .introduction("")
+                .avatarCompositionType(compositionType)
+                .faceSourceType(faceSourceType)
+                .avatarBodyUri(finalBodyUri)
+                .avatarFaceUri(finalFaceUri)
+                .avatarIconUri(iconUri)
+                .combinePositionX(avatarBodyDto.getCombinePositionX())
+                .combinePositionY(avatarBodyDto.getCombinePositionY())
+                .offsetX(0)
+                .offsetY(0)
+                .scale(1.0)
+                .build();
+
+        return profileData;
     }
 
     /**
@@ -139,7 +144,6 @@ public class AdminProfileService {
      * @return Default avatar body URI
      */
     private AvatarBodyUri getDefaultAvatarBodyUri() {
-        // Get first available avatar body (you might want to specify a particular default)
         return new AvatarBodyUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_001.png?alt=media");
     }
 }

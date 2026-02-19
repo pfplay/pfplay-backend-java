@@ -3,8 +3,8 @@ package com.pfplaybackend.api.profile.application.event;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.CrewProfilePreCheckMessage;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
+import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 public class UserProfileEventService {
     private final RedisMessagePublisher messagePublisher;
 
-    public void publishProfileChangedEvent(Member member) {
-        Profile profile = member.getProfile();
+    public void publishProfileChangedEvent(MemberData member) {
+        ProfileData profile = member.getProfileData();
         CrewProfilePreCheckMessage crewProfilePreCheckMessage = new CrewProfilePreCheckMessage(
                 profile.getUserId(),
                 profile.getNickname(),

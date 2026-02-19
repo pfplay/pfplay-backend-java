@@ -28,4 +28,11 @@ public class AvatarFaceResourceData {
         this.name = name;
         this.resourceUri = resourceUri;
     }
+
+    public static AvatarFaceResourceData create(String name, String resourceUri) {
+        return AvatarFaceResourceData.builder()
+                .name(name)
+                .resourceUri(resourceUri)
+                .build();
+    }
 }

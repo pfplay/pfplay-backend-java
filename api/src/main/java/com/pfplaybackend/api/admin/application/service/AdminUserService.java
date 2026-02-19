@@ -1,15 +1,13 @@
 package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
+import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
@@ -43,7 +41,7 @@ public class AdminUserService {
      * @return Created virtual member with FM authority tier
      */
     @Transactional
-    public Member createVirtualMember() {
+    public MemberData createVirtualMember() {
         return createVirtualMember(null, null, null);
     }
 
@@ -57,7 +55,7 @@ public class AdminUserService {
      * @return Created virtual member with FM authority tier
      */
     @Transactional
-    public Member createVirtualMember(
+    public MemberData createVirtualMember(
             String nickname,
             AvatarBodyUri avatarBodyUri,
             AvatarFaceUri avatarFaceUri) {
@@ -66,10 +64,10 @@ public class AdminUserService {
         String virtualEmail = generateVirtualEmail();
 
         // 2. Create member with ADMIN provider type (initially AM)
-        Member member = Member.create(virtualEmail, ProviderType.ADMIN);
+        MemberData member = MemberData.create(virtualEmail, ProviderType.ADMIN);
 
         // 3. Create profile with auto-generated or provided values
-        Profile profile = adminProfileService.createProfileForVirtualMember(
+        ProfileData profile = adminProfileService.createProfileForVirtualMember(
                 member.getUserId(),
                 nickname,
                 avatarBodyUri,
@@ -77,34 +75,32 @@ public class AdminUserService {
         );
 
         // 4. Initialize activity map (all activities start at 0)
-        Map<ActivityType, Activity> activityMap = userActivityService.createUserActivities(member);
+        Map<ActivityType, ActivityData> activityMap = userActivityService.createUserActivities(member.getUserId());
 
         // 5. Update member with profile and activities
-        Member memberWithProfile = member
-                .initializeProfile(profile)
-                .initializeActivityMap(activityMap);
+        member.initializeProfile(profile);
+        member.initializeActivityMap(activityMap);
 
         // 6. Save member (currently AM)
-        MemberData savedData = memberRepository.save(memberWithProfile.toData());
-        Member savedMember = savedData.toDomain();
+        MemberData savedMember = memberRepository.save(member);
 
         // 7. Create default GRABLIST playlist for virtual member
         playlistCommandService.createDefaultPlaylist(savedMember.getUserId());
 
         // 8. Upgrade to FM by setting wallet address
         // This automatically upgrades authority tier to FM
-        Member upgradedMember = savedMember.updateWalletAddress(new WalletAddress(""));
+        savedMember.updateWalletAddress(new WalletAddress(""));
 
         // 9. Save upgraded member (now FM)
-        MemberData finalData = memberRepository.save(upgradedMember.toData());
+        MemberData finalData = memberRepository.save(savedMember);
 
         log.info("Virtual member created with GRABLIST: userId={}, email={}, nickname={}, authorityTier={}",
                 finalData.getUserId().getUid(),
                 virtualEmail,
                 profile.getNickname(),
-                AuthorityTier.FM);
+                finalData.getAuthorityTier());
 
-        return finalData.toDomain();
+        return finalData;
     }
 
     /**
@@ -116,13 +112,13 @@ public class AdminUserService {
      * @return Updated member
      */
     @Transactional
-    public Member updateVirtualMemberAvatar(
+    public MemberData updateVirtualMemberAvatar(
             UserId userId,
             AvatarBodyUri avatarBodyUri,
             AvatarFaceUri avatarFaceUri) {
 
         // 1. Find member
-        Member member = findMemberByUserId(userId);
+        MemberData member = findMemberByUserId(userId);
 
         // 2. Verify it's a virtual member (ADMIN provider type)
         if (member.getProviderType() != ProviderType.ADMIN) {
@@ -130,24 +126,22 @@ public class AdminUserService {
         }
 
         // 3. Create new profile with updated avatar
-        Profile updatedProfile = adminProfileService.createProfileForVirtualMember(
+        ProfileData updatedProfile = adminProfileService.createProfileForVirtualMember(
                 userId,
-                member.getProfile().getNickname(),  // Keep existing nickname
+                member.getProfileData().getNickname(),  // Keep existing nickname
                 avatarBodyUri,
                 avatarFaceUri
         );
 
         // 4. Update member with new profile
-        Member updatedMember = member.toBuilder()
-                .profile(updatedProfile)
-                .build();
+        member.initializeProfile(updatedProfile);
 
         // 5. Save and return
-        MemberData savedData = memberRepository.save(updatedMember.toData());
+        MemberData savedData = memberRepository.save(member);
 
         log.info("Virtual member avatar updated: userId={}", userId.getUid());
 
-        return savedData.toDomain();
+        return savedData;
     }
 
     /**
@@ -159,7 +153,7 @@ public class AdminUserService {
     @Transactional
     public void deleteVirtualMember(UserId userId) {
         // 1. Find member
-        Member member = findMemberByUserId(userId);
+        MemberData member = findMemberByUserId(userId);
 
         // 2. Verify it's a virtual member
         if (member.getProviderType() != ProviderType.ADMIN) {
@@ -179,8 +173,8 @@ public class AdminUserService {
      * @return Virtual member
      */
     @Transactional(readOnly = true)
-    public Member getVirtualMember(UserId userId) {
-        Member member = findMemberByUserId(userId);
+    public MemberData getVirtualMember(UserId userId) {
+        MemberData member = findMemberByUserId(userId);
 
         if (member.getProviderType() != ProviderType.ADMIN) {
             throw new ForbiddenException("FORBIDDEN", "Not a virtual member");
@@ -193,11 +187,10 @@ public class AdminUserService {
      * Find member by user ID
      *
      * @param userId User ID
-     * @return Member domain object
+     * @return MemberData entity
      */
-    private Member findMemberByUserId(UserId userId) {
+    private MemberData findMemberByUserId(UserId userId) {
         return memberRepository.findById(userId.getUid())
-                .map(MemberData::toDomain)
                 .orElseThrow(() -> new NotFoundException("NOT_FOUND", "Member not found: " + userId.getUid()));
     }
 

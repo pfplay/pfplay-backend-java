@@ -6,8 +6,8 @@ import com.pfplaybackend.api.common.config.security.jwt.enums.TokenSubject;
 import com.pfplaybackend.api.common.config.security.jwt.properties.JwtProperties;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.AuthenticationException;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.data.GuestData;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -38,7 +38,7 @@ public class JwtService {
     /**
      * Member용 AccessToken 생성
      */
-    public String generateAccessTokenForMember(Member member) {
+    public String generateAccessTokenForMember(MemberData member) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(TokenClaim.UID.getValue(), member.getUserId().getUid().toString());
         claims.put(TokenClaim.EMAIL.getValue(), member.getEmail());
@@ -57,7 +57,7 @@ public class JwtService {
     /**
      * Guest용 AccessToken 생성
      */
-    public String generateAccessTokenForGuest(Guest guest) {
+    public String generateAccessTokenForGuest(GuestData guest) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(TokenClaim.UID.getValue(), guest.getUserId().getUid().toString());
         claims.put(TokenClaim.EMAIL.getValue(), "N/A");
@@ -76,7 +76,7 @@ public class JwtService {
     /**
      * Member용 만료되지 않는 AccessToken 생성
      */
-    public String generateNonExpiringAccessTokenForMember(Member member) {
+    public String generateNonExpiringAccessTokenForMember(MemberData member) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(TokenClaim.UID.getValue(), member.getUserId().getUid().toString());
         claims.put(TokenClaim.EMAIL.getValue(), member.getEmail());
@@ -90,7 +90,7 @@ public class JwtService {
     /**
      * Guest용 만료되지 않는 AccessToken 생성
      */
-    public String generateNonExpiringAccessTokenForGuest(Guest guest) {
+    public String generateNonExpiringAccessTokenForGuest(GuestData guest) {
         Map<String, Object> claims = new HashMap<>();
         claims.put(TokenClaim.UID.getValue(), guest.getUserId().getUid().toString());
         claims.put(TokenClaim.EMAIL.getValue(), "N/A");

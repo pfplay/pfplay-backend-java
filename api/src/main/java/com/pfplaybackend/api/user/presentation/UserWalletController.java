@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.user.application.dto.command.UpdateWalletCommand;
 import com.pfplaybackend.api.user.application.service.UserWalletService;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.presentation.payload.request.UpdateMyWalletRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,7 +35,7 @@ public class UserWalletController {
     @PutMapping("/me/profile/wallet")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<?> updateMyWallet(@RequestBody UpdateMyWalletRequest request, HttpServletResponse response) {
-        Member member = userWalletService.updateMyWalletAddress(UpdateWalletCommand.builder()
+        MemberData member = userWalletService.updateMyWalletAddress(UpdateWalletCommand.builder()
                 .walletAddress(request.getWalletAddress())
                 .build()
         );

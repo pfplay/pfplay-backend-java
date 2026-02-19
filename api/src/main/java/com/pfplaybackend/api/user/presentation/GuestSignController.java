@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.user.application.service.GuestSignService;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Guest;
+import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class GuestSignController {
     public ResponseEntity<?> createGuest(
             HttpServletResponse response
     ) {
-        Guest guest = guestSignService.getGuestOrCreate();
+        GuestData guest = guestSignService.getGuestOrCreate();
         cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessTokenForGuest(guest));
 
         return ResponseEntity.ok()

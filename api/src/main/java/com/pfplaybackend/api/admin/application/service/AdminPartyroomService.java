@@ -20,7 +20,7 @@ import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -117,10 +117,10 @@ public class AdminPartyroomService {
             String linkDomain = generateLinkDomainForBulk(request.getLinkDomainPrefix(), i);
 
             // 2. Create virtual members for this partyroom
-            List<Member> virtualMembers = new ArrayList<>();
+            List<MemberData> virtualMembers = new ArrayList<>();
             for (int j = 0; j < request.getUsersPerRoom(); j++) {
                 String nickname = String.format("Virtual_%d_%d", i, j + 1);
-                Member member = adminUserService.createVirtualMember(nickname, null, null);
+                MemberData member = adminUserService.createVirtualMember(nickname, null, null);
                 virtualMembers.add(member);
                 totalVirtualMembers++;
             }
@@ -143,7 +143,7 @@ public class AdminPartyroomService {
 
             // 6. Enter other members as regular crew
             for (int j = 1; j < virtualMembers.size(); j++) {
-                Member member = virtualMembers.get(j);
+                MemberData member = virtualMembers.get(j);
                 enterMemberAsRegularCrew(partyroom, member.getUserId());
             }
 

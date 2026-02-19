@@ -6,10 +6,9 @@ import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import com.pfplaybackend.api.profile.application.service.UserProfileService;
+import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Activity;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Member;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.Profile;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
 import com.pfplaybackend.api.user.domain.value.*;
@@ -35,42 +34,39 @@ public class AdminUserInitializeService {
     @Transactional
     public UserId addAdminUser() {
         UserId adminId = new UserId(ADMIN_FIXED_ID);
-        Member member = addAssociateMember(adminId);
-        Member updatedMember = updateAvatarBody(member, new AvatarBodyUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_003.png?alt=media"));
+        MemberData member = addAssociateMember(adminId);
+        MemberData updatedMember = updateAvatarBody(member, new AvatarBodyUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_003.png?alt=media"));
         upgradeMember(updatedMember);
         return adminId;
     }
 
-    private Member addAssociateMember(UserId userId) {
-        Member member = Member.createWithFixedUserId(userId, "N/A", ProviderType.GOOGLE);
-        Profile profile = userProfileService.createProfileForMember(member);
-        Map<ActivityType, Activity> activityMap = userActivityService.createUserActivities(member);
-        Member updatedMember = member
-                .initializeProfile(profile)
-                .initializeActivityMap(activityMap);
-        MemberData memberData = memberRepository.save(updatedMember.toData());
-        return memberData.toDomain();
+    private MemberData addAssociateMember(UserId userId) {
+        MemberData member = MemberData.createWithFixedUserId(userId, "N/A", ProviderType.GOOGLE);
+        ProfileData profile = userProfileService.createProfileDataForMember(member.getUserId());
+        Map<ActivityType, ActivityData> activityMap = userActivityService.createUserActivities(member.getUserId());
+        member.initializeProfile(profile);
+        member.initializeActivityMap(activityMap);
+        return memberRepository.save(member);
     }
 
-    private void upgradeMember(Member member) {
+    private void upgradeMember(MemberData member) {
         // 1. Profile Update
-        Member profileUpdatedMember = member.updateProfileBio(new UpdateBioCommand("운영자", ""));
-        memberRepository.save(profileUpdatedMember.toData());
+        member.updateProfileBio(new UpdateBioCommand("운영자", ""));
+        memberRepository.save(member);
         // 2. Wallet Update
-        Member walletUpdatedMember = profileUpdatedMember.updateWalletAddress(new WalletAddress(""));
-        memberRepository.save(walletUpdatedMember.toData());
+        member.updateWalletAddress(new WalletAddress(""));
+        memberRepository.save(member);
     }
 
-    private Member updateAvatarBody(Member member, AvatarBodyUri avatarBodyUri) {
+    private MemberData updateAvatarBody(MemberData member, AvatarBodyUri avatarBodyUri) {
         AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(avatarBodyUri);
         AvatarFaceUri avatarFaceUri = new AvatarFaceUri();
         AvatarIconUri avatarIconUri = userAvatarDomainService.findAvatarIconPairWithSingleBody(avatarBodyDto);
 
         // TODO Check if the score is actually configurable in Domain Service
-        Member updatedMember = member.updateAvatarBody(avatarBodyDto)
-                .updateAvatarFace(avatarFaceUri)
-                .updateAvatarIcon(avatarIconUri);
-        MemberData memberData = memberRepository.save(updatedMember.toData());
-        return memberData.toDomain();
+        member.updateAvatarBody(avatarBodyDto);
+        member.updateAvatarFace(avatarFaceUri);
+        member.updateAvatarIcon(avatarIconUri);
+        return memberRepository.save(member);
     }
 }

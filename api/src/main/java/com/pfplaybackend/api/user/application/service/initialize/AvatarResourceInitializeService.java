@@ -4,9 +4,8 @@ import com.pfplaybackend.api.avatarresource.repository.AvatarBodyResourceReposit
 import com.pfplaybackend.api.avatarresource.repository.AvatarFaceResourceRepository;
 import com.pfplaybackend.api.avatarresource.repository.AvatarIconResourceRepository;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarBodyResource;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarFaceResource;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.AvatarIconResource;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarFaceResourceData;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarIconResourceData;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import com.pfplaybackend.api.user.domain.enums.PairType;
 import jakarta.transaction.Transactional;
@@ -65,19 +64,19 @@ public class AvatarResourceInitializeService {
             data.updateResource(resourceUri, obtainableType, obtainableScore, isCombinable, isDefaultSetting, x, y);
             avatarBodyResourceRepository.save(data);
         } else {
-            AvatarBodyResource avatarBodyResource = AvatarBodyResource.create(name, resourceUri, obtainableType, obtainableScore,
+            AvatarBodyResourceData avatarBodyResourceData = AvatarBodyResourceData.create(name, resourceUri, obtainableType, obtainableScore,
                     isCombinable, isDefaultSetting, x, y);
-            avatarBodyResourceRepository.save(avatarBodyResource.toData());
+            avatarBodyResourceRepository.save(avatarBodyResourceData);
         }
     }
 
     private void addAvatarFace(String name, String resourceUri) {
-        AvatarFaceResource avatarFaceResource = AvatarFaceResource.create(name, resourceUri);
-        avatarFaceResourceRepository.save(avatarFaceResource.toData());
+        AvatarFaceResourceData avatarFaceResourceData = AvatarFaceResourceData.create(name, resourceUri);
+        avatarFaceResourceRepository.save(avatarFaceResourceData);
     }
 
     private void addAvatarIcon(String name, String resourceUri, PairType pairType) {
-        AvatarIconResource avatarIconResource = AvatarIconResource.create(name, resourceUri, pairType);
-        avatarIconResourceRepository.save(avatarIconResource.toData());
+        AvatarIconResourceData avatarIconResourceData = AvatarIconResourceData.create(name, resourceUri, pairType);
+        avatarIconResourceRepository.save(avatarIconResourceData);
     }
 }

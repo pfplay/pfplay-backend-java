@@ -1,15 +1,12 @@
 package com.pfplaybackend.api.user.presentation;
 
-import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
 import com.pfplaybackend.api.user.application.service.UserInfoService;
 import com.pfplaybackend.api.user.presentation.payload.response.MyInfoResponse;
-import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User Sign API")
@@ -23,9 +20,9 @@ public class UserInfoController {
     @GetMapping("/me/info")
     @PreAuthorize("hasAnyRole('GUEST', 'MEMBER')")
     public ResponseEntity<MyInfoResponse> getMyInfo() {
-        User user = userInfoService.getMyInfo();
+        MyInfoResponse response = userInfoService.getMyInfo();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(MyInfoResponse.from(user));
+                .body(response);
     }
 }
