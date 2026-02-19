@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.profile.application.validation;
 
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
-import com.pfplaybackend.api.profile.presentation.dto.request.AvatarFaceRequest;
-import com.pfplaybackend.api.profile.presentation.dto.request.SetAvatarRequest;
+import com.pfplaybackend.api.profile.adapter.in.web.dto.request.AvatarFaceRequest;
+import com.pfplaybackend.api.profile.adapter.in.web.dto.request.SetAvatarRequest;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

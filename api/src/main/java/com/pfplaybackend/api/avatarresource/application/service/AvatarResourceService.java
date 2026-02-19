@@ -9,9 +9,9 @@ import com.pfplaybackend.api.user.domain.entity.data.AvatarIconResourceData;
 import com.pfplaybackend.api.user.domain.enums.PairType;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.avatarresource.repository.AvatarBodyResourceRepository;
-import com.pfplaybackend.api.avatarresource.repository.AvatarFaceResourceRepository;
-import com.pfplaybackend.api.avatarresource.repository.AvatarIconResourceRepository;
+import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarBodyResourceRepository;
+import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarFaceResourceRepository;
+import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarIconResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

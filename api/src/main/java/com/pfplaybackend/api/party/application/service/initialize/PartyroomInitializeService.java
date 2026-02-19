@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.application.service.initialize;
 
 import com.pfplaybackend.api.party.application.service.PartyroomManagementService;
-import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
+import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

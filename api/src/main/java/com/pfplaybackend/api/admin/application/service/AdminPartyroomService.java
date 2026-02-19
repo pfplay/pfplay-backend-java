@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.admin.application.service;
 
-import com.pfplaybackend.api.admin.presentation.dto.request.AdminCreatePartyroomRequest;
-import com.pfplaybackend.api.admin.presentation.dto.request.BulkPreviewEnvironmentRequest;
-import com.pfplaybackend.api.admin.presentation.dto.response.AdminPartyroomResponse;
-import com.pfplaybackend.api.admin.presentation.dto.response.BulkPreviewEnvironmentResponse;
-import com.pfplaybackend.api.admin.presentation.dto.response.SimulateReactionsResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.dto.request.AdminCreatePartyroomRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.dto.request.BulkPreviewEnvironmentRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.dto.response.AdminPartyroomResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.dto.response.BulkPreviewEnvironmentResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.dto.response.SimulateReactionsResponse;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
@@ -18,9 +18,9 @@ import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
-import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;

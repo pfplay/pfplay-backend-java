@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.result.PenaltyResult;
-import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
+import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewPenaltyHistoryData;
@@ -16,13 +16,13 @@ import com.pfplaybackend.api.party.domain.service.CrewDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewPenaltyHistoryRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
-import com.pfplaybackend.api.party.interfaces.listener.redis.message.CrewPenaltyMessage;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewPenaltyHistoryRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.in.listener.message.CrewPenaltyMessage;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.regulation.PunishPenaltyRequest;
-import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.PunishPenaltyRequest;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class CrewPenaltyService {
     private final PartyroomAccessService partyroomAccessService;
     private final CrewPenaltyHistoryRepository crewPenaltyHistoryRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final UserProfilePeerService userProfileService;
+    private final UserProfileQueryPort userProfileService;
 
     public List<PenaltyResult> getPenalties(PartyroomId partyroomId) {
         List<CrewPenaltyHistoryData> crewPenaltyHistoryDataList = crewPenaltyHistoryRepository.findAllByPartyroomIdAndReleasedIsFalse(partyroomId);

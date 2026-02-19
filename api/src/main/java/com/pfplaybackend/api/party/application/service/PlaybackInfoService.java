@@ -2,14 +2,14 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.party.application.dto.playback.MusicDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
-import com.pfplaybackend.api.party.application.peer.MusicQueryPeerService;
-import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
+import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
+import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.PlaybackRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.transaction.Transactional;
@@ -25,8 +25,8 @@ public class PlaybackInfoService {
 
     private final PartyroomRepository partyroomRepository;
     private final PlaybackRepository playbackRepository;
-    private final MusicQueryPeerService musicQueryService;
-    private final UserProfilePeerService userProfileService;
+    private final PlaylistQueryPort musicQueryService;
+    private final UserProfileQueryPort userProfileService;
 
     @Transactional
     public PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj) {

@@ -13,7 +13,7 @@ import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.WalletAddress;
-import com.pfplaybackend.api.user.repository.MemberRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

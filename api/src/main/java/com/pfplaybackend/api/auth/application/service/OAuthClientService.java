@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.auth.application.service;
 
-import com.pfplaybackend.api.auth.client.GoogleOAuthClient;
-import com.pfplaybackend.api.auth.client.TwitterOAuthClient;
+import com.pfplaybackend.api.auth.adapter.out.external.GoogleOAuthClient;
+import com.pfplaybackend.api.auth.adapter.out.external.TwitterOAuthClient;
 import com.pfplaybackend.api.auth.dto.response.OAuthTokenResponse;
 import com.pfplaybackend.api.auth.dto.OAuthUserProfile;
 import com.pfplaybackend.api.auth.enums.OAuthProvider;

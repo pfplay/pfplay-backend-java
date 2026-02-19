@@ -6,12 +6,12 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
-import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
+import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 public class CrewInfoService {
     private final CrewRepository crewRepository;
     private final PartyroomInfoService partyroomInfoService;
-    private final UserProfilePeerService userProfileService;
+    private final UserProfileQueryPort userProfileService;
 
     public CrewProfileSummaryResult getProfileSummaryByCrewId(Long crewId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();

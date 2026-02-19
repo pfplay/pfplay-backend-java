@@ -3,7 +3,7 @@ package com.pfplaybackend.api.user.application.service;
 import com.pfplaybackend.api.profile.application.service.UserProfileService;
 import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
-import com.pfplaybackend.api.user.repository.GuestRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.admin.application.service;
 
-import com.pfplaybackend.api.admin.presentation.dto.response.SimulateReactionsResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.dto.response.SimulateReactionsResponse;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
-import com.pfplaybackend.api.party.application.peer.UserActivityPeerService;
+import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackReactionPostProcessService;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
@@ -13,7 +13,7 @@ import com.pfplaybackend.api.party.domain.service.PlaybackReactionDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.infrastructure.repository.PlaybackReactionHistoryRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackReactionHistoryRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class ReactionSimulationService {
     private final PlaybackReactionDomainService playbackReactionDomainService;
     private final PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
     private final PlaybackReactionPostProcessService playbackReactionPostProcessService;
-    private final UserActivityPeerService userActivityPeerService;
+    private final UserActivityPort userActivityPeerService;
 
     /**
      * Simulate a single reaction in a separate transaction

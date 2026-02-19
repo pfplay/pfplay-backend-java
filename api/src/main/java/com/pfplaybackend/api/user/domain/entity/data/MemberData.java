@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
-import com.pfplaybackend.api.profile.presentation.dto.request.AvatarFaceRequest;
+import com.pfplaybackend.api.profile.adapter.in.web.dto.request.AvatarFaceRequest;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;

@@ -5,7 +5,7 @@ import com.pfplaybackend.api.profile.application.event.UserProfileEventService;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.user.repository.MemberRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

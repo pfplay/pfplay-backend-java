@@ -2,7 +2,7 @@ package com.pfplaybackend.api.profile.application.event;
 
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.party.interfaces.listener.redis.message.CrewProfilePreCheckMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfilePreCheckMessage;
 import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import lombok.RequiredArgsConstructor;

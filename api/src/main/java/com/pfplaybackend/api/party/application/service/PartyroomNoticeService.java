@@ -5,7 +5,7 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -5,15 +5,15 @@ import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
-import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
+import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -41,7 +41,7 @@ class PartyroomAccessServiceTest {
     @Mock private DjRepository djRepository;
     @Mock private PartyroomDomainService partyroomDomainService;
     @Mock private PartyroomInfoService partyroomInfoService;
-    @Mock private UserProfilePeerService userProfileService;
+    @Mock private UserProfileQueryPort userProfileService;
     @Mock private PlaybackManagementService playbackManagementService;
 
     @InjectMocks

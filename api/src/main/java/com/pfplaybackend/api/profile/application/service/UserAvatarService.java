@@ -20,7 +20,7 @@ import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
 import com.pfplaybackend.api.user.domain.service.UserDomainService;
 import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
-import com.pfplaybackend.api.user.repository.MemberRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -84,7 +84,7 @@ public class UserAvatarService {
     }
 
     @Transactional
-    public void setUserAvatar(com.pfplaybackend.api.profile.presentation.dto.request.SetAvatarRequest request) {
+    public void setUserAvatar(com.pfplaybackend.api.profile.adapter.in.web.dto.request.SetAvatarRequest request) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
 

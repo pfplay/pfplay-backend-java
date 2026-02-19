@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
-import com.pfplaybackend.api.party.application.peer.MusicQueryPeerService;
+import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -14,9 +14,9 @@ import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.service.CrewDomainService;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.*;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +45,7 @@ class DjManagementServiceDjQueueChangeTest {
     @Mock private CrewDomainService crewDomainService;
     @Mock private PartyroomInfoService partyroomInfoService;
     @Mock private PlaybackManagementService playbackManagementService;
-    @Mock private MusicQueryPeerService musicQueryService;
+    @Mock private PlaylistQueryPort musicQueryService;
     @Mock private RedisMessagePublisher messagePublisher;
 
     @InjectMocks

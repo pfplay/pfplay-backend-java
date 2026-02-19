@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.party.interfaces.api.rest;
+package com.pfplaybackend.api.party.adapter.in.web;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

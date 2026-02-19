@@ -2,8 +2,8 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

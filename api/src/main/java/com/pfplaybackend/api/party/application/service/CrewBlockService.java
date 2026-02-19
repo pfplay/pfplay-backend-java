@@ -10,10 +10,10 @@ import com.pfplaybackend.api.party.domain.entity.data.history.CrewBlockHistoryDa
 import com.pfplaybackend.api.party.domain.exception.BlockException;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewBlockHistoryRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
-import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.AddBlockRequest;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.in.web.payload.request.AddBlockRequest;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.profile.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.value.UserId;

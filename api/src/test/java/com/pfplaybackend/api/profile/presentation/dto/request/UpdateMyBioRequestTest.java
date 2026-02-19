@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.profile.presentation.dto.request;
+package com.pfplaybackend.api.profile.adapter.in.web.dto.request;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

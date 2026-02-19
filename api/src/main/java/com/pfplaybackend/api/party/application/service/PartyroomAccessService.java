@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewSummaryDto;
-import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
+import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -17,15 +17,15 @@ import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.party.interfaces.listener.redis.message.DjQueueChangeMessage;
-import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomAccessMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.DjQueueChangeMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.PartyroomAccessMessage;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.domain.exception.PenaltyException;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +50,7 @@ public class PartyroomAccessService {
     private final DjRepository djRepository;
     private final PartyroomDomainService partyroomDomainService;
     private final PartyroomInfoService partyroomInfoService;
-    private final UserProfilePeerService userProfileService;
+    private final UserProfileQueryPort userProfileService;
     private final PlaybackManagementService playbackManagementService;
 
     @Transactional

@@ -4,8 +4,8 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
-import com.pfplaybackend.api.party.application.peer.GrabMusicPeerService;
-import com.pfplaybackend.api.party.application.peer.UserActivityPeerService;
+import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
+import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.enums.MotionType;
@@ -14,8 +14,8 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.party.interfaces.listener.redis.message.ReactionAggregationMessage;
-import com.pfplaybackend.api.party.interfaces.listener.redis.message.ReactionMotionMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.ReactionAggregationMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.ReactionMotionMessage;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,8 +29,8 @@ public class PlaybackReactionPostProcessService {
     // Using RedisMessagePublisher
     private final RedisMessagePublisher messagePublisher;
     // Using Proxy Services
-    private final GrabMusicPeerService grabMusicService;
-    private final UserActivityPeerService userActivityService;
+    private final PlaylistCommandPort grabMusicService;
+    private final UserActivityPort userActivityService;
 
     public void postProcess(ReactionPostProcessDto postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();

@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.domain.service;
 
-import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

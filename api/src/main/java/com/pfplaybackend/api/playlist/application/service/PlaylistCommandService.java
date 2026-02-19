@@ -7,7 +7,7 @@ import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.service.PlaylistDomainService;
 import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
-import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
+import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

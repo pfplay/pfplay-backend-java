@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.playlist.presentation.payload.request;
+package com.pfplaybackend.api.playlist.adapter.in.web.payload.request;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;

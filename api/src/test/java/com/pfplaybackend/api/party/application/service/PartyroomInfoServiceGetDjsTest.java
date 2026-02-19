@@ -1,12 +1,12 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
-import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
+import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
-import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
-import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PartyroomInfoServiceGetDjsTest {
 
-    @Mock private UserProfilePeerService userProfileService;
+    @Mock private UserProfileQueryPort userProfileService;
     @Mock private CrewRepository crewRepository;
     @Mock private DjRepository djRepository;
     @InjectMocks private PartyroomInfoService partyroomInfoService;

@@ -4,8 +4,8 @@ import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
-import com.pfplaybackend.api.party.interfaces.listener.redis.message.CrewProfileMessage;
-import com.pfplaybackend.api.party.interfaces.listener.redis.message.CrewProfilePreCheckMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfileMessage;
+import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfilePreCheckMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

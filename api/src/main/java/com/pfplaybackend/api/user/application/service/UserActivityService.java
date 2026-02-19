@@ -4,7 +4,7 @@ import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.value.UserId;
-import com.pfplaybackend.api.user.repository.MemberRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
