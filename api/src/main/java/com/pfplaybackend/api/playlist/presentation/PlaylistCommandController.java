@@ -2,7 +2,7 @@ package com.pfplaybackend.api.playlist.presentation;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
-import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
+import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.presentation.payload.request.DeletePlaylistListRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.request.CreatePlaylistRequest;
 import com.pfplaybackend.api.playlist.presentation.payload.request.UpdatePlaylistNameRequest;
@@ -28,7 +28,7 @@ public class PlaylistCommandController {
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<?> create(@RequestBody @Valid CreatePlaylistRequest request) {
-        Playlist playlist = playlistCommandService.createPlaylist(request.getName());
+        PlaylistData playlist = playlistCommandService.createPlaylist(request.getName());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(CreatePlaylistResponse.from(playlist)));
@@ -46,7 +46,7 @@ public class PlaylistCommandController {
     @PatchMapping("{playlistId}")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<?> modifyPlaylistName(@PathVariable Long playlistId, @RequestBody UpdatePlaylistNameRequest request) {
-        Playlist playlist = playlistCommandService.renamePlaylist(playlistId, request.getName());
+        PlaylistData playlist = playlistCommandService.renamePlaylist(playlistId, request.getName());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiCommonResponse.success(UpdatePlaylistNameResponse.from(playlist)));

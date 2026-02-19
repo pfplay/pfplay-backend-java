@@ -4,7 +4,6 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
-import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.service.PlaylistDomainService;
 import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
@@ -29,12 +28,12 @@ public class PlaylistCommandService {
      */
     @Transactional
     public void createDefaultPlaylist(UserId userId) {
-        Playlist playlist = Playlist.create(0, "그랩한 곡", PlaylistType.GRABLIST, userId);
-        playlistRepository.save(playlist.toData());
+        PlaylistData playlist = PlaylistData.create(0, "그랩한 곡", PlaylistType.GRABLIST, userId);
+        playlistRepository.save(playlist);
     }
 
     @Transactional
-    public Playlist createPlaylist(String playlistName) {
+    public PlaylistData createPlaylist(String playlistName) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         UserId userId = authContext.getUserId();
         List<PlaylistData> playlistDataList = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST);
@@ -44,24 +43,21 @@ public class PlaylistCommandService {
 
         // Save
         int nextOrderNumber = playlistDataList.isEmpty() ? 1 : playlistDataList.size();
-        Playlist playlist = Playlist.create(nextOrderNumber, playlistName, PlaylistType.PLAYLIST, userId);
-        PlaylistData playlistData = playlistRepository.save(playlist.toData());
-        return playlistData.toDomain();
+        PlaylistData playlist = PlaylistData.create(nextOrderNumber, playlistName, PlaylistType.PLAYLIST, userId);
+        return playlistRepository.save(playlist);
     }
 
     @Transactional
-    public Playlist renamePlaylist(Long playlistId, String name) {
+    public PlaylistData renamePlaylist(Long playlistId, String name) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         UserId userId = authContext.getUserId();
 
         PlaylistData playlistData = playlistRepository.findByIdAndOwnerIdAndType(playlistId, userId, PlaylistType.PLAYLIST)
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
-        Playlist playlist = playlistData.toDomain();
-
-        Playlist updatedPlaylist = playlist.rename(name);
-        playlistRepository.save(updatedPlaylist.toData());
-        return updatedPlaylist;
+        playlistData.rename(name);
+        playlistRepository.save(playlistData);
+        return playlistData;
     }
 
     @Transactional

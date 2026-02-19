@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.presentation.payload.response;
 
-import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
+import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class CreatePlaylistResponse {
     private final Integer orderNumber;
     private final PlaylistType type;
 
-    public static CreatePlaylistResponse from(Playlist playlist) {
+    public static CreatePlaylistResponse from(PlaylistData playlist) {
         return CreatePlaylistResponse.builder()
                 .id(playlist.getId())
                 .name(playlist.getName())

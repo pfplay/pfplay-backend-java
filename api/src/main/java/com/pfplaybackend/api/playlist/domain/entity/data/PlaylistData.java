@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.playlist.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
@@ -58,18 +57,16 @@ public class PlaylistData extends BaseEntity {
         this.type = type;
     }
 
-    public Playlist toDomain() {
-        return Playlist.builder()
-                .id(this.id)
-                .ownerId(ownerId)
+    public static PlaylistData create(Integer orderNumber, String name, PlaylistType type, UserId ownerId) {
+        return PlaylistData.builder()
                 .orderNumber(orderNumber)
-                .name(this.name)
-                .type(this.type)
+                .name(name)
+                .type(type)
+                .ownerId(ownerId)
                 .build();
     }
 
-
-//    public void rename(String name) {
-//        this.name = name;
-//    }
+    public void rename(String name) {
+        this.name = name;
+    }
 }

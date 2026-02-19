@@ -20,7 +20,6 @@ import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
-import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
 import com.pfplaybackend.api.playlist.repository.TrackRepository;
@@ -200,8 +199,8 @@ public class AdminDemoService {
      */
     private void createPlaylistAndTrack(UserId userId) {
         // Create playlist
-        Playlist playlist = Playlist.create(1, "DJ Playlist", PlaylistType.PLAYLIST, userId);
-        PlaylistData savedPlaylist = playlistRepository.save(playlist.toData());
+        PlaylistData playlist = PlaylistData.create(1, "DJ Playlist", PlaylistType.PLAYLIST, userId);
+        PlaylistData savedPlaylist = playlistRepository.save(playlist);
 
         // Add random track
         DemoTrackConstants.TrackInfo track = DemoTrackConstants.getRandomTrack();

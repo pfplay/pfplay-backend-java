@@ -6,7 +6,6 @@ import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
-import com.pfplaybackend.api.playlist.domain.entity.domainmodel.Playlist;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.service.PlaylistDomainService;
 import com.pfplaybackend.api.playlist.repository.PlaylistRepository;
@@ -74,7 +73,7 @@ class PlaylistCommandServiceTest {
         when(playlistRepository.save(any(PlaylistData.class))).thenReturn(savedData);
 
         // when
-        Playlist result = playlistCommandService.createPlaylist(playlistName);
+        PlaylistData result = playlistCommandService.createPlaylist(playlistName);
 
         // then
         verify(playlistRepository, times(1)).save(any(PlaylistData.class));
@@ -116,7 +115,7 @@ class PlaylistCommandServiceTest {
         when(playlistRepository.save(any(PlaylistData.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
-        Playlist result = playlistCommandService.renamePlaylist(playlistId, newName);
+        PlaylistData result = playlistCommandService.renamePlaylist(playlistId, newName);
 
         // then
         verify(playlistRepository, times(1)).save(any(PlaylistData.class));
