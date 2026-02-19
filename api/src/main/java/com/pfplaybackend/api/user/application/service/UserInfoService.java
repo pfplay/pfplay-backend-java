@@ -8,6 +8,7 @@ import com.pfplaybackend.api.user.domain.entity.domainmodel.User;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.repository.GuestRepository;
 import com.pfplaybackend.api.user.repository.MemberRepository;
+import com.pfplaybackend.api.common.exception.http.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +24,12 @@ public class UserInfoService {
     public User getMyInfo () {
         UserContext userContext = (UserContext) ThreadLocalContext.getContext();
         if(userContext.getAuthorityTier() == AuthorityTier.GT) {
-            GuestData guestData = guestRepository.findGuestByUserId(userContext.getUserId()).orElseThrow();
+            GuestData guestData = guestRepository.findGuestByUserId(userContext.getUserId())
+                    .orElseThrow(() -> new UnauthorizedException("USER_NOT_FOUND", "User not found for the given token"));
             return guestData.toDomain();
         }else {
-            MemberData memberData = memberRepository.findByUserId(userContext.getUserId()).orElseThrow();
+            MemberData memberData = memberRepository.findByUserId(userContext.getUserId())
+                    .orElseThrow(() -> new UnauthorizedException("USER_NOT_FOUND", "User not found for the given token"));
             return memberData.toDomain();
         }
     }
