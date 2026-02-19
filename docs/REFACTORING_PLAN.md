@@ -1,6 +1,6 @@
 # PFPlay Backend - DDD Cleanup Refactoring Plan
 
-> **작성일**: 2026-02-18 (갱신: 2026-02-18)
+> **작성일**: 2026-02-18 (갱신: 2026-02-19)
 > **브랜치**: `refactor/ddd-cleanup` (`chore/playlist-tests` 에서 분기)
 > **목표**: 현재 구조를 DDD + 헥사고널 아키텍처 기반의 모듈러 모놀리스로 개편
 
@@ -99,7 +99,7 @@
 - `PartyroomInfoServiceIsRegisteredTest.java` — 동일
 - `PartyroomInfoServiceGetDjsTest.java` — 동일
 
-### 0-2. JPAQueryFactory 주입 수정
+### ~~0-2. JPAQueryFactory 주입 수정~~ ✅ 완료
 
 `QueryDslConfig` Bean은 이미 존재 (`common/config/jpa/QueryDslConfig.java`).
 각 RepositoryImpl에서 `new JPAQueryFactory(em)` → 생성자 주입으로 변경만 필요.
@@ -118,10 +118,10 @@ cd api && ./gradlew compileJava && ./gradlew test
 ```
 
 ### 완료 기준
-- [ ] 3개 Aspect가 `@Around` + try-finally 사용
-- [ ] `AuthContext` 단일 클래스로 통합
-- [ ] JPAQueryFactory가 Bean 주입으로 사용 (5개 RepositoryImpl)
-- [ ] 전체 테스트 통과
+- [x] 3개 Aspect가 `@Around` + try-finally 사용
+- [x] `AuthContext` 단일 클래스로 통합
+- [x] JPAQueryFactory가 Bean 주입으로 사용 (5개 RepositoryImpl)
+- [x] 전체 테스트 통과
 
 ---
 
@@ -216,12 +216,12 @@ cd api && ./gradlew compileJava && ./gradlew test
 ```
 
 ### 완료 기준
-- [ ] `domainmodel/` 디렉토리가 모든 도메인에서 제거됨
-- [ ] `converter/` 디렉토리가 제거됨
-- [ ] 서비스에서 3단계 변환 보일러플레이트가 없음
-- [ ] Data 엔티티가 비즈니스 메서드를 직접 보유
-- [ ] 중간 DTO(`PartyroomDataDto` 등) 제거
-- [ ] 전체 테스트 통과
+- [x] `domainmodel/` 디렉토리가 모든 도메인에서 제거됨
+- [x] `converter/` 디렉토리가 제거됨
+- [x] 서비스에서 3단계 변환 보일러플레이트가 없음
+- [x] Data 엔티티가 비즈니스 메서드를 직접 보유
+- [x] 중간 DTO(`PartyroomDataDto` 등) 제거
+- [x] 전체 테스트 통과
 
 ---
 
@@ -258,10 +258,10 @@ cd api && ./gradlew compileJava && ./gradlew test
 Crew/DJ는 독립 Repository를 통해서만 접근.
 
 ### 완료 기준
-- [ ] `PartymemberRepository`, `DjRepository` 존재
-- [ ] `PartyroomData`에서 Crew/DJ 컬렉션 제거
-- [ ] 크루 1명 등급 변경 시 Partyroom 전체 로드 없음
-- [ ] 전체 테스트 통과
+- [x] `CrewRepository`, `DjRepository` 존재
+- [x] `PartyroomData`에서 Crew/DJ 컬렉션 제거
+- [x] 크루 1명 등급 변경 시 Partyroom 전체 로드 없음
+- [x] 전체 테스트 통과
 
 ---
 
@@ -317,11 +317,49 @@ com.pfplaybackend.api.{domain}/
 각 도메인이 제공하는 port를 통해서만 접근하도록 변경.
 
 ### 완료 기준
-- [ ] 각 도메인이 `port/in`, `port/out` 인터페이스를 보유
-- [ ] `peer/`, `proxy/` 패키지 제거
-- [ ] presentation 계층이 `adapter/in/web/`으로 이동
-- [ ] infrastructure 계층이 `adapter/out/`으로 이동
-- [ ] 전체 테스트 통과
+- [x] 각 도메인이 `port/in`, `port/out` 인터페이스를 보유
+- [x] `peer/`, `proxy/` 패키지 제거
+- [x] presentation 계층이 `adapter/in/web/`으로 이동
+- [x] infrastructure 계층이 `adapter/out/`으로 이동
+- [x] 전체 테스트 통과
+
+### Phase 3 후속: 헥사고널 네이밍 정리 (2026-02-19 완료)
+
+Phase 3 이후 남아있던 레거시 구조 잔재를 일괄 정리:
+
+**playlist:**
+- `serach/` 오타 → `search/` 수정 (MusicSearchController)
+- 미사용 `config/external/YoutubeService{,Impl}` 삭제
+- 테스트 파일 위치 `presentation/` → `adapter/in/web/` 이동
+
+**auth:**
+- `auth/enums/` → `auth/domain/enums/`
+- `auth/validation/` → `auth/adapter/in/web/validation/`
+- `auth/dto/` → `adapter/in/web/dto/` + `application/dto/` 재배치
+- `auth/application/store/StateStore` → `application/port/out/StateStorePort` (port/adapter 패턴)
+- `auth/application/store/RedisStateStore` → `adapter/out/persistence/RedisStateStoreAdapter`
+- `auth/config/WebClientConfig` → `adapter/out/external/config/`
+
+**admin:**
+- `admin/util/NicknameGenerator` → `admin/application/util/`
+
+**테스트 파일 위치 수정:**
+- `profile/presentation/` → `profile/adapter/in/web/` (UpdateMyBioRequestTest)
+- `party/interfaces/api/rest/` → `party/adapter/in/web/` (PartyroomAccessControllerLinkTest)
+
+**빈 레거시 디렉토리 전체 삭제** (40+ 디렉토리: `presentation/`, `interfaces/`, `infrastructure/`, `repository/`, `client/` 등)
+
+### party 도메인 분리 검토 (2026-02-19 결론: 불필요)
+
+user/profile처럼 party를 partyroom/crew/dj/playback으로 최상위 분리할지 검토함.
+
+**분리하지 않는 이유:**
+1. **JPA hard FK**: CrewData, DjData가 `@ManyToOne`으로 PartyroomData에 직접 연결
+2. **서비스 교차 의존**: PlaybackManagementService가 4개 Repository 전부 사용, DjManagementService가 3개 사용
+3. **트랜잭션 원자성**: 퇴장/강퇴/DJ등록 등 핵심 유스케이스가 Crew+DJ+Playback을 단일 트랜잭션으로 조작
+4. **라이프사이클 동일**: 모두 "파티룸 세션"이라는 하나의 라이프사이클에 귀속
+
+→ party는 단일 Aggregate (PartyroomData = Aggregate Root)로 유지. 내부 `application/dto/crew/`, `dto/dj/`, `dto/playback/` 하위 패키지로 개념 구분하는 현재 수준이 적정.
 
 ---
 
@@ -437,4 +475,4 @@ cd api && ./gradlew build -x test
 
 ---
 
-**문서 최종 업데이트**: 2026-02-18
+**문서 최종 업데이트**: 2026-02-19
