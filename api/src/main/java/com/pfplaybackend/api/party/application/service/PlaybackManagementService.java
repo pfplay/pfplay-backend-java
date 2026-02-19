@@ -23,6 +23,7 @@ import com.pfplaybackend.api.party.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.party.interfaces.listener.redis.message.DjQueueChangeMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PlaybackStartMessage;
@@ -48,6 +49,7 @@ public class PlaybackManagementService {
     private final PlaybackDomainService playbackDomainService;
     private final DjDomainService djDomainService;
     private final PlaybackInfoService playbackInfoService;
+    private final PartyroomInfoService partyroomInfoService;
     private final UserActivityPeerService userActivityService;
     private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
@@ -140,6 +142,7 @@ public class PlaybackManagementService {
         scheduleTask(nextPlayback);
         // Propagation Websocket Event
         publishPlaybackChangedEvent(updatedPartyroom.getPartyroomId(), djCrew.getId(), playbackData);
+        publishDjQueueChangeEvent(updatedPartyroom);
     }
 
     private boolean exceedsPlaybackTimeLimit(Partyroom partyroom, Playback playback) {
@@ -159,6 +162,15 @@ public class PlaybackManagementService {
     private void updatePlaybackDeactivation(Partyroom partyroom) {
         partyroomRepository.save(partyroomConverter.toData(partyroom.applyDeactivation()));
         messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION, new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION));
+    }
+
+    private void publishDjQueueChangeEvent(Partyroom partyroom) {
+        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
+                DjQueueChangeMessage.create(
+                        partyroom.getPartyroomId(),
+                        partyroomInfoService.getDjs(partyroom)
+                )
+        );
     }
 
     private Partyroom rotateDjQueue(Partyroom partyroom) {
