@@ -138,6 +138,7 @@ public class Partyroom {
     public Partyroom applyDeactivation() {
         this.isPlaybackActivated = false;
         this.currentPlaybackId = null;
+        this.djSet.stream().filter(Dj::isQueued).forEach(Dj::applyDequeued);
         return this;
     }
 

@@ -6,12 +6,15 @@ import com.pfplaybackend.api.party.application.aspect.context.PartyContext;
 import com.pfplaybackend.api.party.application.dto.base.PartyroomDataDto;
 import com.pfplaybackend.api.party.application.peer.MusicQueryPeerService;
 import com.pfplaybackend.api.party.domain.entity.converter.PartyroomConverter;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Crew;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Partyroom;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.entity.domainmodel.Dj;
 import com.pfplaybackend.api.party.domain.value.*;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
+import com.pfplaybackend.api.user.domain.value.UserId;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.DjException;
@@ -32,6 +35,7 @@ import java.util.Optional;
 public class DjManagementService {
 
     private final PartyroomRepository partyroomRepository;
+    private final DjRepository djRepository;
     private final PartyroomConverter partyroomConverter;
     private final PartyroomDomainService partyroomDomainService;
     private final CrewDomainService crewDomainService;
@@ -43,25 +47,46 @@ public class DjManagementService {
     @Transactional
     public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
         PartyContext partyContext = (PartyContext) ThreadLocalContext.getContext();
-        // ActivePartyroomDto activePartyroom = partyroomInfoService.getMyActivePartyroom();
-        // TODO Do not use 'findById'
+        UserId userId = partyContext.getUserId();
+
+        // 1. Load partyroom and validate
         Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(partyroomId);
         if(optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomDataDto partyroomDataDto = optional.get();
-        PartyroomData partyroomData = partyroomConverter.toEntity(partyroomDataDto);
-        Partyroom partyroom = partyroomConverter.toDomain(partyroomData);
+        Partyroom partyroom = partyroomConverter.toDomain(partyroomConverter.toEntity(optional.get()));
 
         boolean isPostActivationProcessingRequired = !partyroom.isPlaybackActivated();
         if(partyroom.isQueueClosed()) throw ExceptionCreator.create(DjException.QUEUE_CLOSED);
         if(musicQueryService.isEmptyPlaylist(playlistId.getId())) throw ExceptionCreator.create(DjException.EMPTY_PLAYLIST);
+        if(partyroom.getDjSet().stream().anyMatch(dj -> dj.getUserId().equals(userId) && dj.isQueued()))
+            throw ExceptionCreator.create(DjException.ALREADY_REGISTERED);
 
-        // FIXME Direct Add DjData to PartyroomData
-        Partyroom updatedPartyroom = partyroom.createAndAddDj(playlistId, partyContext.getUserId()).applyActivation();
-        PartyroomData updatedPartyroomData = partyroomRepository.save(partyroomConverter.toData(updatedPartyroom));
-        publishDjQueueChangeEvent(partyroomConverter.toDomain(updatedPartyroomData));
+        Crew crew = partyroom.getCrewByUserId(userId).orElseThrow();
+
+        // 2. Insert DjData directly (bypass cascade merge)
+        DjData djData = DjData.builder()
+                .userId(userId)
+                .crewId(new CrewId(crew.getId()))
+                .playlistId(playlistId)
+                .orderNumber(partyroom.getDjSet().size() + 1)
+                .isQueued(true)
+                .build();
+        djData.assignPartyroomData(partyroomRepository.getReferenceById(partyroomId.getId()));
+        djRepository.saveAndFlush(djData);
+
+        // 3. Activate playback on managed entity if needed
+        if(isPostActivationProcessingRequired) {
+            PartyroomData managedPartyroom = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
+            managedPartyroom.applyActivation();
+            partyroomRepository.saveAndFlush(managedPartyroom);
+        }
+
+        // 4. Reload fresh state for events and playback start
+        Optional<PartyroomDataDto> reloaded = partyroomRepository.findPartyroomDto(partyroomId);
+        Partyroom updatedPartyroom = partyroomConverter.toDomain(partyroomConverter.toEntity(reloaded.orElseThrow()));
+        publishDjQueueChangeEvent(updatedPartyroom);
 
         if(isPostActivationProcessingRequired) {
-            playbackManagementService.start(partyroomConverter.toDomain(updatedPartyroomData));
+            playbackManagementService.start(updatedPartyroom);
         }
     }
 

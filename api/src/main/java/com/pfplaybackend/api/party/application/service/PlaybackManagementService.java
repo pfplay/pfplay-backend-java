@@ -23,6 +23,7 @@ import com.pfplaybackend.api.party.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.party.interfaces.listener.redis.message.DjQueueChangeMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PlaybackStartMessage;
@@ -48,6 +49,7 @@ public class PlaybackManagementService {
     private final PlaybackDomainService playbackDomainService;
     private final DjDomainService djDomainService;
     private final PlaybackInfoService playbackInfoService;
+    private final PartyroomInfoService partyroomInfoService;
     private final UserActivityPeerService userActivityService;
     private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
@@ -106,18 +108,48 @@ public class PlaybackManagementService {
 
 
     public void start(Partyroom partyroom) {
+        int maxAttempts = (int) partyroom.getDjSet().stream().filter(Dj::isQueued).count();
+        doStart(partyroom, maxAttempts);
+    }
+
+    private void doStart(Partyroom partyroom, int remainingAttempts) {
         // FIXME All Dj 'orderNumber' bulk update
-        Partyroom updataedPartyroom = rotateDjQueue(partyroom);
-        Dj nextDj = updataedPartyroom.getDjSet().stream().min(Comparator.comparingInt(Dj::getOrderNumber)).orElseThrow();
-        Crew djCrew = updataedPartyroom.getCrewSet().stream().filter(crew -> crew.getUserId().equals(nextDj.getUserId())).toList().get(0);
-        Playback nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(updataedPartyroom.getPartyroomId(), nextDj);
+        Partyroom updatedPartyroom = rotateDjQueue(partyroom);
+        Dj nextDj = updatedPartyroom.getDjSet().stream().min(Comparator.comparingInt(Dj::getOrderNumber)).orElseThrow();
+        Crew djCrew = updatedPartyroom.getCrewSet().stream().filter(crew -> crew.getUserId().equals(nextDj.getUserId())).toList().get(0);
+        Playback nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(updatedPartyroom.getPartyroomId(), nextDj);
+
+        if (exceedsPlaybackTimeLimit(updatedPartyroom, nextPlayback)) {
+            if (remainingAttempts <= 1) {
+                updatePlaybackDeactivation(updatedPartyroom);
+                return;
+            }
+            Optional<PartyroomDataDto> optional = partyroomRepository.findPartyroomDto(updatedPartyroom.getPartyroomId());
+            if (optional.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+            Partyroom reloaded = partyroomConverter.toDomain(partyroomConverter.toEntity(optional.get()));
+            if (djDomainService.isExistDj(reloaded)) {
+                doStart(reloaded, remainingAttempts - 1);
+            } else {
+                updatePlaybackDeactivation(reloaded);
+            }
+            return;
+        }
+
         PlaybackData playbackData = playbackRepository.save(playbackConverter.toData(nextPlayback));
         // Update 'CurrentPlaybackId'
         partyroomRepository.save(partyroomConverter.toData(partyroom.updatePlaybackId(new PlaybackId(playbackData.getId()))));
         // Schedule Task to wait for playback time
         scheduleTask(nextPlayback);
         // Propagation Websocket Event
-        publishPlaybackChangedEvent(updataedPartyroom.getPartyroomId(), djCrew.getId(), playbackData);
+        publishPlaybackChangedEvent(updatedPartyroom.getPartyroomId(), djCrew.getId(), playbackData);
+        publishDjQueueChangeEvent(updatedPartyroom);
+    }
+
+    private boolean exceedsPlaybackTimeLimit(Partyroom partyroom, Playback playback) {
+        int limitMinutes = partyroom.getPlaybackTimeLimit();
+        if (limitMinutes <= 0) return false;
+        long durationSeconds = playbackDomainService.convertToSeconds(playback.getDuration());
+        return durationSeconds > limitMinutes * 60L;
     }
 
     // FIXME CrewId
@@ -130,6 +162,15 @@ public class PlaybackManagementService {
     private void updatePlaybackDeactivation(Partyroom partyroom) {
         partyroomRepository.save(partyroomConverter.toData(partyroom.applyDeactivation()));
         messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION, new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION));
+    }
+
+    private void publishDjQueueChangeEvent(Partyroom partyroom) {
+        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
+                DjQueueChangeMessage.create(
+                        partyroom.getPartyroomId(),
+                        partyroomInfoService.getDjs(partyroom)
+                )
+        );
     }
 
     private Partyroom rotateDjQueue(Partyroom partyroom) {
