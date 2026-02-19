@@ -8,6 +8,7 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.adapter.in.web.payload.response.MyInfoResponse;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
+import com.pfplaybackend.api.common.exception.http.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,10 +24,12 @@ public class UserInfoService {
     public MyInfoResponse getMyInfo() {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         if (authContext.getAuthorityTier() == AuthorityTier.GT) {
-            GuestData guest = guestRepository.findGuestByUserId(authContext.getUserId()).orElseThrow();
+            GuestData guest = guestRepository.findGuestByUserId(authContext.getUserId())
+                    .orElseThrow(() -> new UnauthorizedException("USER_NOT_FOUND", "Guest user not found"));
             return MyInfoResponse.fromGuest(guest);
         } else {
-            MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
+            MemberData member = memberRepository.findByUserId(authContext.getUserId())
+                    .orElseThrow(() -> new UnauthorizedException("USER_NOT_FOUND", "Member user not found"));
             return MyInfoResponse.fromMember(member);
         }
     }
