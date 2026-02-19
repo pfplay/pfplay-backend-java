@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,32 +24,19 @@ public class ApplicationReadyEventListener {
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationEvent() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        boolean isLocalProfileActive = false;
-
-        for (String profile : activeProfiles) {
-            if ("local".equals(profile)) {
-                isLocalProfileActive = true;
-                break;
-            }
+        if (!environment.acceptsProfiles(Profiles.of("prod"))) {
+            avatarResourceInitializeService.addAvatarBodies();
+            avatarResourceInitializeService.addAvatarFaces();
+            avatarResourceInitializeService.addAvatarIcons();
         }
-
-        // TODO Prod 이상 환경에서는 동작 '불필요'
-        // Add AvatarResources
-        avatarResourceInitializeService.addAvatarBodies();
-        avatarResourceInitializeService.addAvatarFaces();
-        avatarResourceInitializeService.addAvatarIcons();
         // FIXME 서비스 간 '구동 순서에 대한 의존 문제'를 해소
         // Add AdminUser
         UserId adminId = adminUserInitializeService.addAdminUser();
         // Add Main Partyroom
         partyroomInitializeService.addPartyroomByAdmin(adminId);
 
-        if (isLocalProfileActive) {
-            System.out.println("Local profile is active");
+        if (environment.acceptsProfiles(Profiles.of("local"))) {
             temporaryUserInitializeService.addTemporaryUsers();
-        } else {
-            System.out.println("Local profile is not active");
         }
     }
 }

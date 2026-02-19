@@ -41,8 +41,8 @@ public class UserAvatarDomainService {
             case ROOM_ACT -> {
                 return ActivityType.ROOM_ACT;
             }
+            default -> throw new IllegalArgumentException("Unsupported ObtainmentType: " + obtainmentType);
         }
-        return null;
     }
 
     public AvatarIconUri findAvatarIconPairWithSingleBody(AvatarBodyDto avatarBodyDto) {
@@ -56,7 +56,6 @@ public class UserAvatarDomainService {
             AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByFaceUri(avatarFaceUri);
             return new AvatarIconUri(avatarIconDto.getResourceUri());
         }else {
-            // FIXME
             return new AvatarIconUri(avatarFaceUri.getAvatarFaceUri());
         }
     }

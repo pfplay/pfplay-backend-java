@@ -5,6 +5,7 @@ import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
 import com.pfplaybackend.api.auth.adapter.in.web.dto.request.OAuthLoginRequest;
 import com.pfplaybackend.api.auth.adapter.in.web.dto.response.AuthResponse;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
+import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.common.exception.AuthenticationException;
 import com.pfplaybackend.api.user.application.service.MemberSignService;
@@ -47,7 +48,8 @@ public class AuthService {
             );
 
             // 3. Get or Create Member
-            MemberData member = memberSignService.getMemberOrCreate(userProfile.getEmail());
+            ProviderType providerType = ProviderType.valueOf(provider.name());
+            MemberData member = memberSignService.getMemberOrCreate(userProfile.getEmail(), providerType);
 
             // 4. Generate JWT tokens
             String accessToken = jwtService.generateAccessTokenForMember(member);

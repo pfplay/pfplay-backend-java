@@ -42,7 +42,6 @@ public class ReactionState {
         if(reactionType.equals(ReactionType.GRAB)) {
             return new ReactionState(true, false, true);
         }
-        // TODO Throw Exception;
-        return null;
+        throw new IllegalArgumentException("Unsupported ReactionType: " + reactionType);
     }
 }

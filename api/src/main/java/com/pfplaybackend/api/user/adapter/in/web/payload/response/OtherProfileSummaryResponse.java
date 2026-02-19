@@ -8,8 +8,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -21,13 +21,11 @@ public class OtherProfileSummaryResponse {
     private List<ActivitySummaryDto> activitySummaries;
 
     public static OtherProfileSummaryResponse from(ProfileSummaryDto profileSummaryDto) {
-        // TODO Code Refactoring
-        List<ActivitySummaryDto> activitySummaries = null;
-        if(profileSummaryDto.getActivitySummaries() != null) {
-            activitySummaries = profileSummaryDto.getActivitySummaries().stream()
-                    .filter(activitySummaryDto -> activitySummaryDto.getActivityType().equals(ActivityType.DJ_PNT))
-                    .toList();
-        }
+        List<ActivitySummaryDto> activitySummaries = Optional.ofNullable(profileSummaryDto.getActivitySummaries())
+                .map(list -> list.stream()
+                        .filter(a -> a.getActivityType().equals(ActivityType.DJ_PNT))
+                        .toList())
+                .orElse(List.of());
         return OtherProfileSummaryResponse.builder()
                 .nickname(profileSummaryDto.getNickname())
                 .introduction(profileSummaryDto.getIntroduction())

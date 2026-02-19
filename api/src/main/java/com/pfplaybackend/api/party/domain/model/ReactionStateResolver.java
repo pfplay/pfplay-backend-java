@@ -85,8 +85,7 @@ public class ReactionStateResolver {
         if(reactionType.equals(ReactionType.GRAB)) {
             return grabCombinationTable.get(reactionState);
         }
-        // TODO Throw Exception;
-        return null;
+        throw new IllegalArgumentException("Unsupported ReactionType: " + reactionType);
     }
 
     public static ResolvedReaction resolve(ReactionState reactionState) {

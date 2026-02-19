@@ -35,7 +35,6 @@ public class PartyroomSessionCacheManager implements SessionCachePort {
                     throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
                 }
                 PartyroomSessionDto sessionData = PartyroomSessionDto.get();
-                // TODO Value: "crewInfo", Key: "sessionId"
                 redisTemplate.opsForValue().set(sessionId, sessionData);
             }
         }

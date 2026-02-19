@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DjWithProfileDto {
-    // FIXME Change to crewId
     private long crewId;
     private long orderNumber;
     private String nickname;
