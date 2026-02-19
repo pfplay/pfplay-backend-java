@@ -20,14 +20,15 @@ public class PartyContextAspect {
 
     @Around("contextRequiredMethods()")
     public Object aroundServiceMethods(ProceedingJoinPoint joinPoint) throws Throwable {
+        boolean isOutermost = ThreadLocalContext.getContext() == null;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication instanceof CustomJwtAuthenticationToken token) {
+        if (isOutermost && authentication instanceof CustomJwtAuthenticationToken token) {
             ThreadLocalContext.setContext(AuthContext.create(token));
         }
         try {
             return joinPoint.proceed();
         } finally {
-            ThreadLocalContext.clearContext();
+            if (isOutermost) ThreadLocalContext.clearContext();
         }
     }
 }
