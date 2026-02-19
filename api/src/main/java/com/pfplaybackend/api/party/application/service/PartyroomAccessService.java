@@ -23,6 +23,8 @@ import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.domain.exception.PenaltyException;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -31,8 +33,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
@@ -41,6 +46,8 @@ public class PartyroomAccessService {
 
     private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
+    private final CrewRepository crewRepository;
+    private final DjRepository djRepository;
     private final PartyroomDomainService partyroomDomainService;
     private final PartyroomInfoService partyroomInfoService;
     private final UserProfilePeerService userProfileService;
@@ -60,15 +67,16 @@ public class PartyroomAccessService {
                             partyroomId.getId(), userId);
                     return ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
                 });
-        log.debug("[tryEnter] Partyroom found - partyroomId={}, isTerminated={}, crewCount={}, djCount={}",
-                partyroomId.getId(), partyroom.isTerminated(),
-                partyroom.getCrewDataSet().size(), partyroom.getDjDataSet().size());
+
+        long activeCrewCount = crewRepository.countByPartyroomDataIdAndIsActiveTrue(partyroomId.getId());
+        log.debug("[tryEnter] Partyroom found - partyroomId={}, isTerminated={}, crewCount={}",
+                partyroomId.getId(), partyroom.isTerminated(), activeCrewCount);
 
         if(partyroom.isTerminated()) {
             log.warn("[tryEnter] ALREADY_TERMINATED - partyroomId={}, userId={}", partyroomId.getId(), userId);
             throw ExceptionCreator.create(PartyroomException.ALREADY_TERMINATED);
         }
-        if(partyroom.isExceededLimit()) throw ExceptionCreator.create(PartyroomException.EXCEEDED_LIMIT);
+        if(activeCrewCount > 49) throw ExceptionCreator.create(PartyroomException.EXCEEDED_LIMIT);
 
         // Validate Crew Condition
         Optional<ActivePartyroomWithCrewDto> optActiveRoomInfo = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
@@ -85,35 +93,37 @@ public class PartyroomAccessService {
                 exit(new PartyroomId(activeRoomInfo.getId()));
             } else {
                 log.info("[tryEnter] Same room re-entry - userId={}, partyroomId={}", userId, partyroomId.getId());
-                CrewData crew = partyroom.getCrewByUserId(userId).orElseThrow();
+                CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)
+                        .orElseThrow();
                 publishAccessChangedEvent(partyroom.getPartyroomId(), crew, userId);
                 return crew;
             }
         }
 
-        addOrActivateCrew(partyroom, userId, authorityTier);
-        PartyroomData savedPartyroomData = partyroomRepository.save(partyroom);
-        // Publish Changed Event
-        CrewData crew = savedPartyroomData.getCrewByUserId(userId).orElseThrow();
+        CrewData crew = addOrActivateCrew(partyroom, userId, authorityTier);
         log.info("[tryEnter] SUCCESS - userId={}, partyroomId={}, crewId={}", userId, partyroomId.getId(), crew.getId());
-        publishAccessChangedEvent(savedPartyroomData.getPartyroomId(), crew, userId);
+        publishAccessChangedEvent(partyroom.getPartyroomId(), crew, userId);
         return crew;
     }
 
-    private void addOrActivateCrew(PartyroomData partyroom, UserId userId, AuthorityTier authorityTier) {
-        if (partyroom.isUserInactiveCrew(userId)) {
-            if(partyroom.isUserBannedCrew(userId)) {
+    private CrewData addOrActivateCrew(PartyroomData partyroom, UserId userId, AuthorityTier authorityTier) {
+        Optional<CrewData> existingCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroom.getId(), userId);
+        if (existingCrew.isPresent() && !existingCrew.get().isActive()) {
+            CrewData crew = existingCrew.get();
+            if(crew.isBanned()) {
                 log.warn("[addOrActivateCrew] PERMANENT_EXPULSION - userId={}, partyroomId={}",
                         userId, partyroom.getPartyroomId().getId());
                 throw ExceptionCreator.create(PenaltyException.PERMANENT_EXPULSION);
             }
             log.info("[addOrActivateCrew] Reactivating inactive crew - userId={}, partyroomId={}",
                     userId, partyroom.getPartyroomId().getId());
-            partyroom.activateCrew(userId);
-        }else {
+            crew.activatePresence();
+            return crewRepository.save(crew);
+        } else {
             log.info("[addOrActivateCrew] Adding new crew - userId={}, partyroomId={}, gradeType=LISTENER",
                     userId, partyroom.getPartyroomId().getId());
-            partyroom.addNewCrew(userId, authorityTier, GradeType.LISTENER);
+            CrewData crew = CrewData.create(partyroom, userId, authorityTier, GradeType.LISTENER);
+            return crewRepository.save(crew);
         }
     }
 
@@ -130,8 +140,8 @@ public class PartyroomAccessService {
 
     @Transactional
     public void enterByHost(UserId hostId, PartyroomData partyroom) {
-        partyroom.addNewCrew(hostId, AuthorityTier.FM, GradeType.HOST);
-        partyroomRepository.save(partyroom);
+        CrewData crew = CrewData.create(partyroom, hostId, AuthorityTier.FM, GradeType.HOST);
+        crewRepository.save(crew);
     }
 
     @Transactional
@@ -146,30 +156,36 @@ public class PartyroomAccessService {
                     return ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
                 });
 
-        Optional<CrewData> optionalCrew = partyroom.getCrewByUserId(authContext.getUserId());
+        Optional<CrewData> optionalCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId());
         if(optionalCrew.isEmpty()) {
-            log.warn("[exit] INVALID_ACTIVE_ROOM - userId={} has no active crew in partyroomId={}. crewSetSize={}",
-                    authContext.getUserId(), partyroomId.getId(), partyroom.getCrewDataSet().size());
+            log.warn("[exit] INVALID_ACTIVE_ROOM - userId={} has no active crew in partyroomId={}",
+                    authContext.getUserId(), partyroomId.getId());
             throw ExceptionCreator.create(CrewException.INVALID_ACTIVE_ROOM);
         }
 
-        CrewData crew = partyroom.deactivateCrewAndGet(authContext.getUserId());
+        CrewData crew = optionalCrew.get();
+        crew.deactivatePresence();
+        crewRepository.save(crew);
 
-        boolean wasInDjQueue = partyroom.getDjDataSet().stream()
-                .anyMatch(dj -> dj.getCrewId().equals(new CrewId(crew.getId())) && dj.isQueued());
+        CrewId crewId = new CrewId(crew.getId());
+        boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), crewId)
+                .map(DjData::isQueued).orElse(false);
 
-        partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
-        partyroomRepository.save(partyroom);
+        boolean wasCurrentDj = false;
+        if (wasInDjQueue) {
+            List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId());
+            wasCurrentDj = queuedDjs.stream()
+                    .anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
+        }
+
+        removeFromDjQueue(partyroomId.getId(), crewId);
 
         if(wasInDjQueue) {
             publishDjQueueChangeEvent(partyroom);
         }
 
-        Optional<DjData> optionalDj = partyroom.getCurrentDj();
-        if(optionalDj.isPresent()) {
-            if(optionalDj.get().getCrewId().equals(new CrewId(crew.getId()))) {
-                playbackManagementService.skipBySystem(partyroomId);
-            }
+        if(wasCurrentDj) {
+            playbackManagementService.skipBySystem(partyroomId);
         }
 
         CrewSummaryDto crewSummaryDto = new CrewSummaryDto(crew.getId());
@@ -183,15 +199,22 @@ public class PartyroomAccessService {
 
     @Transactional
     public void expel(PartyroomData partyroom, CrewData crew, boolean isPermanent)  {
-        partyroom.deactivateCrewAndGet(crew.getUserId());
-        if(isPermanent) partyroom.applyPermanentBan(new CrewId(crew.getId()));
+        crew.deactivatePresence();
+        if(isPermanent) crew.enforceBan();
+        crewRepository.save(crew);
 
-        boolean wasInDjQueue = partyroom.getDjDataSet().stream()
-                .anyMatch(dj -> dj.getCrewId().equals(new CrewId(crew.getId())) && dj.isQueued());
-        boolean wasCurrentDj = partyroom.isCurrentDj(new CrewId(crew.getId()));
+        CrewId crewId = new CrewId(crew.getId());
+        boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroom.getId(), crewId)
+                .map(DjData::isQueued).orElse(false);
 
-        partyroom.tryRemoveInDjQueue(new CrewId(crew.getId()));
-        partyroomRepository.save(partyroom);
+        boolean wasCurrentDj = false;
+        if (partyroom.isPlaybackActivated() && wasInDjQueue) {
+            List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
+            wasCurrentDj = queuedDjs.stream()
+                    .anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
+        }
+
+        removeFromDjQueue(partyroom.getId(), crewId);
 
         if(wasInDjQueue) {
             publishDjQueueChangeEvent(partyroom);
@@ -210,11 +233,24 @@ public class PartyroomAccessService {
         messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS, partyroomAccessMessage);
     }
 
+    private void removeFromDjQueue(Long partyroomId, CrewId crewId) {
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId);
+        AtomicInteger order = new AtomicInteger(1);
+        queuedDjs.forEach(dj -> {
+            if (dj.getCrewId().equals(crewId)) {
+                dj.applyDequeued();
+            } else {
+                dj.updateOrderNumber(order.getAndIncrement());
+            }
+        });
+        djRepository.saveAll(queuedDjs);
+    }
+
     private void publishDjQueueChangeEvent(PartyroomData partyroom) {
         messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
                 DjQueueChangeMessage.create(
                         partyroom.getPartyroomId(),
-                        partyroomInfoService.getDjs(partyroom)
+                        partyroomInfoService.getDjs(partyroom.getId())
                 )
         );
     }

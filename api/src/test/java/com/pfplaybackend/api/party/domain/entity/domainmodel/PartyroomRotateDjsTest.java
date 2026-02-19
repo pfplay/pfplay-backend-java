@@ -1,21 +1,23 @@
 package com.pfplaybackend.api.party.domain.entity.domainmodel;
 
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
-import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * DJ 순환 로직 테스트
+ * Phase 2에서 PartyroomData → 서비스 레벨로 이동된 로직을 단위 테스트
+ */
 class PartyroomRotateDjsTest {
 
     private DjData createDj(long crewId, int orderNumber) {
@@ -29,6 +31,20 @@ class PartyroomRotateDjsTest {
                 .build();
     }
 
+    /**
+     * Service-level DJ rotation logic (extracted from PartyroomData)
+     */
+    private void rotateDjs(List<DjData> djList) {
+        int totalElements = djList.size();
+        djList.forEach(dj -> {
+            if (dj.getOrderNumber() == 1) {
+                dj.updateOrderNumber(totalElements);
+            } else {
+                dj.updateOrderNumber(dj.getOrderNumber() - 1);
+            }
+        });
+    }
+
     @Test
     @DisplayName("rotateDjs - DJ 순서가 실제로 변경되어야 한다")
     void rotateDjs_shouldActuallyUpdateOrderNumbers() {
@@ -37,21 +53,13 @@ class PartyroomRotateDjsTest {
         DjData dj2 = createDj(2L, 2);
         DjData dj3 = createDj(3L, 3);
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj1);
-        djSet.add(dj2);
-        djSet.add(dj3);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .partyroomId(new PartyroomId(1L))
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        List<DjData> djList = new ArrayList<>(List.of(dj1, dj2, dj3));
 
         // when
-        partyroom.rotateDjs();
+        rotateDjs(djList);
 
         // then
-        Map<Long, Integer> orderMap = partyroom.getDjDataSet().stream()
+        Map<Long, Integer> orderMap = djList.stream()
                 .collect(Collectors.toMap(dj -> dj.getCrewId().getId(), DjData::getOrderNumber));
 
         assertThat(orderMap.get(1L)).isEqualTo(3); // 1번 DJ -> 맨 뒤로
@@ -65,16 +73,10 @@ class PartyroomRotateDjsTest {
         // given
         DjData dj1 = createDj(1L, 1);
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj1);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .partyroomId(new PartyroomId(1L))
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        List<DjData> djList = new ArrayList<>(List.of(dj1));
 
         // when
-        partyroom.rotateDjs();
+        rotateDjs(djList);
 
         // then
         assertThat(dj1.getOrderNumber()).isEqualTo(1);

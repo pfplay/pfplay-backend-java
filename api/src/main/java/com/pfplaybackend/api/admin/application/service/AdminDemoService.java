@@ -12,10 +12,15 @@ import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.StageType;
+import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
@@ -56,6 +61,8 @@ public class AdminDemoService {
     private final AdminUserService adminUserService;
     private final MemberRepository memberRepository;
     private final PartyroomRepository partyroomRepository;
+    private final CrewRepository crewRepository;
+    private final DjRepository djRepository;
     private final PartyroomAccessService partyroomAccessService;
     private final PlaylistRepository playlistRepository;
     private final TrackRepository trackRepository;
@@ -71,19 +78,6 @@ public class AdminDemoService {
 
     private final Random random = new Random();
 
-    /**
-     * Initialize complete demo environment
-     * <p>
-     * Process:
-     * 1. Find existing main stage (created during app initialization)
-     * 2. Create 400 virtual members (13 special with playlists)
-     * 3. Create 12 general partyrooms
-     * 4. Enter members into rooms
-     * 5. Register DJs in queue (optional)
-     *
-     * @param request Demo initialization request
-     * @return Demo environment response with created details
-     */
     @Transactional
     public DemoEnvironmentResponse initializeDemoEnvironment(InitializeDemoEnvironmentRequest request) {
         long startTime = System.currentTimeMillis();
@@ -133,9 +127,6 @@ public class AdminDemoService {
         return buildResponse(mainStage, generalRooms, specialMembers, djsRegistered, executionTime);
     }
 
-    /**
-     * Step 1: Create virtual members
-     */
     private void createVirtualMembers(
             List<MemberData> specialMembers,
             List<MemberData> regularMembers,
@@ -145,24 +136,19 @@ public class AdminDemoService {
         for (int i = 0; i < TOTAL_MEMBERS; i++) {
             String nickname = NicknameGenerator.generateUnique(i + 1);
 
-            // Select random body
             AvatarBodyResourceData randomBody = avatarBodies.get(random.nextInt(avatarBodies.size()));
             AvatarBodyUri avatarBody = new AvatarBodyUri(randomBody.getResourceUri());
 
-            // Check isCombinable to determine face assignment
             AvatarFaceUri avatarFace;
             if (randomBody.isCombinable()) {
-                // Combinable body: use NFT face (ava_nft_tmp pattern)
                 avatarFace = generateRandomNftFaceUri();
             } else {
-                // Non-combinable body: no face (SINGLE_BODY)
-                avatarFace = new AvatarFaceUri();  // Empty
+                avatarFace = new AvatarFaceUri();
             }
 
             MemberData member = adminUserService.createVirtualMember(nickname, avatarBody, avatarFace);
 
             if (i < SPECIAL_MEMBERS) {
-                // Special members: create playlist and track
                 createPlaylistAndTrack(member.getUserId());
                 specialMembers.add(member);
                 log.debug("Created special member {}/{}: {} (combinable: {})",
@@ -180,10 +166,6 @@ public class AdminDemoService {
                 specialMembers.size(), regularMembers.size());
     }
 
-    /**
-     * Find existing main stage
-     * Main stage is created during application initialization
-     */
     private PartyroomData findMainStage() {
         PartyroomData mainStage = partyroomRepository.findAll().stream()
                 .filter(p -> p.getStageType() == StageType.MAIN)
@@ -194,15 +176,10 @@ public class AdminDemoService {
         return mainStage;
     }
 
-    /**
-     * Create playlist and track for special member
-     */
     private void createPlaylistAndTrack(UserId userId) {
-        // Create playlist
         PlaylistData playlist = PlaylistData.create(1, "DJ Playlist", PlaylistType.PLAYLIST, userId);
         PlaylistData savedPlaylist = playlistRepository.save(playlist);
 
-        // Add random track
         DemoTrackConstants.TrackInfo track = DemoTrackConstants.getRandomTrack();
         TrackData trackData = TrackData.builder()
                 .playlistData(savedPlaylist)
@@ -216,10 +193,6 @@ public class AdminDemoService {
         trackRepository.save(trackData);
     }
 
-    /**
-     * Step 2: Create general rooms
-     * First special member is for main stage DJ, so hosts start from index 1
-     */
     private List<PartyroomData> createGeneralRooms(
             InitializeDemoEnvironmentRequest request,
             List<MemberData> specialMembers) {
@@ -227,8 +200,6 @@ public class AdminDemoService {
         List<PartyroomData> rooms = new ArrayList<>();
 
         for (int i = 0; i < GENERAL_ROOMS_COUNT; i++) {
-            // First special member (index 0) is main stage DJ
-            // General room hosts start from index 1
             UserId hostUserId = specialMembers.get(i + 1).getUserId();
             String title = String.format("%s %d", request.getTitlePrefix(), i + 1);
             String linkDomain = String.format("demo-room-%d", i + 1);
@@ -254,9 +225,6 @@ public class AdminDemoService {
         return rooms;
     }
 
-    /**
-     * Step 3: Enter members into rooms
-     */
     private void enterMembersIntoRooms(
             PartyroomData mainStage,
             List<PartyroomData> generalRooms,
@@ -265,8 +233,6 @@ public class AdminDemoService {
 
         int memberIndex = 0;
 
-        // Enter members into main stage (50 total, no host since it's pre-created)
-        // Include first special member (main stage DJ) as regular crew
         MemberData mainStageDj = specialMembers.get(0);
         enterMemberAsRegularCrew(mainStage, mainStageDj.getUserId());
 
@@ -276,7 +242,6 @@ public class AdminDemoService {
         }
         log.info("Entered {} crew into main stage (including 1 special member as DJ)", MAIN_STAGE_CREW);
 
-        // Enter members into general rooms (30 each, host already entered, so 29 more each)
         for (int roomIdx = 0; roomIdx < generalRooms.size(); roomIdx++) {
             PartyroomData room = generalRooms.get(roomIdx);
 
@@ -291,20 +256,14 @@ public class AdminDemoService {
                 MAIN_STAGE_CREW + (GENERAL_ROOM_CREW * GENERAL_ROOMS_COUNT), memberIndex);
     }
 
-    /**
-     * Enter a member as regular crew (not HOST)
-     */
     private void enterMemberAsRegularCrew(PartyroomData partyroom, UserId userId) {
         PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
-        loadedPartyroom.addNewCrew(userId, AuthorityTier.FM, GradeType.LISTENER);
-        partyroomRepository.save(loadedPartyroom);
+        CrewData crew = CrewData.create(loadedPartyroom, userId, AuthorityTier.FM, GradeType.LISTENER);
+        crewRepository.save(crew);
     }
 
-    /**
-     * Step 4: Register DJs in queues
-     */
     private int registerDjsInQueues(
             PartyroomData mainStage,
             List<PartyroomData> generalRooms,
@@ -312,11 +271,9 @@ public class AdminDemoService {
 
         int djCount = 0;
 
-        // Register DJ in main stage (first special member)
         registerDjInRoom(mainStage, specialMembers.get(0).getUserId());
         djCount++;
 
-        // Register DJs in general rooms
         for (int i = 0; i < generalRooms.size(); i++) {
             PartyroomData room = generalRooms.get(i);
             UserId hostUserId = specialMembers.get(i + 1).getUserId();
@@ -328,12 +285,7 @@ public class AdminDemoService {
         return djCount;
     }
 
-    /**
-     * Register DJ in room queue
-     * Mimics DjManagementService.enqueueDj() logic
-     */
     private void registerDjInRoom(PartyroomData partyroom, UserId userId) {
-        // Find user's playlist
         Optional<PlaylistData> playlistOpt = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(
                 userId, PlaylistType.PLAYLIST).stream().findFirst();
 
@@ -344,21 +296,35 @@ public class AdminDemoService {
 
         PlaylistData playlist = playlistOpt.get();
 
-        // Load latest partyroom state
         PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
-        // Check if playback activation is required (first DJ)
         boolean isPostActivationProcessingRequired = !loadedPartyroom.isPlaybackActivated();
 
-        // Create and add DJ
-        loadedPartyroom.createAndAddDj(new PlaylistId(playlist.getId()), userId).applyActivation();
+        // Find crew
+        CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(loadedPartyroom.getId(), userId)
+                .orElseThrow();
 
-        PartyroomData savedPartyroomData = partyroomRepository.save(loadedPartyroom);
+        // Check if already registered
+        if (djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(loadedPartyroom.getId(), userId)) {
+            log.warn("DJ already registered for user {}, skipping", userId.getUid());
+            return;
+        }
+
+        // Calculate next order number
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(loadedPartyroom.getId());
+        int nextOrder = queuedDjs.size() + 1;
+
+        // Create and save DJ
+        DjData dj = DjData.create(loadedPartyroom, new PlaylistId(playlist.getId()), userId, new CrewId(crew.getId()), nextOrder);
+        djRepository.save(dj);
+
+        loadedPartyroom.applyActivation();
+        partyroomRepository.save(loadedPartyroom);
 
         // Start playback if this is the first DJ
         if (isPostActivationProcessingRequired) {
-            playbackManagementService.start(savedPartyroomData);
+            playbackManagementService.start(loadedPartyroom);
             log.info("Started playback for partyroom: partyroomId={}, djUserId={}",
                     partyroom.getPartyroomId().getId(), userId.getUid());
         }
@@ -367,9 +333,6 @@ public class AdminDemoService {
                 userId.getUid(), playlist.getId(), partyroom.getPartyroomId().getId());
     }
 
-    /**
-     * Build response
-     */
     private DemoEnvironmentResponse buildResponse(
             PartyroomData mainStage,
             List<PartyroomData> generalRooms,
@@ -377,7 +340,6 @@ public class AdminDemoService {
             int djsRegistered,
             long executionTime) {
 
-        // Build main stage detail (no host, only DJ)
         UserId mainStageDjUserId = specialMembers.get(0).getUserId();
         Long mainStagePlaylistId = findPlaylistId(mainStageDjUserId);
 
@@ -386,13 +348,12 @@ public class AdminDemoService {
                 .stageType(mainStage.getStageType().name())
                 .title(mainStage.getTitle())
                 .linkDomain(mainStage.getLinkDomain())
-                .hostUserId(null)  // Main stage has no designated host
+                .hostUserId(null)
                 .totalCrewCount(MAIN_STAGE_CREW)
                 .djUserId(mainStageDjUserId.getUid().toString())
                 .playlistId(mainStagePlaylistId)
                 .build();
 
-        // Build general rooms details (each has host who is also DJ)
         List<DemoEnvironmentResponse.PartyroomDetail> generalRoomDetails = new ArrayList<>();
         for (int i = 0; i < generalRooms.size(); i++) {
             PartyroomData room = generalRooms.get(i);
@@ -424,32 +385,20 @@ public class AdminDemoService {
                 .build();
     }
 
-    /**
-     * Find playlist ID for user
-     */
     private Long findPlaylistId(UserId userId) {
         Optional<PlaylistData> playlistOpt = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(
                 userId, PlaylistType.PLAYLIST).stream().findFirst();
         return playlistOpt.map(PlaylistData::getId).orElse(null);
     }
 
-    /**
-     * Generate random NFT face URI
-     * Pattern: ava_nft_tmp_001.png to ava_nft_tmp_030.png
-     *
-     * @return AvatarFaceUri with random NFT face URI
-     */
     private AvatarFaceUri generateRandomNftFaceUri() {
-        int faceNumber = random.nextInt(30) + 1;  // 1 to 30
+        int faceNumber = random.nextInt(30) + 1;
         String faceFileName = String.format("ava_nft_tmp_%03d.png", faceNumber);
         String faceUri = "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/" +
                 "ava_nft_tmp%2F" + faceFileName + "?alt=media";
         return new AvatarFaceUri(faceUri);
     }
 
-    /**
-     * Check if demo environment is initialized
-     */
     @Transactional(readOnly = true)
     public DemoEnvironmentStatusResponse getDemoEnvironmentStatus() {
         long virtualMemberCount = memberRepository.countByProviderType(ProviderType.ADMIN);
@@ -466,22 +415,23 @@ public class AdminDemoService {
                 .build();
     }
 
-    /**
-     * Get all active partyrooms for admin
-     */
     @Transactional(readOnly = true)
     public AdminPartyroomListResponse getPartyrooms() {
         List<AdminPartyroomListResponse.PartyroomItem> items = partyroomRepository.findAll().stream()
                 .filter(p -> !p.isTerminated())
-                .map(p -> AdminPartyroomListResponse.PartyroomItem.builder()
-                        .partyroomId(p.getId())
-                        .stageType(p.getStageType().name())
-                        .title(p.getTitle())
-                        .linkDomain(p.getLinkDomain())
-                        .crewCount(p.getCrewDataSet() != null ? p.getCrewDataSet().size() : 0)
-                        .djCount(p.getDjDataSet() != null ? p.getDjDataSet().size() : 0)
-                        .isPlaybackActivated(p.isPlaybackActivated())
-                        .build())
+                .map(p -> {
+                    int crewCount = (int) crewRepository.countByPartyroomDataIdAndIsActiveTrue(p.getId());
+                    int djCount = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(p.getId()).size();
+                    return AdminPartyroomListResponse.PartyroomItem.builder()
+                            .partyroomId(p.getId())
+                            .stageType(p.getStageType().name())
+                            .title(p.getTitle())
+                            .linkDomain(p.getLinkDomain())
+                            .crewCount(crewCount)
+                            .djCount(djCount)
+                            .isPlaybackActivated(p.isPlaybackActivated())
+                            .build();
+                })
                 .toList();
 
         return AdminPartyroomListResponse.builder()

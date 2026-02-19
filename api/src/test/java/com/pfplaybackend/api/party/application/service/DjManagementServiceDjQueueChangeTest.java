@@ -14,6 +14,8 @@ import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.service.CrewDomainService;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.*;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -26,10 +28,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,6 +39,8 @@ import static org.mockito.Mockito.*;
 class DjManagementServiceDjQueueChangeTest {
 
     @Mock private PartyroomRepository partyroomRepository;
+    @Mock private CrewRepository crewRepository;
+    @Mock private DjRepository djRepository;
     @Mock private PartyroomDomainService partyroomDomainService;
     @Mock private CrewDomainService crewDomainService;
     @Mock private PartyroomInfoService partyroomInfoService;
@@ -81,22 +83,20 @@ class DjManagementServiceDjQueueChangeTest {
                 .isActive(true)
                 .build();
 
-        Set<CrewData> crewSet = new HashSet<>();
-        crewSet.add(crew);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .isQueueClosed(false)
                 .build();
-        partyroomData.assignCrewDataSet(crewSet);
-        partyroomData.assignDjDataSet(new HashSet<>());
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
         when(musicQueryService.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
+        when(djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId.getId(), userId)).thenReturn(false);
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
         when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(List.of(
+        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(List.of(
                 new DjWithProfileDto(1L, 1, "nick1", "icon1")
         ));
 
@@ -128,22 +128,16 @@ class DjManagementServiceDjQueueChangeTest {
                 .isQueued(true)
                 .build();
 
-        Set<CrewData> crewSet = new HashSet<>();
-        crewSet.add(crew);
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .build();
-        partyroomData.assignCrewDataSet(crewSet);
-        partyroomData.assignDjDataSet(djSet);
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(Collections.emptyList());
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(List.of(dj));
+        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(Collections.emptyList());
 
         // when
         djManagementService.dequeueDj(partyroomId);
@@ -175,22 +169,16 @@ class DjManagementServiceDjQueueChangeTest {
                 .isQueued(true)
                 .build();
 
-        Set<CrewData> crewSet = new HashSet<>();
-        crewSet.add(crew);
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .build();
-        partyroomData.assignCrewDataSet(crewSet);
-        partyroomData.assignDjDataSet(djSet);
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(Collections.emptyList());
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(List.of(dj));
+        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(Collections.emptyList());
 
         // when
         djManagementService.dequeueDj(partyroomId);
@@ -218,21 +206,17 @@ class DjManagementServiceDjQueueChangeTest {
                 .isQueued(true)
                 .build();
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(targetDj);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .build();
-        partyroomData.assignDjDataSet(djSet);
-        partyroomData.assignCrewDataSet(new HashSet<>());
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(crewDomainService.isBelowManagerGrade(any(PartyroomData.class), eq(adminUserId))).thenReturn(false);
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(Collections.emptyList());
+        when(crewDomainService.isBelowManagerGrade(partyroomId.getId(), adminUserId)).thenReturn(false);
+        when(djRepository.findById(djId.getId())).thenReturn(Optional.of(targetDj));
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(List.of(targetDj));
+        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(Collections.emptyList());
 
         // when
         djManagementService.dequeueDj(partyroomId, djId);

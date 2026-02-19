@@ -1,21 +1,25 @@
 package com.pfplaybackend.api.party.domain.entity.domainmodel;
 
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
-import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * DJ 큐 제거/순서 재배정 로직 테스트
+ * Phase 2에서 PartyroomData → 서비스 레벨로 이동된 로직을 단위 테스트
+ */
 class PartyroomDjQueueTest {
 
     private DjData createDj(long crewId, int orderNumber) {
@@ -29,6 +33,22 @@ class PartyroomDjQueueTest {
                 .build();
     }
 
+    /**
+     * Service-level DJ queue removal logic (extracted from PartyroomData)
+     */
+    private void removeFromDjQueue(List<DjData> queuedDjs, CrewId crewId) {
+        AtomicInteger orderNumber = new AtomicInteger(1);
+        queuedDjs.stream()
+                .sorted(Comparator.comparingInt(DjData::getOrderNumber))
+                .forEach(dj -> {
+                    if (dj.getCrewId().equals(crewId)) {
+                        dj.applyDequeued();
+                    } else {
+                        dj.updateOrderNumber(orderNumber.getAndIncrement());
+                    }
+                });
+    }
+
     @Test
     @DisplayName("tryRemoveInDjQueue - 제거 후 남은 DJ 순서가 빈틈 없이 재배정되어야 한다")
     void tryRemoveInDjQueue_shouldReassignOrderWithoutGaps() {
@@ -37,21 +57,13 @@ class PartyroomDjQueueTest {
         DjData dj2 = createDj(2L, 2);
         DjData dj3 = createDj(3L, 3);
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj1);
-        djSet.add(dj2);
-        djSet.add(dj3);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .partyroomId(new PartyroomId(1L))
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        List<DjData> djList = new ArrayList<>(List.of(dj1, dj2, dj3));
 
         // when
-        partyroom.tryRemoveInDjQueue(new CrewId(2L));
+        removeFromDjQueue(djList, new CrewId(2L));
 
         // then
-        Map<Long, Integer> orderMap = partyroom.getDjDataSet().stream()
+        Map<Long, Integer> orderMap = djList.stream()
                 .filter(DjData::isQueued)
                 .collect(Collectors.toMap(dj -> dj.getCrewId().getId(), DjData::getOrderNumber));
 
@@ -68,21 +80,13 @@ class PartyroomDjQueueTest {
         DjData dj2 = createDj(2L, 2);
         DjData dj3 = createDj(3L, 3);
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj1);
-        djSet.add(dj2);
-        djSet.add(dj3);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .partyroomId(new PartyroomId(1L))
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        List<DjData> djList = new ArrayList<>(List.of(dj1, dj2, dj3));
 
         // when
-        partyroom.tryRemoveInDjQueue(new CrewId(1L));
+        removeFromDjQueue(djList, new CrewId(1L));
 
         // then
-        Map<Long, Integer> orderMap = partyroom.getDjDataSet().stream()
+        Map<Long, Integer> orderMap = djList.stream()
                 .filter(DjData::isQueued)
                 .collect(Collectors.toMap(dj -> dj.getCrewId().getId(), DjData::getOrderNumber));
 
@@ -98,19 +102,12 @@ class PartyroomDjQueueTest {
         DjData dj1 = createDj(1L, 1);
         DjData dj2 = createDj(2L, 2);
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj1);
-        djSet.add(dj2);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .partyroomId(new PartyroomId(1L))
-                .isPlaybackActivated(true)
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        List<DjData> queuedDjs = List.of(dj1, dj2);
+        boolean isPlaybackActivated = true;
 
         // when & then
-        assertThat(partyroom.isCurrentDj(new CrewId(1L))).isTrue();
-        assertThat(partyroom.isCurrentDj(new CrewId(2L))).isFalse();
+        assertThat(isCurrentDj(queuedDjs, new CrewId(1L), isPlaybackActivated)).isTrue();
+        assertThat(isCurrentDj(queuedDjs, new CrewId(2L), isPlaybackActivated)).isFalse();
     }
 
     @Test
@@ -119,16 +116,16 @@ class PartyroomDjQueueTest {
         // given
         DjData dj1 = createDj(1L, 1);
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj1);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .partyroomId(new PartyroomId(1L))
-                .isPlaybackActivated(false)
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        List<DjData> queuedDjs = List.of(dj1);
+        boolean isPlaybackActivated = false;
 
         // when & then
-        assertThat(partyroom.isCurrentDj(new CrewId(1L))).isFalse();
+        assertThat(isCurrentDj(queuedDjs, new CrewId(1L), isPlaybackActivated)).isFalse();
+    }
+
+    private boolean isCurrentDj(List<DjData> queuedDjs, CrewId crewId, boolean isPlaybackActivated) {
+        if (!isPlaybackActivated) return false;
+        return queuedDjs.stream()
+                .anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
     }
 }

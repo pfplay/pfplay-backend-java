@@ -77,12 +77,12 @@ public class PartyroomInfoController {
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(new PartyroomId(partyroomId));
         boolean isPlaybackActivated = partyroom.isPlaybackActivated();
         QueueStatus queueStatus = partyroom.isQueueClosed() ? QueueStatus.CLOSE :  QueueStatus.OPEN;
-        boolean isRegistered = partyroomInfoService.isAlreadyRegistered(partyroom);
+        boolean isRegistered = partyroomInfoService.isAlreadyRegistered(partyroom.getId());
         PlaybackData playback = null;
         if(isPlaybackActivated) {
             playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
         }
-        List<DjWithProfileDto> djWithProfiles = partyroomInfoService.getDjs(partyroom);
+        List<DjWithProfileDto> djWithProfiles = partyroomInfoService.getDjs(partyroom.getId());
         return ResponseEntity.ok().body(QueryDjQueueResponse.from(isPlaybackActivated, queueStatus, isRegistered, playback, djWithProfiles));
     }
 }

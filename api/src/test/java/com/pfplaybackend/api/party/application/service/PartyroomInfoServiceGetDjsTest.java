@@ -3,10 +3,10 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.peer.UserProfilePeerService;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
-import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
@@ -17,10 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -31,6 +29,8 @@ import static org.mockito.Mockito.when;
 class PartyroomInfoServiceGetDjsTest {
 
     @Mock private UserProfilePeerService userProfileService;
+    @Mock private CrewRepository crewRepository;
+    @Mock private DjRepository djRepository;
     @InjectMocks private PartyroomInfoService partyroomInfoService;
 
     private DjData createDj(long crewId, int orderNumber, boolean isQueued, UserId userId) {
@@ -56,23 +56,15 @@ class PartyroomInfoServiceGetDjsTest {
     void getDjs_shouldExcludeDequeuedDjs() {
         // given
         UserId user1 = new UserId();
-        UserId user2 = new UserId();
         UserId user3 = new UserId();
 
         DjData queuedDj1 = createDj(1L, 1, true, user1);
-        DjData dequeuedDj = createDj(2L, 0, false, user2);
         DjData queuedDj2 = createDj(3L, 2, true, user3);
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(queuedDj1);
-        djSet.add(dequeuedDj);
-        djSet.add(queuedDj2);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .id(1L)
-                .partyroomId(new PartyroomId(1L))
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        Long partyroomId = 1L;
+        // Only queued DJs are returned by the repository
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId))
+                .thenReturn(List.of(queuedDj1, queuedDj2));
 
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
         profileMap.put(user1, mockProfile("nick1", "icon1"));
@@ -80,7 +72,7 @@ class PartyroomInfoServiceGetDjsTest {
         when(userProfileService.getUsersProfileSetting(anyList())).thenReturn(profileMap);
 
         // when
-        List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroom);
+        List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroomId);
 
         // then
         assertThat(result).hasSize(2);
@@ -95,20 +87,14 @@ class PartyroomInfoServiceGetDjsTest {
         UserId user2 = new UserId();
         UserId user3 = new UserId();
 
-        DjData dj3 = createDj(3L, 3, true, user3);
         DjData dj1 = createDj(1L, 1, true, user1);
         DjData dj2 = createDj(2L, 2, true, user2);
+        DjData dj3 = createDj(3L, 3, true, user3);
 
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj3);
-        djSet.add(dj1);
-        djSet.add(dj2);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .id(1L)
-                .partyroomId(new PartyroomId(1L))
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        Long partyroomId = 1L;
+        // Repository returns in order
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId))
+                .thenReturn(List.of(dj1, dj2, dj3));
 
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
         profileMap.put(user1, mockProfile("nick1", "icon1"));
@@ -117,7 +103,7 @@ class PartyroomInfoServiceGetDjsTest {
         when(userProfileService.getUsersProfileSetting(anyList())).thenReturn(profileMap);
 
         // when
-        List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroom);
+        List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroomId);
 
         // then
         assertThat(result).hasSize(3);
@@ -130,22 +116,15 @@ class PartyroomInfoServiceGetDjsTest {
     @DisplayName("getDjs - 모든 DJ가 dequeued이면 빈 리스트를 반환해야 한다")
     void getDjs_shouldReturnEmptyList_whenAllDjsDequeued() {
         // given
-        UserId user1 = new UserId();
-        DjData dequeuedDj = createDj(1L, 0, false, user1);
-
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dequeuedDj);
-
-        PartyroomData partyroom = PartyroomData.builder()
-                .id(1L)
-                .partyroomId(new PartyroomId(1L))
-                .build();
-        partyroom.assignDjDataSet(djSet);
+        Long partyroomId = 1L;
+        // Repository returns empty for all dequeued
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId))
+                .thenReturn(List.of());
 
         when(userProfileService.getUsersProfileSetting(anyList())).thenReturn(new HashMap<>());
 
         // when
-        List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroom);
+        List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroomId);
 
         // then
         assertThat(result).isEmpty();

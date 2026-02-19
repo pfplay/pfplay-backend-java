@@ -1,20 +1,14 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import com.pfplaybackend.api.party.domain.enums.StageType;
-import com.pfplaybackend.api.party.domain.exception.CrewException;
-import com.pfplaybackend.api.party.domain.exception.DjException;
 import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.UpdateDjQueueStatusRequest;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.UpdatePartyroomRequest;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import jakarta.persistence.*;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.Builder;
@@ -22,9 +16,6 @@ import lombok.Getter;
 import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 @Getter
 @DynamicInsert
@@ -63,12 +54,6 @@ public class PartyroomData extends BaseEntity {
     private String linkDomain;
     // 재생 길이 제약
     private int playbackTimeLimit;
-    
-    @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL)
-    private Set<CrewData> crewDataSet;
-
-    @OneToMany(mappedBy = "partyroomData", cascade = CascadeType.ALL)
-    private Set<DjData> djDataSet;
 
     // 공지사항 내용
     private String noticeContent;
@@ -116,10 +101,6 @@ public class PartyroomData extends BaseEntity {
         this.introduction = introduction;
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
-        // Assign Empty Collection
-        this.crewDataSet = new HashSet<>();
-        this.djDataSet = new HashSet<>();
-        //
         this.noticeContent = noticeContent;
         this.currentPlaybackId = currentPlaybackId;
         this.isPlaybackActivated = isPlaybackActivated;
@@ -129,21 +110,10 @@ public class PartyroomData extends BaseEntity {
         this.updatedAt = updatedAt;
     }
 
-    public PartyroomData assignCrewDataSet(Set<CrewData> crewDataSet) {
-        this.crewDataSet = crewDataSet;
-        return this;
-    }
-
-    public PartyroomData assignDjDataSet(Set<DjData> djDataSet) {
-        this.djDataSet = djDataSet;
-        return this;
-    }
-
     public PartyroomData applyActivation() {
         this.isPlaybackActivated = true;
         return this;
     }
-
 
     // ── Factory Method ──
 
@@ -162,149 +132,7 @@ public class PartyroomData extends BaseEntity {
                 .build();
     }
 
-    // ── Convenience Accessors ──
-
-    public Set<CrewData> getActiveCrewDataSet() {
-        return this.crewDataSet.stream()
-                .filter(CrewData::isActive)
-                .collect(Collectors.toSet());
-    }
-
-    public Set<DjData> getQueuedDjDataSet() {
-        return this.djDataSet.stream()
-                .filter(DjData::isQueued)
-                .collect(Collectors.toSet());
-    }
-
-    // ── Crew Business Methods ──
-
-    public boolean isExceededLimit() {
-        return this.getActiveCrewDataSet().size() > 49;
-    }
-
-    public Optional<CrewData> getCrewByUserId(UserId userId) {
-        return this.crewDataSet.stream()
-                .filter(crew -> crew.getUserId().equals(userId))
-                .findFirst();
-    }
-
-    public PartyroomData addNewCrew(UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
-        CrewData crew = CrewData.create(this, userId, authorityTier, gradeType);
-        this.crewDataSet.add(crew);
-        return this;
-    }
-
-    public PartyroomData activateCrew(UserId userId) {
-        this.crewDataSet.stream()
-                .filter(crew -> crew.getUserId().equals(userId))
-                .forEach(CrewData::activatePresence);
-        return this;
-    }
-
-    public CrewData deactivateCrewAndGet(UserId userId) {
-        this.crewDataSet.stream()
-                .filter(crew -> crew.getUserId().equals(userId))
-                .forEach(CrewData::deactivatePresence);
-        return this.crewDataSet.stream()
-                .filter(crew -> crew.getUserId().equals(userId))
-                .findAny().orElseThrow();
-    }
-
-    public boolean isUserInactiveCrew(UserId userId) {
-        return this.crewDataSet.stream()
-                .anyMatch(crew -> crew.getUserId().equals(userId) && !crew.isActive());
-    }
-
-    public boolean isUserBannedCrew(UserId userId) {
-        return this.crewDataSet.stream()
-                .filter(crew -> crew.getUserId().equals(userId))
-                .findAny().orElseThrow()
-                .isBanned();
-    }
-
-    public CrewData getCrew(CrewId crewId) {
-        return this.crewDataSet.stream()
-                .filter(crew -> crew.getId().equals(crewId.getId()))
-                .findAny()
-                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
-    }
-
-    public void updateCrewGrade(CrewId crewId, GradeType gradeType) {
-        this.crewDataSet.stream()
-                .filter(crew -> crew.getId().equals(crewId.getId()))
-                .forEach(crew -> crew.updateGrade(gradeType));
-    }
-
-    public void applyPermanentBan(CrewId crewId) {
-        this.crewDataSet.stream()
-                .filter(crew -> crew.getId().equals(crewId.getId()))
-                .forEach(CrewData::enforceBan);
-    }
-
-    public void removePermanentBan(CrewId crewId) {
-        this.crewDataSet.stream()
-                .filter(crew -> crew.getId().equals(crewId.getId()))
-                .forEach(CrewData::releaseBan);
-    }
-
-    // ── DJ Business Methods ──
-
-    public PartyroomData createAndAddDj(PlaylistId playlistId, UserId userId) {
-        CrewData crewOfDj = this.getCrewByUserId(userId).orElseThrow();
-        if (this.djDataSet.stream().anyMatch(dj -> dj.getUserId().equals(userId) && dj.isQueued())) {
-            throw ExceptionCreator.create(DjException.ALREADY_REGISTERED);
-        }
-        CrewId crewId = new CrewId(crewOfDj.getId());
-        this.djDataSet.add(DjData.create(this, playlistId, userId, crewId, this.djDataSet.size() + 1));
-        return this;
-    }
-
-    public PartyroomData rotateDjs() {
-        int totalElements = this.djDataSet.size();
-        this.djDataSet.forEach(dj -> {
-            if (dj.getOrderNumber() == 1) {
-                dj.updateOrderNumber(totalElements);
-            } else {
-                dj.updateOrderNumber(dj.getOrderNumber() - 1);
-            }
-        });
-        return this;
-    }
-
-    public void tryRemoveInDjQueue(CrewId crewId) {
-        AtomicInteger orderNumber = new AtomicInteger(1);
-        this.djDataSet.stream()
-                .sorted(Comparator.comparingInt(DjData::getOrderNumber))
-                .forEach(dj -> {
-                    if (dj.getCrewId().equals(crewId)) {
-                        dj.applyDequeued();
-                    } else {
-                        dj.updateOrderNumber(orderNumber.getAndIncrement());
-                    }
-                });
-    }
-
-    public Optional<DjData> getDjById(Long djId) {
-        return this.djDataSet.stream()
-                .filter(dj -> dj.getId() != null && dj.getId().equals(djId))
-                .findFirst();
-    }
-
-    public Optional<DjData> getCurrentDj() {
-        return this.djDataSet.stream()
-                .filter(dj -> dj.getOrderNumber() == 1)
-                .findFirst();
-    }
-
-    public boolean isCurrentDj(CrewId crewId) {
-        if (isPlaybackActivated) {
-            return this.djDataSet.stream()
-                    .anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
-        }
-        return false;
-    }
-
-    // ── Other Business Methods ──
+    // ── Business Methods ──
 
     public PartyroomData updatePlaybackId(PlaybackId playbackId) {
         this.currentPlaybackId = playbackId;
@@ -314,7 +142,6 @@ public class PartyroomData extends BaseEntity {
     public PartyroomData applyDeactivation() {
         this.isPlaybackActivated = false;
         this.currentPlaybackId = null;
-        this.djDataSet.stream().filter(DjData::isQueued).forEach(DjData::applyDequeued);
         return this;
     }
 

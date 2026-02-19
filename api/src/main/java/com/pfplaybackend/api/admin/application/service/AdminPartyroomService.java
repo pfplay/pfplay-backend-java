@@ -18,6 +18,7 @@ import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.party.interfaces.api.rest.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 public class AdminPartyroomService {
 
     private final PartyroomRepository partyroomRepository;
+    private final CrewRepository crewRepository;
     private final PartyroomDomainService partyroomDomainService;
     private final PartyroomAccessService partyroomAccessService;
     private final AdminUserService adminUserService;
@@ -53,19 +55,10 @@ public class AdminPartyroomService {
     // ExecutorService for async reaction simulation
     private final ExecutorService reactionExecutor = Executors.newFixedThreadPool(10);
 
-    /**
-     * Create a single partyroom with designated host
-     * Admin can specify which user will be the HOST
-     *
-     * @param request Admin partyroom creation request with hostUserId
-     * @return Created partyroom information
-     */
     @Transactional
     public AdminPartyroomResponse createPartyroomWithHost(AdminCreatePartyroomRequest request) {
-        // 1. Parse and validate host user ID
         UserId hostUserId = parseUserId(request.getHostUserId());
 
-        // 2. Validate link domain uniqueness
         String linkDomain = request.getLinkDomain();
         if (linkDomain == null || linkDomain.isEmpty()) {
             linkDomain = generateUniqueLinkDomain();
@@ -73,7 +66,6 @@ public class AdminPartyroomService {
             partyroomDomainService.checkIsLinkAddressDuplicated(linkDomain);
         }
 
-        // 3. Create partyroom request
         CreatePartyroomRequest createRequest = new CreatePartyroomRequest(
                 request.getTitle(),
                 request.getIntroduction() != null ? request.getIntroduction() : "",
@@ -81,10 +73,7 @@ public class AdminPartyroomService {
                 request.getPlaybackTimeLimit()
         );
 
-        // 4. Create partyroom
         PartyroomData partyroom = createPartyroom(createRequest, StageType.GENERAL, hostUserId);
-
-        // 5. Enter host into partyroom
         partyroomAccessService.enterByHost(hostUserId, partyroom);
 
         log.info("Admin created partyroom: partyroomId={}, hostUserId={}, title={}",
@@ -93,13 +82,6 @@ public class AdminPartyroomService {
         return AdminPartyroomResponse.from(partyroom, hostUserId.getUid().toString());
     }
 
-    /**
-     * Create bulk preview environment for testing/demo
-     * Creates multiple partyrooms with virtual members
-     *
-     * @param request Bulk creation request
-     * @return Summary of created environment
-     */
     @Transactional
     public BulkPreviewEnvironmentResponse createBulkPreviewEnvironment(BulkPreviewEnvironmentRequest request) {
         long startTime = System.currentTimeMillis();
@@ -110,13 +92,10 @@ public class AdminPartyroomService {
         log.info("Starting bulk preview environment creation: {} partyrooms with {} users each",
                 request.getPartyroomCount(), request.getUsersPerRoom());
 
-        // Create each partyroom with virtual members
         for (int i = 1; i <= request.getPartyroomCount(); i++) {
-            // 1. Generate partyroom details
             String title = String.format("%s %d", request.getTitlePrefix(), i);
             String linkDomain = generateLinkDomainForBulk(request.getLinkDomainPrefix(), i);
 
-            // 2. Create virtual members for this partyroom
             List<MemberData> virtualMembers = new ArrayList<>();
             for (int j = 0; j < request.getUsersPerRoom(); j++) {
                 String nickname = String.format("Virtual_%d_%d", i, j + 1);
@@ -125,10 +104,8 @@ public class AdminPartyroomService {
                 totalVirtualMembers++;
             }
 
-            // 3. First member becomes HOST
             UserId hostUserId = virtualMembers.get(0).getUserId();
 
-            // 4. Create partyroom
             CreatePartyroomRequest createRequest = new CreatePartyroomRequest(
                     title,
                     request.getIntroduction() != null ? request.getIntroduction() : "Preview environment room",
@@ -137,17 +114,13 @@ public class AdminPartyroomService {
             );
 
             PartyroomData partyroom = createPartyroom(createRequest, StageType.GENERAL, hostUserId);
-
-            // 5. Enter HOST
             partyroomAccessService.enterByHost(hostUserId, partyroom);
 
-            // 6. Enter other members as regular crew
             for (int j = 1; j < virtualMembers.size(); j++) {
                 MemberData member = virtualMembers.get(j);
                 enterMemberAsRegularCrew(partyroom, member.getUserId());
             }
 
-            // 7. Build summary
             List<String> crewUserIds = virtualMembers.stream()
                     .map(m -> m.getUserId().getUid().toString())
                     .collect(Collectors.toList());
@@ -184,31 +157,19 @@ public class AdminPartyroomService {
                 .build();
     }
 
-    /**
-     * Create partyroom (internal method)
-     */
     private PartyroomData createPartyroom(CreatePartyroomRequest request, StageType stageType, UserId hostId) {
         PartyroomData partyroom = PartyroomData.create(request, stageType, hostId);
         return partyroomRepository.save(partyroom);
     }
 
-    /**
-     * Enter a member as regular crew (not HOST)
-     */
     private void enterMemberAsRegularCrew(PartyroomData partyroom, UserId userId) {
-        // Load the latest partyroom state
         PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
-        // Add as regular crew with LISTENER grade
-        loadedPartyroom.addNewCrew(userId, AuthorityTier.FM, GradeType.LISTENER);
-
-        partyroomRepository.save(loadedPartyroom);
+        CrewData crew = CrewData.create(loadedPartyroom, userId, AuthorityTier.FM, GradeType.LISTENER);
+        crewRepository.save(crew);
     }
 
-    /**
-     * Generate unique link domain
-     */
     private String generateUniqueLinkDomain() {
         String linkDomain;
         do {
@@ -217,9 +178,6 @@ public class AdminPartyroomService {
         return linkDomain;
     }
 
-    /**
-     * Generate link domain for bulk creation
-     */
     private String generateLinkDomainForBulk(String prefix, int index) {
         if (prefix == null || prefix.isEmpty()) {
             return String.format("preview_%d_%s", index,
@@ -228,16 +186,10 @@ public class AdminPartyroomService {
         return String.format("%s_%d", prefix, index);
     }
 
-    /**
-     * Check if link domain is duplicated
-     */
     private boolean isLinkDomainDuplicated(String linkDomain) {
         return partyroomRepository.findByLinkDomain(linkDomain).isPresent();
     }
 
-    /**
-     * Parse user ID from string
-     */
     private UserId parseUserId(String userIdString) {
         try {
             Long id = Long.parseLong(userIdString);
@@ -247,21 +199,10 @@ public class AdminPartyroomService {
         }
     }
 
-    /**
-     * Simulate reactions in a partyroom with realistic timing
-     * Selects ~70% of crew members (excluding DJ) and makes them react:
-     * - 50% of selected: LIKE reaction with 0-5s random delay
-     * - 50% of selected: GRAB reaction with 0-5s random delay
-     *
-     * @param partyroomId Partyroom ID
-     * @return Simulation result with reaction details
-     */
     public SimulateReactionsResponse simulateReactions(Long partyroomId) {
-        // 1. Load partyroom (in separate transaction to avoid long-running transaction)
         PartyroomData partyroom = partyroomRepository.findById(partyroomId)
                 .orElseThrow(() -> new IllegalArgumentException("Partyroom not found: " + partyroomId));
 
-        // 2. Get current playback
         PlaybackId playbackId = partyroom.getCurrentPlaybackId();
         if (playbackId == null) {
             throw new IllegalStateException("No active playback in partyroom: " + partyroomId);
@@ -270,8 +211,7 @@ public class AdminPartyroomService {
         PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
         UserId djUserId = playback.getUserId();
 
-        // 3. Get crew members excluding DJ
-        List<CrewData> eligibleCrew = partyroom.getActiveCrewDataSet().stream()
+        List<CrewData> eligibleCrew = crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId).stream()
                 .filter(crew -> !crew.getUserId().equals(djUserId))
                 .collect(Collectors.toList());
 
@@ -279,26 +219,22 @@ public class AdminPartyroomService {
             throw new IllegalStateException("No crew members available (excluding DJ)");
         }
 
-        // 4. Select ~70% of eligible crew randomly
         Collections.shuffle(eligibleCrew);
         int selectionCount = Math.max(1, (int) Math.ceil(eligibleCrew.size() * 0.7));
         List<CrewData> selectedCrew = eligibleCrew.subList(0, selectionCount);
 
         log.info("Selected {}/{} crew members for reaction simulation", selectionCount, eligibleCrew.size());
 
-        // 5. Split selected crew 50:50 into LIKE and GRAB groups
         Collections.shuffle(selectedCrew);
         int halfCount = selectedCrew.size() / 2;
         List<CrewData> likeGroup = selectedCrew.subList(0, halfCount);
         List<CrewData> grabGroup = selectedCrew.subList(halfCount, selectedCrew.size());
 
-        // 6. Create async tasks for all reactions
         List<CompletableFuture<SimulateReactionsResponse.SimulatedReaction>> reactionFutures = new ArrayList<>();
 
-        // LIKE reactions
         for (CrewData crew : likeGroup) {
             CompletableFuture<SimulateReactionsResponse.SimulatedReaction> future = CompletableFuture.supplyAsync(() -> {
-                int delayMs = ThreadLocalRandom.current().nextInt(0, 5001); // 0-5000ms
+                int delayMs = ThreadLocalRandom.current().nextInt(0, 5001);
                 try {
                     TimeUnit.MILLISECONDS.sleep(delayMs);
                 } catch (InterruptedException e) {
@@ -317,10 +253,9 @@ public class AdminPartyroomService {
             reactionFutures.add(future);
         }
 
-        // GRAB reactions
         for (CrewData crew : grabGroup) {
             CompletableFuture<SimulateReactionsResponse.SimulatedReaction> future = CompletableFuture.supplyAsync(() -> {
-                int delayMs = ThreadLocalRandom.current().nextInt(0, 5001); // 0-5000ms
+                int delayMs = ThreadLocalRandom.current().nextInt(0, 5001);
                 try {
                     TimeUnit.MILLISECONDS.sleep(delayMs);
                 } catch (InterruptedException e) {
@@ -339,24 +274,21 @@ public class AdminPartyroomService {
             reactionFutures.add(future);
         }
 
-        // 7. Wait for all reactions to complete
         CompletableFuture<Void> allFutures = CompletableFuture.allOf(
                 reactionFutures.toArray(new CompletableFuture[0])
         );
 
         try {
-            allFutures.get(10, TimeUnit.SECONDS); // Max 10 seconds wait
+            allFutures.get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("Error waiting for reaction simulation to complete", e);
             throw new RuntimeException("Reaction simulation failed", e);
         }
 
-        // 8. Collect results
         List<SimulateReactionsResponse.SimulatedReaction> reactions = reactionFutures.stream()
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
 
-        // 9. Get updated playback aggregation
         PlaybackData updatedPlayback = playbackInfoService.getPlaybackById(playbackId);
 
         log.info("Simulated reactions completed: partyroomId={}, playbackId={}, reactions={}, likes={}, grabs={}",

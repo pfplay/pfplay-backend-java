@@ -11,6 +11,8 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.domain.value.UserId;
@@ -23,9 +25,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -36,6 +37,8 @@ class PartyroomAccessServiceTest {
 
     @Mock private RedisMessagePublisher messagePublisher;
     @Mock private PartyroomRepository partyroomRepository;
+    @Mock private CrewRepository crewRepository;
+    @Mock private DjRepository djRepository;
     @Mock private PartyroomDomainService partyroomDomainService;
     @Mock private PartyroomInfoService partyroomInfoService;
     @Mock private UserProfilePeerService userProfileService;
@@ -75,18 +78,15 @@ class PartyroomAccessServiceTest {
                 .isActive(true)
                 .build();
 
-        Set<CrewData> crewSet = new HashSet<>();
-        crewSet.add(crew);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isTerminated(false)
                 .build();
-        partyroomData.assignCrewDataSet(crewSet);
-        partyroomData.assignDjDataSet(new HashSet<>());
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
+        when(crewRepository.countByPartyroomDataIdAndIsActiveTrue(partyroomId.getId())).thenReturn(10L);
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
 
         // 같은 룸에 이미 active
         ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
@@ -111,7 +111,7 @@ class PartyroomAccessServiceTest {
         PartyroomId newRoomId = new PartyroomId(2L);
         PartyroomId oldRoomId = new PartyroomId(1L);
 
-        // 새 룸 PartyroomData — 사용자가 inactive crew로 존재; addOrActivateCrew가 in-place로 reactivate
+        // 새 룸 PartyroomData — 사용자가 inactive crew로 존재; addOrActivateCrew가 reactivate
         CrewData newRoomCrew = CrewData.builder()
                 .id(20L)
                 .userId(userId)
@@ -120,18 +120,14 @@ class PartyroomAccessServiceTest {
                 .isActive(false)
                 .build();
 
-        Set<CrewData> newRoomCrewSet = new HashSet<>();
-        newRoomCrewSet.add(newRoomCrew);
-
         PartyroomData newPartyroomData = PartyroomData.builder()
                 .id(2L)
                 .partyroomId(newRoomId)
                 .isTerminated(false)
                 .build();
-        newPartyroomData.assignCrewDataSet(newRoomCrewSet);
-        newPartyroomData.assignDjDataSet(new HashSet<>());
 
         when(partyroomRepository.findById(newRoomId.getId())).thenReturn(Optional.of(newPartyroomData));
+        when(crewRepository.countByPartyroomDataIdAndIsActiveTrue(newRoomId.getId())).thenReturn(5L);
 
         // 다른 룸에 이미 active
         ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
@@ -148,21 +144,20 @@ class PartyroomAccessServiceTest {
                 .isActive(true)
                 .build();
 
-        Set<CrewData> oldCrewSet = new HashSet<>();
-        oldCrewSet.add(oldCrew);
-
         PartyroomData oldPartyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(oldRoomId)
                 .isTerminated(false)
                 .build();
-        oldPartyroomData.assignCrewDataSet(oldCrewSet);
-        oldPartyroomData.assignDjDataSet(new HashSet<>());
 
         when(partyroomRepository.findById(oldRoomId.getId())).thenReturn(Optional.of(oldPartyroomData));
+        // exit() mock: crew lookup
+        when(crewRepository.findByPartyroomDataIdAndUserId(oldRoomId.getId(), userId)).thenReturn(Optional.of(oldCrew));
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(oldRoomId.getId())).thenReturn(Collections.emptyList());
 
-        // 첫 번째 save(exit) → oldPartyroomData, 두 번째 save(enter) → newPartyroomData (crew already added in-place)
-        when(partyroomRepository.save(any())).thenReturn(oldPartyroomData, newPartyroomData);
+        // addOrActivateCrew mock for new room: inactive crew found → reactivate
+        when(crewRepository.findByPartyroomDataIdAndUserId(newRoomId.getId(), userId)).thenReturn(Optional.of(newRoomCrew));
+        when(crewRepository.save(any(CrewData.class))).thenReturn(newRoomCrew);
 
         ProfileSettingDto profileSettingDto = mock(ProfileSettingDto.class);
         when(userProfileService.getUserProfileSetting(userId)).thenReturn(profileSettingDto);

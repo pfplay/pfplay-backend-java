@@ -14,6 +14,8 @@ import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
 import com.pfplaybackend.api.party.infrastructure.repository.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -26,9 +28,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -39,6 +40,8 @@ class PartyroomAccessServiceDjQueueChangeTest {
 
     @Mock private RedisMessagePublisher messagePublisher;
     @Mock private PartyroomRepository partyroomRepository;
+    @Mock private CrewRepository crewRepository;
+    @Mock private DjRepository djRepository;
     @Mock private PartyroomDomainService partyroomDomainService;
     @Mock private PartyroomInfoService partyroomInfoService;
     @Mock private UserProfilePeerService userProfileService;
@@ -86,22 +89,17 @@ class PartyroomAccessServiceDjQueueChangeTest {
                 .isQueued(true)
                 .build();
 
-        Set<CrewData> crewSet = new HashSet<>();
-        crewSet.add(crew);
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .build();
-        partyroomData.assignCrewDataSet(crewSet);
-        partyroomData.assignDjDataSet(djSet);
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(Collections.emptyList());
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.of(dj));
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(List.of(dj));
+        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(Collections.emptyList());
 
         // when
         partyroomAccessService.exit(partyroomId);
@@ -123,19 +121,16 @@ class PartyroomAccessServiceDjQueueChangeTest {
                 .isActive(true)
                 .build();
 
-        Set<CrewData> crewSet = new HashSet<>();
-        crewSet.add(crew);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(false)
                 .build();
-        partyroomData.assignCrewDataSet(crewSet);
-        partyroomData.assignDjDataSet(new HashSet<>());
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.empty());
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
 
         // when
         partyroomAccessService.exit(partyroomId);
@@ -168,21 +163,15 @@ class PartyroomAccessServiceDjQueueChangeTest {
                 .isQueued(true)
                 .build();
 
-        Set<CrewData> crewSet = new HashSet<>();
-        crewSet.add(targetCrew);
-        Set<DjData> djSet = new HashSet<>();
-        djSet.add(dj);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(true)
                 .build();
-        partyroomData.assignCrewDataSet(crewSet);
-        partyroomData.assignDjDataSet(djSet);
 
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(any(PartyroomData.class))).thenReturn(Collections.emptyList());
+        when(djRepository.findByPartyroomDataIdAndCrewId(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.of(dj));
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomData.getId())).thenReturn(List.of(dj));
+        when(partyroomInfoService.getDjs(partyroomData.getId())).thenReturn(Collections.emptyList());
 
         // when
         partyroomAccessService.expel(partyroomData, targetCrew, false);
@@ -206,18 +195,14 @@ class PartyroomAccessServiceDjQueueChangeTest {
                 .isActive(true)
                 .build();
 
-        Set<CrewData> crewSet = new HashSet<>();
-        crewSet.add(targetCrew);
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
                 .isPlaybackActivated(false)
                 .build();
-        partyroomData.assignCrewDataSet(crewSet);
-        partyroomData.assignDjDataSet(new HashSet<>());
 
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
+        when(djRepository.findByPartyroomDataIdAndCrewId(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.empty());
+        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomData.getId())).thenReturn(Collections.emptyList());
 
         // when
         partyroomAccessService.expel(partyroomData, targetCrew, false);

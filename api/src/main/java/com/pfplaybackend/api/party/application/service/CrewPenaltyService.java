@@ -17,6 +17,7 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.infrastructure.repository.CrewPenaltyHistoryRepository;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.CrewPenaltyMessage;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
@@ -40,6 +41,7 @@ public class CrewPenaltyService {
 
     private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
+    private final CrewRepository crewRepository;
     private final CrewDomainService crewDomainService;
     private final PartyroomAccessService partyroomAccessService;
     private final CrewPenaltyHistoryRepository crewPenaltyHistoryRepository;
@@ -48,15 +50,19 @@ public class CrewPenaltyService {
 
     public List<PenaltyResult> getPenalties(PartyroomId partyroomId) {
         List<CrewPenaltyHistoryData> crewPenaltyHistoryDataList = crewPenaltyHistoryRepository.findAllByPartyroomIdAndReleasedIsFalse(partyroomId);
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
 
-        List<UserId> PunishedUserIds = crewPenaltyHistoryDataList.stream().map(history ->
-                partyroom.getCrew(history.getPunishedCrewId()).getUserId()).toList();
+        List<UserId> PunishedUserIds = crewPenaltyHistoryDataList.stream().map(history -> {
+            CrewData crew = crewRepository.findById(history.getPunishedCrewId().getId())
+                    .orElseThrow();
+            return crew.getUserId();
+        }).toList();
 
         Map<UserId, ProfileSettingDto> map = userProfileService.getUsersProfileSetting(PunishedUserIds);
 
         return crewPenaltyHistoryDataList.stream().map(history -> {
-            UserId userId = partyroom.getCrew(history.getPunishedCrewId()).getUserId();
+            CrewData crew = crewRepository.findById(history.getPunishedCrewId().getId())
+                    .orElseThrow();
+            UserId userId = crew.getUserId();
             ProfileSettingDto profileSettingDto = map.get(userId);
             return PenaltyResult.from(history, profileSettingDto);
         }).toList();
@@ -65,21 +71,24 @@ public class CrewPenaltyService {
     @Transactional
     public void addPenalty(PartyroomId partyroomId, PunishPenaltyRequest request) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+        partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
         CrewId punishedCrewId = new CrewId(request.getCrewId());
-        CrewData punisherCrew = partyroom.getCrewByUserId(authContext.getUserId()).orElseThrow();
-        CrewData punishedCrew = partyroom.getCrew(punishedCrewId);
+        CrewData punisherCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId())
+                .orElseThrow();
+        CrewData punishedCrew = crewRepository.findById(punishedCrewId.getId())
+                .orElseThrow();
         GradeType punishedGradeType = punishedCrew.getGradeType();
         PenaltyType penaltyType = request.getPenaltyType();
 
         // 권한 검증
-        if(crewDomainService.isBelowManagerGrade(partyroom, authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
-        if(crewDomainService.isAdjusterGradeLowerThanSubject(partyroom, authContext.getUserId(), punishedCrewId)) throw ExceptionCreator.create(GradeException.GRADE_INSUFFICIENT_FOR_OPERATION);
-        if(crewDomainService.isTargetGradeExceedingAdjuster(partyroom, authContext.getUserId(), punishedGradeType)) throw ExceptionCreator.create(GradeException.GRADE_EXCEEDS_ALLOWED_THRESHOLD);
+        if(crewDomainService.isBelowManagerGrade(partyroomId.getId(), authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
+        if(crewDomainService.isAdjusterGradeLowerThanSubject(partyroomId.getId(), authContext.getUserId(), punishedCrewId)) throw ExceptionCreator.create(GradeException.GRADE_INSUFFICIENT_FOR_OPERATION);
+        if(crewDomainService.isTargetGradeExceedingAdjuster(partyroomId.getId(), authContext.getUserId(), punishedGradeType)) throw ExceptionCreator.create(GradeException.GRADE_EXCEEDS_ALLOWED_THRESHOLD);
 
         // 페널티 부과
+        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
         if(penaltyType.equals(PenaltyType.CHAT_BAN_30_SECONDS)) recordInShortTime(punishedCrewId.getId());
         if(penaltyType.equals(PenaltyType.ONE_TIME_EXPULSION)) partyroomAccessService.expel(partyroom, punishedCrew, false);
         if(penaltyType.equals(PenaltyType.PERMANENT_EXPULSION)) partyroomAccessService.expel(partyroom, punishedCrew, true);
@@ -108,20 +117,25 @@ public class CrewPenaltyService {
 
     public void releaseCrewPenalty(PartyroomId partyroomId, Long penaltyId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+        partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
-        if(crewDomainService.isBelowManagerGrade(partyroom, authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
+        if(crewDomainService.isBelowManagerGrade(partyroomId.getId(), authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
 
         CrewPenaltyHistoryData historyData = crewPenaltyHistoryRepository.findByIdAndPartyroomIdAndReleasedIsFalse(penaltyId, partyroomId)
                 .orElseThrow(() -> ExceptionCreator.create(PenaltyException.PENALTY_HISTORY_NOT_FOUND));
 
-        // 1.
-        partyroom.removePermanentBan(historyData.getPunishedCrewId());
-        partyroomRepository.save(partyroom);
-        // 2.
+        // 1. Release ban on crew
+        CrewData crew = crewRepository.findById(historyData.getPunishedCrewId().getId())
+                .orElseThrow();
+        crew.releaseBan();
+        crewRepository.save(crew);
+
+        // 2. Update history
+        CrewData releaserCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId())
+                .orElseThrow();
         historyData.setReleased(true);
-        historyData.setReleasedByCrewId(new CrewId(partyroom.getCrewByUserId(authContext.getUserId()).orElseThrow().getId()));
+        historyData.setReleasedByCrewId(new CrewId(releaserCrew.getId()));
         historyData.setReleaseDate(LocalDateTime.now());
         crewPenaltyHistoryRepository.save(historyData);
     }

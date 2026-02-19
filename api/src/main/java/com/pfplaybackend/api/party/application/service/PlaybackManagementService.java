@@ -18,6 +18,8 @@ import com.pfplaybackend.api.party.domain.service.PlaybackDomainService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.party.infrastructure.repository.CrewRepository;
+import com.pfplaybackend.api.party.infrastructure.repository.DjRepository;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.party.interfaces.listener.redis.message.PlaybackStartMessage;
@@ -30,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -44,6 +46,8 @@ public class PlaybackManagementService {
     private final UserActivityPeerService userActivityService;
     private final RedisMessagePublisher messagePublisher;
     private final PartyroomRepository partyroomRepository;
+    private final CrewRepository crewRepository;
+    private final DjRepository djRepository;
     private final ExpirationTaskScheduler scheduleService;
     private final CrewDomainService crewDomainService;
 
@@ -69,8 +73,7 @@ public class PlaybackManagementService {
     public void skipByManager(PartyroomId partyroomId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         ActivePartyroomDto activePartyroomDto = partyroomRepository.getActivePartyroomByUserId(authContext.getUserId()).orElseThrow();
-        PartyroomData partyroom = partyroomRepository.findById(activePartyroomDto.getId()).orElseThrow();
-        if(crewDomainService.isBelowManagerGrade(partyroom, authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
+        if(crewDomainService.isBelowManagerGrade(activePartyroomDto.getId(), authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
         cancelTask(partyroomId);
         tryProceed(partyroomId);
     }
@@ -85,7 +88,7 @@ public class PlaybackManagementService {
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
-        if(djDomainService.isExistDj(partyroom)) {
+        if(djDomainService.isExistDj(partyroomId.getId())) {
             start(partyroom);
         }else{
             updatePlaybackDeactivation(partyroom);
@@ -93,24 +96,28 @@ public class PlaybackManagementService {
     }
 
     public void start(PartyroomData partyroom) {
-        int maxAttempts = (int) partyroom.getDjDataSet().stream().filter(DjData::isQueued).count();
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
+        int maxAttempts = queuedDjs.size();
         doStart(partyroom, maxAttempts);
     }
 
     private void doStart(PartyroomData partyroom, int remainingAttempts) {
-        PartyroomData updatedPartyroom = rotateDjQueue(partyroom);
-        DjData nextDj = updatedPartyroom.getDjDataSet().stream().min(Comparator.comparingInt(DjData::getOrderNumber)).orElseThrow();
-        CrewData djCrew = updatedPartyroom.getCrewDataSet().stream().filter(crew -> crew.getUserId().equals(nextDj.getUserId())).toList().get(0);
-        PlaybackData nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(updatedPartyroom.getPartyroomId(), nextDj);
+        rotateDjQueue(partyroom);
 
-        if (exceedsPlaybackTimeLimit(updatedPartyroom, nextPlayback)) {
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
+        DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
+        CrewData djCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroom.getId(), nextDj.getUserId())
+                .orElseThrow();
+        PlaybackData nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj);
+
+        if (exceedsPlaybackTimeLimit(partyroom, nextPlayback)) {
             if (remainingAttempts <= 1) {
-                updatePlaybackDeactivation(updatedPartyroom);
+                updatePlaybackDeactivation(partyroom);
                 return;
             }
-            PartyroomData reloaded = partyroomRepository.findById(updatedPartyroom.getPartyroomId().getId())
+            PartyroomData reloaded = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                     .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-            if (djDomainService.isExistDj(reloaded)) {
+            if (djDomainService.isExistDj(reloaded.getId())) {
                 doStart(reloaded, remainingAttempts - 1);
             } else {
                 updatePlaybackDeactivation(reloaded);
@@ -125,7 +132,7 @@ public class PlaybackManagementService {
         // Schedule Task to wait for playback time
         scheduleTask(nextPlayback);
         // Propagation Websocket Event
-        publishPlaybackChangedEvent(updatedPartyroom.getPartyroomId(), djCrew.getId(), playbackData);
+        publishPlaybackChangedEvent(partyroom.getPartyroomId(), djCrew.getId(), playbackData);
     }
 
     private boolean exceedsPlaybackTimeLimit(PartyroomData partyroom, PlaybackData playback) {
@@ -144,11 +151,23 @@ public class PlaybackManagementService {
     private void updatePlaybackDeactivation(PartyroomData partyroom) {
         partyroom.applyDeactivation();
         partyroomRepository.save(partyroom);
+        // Bulk dequeue all DJs
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
+        queuedDjs.forEach(DjData::applyDequeued);
+        djRepository.saveAll(queuedDjs);
         messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION, new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION));
     }
 
-    private PartyroomData rotateDjQueue(PartyroomData partyroom) {
-        partyroom.rotateDjs();
-        return partyroomRepository.save(partyroom);
+    private void rotateDjQueue(PartyroomData partyroom) {
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
+        int totalElements = queuedDjs.size();
+        queuedDjs.forEach(dj -> {
+            if (dj.getOrderNumber() == 1) {
+                dj.updateOrderNumber(totalElements);
+            } else {
+                dj.updateOrderNumber(dj.getOrderNumber() - 1);
+            }
+        });
+        djRepository.saveAll(queuedDjs);
     }
 }
