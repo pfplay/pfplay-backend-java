@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.auth.enums;
+package com.pfplaybackend.api.auth.domain.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

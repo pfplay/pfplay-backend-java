@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.auth.dto;
+package com.pfplaybackend.api.auth.application.dto;
 
 import lombok.Builder;
 import lombok.Data;

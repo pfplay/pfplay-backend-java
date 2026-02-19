@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.auth.dto.request;
+package com.pfplaybackend.api.auth.adapter.in.web.dto.request;
 
-import com.pfplaybackend.api.auth.validation.ValidProvider;
+import com.pfplaybackend.api.auth.adapter.in.web.validation.ValidProvider;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

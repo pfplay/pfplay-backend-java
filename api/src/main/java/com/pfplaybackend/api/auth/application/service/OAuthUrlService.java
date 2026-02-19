@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.auth.application.service;
 
-import com.pfplaybackend.api.auth.application.store.StateStore;
-import com.pfplaybackend.api.auth.dto.response.OAuthUrlResponse;
-import com.pfplaybackend.api.auth.enums.OAuthProvider;
+import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
+import com.pfplaybackend.api.auth.adapter.in.web.dto.response.OAuthUrlResponse;
+import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.jwt.properties.OAuth2Properties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import java.util.Base64;
 public class OAuthUrlService {
 
     private final OAuth2Properties oAuth2Properties;
-    private final StateStore stateStore;
+    private final StateStorePort stateStorePort;
 
     /**
      * OAuth 인증 URL 생성
@@ -27,7 +27,7 @@ public class OAuthUrlService {
         OAuth2Properties.Provider config = getProviderConfig(provider);
 
         // State 생성 및 Redis에 저장
-        String state = stateStore.generateAndStoreState(provider.getValue());
+        String state = stateStorePort.generateAndStoreState(provider.getValue());
 
         // Code Challenge 생성 (PKCE)
         String codeChallenge = generateCodeChallenge(codeVerifier);
@@ -49,7 +49,7 @@ public class OAuthUrlService {
      * State 검증 및 제거
      */
     public boolean validateAndConsumeState(String state, OAuthProvider provider, String codeVerifier) {
-        return stateStore.validateAndConsumeState(state, provider.getValue());
+        return stateStorePort.validateAndConsumeState(state, provider.getValue());
     }
 
     private String buildAuthUrl(OAuthProvider provider, OAuth2Properties.Provider config,

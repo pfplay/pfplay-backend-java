@@ -5,7 +5,7 @@ import com.pfplaybackend.api.admin.adapter.in.web.dto.request.InitializeDemoEnvi
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.AdminPartyroomListResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentStatusResponse;
-import com.pfplaybackend.api.admin.util.NicknameGenerator;
+import com.pfplaybackend.api.admin.application.util.NicknameGenerator;
 import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarBodyResourceRepository;
 import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarFaceResourceRepository;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;

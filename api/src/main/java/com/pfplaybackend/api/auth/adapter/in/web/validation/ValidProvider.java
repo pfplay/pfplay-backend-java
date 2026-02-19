@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.auth.validation;
+package com.pfplaybackend.api.auth.adapter.in.web.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

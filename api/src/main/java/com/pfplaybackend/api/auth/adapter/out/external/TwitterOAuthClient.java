@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.auth.adapter.out.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pfplaybackend.api.auth.dto.response.OAuthTokenResponse;
-import com.pfplaybackend.api.auth.dto.OAuthUserProfile;
+import com.pfplaybackend.api.auth.application.dto.OAuthTokenResponse;
+import com.pfplaybackend.api.auth.application.dto.OAuthUserProfile;
 import com.pfplaybackend.api.common.config.security.jwt.properties.OAuth2Properties;
 import com.pfplaybackend.api.common.exception.OAuthException;
 import lombok.Data;

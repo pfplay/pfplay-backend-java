@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.admin.util;
+package com.pfplaybackend.api.admin.application.util;
 
 import java.util.Arrays;
 import java.util.List;

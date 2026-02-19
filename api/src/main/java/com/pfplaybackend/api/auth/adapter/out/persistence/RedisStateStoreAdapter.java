@@ -1,5 +1,6 @@
-package com.pfplaybackend.api.auth.application.store;
+package com.pfplaybackend.api.auth.adapter.out.persistence;
 
+import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class RedisStateStore implements StateStore {
+public class RedisStateStoreAdapter implements StateStorePort {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final SecureRandom secureRandom = new SecureRandom();

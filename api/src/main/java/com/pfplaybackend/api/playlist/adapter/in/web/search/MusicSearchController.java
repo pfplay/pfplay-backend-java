@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.playlist.adapter.in.web.serach;
+package com.pfplaybackend.api.playlist.adapter.in.web.search;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.playlist.application.service.search.MusicSearchService;

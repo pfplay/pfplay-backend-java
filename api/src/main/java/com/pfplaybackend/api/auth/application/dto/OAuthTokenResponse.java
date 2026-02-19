@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.auth.dto.response;
+package com.pfplaybackend.api.auth.application.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

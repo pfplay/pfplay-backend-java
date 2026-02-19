@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.auth.validation;
+package com.pfplaybackend.api.auth.adapter.in.web.validation;
 
-import com.pfplaybackend.api.auth.enums.OAuthProvider;
+import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

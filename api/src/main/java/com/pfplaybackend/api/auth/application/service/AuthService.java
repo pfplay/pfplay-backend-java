@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.auth.application.service;
 
 import com.mysema.commons.lang.Assert;
-import com.pfplaybackend.api.auth.application.store.StateStore;
-import com.pfplaybackend.api.auth.dto.request.OAuthLoginRequest;
-import com.pfplaybackend.api.auth.dto.response.AuthResponse;
-import com.pfplaybackend.api.auth.enums.OAuthProvider;
+import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
+import com.pfplaybackend.api.auth.adapter.in.web.dto.request.OAuthLoginRequest;
+import com.pfplaybackend.api.auth.adapter.in.web.dto.response.AuthResponse;
+import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.common.exception.AuthenticationException;
 import com.pfplaybackend.api.user.application.service.MemberSignService;
@@ -24,7 +24,7 @@ public class AuthService {
     private final OAuthClientService oAuthClientService;
     private final MemberSignService memberSignService;
     private final JwtService jwtService;
-    private final StateStore stateStore;
+    private final StateStorePort stateStorePort;
 
     @Transactional
     public AuthResponse processOAuthLogin(OAuthLoginRequest request) {

@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.auth.config;
+package com.pfplaybackend.api.auth.adapter.out.external.config;
 
 import com.pfplaybackend.api.common.config.security.jwt.properties.WebClientProperties;
 import io.netty.channel.ChannelOption;

@@ -2,9 +2,9 @@ package com.pfplaybackend.api.auth.application.service;
 
 import com.pfplaybackend.api.auth.adapter.out.external.GoogleOAuthClient;
 import com.pfplaybackend.api.auth.adapter.out.external.TwitterOAuthClient;
-import com.pfplaybackend.api.auth.dto.response.OAuthTokenResponse;
-import com.pfplaybackend.api.auth.dto.OAuthUserProfile;
-import com.pfplaybackend.api.auth.enums.OAuthProvider;
+import com.pfplaybackend.api.auth.application.dto.OAuthTokenResponse;
+import com.pfplaybackend.api.auth.application.dto.OAuthUserProfile;
+import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

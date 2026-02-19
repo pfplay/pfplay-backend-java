@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.auth.application.store;
+package com.pfplaybackend.api.auth.application.port.out;
 
-public interface StateStore {
+public interface StateStorePort {
     String generateAndStoreState(String provider);
     boolean validateAndConsumeState(String state, String expectedProvider);
 }
