@@ -15,6 +15,7 @@ import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.service.CrewDomainService;
 import com.pfplaybackend.api.party.domain.service.DjDomainService;
 import com.pfplaybackend.api.party.domain.service.PlaybackDomainService;
+import com.pfplaybackend.api.party.adapter.in.listener.message.DjQueueChangeMessage;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
@@ -50,6 +51,7 @@ public class PlaybackManagementService {
     private final DjRepository djRepository;
     private final ExpirationTaskScheduler scheduleService;
     private final CrewDomainService crewDomainService;
+    private final PartyroomInfoService partyroomInfoService;
 
     private void scheduleTask(PlaybackData playback) {
         long seconds = playbackDomainService.convertToSeconds(playback.getDuration());
@@ -133,13 +135,23 @@ public class PlaybackManagementService {
         scheduleTask(nextPlayback);
         // Propagation Websocket Event
         publishPlaybackChangedEvent(partyroom.getPartyroomId(), djCrew.getId(), playbackData);
+        publishDjQueueChangeEvent(partyroom);
     }
 
     private boolean exceedsPlaybackTimeLimit(PartyroomData partyroom, PlaybackData playback) {
-        int limitSeconds = partyroom.getPlaybackTimeLimit();
-        if (limitSeconds <= 0) return false;
+        int limitMinutes = partyroom.getPlaybackTimeLimit();
+        if (limitMinutes <= 0) return false;
         long durationSeconds = playbackDomainService.convertToSeconds(playback.getDuration());
-        return durationSeconds > limitSeconds;
+        return durationSeconds > limitMinutes * 60L;
+    }
+
+    private void publishDjQueueChangeEvent(PartyroomData partyroom) {
+        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE,
+                DjQueueChangeMessage.create(
+                        partyroom.getPartyroomId(),
+                        partyroomInfoService.getDjs(partyroom.getId())
+                )
+        );
     }
 
     private void publishPlaybackChangedEvent(PartyroomId partyroomId, long crewId, PlaybackData playbackData) {
