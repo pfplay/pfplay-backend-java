@@ -4,6 +4,7 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.QueueStatus;
@@ -13,6 +14,7 @@ import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.event.PartyroomClosedEvent;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
@@ -36,6 +38,7 @@ public class PartyroomManagementService {
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomPlaybackRepository partyroomPlaybackRepository;
+    private final DjQueueRepository djQueueRepository;
     private final PartyroomAccessService partyroomAccessService;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -68,6 +71,7 @@ public class PartyroomManagementService {
                 stageType, hostId);
         PartyroomData saved = partyroomRepository.save(partyroom);
         partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(saved.getId()));
+        djQueueRepository.save(DjQueueData.createFor(saved.getId()));
         return saved;
     }
 
@@ -112,9 +116,11 @@ public class PartyroomManagementService {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        if (request.getQueueStatus().equals(QueueStatus.CLOSE)) partyroom.closeQueue();
-        if (request.getQueueStatus().equals(QueueStatus.OPEN)) partyroom.openQueue();
-        partyroomRepository.save(partyroom);
+        partyroom.validateHost(authContext.getUserId());
+        DjQueueData djQueue = djQueueRepository.findById(partyroomId.getId()).orElseThrow();
+        if (request.getQueueStatus().equals(QueueStatus.CLOSE)) djQueue.close();
+        if (request.getQueueStatus().equals(QueueStatus.OPEN)) djQueue.open();
+        djQueueRepository.save(djQueue);
     }
 
     public void initializeMainStage(UserId adminId) {

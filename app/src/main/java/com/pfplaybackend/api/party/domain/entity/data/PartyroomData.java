@@ -2,7 +2,6 @@ package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.party.domain.enums.StageType;
-import com.pfplaybackend.api.party.domain.exception.DjException;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
@@ -63,8 +62,6 @@ public class PartyroomData extends BaseEntity {
 
     // 공지사항 내용
     private String noticeContent;
-    // 대기열이 닫혔는가 여부
-    private boolean isQueueClosed;
     // 폐쇄되었는가 여부
     private boolean isTerminated;
 
@@ -89,7 +86,7 @@ public class PartyroomData extends BaseEntity {
     @Builder
     public PartyroomData(Long id, PartyroomId partyroomId, UserId hostId, StageType stageType,
                          String title, String introduction, LinkDomain linkDomain, PlaybackTimeLimit playbackTimeLimit,
-                         String noticeContent, boolean isQueueClosed, boolean isTerminated,
+                         String noticeContent, boolean isTerminated,
                          LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.partyroomId = partyroomId;
@@ -100,7 +97,6 @@ public class PartyroomData extends BaseEntity {
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
         this.noticeContent = noticeContent;
-        this.isQueueClosed = isQueueClosed;
         this.isTerminated = isTerminated;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
@@ -118,7 +114,6 @@ public class PartyroomData extends BaseEntity {
                 .linkDomain(linkDomain)
                 .playbackTimeLimit(timeLimit)
                 .noticeContent("")
-                .isQueueClosed(false)
                 .isTerminated(false)
                 .build();
     }
@@ -133,14 +128,6 @@ public class PartyroomData extends BaseEntity {
         return this;
     }
 
-    public void openQueue() {
-        this.isQueueClosed = false;
-    }
-
-    public void closeQueue() {
-        this.isQueueClosed = true;
-    }
-
     // ── Validation Methods ──
 
     public void validateHost(UserId userId) {
@@ -152,12 +139,6 @@ public class PartyroomData extends BaseEntity {
     public void validateNotTerminated() {
         if (this.isTerminated) {
             throw ExceptionCreator.create(PartyroomException.ALREADY_TERMINATED);
-        }
-    }
-
-    public void validateQueueOpen() {
-        if (this.isQueueClosed) {
-            throw ExceptionCreator.create(DjException.QUEUE_CLOSED);
         }
     }
 

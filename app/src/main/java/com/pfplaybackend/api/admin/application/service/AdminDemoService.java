@@ -17,6 +17,7 @@ import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
+import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
@@ -26,6 +27,7 @@ import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
@@ -69,6 +71,7 @@ public class AdminDemoService {
     private final MemberRepository memberRepository;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomPlaybackRepository partyroomPlaybackRepository;
+    private final DjQueueRepository djQueueRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final PartyroomAccessService partyroomAccessService;
@@ -226,6 +229,7 @@ public class AdminDemoService {
                     StageType.GENERAL, hostUserId);
             PartyroomData savedPartyroom = partyroomRepository.save(partyroom);
             partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(savedPartyroom.getId()));
+            djQueueRepository.save(DjQueueData.createFor(savedPartyroom.getId()));
 
             // Enter host
             partyroomAccessService.enterByHost(hostUserId, savedPartyroom);

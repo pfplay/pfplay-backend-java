@@ -3,10 +3,12 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
+import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
@@ -38,6 +40,7 @@ class DjManagementServiceDjQueueChangeTest {
 
     @Mock private PartyroomRepository partyroomRepository;
     @Mock private PartyroomPlaybackRepository partyroomPlaybackRepository;
+    @Mock private DjQueueRepository djQueueRepository;
     @Mock private DjRepository djRepository;
     @Mock private PlaybackManagementService playbackManagementService;
     @Mock private PlaylistQueryPort playlistQueryPort;
@@ -83,14 +86,15 @@ class DjManagementServiceDjQueueChangeTest {
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
-                .isQueueClosed(false)
                 .build();
 
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
         playbackState.activate(null, null);
+        DjQueueData djQueue = DjQueueData.createFor(1L);
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
+        when(djQueueRepository.findById(partyroomId.getId())).thenReturn(Optional.of(djQueue));
         when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
         when(djRepository.existsByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(false);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);

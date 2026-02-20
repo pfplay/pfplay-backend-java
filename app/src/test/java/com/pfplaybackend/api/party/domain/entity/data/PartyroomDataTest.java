@@ -26,38 +26,10 @@ class PartyroomDataTest {
         PartyroomData partyroom = createPartyroom();
 
         // then
-        assertThat(partyroom.isQueueClosed()).isFalse();
         assertThat(partyroom.isTerminated()).isFalse();
         assertThat(partyroom.getNoticeContent()).isEmpty();
         assertThat(partyroom.getTitle()).isEqualTo("Test Room");
         assertThat(partyroom.getStageType()).isEqualTo(StageType.GENERAL);
-    }
-
-    @Test
-    @DisplayName("openQueue — 대기열 열기 시 isQueueClosed가 false가 된다")
-    void openQueue() {
-        // given
-        PartyroomData partyroom = createPartyroom();
-        partyroom.closeQueue();
-
-        // when
-        partyroom.openQueue();
-
-        // then
-        assertThat(partyroom.isQueueClosed()).isFalse();
-    }
-
-    @Test
-    @DisplayName("closeQueue — 대기열 닫기 시 isQueueClosed가 true가 된다")
-    void closeQueue() {
-        // given
-        PartyroomData partyroom = createPartyroom();
-
-        // when
-        partyroom.closeQueue();
-
-        // then
-        assertThat(partyroom.isQueueClosed()).isTrue();
     }
 
     @Test
@@ -92,18 +64,6 @@ class PartyroomDataTest {
 
         // when & then
         assertThatThrownBy(() -> partyroom.validateNotTerminated())
-                .isInstanceOf(ForbiddenException.class);
-    }
-
-    @Test
-    @DisplayName("validateQueueOpen — 대기열이 닫힌 상태에서 검증 시 예외가 발생한다")
-    void validateQueueOpen_closed_throws() {
-        // given
-        PartyroomData partyroom = createPartyroom();
-        partyroom.closeQueue();
-
-        // when & then
-        assertThatThrownBy(() -> partyroom.validateQueueOpen())
                 .isInstanceOf(ForbiddenException.class);
     }
 

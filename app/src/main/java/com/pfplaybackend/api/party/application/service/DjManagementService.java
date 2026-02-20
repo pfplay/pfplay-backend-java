@@ -6,6 +6,7 @@ import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
+import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
@@ -15,6 +16,7 @@ import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.exception.DjException;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
@@ -31,6 +33,7 @@ public class DjManagementService {
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomPlaybackRepository partyroomPlaybackRepository;
+    private final DjQueueRepository djQueueRepository;
     private final DjRepository djRepository;
     private final PlaybackManagementService playbackManagementService;
     private final PlaylistQueryPort playlistQueryPort;
@@ -43,11 +46,12 @@ public class DjManagementService {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
         PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroomId.getId()).orElseThrow();
+        DjQueueData djQueue = djQueueRepository.findById(partyroomId.getId()).orElseThrow();
 
         boolean isPostActivationProcessingRequired = !playbackState.isActivated();
         boolean isAlreadyRegistered = djRepository.existsByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId());
         boolean isEmptyPlaylist = playlistQueryPort.isEmptyPlaylist(playlistId.getId());
-        new DjEnqueueSpecification().validate(partyroom, isAlreadyRegistered, isEmptyPlaylist);
+        new DjEnqueueSpecification().validate(djQueue, isAlreadyRegistered, isEmptyPlaylist);
 
         // Find crew
         CrewData crew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());

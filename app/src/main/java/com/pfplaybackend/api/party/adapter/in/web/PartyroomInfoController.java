@@ -2,11 +2,13 @@ package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.adapter.in.web.dto.PartyroomElement;
+import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
+import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
@@ -32,6 +34,7 @@ public class PartyroomInfoController {
     private final PartyroomInfoService partyroomInfoService;
     private final PlaybackInfoService playbackInfoService;
     private final PartyroomPlaybackRepository partyroomPlaybackRepository;
+    private final DjQueueRepository djQueueRepository;
 
     /**
      * 모든 파티룸의 정보를 조회한다.
@@ -57,8 +60,9 @@ public class PartyroomInfoController {
     public ResponseEntity<ApiCommonResponse<QueryDjQueueResponse>> getDjQueueInfo(@PathVariable Long partyroomId) {
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(new PartyroomId(partyroomId));
         PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroom.getId()).orElseThrow();
+        DjQueueData djQueue = djQueueRepository.findById(partyroom.getId()).orElseThrow();
         boolean isPlaybackActivated = playbackState.isActivated();
-        QueueStatus queueStatus = partyroom.isQueueClosed() ? QueueStatus.CLOSE :  QueueStatus.OPEN;
+        QueueStatus queueStatus = djQueue.isClosed() ? QueueStatus.CLOSE : QueueStatus.OPEN;
         boolean isRegistered = partyroomInfoService.isAlreadyRegistered(partyroom.getId());
         PlaybackData playback = null;
         if(isPlaybackActivated) {

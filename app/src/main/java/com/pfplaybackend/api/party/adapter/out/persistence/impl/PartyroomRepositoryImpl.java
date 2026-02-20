@@ -30,12 +30,13 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
         QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
         QCrewData qCrewData = QCrewData.crewData;
         QPartyroomPlaybackData qPlayback = QPartyroomPlaybackData.partyroomPlaybackData;
+        QDjQueueData qDjQueue = QDjQueueData.djQueueData;
 
         ActivePartyroomDto activePartyroomDto = queryFactory
                 .select(Projections.constructor(
                         ActivePartyroomDto.class,
                         qPartyroomData.id,
-                        qPartyroomData.isQueueClosed,
+                        qDjQueue.isClosed,
                         qCrewData.id.as("crewId"),
                         qPlayback.isActivated,
                         qPlayback.currentPlaybackId,
@@ -44,6 +45,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 .from(qCrewData)
                 .join(qCrewData.partyroomData, qPartyroomData)
                 .join(qPlayback).on(qPlayback.partyroomId.eq(qPartyroomData.id))
+                .join(qDjQueue).on(qDjQueue.partyroomId.eq(qPartyroomData.id))
                 .where(qCrewData.userId.eq(userId)
                         .and(qCrewData.isActive.eq(true)))
                 .fetchOne();
@@ -57,6 +59,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
         QCrewData qCrewData = QCrewData.crewData;
         QPlaybackData qPlaybackData = QPlaybackData.playbackData;
         QPartyroomPlaybackData qPlayback = QPartyroomPlaybackData.partyroomPlaybackData;
+        QDjQueueData qDjQueue = QDjQueueData.djQueueData;
 
         JPQLQuery<Long> crewCountSubquery = JPAExpressions
                 .select(qCrewData.count())
@@ -82,7 +85,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         qPartyroomData.title,
                         qPartyroomData.introduction,
                         qPlayback.isActivated,
-                        qPartyroomData.isQueueClosed,
+                        qDjQueue.isClosed,
                         crewCountSubquery,
                         playbackDto,
                         qCrewData.id,
@@ -92,6 +95,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 )
                 .from(qPartyroomData)
                 .join(qPlayback).on(qPlayback.partyroomId.eq(qPartyroomData.id))
+                .join(qDjQueue).on(qDjQueue.partyroomId.eq(qPartyroomData.id))
                 .leftJoin(qCrewData)
                 .on(qPartyroomData.eq(qCrewData.partyroomData)
                         .and(qCrewData.isActive.eq(true))
@@ -129,7 +133,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                                 tuple.get(qPartyroomData.title),
                                 tuple.get(qPartyroomData.introduction),
                                 Boolean.TRUE.equals(tuple.get(qPlayback.isActivated)),
-                                Boolean.TRUE.equals(tuple.get(qPartyroomData.isQueueClosed)),
+                                Boolean.TRUE.equals(tuple.get(qDjQueue.isClosed)),
                                 tuple.get(crewCountSubquery),
                                 tuple.get(8, PlaybackDto.class),
                                 crewsByPartyroomId.getOrDefault(tuple.get(qPartyroomData.id), List.of())
