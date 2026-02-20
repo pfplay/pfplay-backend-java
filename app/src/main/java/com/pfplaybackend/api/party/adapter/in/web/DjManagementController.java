@@ -30,11 +30,11 @@ public class DjManagementController {
      */
     @PostMapping("/{partyroomId}/djs")
     @PreAuthorize("hasAnyRole('ROLE_MEMBER')")
-    public ResponseEntity<?> enqueueDj(@PathVariable Long partyroomId,
-                                       @RequestBody RegisterDjRequest request) {
+    public ResponseEntity<ApiCommonResponse<Void>> enqueueDj(@PathVariable Long partyroomId,
+                                                            @RequestBody RegisterDjRequest request) {
         djManagementService.enqueueDj(new PartyroomId(partyroomId), new PlaylistId(request.getPlaylistId()));
         return ResponseEntity.ok()
-                .body(ApiCommonResponse.success("OK"));
+                .body(ApiCommonResponse.ok());
     }
 
     /**
@@ -42,10 +42,10 @@ public class DjManagementController {
      * @param partyroomId
      */
     @DeleteMapping("/{partyroomId}/djs/me")
-    public ResponseEntity<?> dequeueDj(@PathVariable Long partyroomId) {
+    public ResponseEntity<ApiCommonResponse<Void>> dequeueDj(@PathVariable Long partyroomId) {
         djManagementService.dequeueDj(new PartyroomId(partyroomId));
         return ResponseEntity.ok()
-                .body(ApiCommonResponse.success("OK"));
+                .body(ApiCommonResponse.ok());
     }
 
     /**
@@ -53,9 +53,9 @@ public class DjManagementController {
      * @param partyroomId
      */
     @DeleteMapping("/{partyroomId}/djs/{djId}")
-    public ResponseEntity<?> dequeueDj(@PathVariable Long partyroomId, @PathVariable Long djId) {
+    public ResponseEntity<ApiCommonResponse<Void>> dequeueDj(@PathVariable Long partyroomId, @PathVariable Long djId) {
         djManagementService.dequeueDj(new PartyroomId(partyroomId), new DjId(djId));
         return ResponseEntity.ok()
-                .body(ApiCommonResponse.success("OK"));
+                .body(ApiCommonResponse.ok());
     }
 }

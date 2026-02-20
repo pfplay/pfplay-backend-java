@@ -27,7 +27,7 @@ public class PlaylistCommandController {
 
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> create(@RequestBody @Valid CreatePlaylistRequest request) {
+    public ResponseEntity<ApiCommonResponse<CreatePlaylistResponse>> create(@RequestBody @Valid CreatePlaylistRequest request) {
         PlaylistData playlist = playlistCommandService.createPlaylist(request.getName());
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -36,7 +36,7 @@ public class PlaylistCommandController {
 
     @DeleteMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> deletePlaylist(@RequestBody DeletePlaylistListRequest request) {
+    public ResponseEntity<ApiCommonResponse<DeletePlaylistListResponse>> deletePlaylist(@RequestBody DeletePlaylistListRequest request) {
         playlistCommandService.deletePlaylist(request.getPlaylistIds());
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -45,7 +45,7 @@ public class PlaylistCommandController {
 
     @PatchMapping("{playlistId}")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> modifyPlaylistName(@PathVariable Long playlistId, @RequestBody UpdatePlaylistNameRequest request) {
+    public ResponseEntity<ApiCommonResponse<UpdatePlaylistNameResponse>> modifyPlaylistName(@PathVariable Long playlistId, @RequestBody UpdatePlaylistNameRequest request) {
         PlaylistData playlist = playlistCommandService.renamePlaylist(playlistId, request.getName());
         return ResponseEntity
                 .status(HttpStatus.OK)

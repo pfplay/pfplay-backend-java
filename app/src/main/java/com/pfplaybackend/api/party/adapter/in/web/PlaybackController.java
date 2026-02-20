@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -8,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 이 클래스는 재생 시작/종료와 같은 DJ 행위에 대한 표현 계층을 담당한다.
@@ -28,9 +31,9 @@ public class PlaybackController {
      * @param partyroomId
      */
     @PostMapping("/{partyroomId}/playbacks/skip")
-    public ResponseEntity<?> playBackSkip(@PathVariable Long partyroomId) {
+    public ResponseEntity<ApiCommonResponse<Void>> playBackSkip(@PathVariable Long partyroomId) {
         playbackManagementService.skipByManager(new PartyroomId(partyroomId));
-        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
+        return ResponseEntity.ok().body(ApiCommonResponse.ok());
     }
 
     /**
@@ -40,7 +43,7 @@ public class PlaybackController {
      * @return List<PlaybackHistory>
      */
     @GetMapping("/{partyroomId}/playbacks/histories")
-    public ResponseEntity<?> playBackHistory(@PathVariable Long partyroomId) {
+    public ResponseEntity<ApiCommonResponse<List<PlaybackHistoryDto>>> playBackHistory(@PathVariable Long partyroomId) {
         return ResponseEntity.ok().body(ApiCommonResponse.success(
                 playbackInfoService.getRecentPlaybackHistory(new PartyroomId(partyroomId)))
         );

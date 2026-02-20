@@ -21,7 +21,7 @@ public class TrackQueryController {
 
     @GetMapping("{playlistId}/tracks")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> getAllTracks(@PathVariable Long playlistId, @ModelAttribute @Valid PaginationRequest request) {
+    public ResponseEntity<ApiCommonResponse<QueryTrackListResponse>> getAllTracks(@PathVariable Long playlistId, @ModelAttribute @Valid PaginationRequest request) {
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @Tag(name = "DJ Music Interaction API", description = "Operations related to partyroom management")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
@@ -18,7 +20,7 @@ public class PlaybackReactionController {
     private final PlaybackReactionService playbackReactionService;
 
     @PostMapping("/{partyroomId}/playbacks/reaction")
-    public ResponseEntity<?> reactToPlayback(
+    public ResponseEntity<ApiCommonResponse<Map<String, Boolean>>> reactToPlayback(
             @PathVariable Long partyroomId,
             @RequestBody ReactCurrentPlaybackRequest request) {
         return ResponseEntity.ok().body(

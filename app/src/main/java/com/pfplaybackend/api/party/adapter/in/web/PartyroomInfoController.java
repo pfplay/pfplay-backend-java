@@ -1,5 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
+import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.party.adapter.in.web.dto.PartyroomElement;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
@@ -33,10 +35,10 @@ public class PartyroomInfoController {
      * → 대기실에서의 목록 조회 API
      */
     @GetMapping
-    public ResponseEntity<?> getPartyrooms() {
+    public ResponseEntity<ApiCommonResponse<List<PartyroomElement>>> getPartyrooms() {
         List<PartyroomWithCrewDto> partyrooms = partyroomInfoService.getAllPartyrooms();
         Map<UserId, ProfileSettingDto> avatarSettings = partyroomInfoService.getPrimariesAvatarSettings(partyrooms);
-        return ResponseEntity.ok().body(QueryPartyroomListResponse.from(partyrooms, avatarSettings));
+        return ResponseEntity.ok().body(ApiCommonResponse.success(QueryPartyroomListResponse.from(partyrooms, avatarSettings)));
     }
 
     /**
@@ -44,12 +46,12 @@ public class PartyroomInfoController {
      * → 파티룸 내에서 우측 상단의 '파티 정보' 클릭 시 호출 API
      */
     @GetMapping("/{partyroomId}/summary")
-    public ResponseEntity<QueryPartyroomSummaryResponse> getPartyroomSummaryInfo(@PathVariable Long partyroomId) {
-        return ResponseEntity.ok().body(partyroomInfoService.getSummaryInfo(new PartyroomId(partyroomId)));
+    public ResponseEntity<ApiCommonResponse<QueryPartyroomSummaryResponse>> getPartyroomSummaryInfo(@PathVariable Long partyroomId) {
+        return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomInfoService.getSummaryInfo(new PartyroomId(partyroomId))));
     }
 
     @GetMapping("/{partyroomId}/dj-queue")
-    public ResponseEntity<?> getDjQueueInfo(@PathVariable Long partyroomId) {
+    public ResponseEntity<ApiCommonResponse<QueryDjQueueResponse>> getDjQueueInfo(@PathVariable Long partyroomId) {
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(new PartyroomId(partyroomId));
         boolean isPlaybackActivated = partyroom.isPlaybackActivated();
         QueueStatus queueStatus = partyroom.isQueueClosed() ? QueueStatus.CLOSE :  QueueStatus.OPEN;
@@ -59,6 +61,6 @@ public class PartyroomInfoController {
             playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
         }
         List<DjWithProfileDto> djWithProfiles = partyroomInfoService.getDjs(partyroom.getId());
-        return ResponseEntity.ok().body(QueryDjQueueResponse.from(isPlaybackActivated, queueStatus, isRegistered, playback, djWithProfiles));
+        return ResponseEntity.ok().body(ApiCommonResponse.success(QueryDjQueueResponse.from(isPlaybackActivated, queueStatus, isRegistered, playback, djWithProfiles)));
     }
 }

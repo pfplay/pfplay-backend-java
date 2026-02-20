@@ -30,9 +30,9 @@ public class UserBioController {
      */
     @PutMapping("/me/profile/bio")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> setMyBio(@Valid @RequestBody UpdateMyBioRequest request) {
+    public ResponseEntity<ApiCommonResponse<Void>> setMyBio(@Valid @RequestBody UpdateMyBioRequest request) {
         UpdateBioCommand updateBioCommand = new UpdateBioCommand(request.getNickname(), request.getIntroduction());
         userBioService.updateMyBio(updateBioCommand);
-        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
+        return ResponseEntity.ok().body(ApiCommonResponse.ok());
     }
 }

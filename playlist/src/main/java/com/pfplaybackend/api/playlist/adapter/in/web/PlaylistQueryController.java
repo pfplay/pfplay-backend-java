@@ -19,7 +19,7 @@ public class PlaylistQueryController {
 
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> getPlaylists() {
+    public ResponseEntity<ApiCommonResponse<QueryPlaylistResponse>> getPlaylists() {
         return ResponseEntity.ok().body(ApiCommonResponse.success(
                 QueryPlaylistResponse.builder()
                         .playlists(playlistQueryService.getPlaylists())

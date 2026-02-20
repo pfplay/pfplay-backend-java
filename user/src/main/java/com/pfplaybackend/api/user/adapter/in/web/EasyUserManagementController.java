@@ -26,7 +26,7 @@ public class EasyUserManagementController {
     private final TemporaryUserInitializeService temporaryUserInitializeService;
 
     @PostMapping("/members/sign/temporary/associate-member")
-    public ResponseEntity<?> createAssociateMember(HttpServletResponse response) {
+    public ResponseEntity<ApiCommonResponse<Void>> createAssociateMember(HttpServletResponse response) {
         UserId userId = new UserId();
         MemberData member = temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com");
         cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(new TokenClaimsRequest(
@@ -37,11 +37,11 @@ public class EasyUserManagementController {
         )));
 
         return ResponseEntity.ok()
-                .body(ApiCommonResponse.success("OK"));
+                .body(ApiCommonResponse.ok());
     }
 
     @PostMapping("/members/sign/temporary/full-member")
-    public ResponseEntity<?> createFullMember(HttpServletResponse response) {
+    public ResponseEntity<ApiCommonResponse<Void>> createFullMember(HttpServletResponse response) {
         UserId userId = new UserId();
         MemberData member = temporaryUserInitializeService.upgradeMember(
                 temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com"));
@@ -53,6 +53,6 @@ public class EasyUserManagementController {
         )));
 
         return ResponseEntity.ok()
-                .body(ApiCommonResponse.success("OK"));
+                .body(ApiCommonResponse.ok());
     }
 }

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
+import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.exception.http.UnauthorizedException;
 import com.pfplaybackend.api.user.application.service.UserInfoService;
@@ -23,12 +24,12 @@ public class UserInfoController {
 
     @GetMapping("/me/info")
     @PreAuthorize("hasAnyRole('GUEST', 'MEMBER')")
-    public ResponseEntity<MyInfoResponse> getMyInfo(HttpServletResponse response) {
+    public ResponseEntity<ApiCommonResponse<MyInfoResponse>> getMyInfo(HttpServletResponse response) {
         try {
             MyInfoResponse myInfoResponse = userInfoService.getMyInfo();
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(myInfoResponse);
+                    .body(ApiCommonResponse.success(myInfoResponse));
         } catch (UnauthorizedException e) {
             cookieUtil.deleteAccessTokenCookie(response);
             cookieUtil.deleteRefreshTokenCookie(response);

@@ -25,7 +25,7 @@ public class GuestSignController {
     private final JwtService jwtService;
 
     @PostMapping("/guests/sign")
-    public ResponseEntity<?> createGuest(
+    public ResponseEntity<ApiCommonResponse<Void>> createGuest(
             HttpServletResponse response
     ) {
         GuestData guest = guestSignService.getGuestOrCreate();
@@ -37,6 +37,6 @@ public class GuestSignController {
         )));
 
         return ResponseEntity.ok()
-                .body(ApiCommonResponse.success("OK"));
+                .body(ApiCommonResponse.ok());
     }
 }

@@ -18,9 +18,7 @@ public class ApiCommonResponse<T> {
                 .build();
     }
 
-    public static <T> ApiCommonResponse<T> error(T data) {
-        return ApiCommonResponse.<T>builder()
-                .data(data)
-                .build();
+    public static ApiCommonResponse<Void> ok() {
+        return new ApiCommonResponse<>(null);
     }
 }

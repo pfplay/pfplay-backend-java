@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ public class CrewInfoController {
 
     @GetMapping("/{crewId}/profile/summary")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
-    public ResponseEntity<?> getOtherProfileSummary(@PathVariable Long crewId) {
+    public ResponseEntity<ApiCommonResponse<CrewProfileSummaryResult>> getOtherProfileSummary(@PathVariable Long crewId) {
         return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomInfoService.getProfileSummaryByCrewId(crewId)));
     }
 }

@@ -2,12 +2,11 @@ package com.pfplaybackend.api.user.adapter.in.web;
 
 import com.pfplaybackend.api.user.application.validation.AvatarRequestValidator;
 import com.pfplaybackend.api.user.adapter.in.web.payload.request.SetAvatarRequest;
-import com.pfplaybackend.api.user.application.dto.command.UpdateAvatarFaceCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.adapter.in.web.api.UserAvatarApi;
-import com.pfplaybackend.api.user.adapter.in.web.payload.request.UpdateMyAvatarFaceRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,7 @@ public class UserAvatarController implements UserAvatarApi {
 
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     @GetMapping("/me/profile/avatar/bodies")
-    public ResponseEntity<?> getMyAllAvatarBodies() {
+    public ResponseEntity<ApiCommonResponse<List<AvatarBodyDto>>> getMyAllAvatarBodies() {
         List<AvatarBodyDto> avatarBodies = userAvatarService.findMyAvatarBodies();
         return ResponseEntity.ok().body(ApiCommonResponse.success(avatarBodies));
     }
@@ -37,7 +36,7 @@ public class UserAvatarController implements UserAvatarApi {
     // TODO 1개 이상의 Face 가 제공될 수 있는지 여부에 따라서 확장(개선) 필요
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     @GetMapping("/me/profile/avatar/faces")
-    public ResponseEntity<?> getMyDefaultAvatarFaces() {
+    public ResponseEntity<ApiCommonResponse<List<AvatarFaceDto>>> getMyDefaultAvatarFaces() {
         return ResponseEntity.ok().body(ApiCommonResponse.success(
                 userAvatarService.findMyAvatarFaces())
         );
@@ -45,9 +44,9 @@ public class UserAvatarController implements UserAvatarApi {
 
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @PutMapping("/me/profile/avatar")
-    public ResponseEntity<?> setMyAvatar(@Valid @RequestBody SetAvatarRequest request) {
+    public ResponseEntity<ApiCommonResponse<Void>> setMyAvatar(@Valid @RequestBody SetAvatarRequest request) {
         avatarRequestValidator.validate(request);
         userAvatarService.setUserAvatar(request);
-        return ResponseEntity.ok().body(ApiCommonResponse.success("OK"));
+        return ResponseEntity.ok().body(ApiCommonResponse.ok());
     }
 }

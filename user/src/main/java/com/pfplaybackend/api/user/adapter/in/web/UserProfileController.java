@@ -23,7 +23,7 @@ public class UserProfileController {
      */
     @GetMapping("/me/profile/summary")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
-    public ResponseEntity<?> getMyProfileSummary() {
+    public ResponseEntity<ApiCommonResponse<MyProfileSummaryResponse>> getMyProfileSummary() {
         ProfileSummaryDto profileSummaryDto = userProfileService.getMyProfileSummary();
         return ResponseEntity.ok().body(ApiCommonResponse.success(MyProfileSummaryResponse.from(profileSummaryDto)));
     }

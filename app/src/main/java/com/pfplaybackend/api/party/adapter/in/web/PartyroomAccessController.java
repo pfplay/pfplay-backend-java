@@ -13,13 +13,14 @@ import com.pfplaybackend.api.party.adapter.in.web.payload.response.access.EnterP
 import com.pfplaybackend.api.user.application.service.GuestSignService;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
 @Tag(name = "Partyroom API")
@@ -39,21 +40,21 @@ public class PartyroomAccessController {
      * @return
      */
     @PostMapping("/{partyroomId}/enter")
-    public ResponseEntity<?> enterPartyroom(
+    public ResponseEntity<ApiCommonResponse<EnterPartyroomResponse>> enterPartyroom(
             @PathVariable Long partyroomId) {
         CrewData crew = partyroomAccessService.tryEnter(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success(EnterPartyroomResponse.from(crew)));
     }
 
     @PostMapping("/{partyroomId}/exit")
-    public ResponseEntity<?> exitPartyroom(
+    public ResponseEntity<Void> exitPartyroom(
             @PathVariable Long partyroomId) {
         partyroomAccessService.exit(new PartyroomId(partyroomId));
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/link/{linkDomain}/enter")
-    public ResponseEntity<?> enterPartyroomByLinkAddress(
+    public ResponseEntity<ApiCommonResponse<Map<String, Long>>> enterPartyroomByLinkAddress(
             @PathVariable String linkDomain,
             HttpServletResponse response) {
         // 비인증 사용자인 경우 게스트 토큰 자동 발급

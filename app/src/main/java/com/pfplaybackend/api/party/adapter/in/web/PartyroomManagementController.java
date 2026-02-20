@@ -25,27 +25,28 @@ public class PartyroomManagementController {
     private final PartyroomManagementService partyRoomManagementService;
 
     @PostMapping
-    public ResponseEntity<?> createPartyroom(@RequestBody CreatePartyroomRequest createPartyroomRequest) {
+    public ResponseEntity<ApiCommonResponse<CreatePartyroomResponse>> createPartyroom(@RequestBody CreatePartyroomRequest createPartyroomRequest) {
         PartyroomData partyRoom = partyRoomManagementService.createGeneralPartyRoom(createPartyroomRequest);
-        return ResponseEntity.ok().body(CreatePartyroomResponse.from(partyRoom));
+        return ResponseEntity.ok().body(ApiCommonResponse.success(CreatePartyroomResponse.from(partyRoom)));
     }
 
     @PutMapping("/{partyroomId}")
-    public ResponseEntity<?> updatePartyroom(@PathVariable Long partyroomId, @RequestBody UpdatePartyroomRequest request) {
+    public ResponseEntity<ApiCommonResponse<Void>> updatePartyroom(@PathVariable Long partyroomId, @RequestBody UpdatePartyroomRequest request) {
         partyRoomManagementService.updatePartyroom(new PartyroomId(partyroomId), request);
         return ResponseEntity.ok()
-                .body(ApiCommonResponse.success("OK"));
+                .body(ApiCommonResponse.ok());
     }
 
     @DeleteMapping("/{partyroomId}")
-    public void deletePartyroom(@PathVariable Long partyroomId) {
+    public ResponseEntity<Void> deletePartyroom(@PathVariable Long partyroomId) {
         partyRoomManagementService.deletePartyRoom(new PartyroomId(partyroomId));
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{partyroomId}/dj-queue")
-    public ResponseEntity<?> updateDjQueue(@PathVariable Long partyroomId, @RequestBody UpdateDjQueueStatusRequest request) {
+    public ResponseEntity<ApiCommonResponse<Void>> updateDjQueue(@PathVariable Long partyroomId, @RequestBody UpdateDjQueueStatusRequest request) {
         partyRoomManagementService.updateDjQueueStatus(new PartyroomId(partyroomId), request);
         return ResponseEntity.ok()
-                .body(ApiCommonResponse.success("OK"));
+                .body(ApiCommonResponse.ok());
     }
 }

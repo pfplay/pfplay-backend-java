@@ -6,6 +6,7 @@ import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,9 +28,10 @@ public class CrewGradeController {
      * @param request
      */
     @PatchMapping("/{partyroomId}/crews/{crewId}/grade")
-    public void updateCrewGrade(@PathVariable("partyroomId") long partyroomId,
+    public ResponseEntity<Void> updateCrewGrade(@PathVariable("partyroomId") long partyroomId,
                             @PathVariable("crewId") long crewId,
                             @RequestBody AdjustGradeRequest request) {
         crewGradeService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId), request);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -25,7 +25,7 @@ public class PartyroomNoticeController {
     }
 
     @GetMapping("/{partyroomId}/notice")
-    public ResponseEntity<?> getNotice(@PathVariable Long partyroomId) {
+    public ResponseEntity<ApiCommonResponse<QueryPartyroomNoticeResponse>> getNotice(@PathVariable Long partyroomId) {
         String content = partyroomNoticeService.getNotice(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success(new QueryPartyroomNoticeResponse(content)));
     }

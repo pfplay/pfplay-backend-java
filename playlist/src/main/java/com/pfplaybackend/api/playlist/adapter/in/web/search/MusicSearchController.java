@@ -25,7 +25,7 @@ public class MusicSearchController {
 
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<?> getSearchList(@ModelAttribute @Valid SearchMusicListRequest request) {
+    public ResponseEntity<ApiCommonResponse<SearchMusicResponse>> getSearchList(@ModelAttribute @Valid SearchMusicListRequest request) {
         SearchMusicResponse searchMusicResponse = SearchMusicResponse.from(musicSearchService.getSearchList(request.getQ()));
         return ResponseEntity
                 .status(HttpStatus.OK)
