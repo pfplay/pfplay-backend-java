@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.party.domain.enums;
+package com.pfplaybackend.api.common.domain.enums;
 
 public enum MessageTopic {
     PARTYROOM_DEACTIVATION,

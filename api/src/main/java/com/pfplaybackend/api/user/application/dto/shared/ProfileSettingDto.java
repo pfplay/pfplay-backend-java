@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.application.dto.shared;
 
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

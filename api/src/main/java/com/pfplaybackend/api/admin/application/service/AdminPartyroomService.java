@@ -5,6 +5,8 @@ import com.pfplaybackend.api.admin.adapter.in.web.dto.request.BulkPreviewEnviron
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.AdminPartyroomResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.BulkPreviewEnvironmentResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.SimulateReactionsResponse;
+import com.pfplaybackend.api.admin.domain.exception.AdminException;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
@@ -197,17 +199,17 @@ public class AdminPartyroomService {
             Long id = Long.parseLong(userIdString);
             return new UserId(id);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid user ID format: " + userIdString, e);
+            throw ExceptionCreator.create(AdminException.INVALID_USER_ID_FORMAT);
         }
     }
 
     public SimulateReactionsResponse simulateReactions(Long partyroomId) {
         PartyroomData partyroom = partyroomRepository.findById(partyroomId)
-                .orElseThrow(() -> new IllegalArgumentException("Partyroom not found: " + partyroomId));
+                .orElseThrow(() -> ExceptionCreator.create(AdminException.PARTYROOM_NOT_FOUND));
 
         PlaybackId playbackId = partyroom.getCurrentPlaybackId();
         if (playbackId == null) {
-            throw new IllegalStateException("No active playback in partyroom: " + partyroomId);
+            throw ExceptionCreator.create(AdminException.NO_ACTIVE_PLAYBACK);
         }
 
         PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
@@ -218,7 +220,7 @@ public class AdminPartyroomService {
                 .collect(Collectors.toList());
 
         if (eligibleCrew.isEmpty()) {
-            throw new IllegalStateException("No crew members available (excluding DJ)");
+            throw ExceptionCreator.create(AdminException.NO_AVAILABLE_CREW);
         }
 
         Collections.shuffle(eligibleCrew);
@@ -284,7 +286,7 @@ public class AdminPartyroomService {
             allFutures.get(10, TimeUnit.SECONDS);
         } catch (Exception e) {
             log.error("Error waiting for reaction simulation to complete", e);
-            throw new RuntimeException("Reaction simulation failed", e);
+            throw ExceptionCreator.create(AdminException.REACTION_SIMULATION_FAILED);
         }
 
         List<SimulateReactionsResponse.SimulatedReaction> reactions = reactionFutures.stream()

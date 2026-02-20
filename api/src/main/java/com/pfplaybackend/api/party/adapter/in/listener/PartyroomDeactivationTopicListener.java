@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.realtime.sender.SimpMessageSender;
 import com.pfplaybackend.api.party.adapter.in.listener.message.PartyroomDeactivationMessage;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 
+@Slf4j
 @AllArgsConstructor
 public class PartyroomDeactivationTopicListener implements MessageListener {
 
@@ -21,7 +23,8 @@ public class PartyroomDeactivationTopicListener implements MessageListener {
             PartyroomDeactivationMessage partyroomDeactivationMessage = objectMapper.readValue(jsonstring, PartyroomDeactivationMessage.class);
             messageSender.sendToGroup(partyroomDeactivationMessage.getPartyroomId().getId(), partyroomDeactivationMessage);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.error("Failed to deserialize message: {}", jsonstring, e);
+            return;
         }
     }
 }

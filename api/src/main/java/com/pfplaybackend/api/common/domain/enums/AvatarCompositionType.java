@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.profile.domain.enums;
+package com.pfplaybackend.api.common.domain.enums;
 
 import lombok.Getter;
 

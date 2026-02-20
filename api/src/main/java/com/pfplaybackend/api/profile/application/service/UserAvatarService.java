@@ -4,7 +4,7 @@ import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceSe
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.profile.application.event.UserProfileEventService;
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;

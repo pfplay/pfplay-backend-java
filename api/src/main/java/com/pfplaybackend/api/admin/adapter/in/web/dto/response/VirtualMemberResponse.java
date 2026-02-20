@@ -3,7 +3,7 @@ package com.pfplaybackend.api.admin.adapter.in.web.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.profile.application.event;
 
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
+import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfilePreCheckMessage;
+import com.pfplaybackend.api.profile.application.dto.ProfileChangedEvent;
 import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class UserProfileEventService {
     public void publishProfileChangedEvent(MemberData member) {
         ProfileData profile = member.getProfileData();
         var avatar = profile.getAvatarSetting();
-        CrewProfilePreCheckMessage crewProfilePreCheckMessage = new CrewProfilePreCheckMessage(
+        ProfileChangedEvent event = new ProfileChangedEvent(
                 profile.getUserId(),
                 profile.getNicknameValue(),
                 avatar.getAvatarFaceUri().getAvatarFaceUri(),
@@ -29,6 +29,6 @@ public class UserProfileEventService {
                 avatar.getOffsetY(),
                 avatar.getScale()
         );
-        messagePublisher.publish(MessageTopic.CREW_PROFILE_PRE_CHECK.topic(), crewProfilePreCheckMessage);
+        messagePublisher.publish(MessageTopic.CREW_PROFILE_PRE_CHECK.topic(), event);
     }
 }

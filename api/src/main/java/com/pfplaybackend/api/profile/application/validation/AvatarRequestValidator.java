@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.profile.application.validation;
 
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.adapter.in.web.dto.request.AvatarFaceRequest;
 import com.pfplaybackend.api.profile.adapter.in.web.dto.request.SetAvatarRequest;
 import jakarta.validation.ValidationException;

@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.profile.domain;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.profile.domain.value.AvatarSetting;
 import com.pfplaybackend.api.profile.domain.value.Bio;

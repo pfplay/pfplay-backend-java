@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.profile.domain.ProfileData;
 import com.pfplaybackend.api.profile.domain.value.AvatarSetting;
 import com.pfplaybackend.api.profile.domain.value.Nickname;
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;

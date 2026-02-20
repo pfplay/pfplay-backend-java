@@ -5,10 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.realtime.sender.SimpMessageSender;
 import com.pfplaybackend.api.party.adapter.in.listener.message.PlaybackStartMessage;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 
-
+@Slf4j
 @AllArgsConstructor
 public class PlaybackStartTopicListener implements MessageListener {
 
@@ -21,7 +22,8 @@ public class PlaybackStartTopicListener implements MessageListener {
             PlaybackStartMessage deserialized = objectMapper.readValue(new String(message.getBody()), PlaybackStartMessage.class);
             messageSender.sendToGroup(deserialized.getPartyroomId().getId(), deserialized);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.error("Failed to deserialize message: {}", new String(message.getBody()), e);
+            return;
         }
     }
 }

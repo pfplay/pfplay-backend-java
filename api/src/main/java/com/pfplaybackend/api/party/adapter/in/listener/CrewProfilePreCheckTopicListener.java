@@ -6,9 +6,11 @@ import com.pfplaybackend.api.party.application.service.CrewProfileChangeHandler;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfilePreCheckMessage;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 
+@Slf4j
 @AllArgsConstructor
 public class CrewProfilePreCheckTopicListener implements MessageListener {
 
@@ -26,7 +28,8 @@ public class CrewProfilePreCheckTopicListener implements MessageListener {
                 return null;
             });
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            log.error("Failed to deserialize message: {}", new String(message.getBody()), e);
+            return;
         }
     }
 }

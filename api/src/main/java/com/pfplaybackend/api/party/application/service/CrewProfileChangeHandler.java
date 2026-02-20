@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
+import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfileMessage;
 import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfilePreCheckMessage;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.adapter.in.web.payload.response;
 
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import lombok.Builder;

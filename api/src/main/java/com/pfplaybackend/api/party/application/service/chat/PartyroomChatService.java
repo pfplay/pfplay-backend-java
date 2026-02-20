@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.realtime.port.SessionCachePort;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
+import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.adapter.in.listener.message.OutgoingGroupChatMessage;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;

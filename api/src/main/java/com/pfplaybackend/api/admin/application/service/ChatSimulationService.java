@@ -1,10 +1,12 @@
 package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.admin.domain.enums.ChatScriptType;
+import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.adapter.in.listener.message.OutgoingGroupChatMessage;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
+import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import lombok.RequiredArgsConstructor;
@@ -159,7 +161,7 @@ public class ChatSimulationService {
 
         List<CrewData> crewList = crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId);
         if (crewList.isEmpty()) {
-            throw new IllegalStateException("No crew members in partyroom: " + partyroomId);
+            throw ExceptionCreator.create(AdminException.NO_CREW_MEMBERS);
         }
 
         List<String> scripts = getScriptsByType(scriptType);

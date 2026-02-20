@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.profile.adapter.in.web.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

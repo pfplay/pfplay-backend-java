@@ -5,7 +5,9 @@ import com.pfplaybackend.api.admin.adapter.in.web.dto.request.InitializeDemoEnvi
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.AdminPartyroomListResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentStatusResponse;
+import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.admin.application.util.NicknameGenerator;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarBodyResourceRepository;
 import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarFaceResourceRepository;
 import com.pfplaybackend.api.common.domain.value.Duration;
@@ -96,7 +98,7 @@ public class AdminDemoService {
         List<AvatarFaceResourceData> avatarFaces = avatarFaceResourceRepository.findAll();
 
         if (avatarBodies.isEmpty() || avatarFaces.isEmpty()) {
-            throw new IllegalStateException("Avatar resources not initialized. Please run avatar initialization first.");
+            throw ExceptionCreator.create(AdminException.AVATAR_RESOURCES_NOT_INITIALIZED);
         }
 
         // Step 1: Create virtual members
@@ -173,7 +175,7 @@ public class AdminDemoService {
         PartyroomData mainStage = partyroomRepository.findAll().stream()
                 .filter(p -> p.getStageType() == StageType.MAIN)
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Main stage not found. It should be created during application initialization."));
+                .orElseThrow(() -> ExceptionCreator.create(AdminException.MAIN_STAGE_NOT_FOUND));
 
         log.info("Found existing main stage: partyroomId={}", mainStage.getId());
         return mainStage;
