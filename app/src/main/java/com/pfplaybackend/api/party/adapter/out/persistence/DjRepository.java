@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DjRepository extends JpaRepository<DjData, Long> {
-    List<DjData> findByPartyroomDataIdOrderByOrderNumberAsc(Long partyroomId);
-    Optional<DjData> findByPartyroomDataIdAndCrewId(Long partyroomId, CrewId crewId);
-    boolean existsByPartyroomDataId(Long partyroomId);
-    boolean existsByPartyroomDataIdAndCrewId(Long partyroomId, CrewId crewId);
+    List<DjData> findByPartyroomIdOrderByOrderNumberAsc(Long partyroomId);
+    Optional<DjData> findByPartyroomIdAndCrewId(Long partyroomId, CrewId crewId);
+    boolean existsByPartyroomId(Long partyroomId);
+    boolean existsByPartyroomIdAndCrewId(Long partyroomId, CrewId crewId);
 }

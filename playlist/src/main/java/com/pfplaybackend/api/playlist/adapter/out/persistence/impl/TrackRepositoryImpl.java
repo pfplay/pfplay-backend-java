@@ -30,7 +30,7 @@ public class TrackRepositoryImpl implements TrackRepositoryCustom {
                         qTrackData.duration,
                         qTrackData.thumbnailImage))
                 .from(qTrackData)
-                .where(qTrackData.playlistData.id.eq(playlistId))
+                .where(qTrackData.playlistId.eq(playlistId))
                 .orderBy(qTrackData.orderNumber.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -39,7 +39,7 @@ public class TrackRepositoryImpl implements TrackRepositoryCustom {
         Long count = queryFactory
                 .select(qTrackData.count())
                 .from(qTrackData)
-                .where(qTrackData.playlistData.id.eq(playlistId))
+                .where(qTrackData.playlistId.eq(playlistId))
                 .fetchOne();
 
         long total = count != null ? count : 0;

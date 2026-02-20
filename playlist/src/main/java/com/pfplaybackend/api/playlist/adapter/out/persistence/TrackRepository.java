@@ -11,22 +11,22 @@ import java.util.Optional;
 
 public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRepositoryCustom {
 
-    Optional<TrackData> findByPlaylistDataIdAndLinkId(Long playlistDataId, String linkId);
+    Optional<TrackData> findByPlaylistIdAndLinkId(Long playlistDataId, String linkId);
     TrackData findFirstByLinkId(String linkId);
-    Optional<TrackData> findByIdAndPlaylistDataId(Long id, Long playlistDataId);
-    boolean existsByPlaylistDataId(Long playlistDataId);
+    Optional<TrackData> findByIdAndPlaylistId(Long id, Long playlistDataId);
+    boolean existsByPlaylistId(Long playlistDataId);
 
     @Modifying
     @Query("UPDATE TrackData pm SET pm.orderNumber = CASE " +
             "WHEN pm.orderNumber = 1 THEN :totalElements " +
             "ELSE pm.orderNumber - 1 END " +
-            "WHERE pm.playlistData.id = :playlistId")
+            "WHERE pm.playlistId = :playlistId")
     void reorderTracks(@Param("playlistId") Long playlistId, @Param("totalElements") long totalElements);
 
     @Modifying
     @Query("UPDATE TrackData pm " +
             "SET pm.orderNumber =  pm.orderNumber - 1" +
-            "WHERE pm.playlistData.id = :playlistId " +
+            "WHERE pm.playlistId = :playlistId " +
             "AND pm.orderNumber > :deleteOrderNumber "
     )
     void shiftUpOrderByDelete(@Param("playlistId") Long playlistId, @Param("deleteOrderNumber") Integer deleteOrderNumber);
@@ -34,7 +34,7 @@ public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRe
     @Modifying
     @Query("UPDATE TrackData pm " +
             "SET pm.orderNumber =  pm.orderNumber - 1" +
-            "WHERE pm.playlistData.id = :playlistId " +
+            "WHERE pm.playlistId = :playlistId " +
             "AND pm.orderNumber > :prevOrderNumber " +
             "AND pm.orderNumber <= :nextOrderNumber "
     )
@@ -43,7 +43,7 @@ public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRe
     @Modifying
     @Query("UPDATE TrackData pm " +
             "SET pm.orderNumber =  pm.orderNumber + 1" +
-            "WHERE pm.playlistData.id = :playlistId " +
+            "WHERE pm.playlistId = :playlistId " +
             "AND pm.orderNumber < :prevOrderNumber " +
             "AND pm.orderNumber >= :nextOrderNumber "
     )

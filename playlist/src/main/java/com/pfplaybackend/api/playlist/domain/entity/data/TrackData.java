@@ -27,9 +27,8 @@ public class TrackData extends BaseEntity {
     @Column(columnDefinition = "integer unsigned")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "playlist_id")
-    private PlaylistData playlistData;
+    @Column(name = "playlist_id", nullable = false)
+    private Long playlistId;
 
     @Comment("플레이리스트의 곡 순서")
     @Column(columnDefinition = "integer unsigned")
@@ -51,8 +50,8 @@ public class TrackData extends BaseEntity {
     protected TrackData() { }
 
     @Builder
-    public TrackData(PlaylistData playlistData, Integer orderNumber, String name, Duration duration, String linkId, String thumbnailImage) {
-        this.playlistData = playlistData;
+    public TrackData(Long playlistId, Integer orderNumber, String name, Duration duration, String linkId, String thumbnailImage) {
+        this.playlistId = playlistId;
         this.orderNumber = orderNumber;
         this.name = name;
         this.duration = duration;
@@ -66,8 +65,8 @@ public class TrackData extends BaseEntity {
         this.orderNumber = newOrderNumber;
     }
 
-    public void moveToPlaylist(PlaylistData targetPlaylist, int newOrderNumber) {
-        this.playlistData = targetPlaylist;
+    public void moveToPlaylist(Long targetPlaylistId, int newOrderNumber) {
+        this.playlistId = targetPlaylistId;
         this.orderNumber = newOrderNumber;
     }
 }

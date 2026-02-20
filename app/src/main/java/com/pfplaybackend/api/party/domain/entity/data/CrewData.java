@@ -33,9 +33,8 @@ public class CrewData extends BaseEntity {
     @Column(name = "crew_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partyroom_id")
-    private PartyroomData partyroomData;
+    @Column(name = "partyroom_id", nullable = false)
+    private Long partyroomId;
 
     @Embedded
     @AttributeOverrides({
@@ -59,10 +58,11 @@ public class CrewData extends BaseEntity {
     protected CrewData() {}
 
     @Builder
-    public CrewData(Long id, UserId userId, GradeType gradeType,
+    public CrewData(Long id, Long partyroomId, UserId userId, GradeType gradeType,
                     boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt,
                     LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.partyroomId = partyroomId;
         this.userId = userId;
         this.gradeType = gradeType;
         this.isActive = isActive;
@@ -73,23 +73,17 @@ public class CrewData extends BaseEntity {
         this.updatedAt = updatedAt;
     }
 
-    public CrewData assignPartyroomData(PartyroomData partyroomData) {
-        this.partyroomData = partyroomData;
-        return this;
-    }
-
     // ── Business Methods ──
 
-    public static CrewData create(PartyroomData partyroomData, UserId userId, GradeType gradeType) {
-        CrewData crew = CrewData.builder()
+    public static CrewData create(Long partyroomId, UserId userId, GradeType gradeType) {
+        return CrewData.builder()
+                .partyroomId(partyroomId)
                 .userId(userId)
                 .gradeType(gradeType)
                 .isActive(true)
                 .isBanned(false)
                 .enteredAt(LocalDateTime.now())
                 .build();
-        crew.assignPartyroomData(partyroomData);
-        return crew;
     }
 
     public void deactivatePresence() {

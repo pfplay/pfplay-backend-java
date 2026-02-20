@@ -176,7 +176,7 @@ public class AdminPartyroomService {
         PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
-        CrewData crew = CrewData.create(loadedPartyroom, userId, GradeType.LISTENER);
+        CrewData crew = CrewData.create(loadedPartyroom.getId(), userId, GradeType.LISTENER);
         crewRepository.save(crew);
     }
 
@@ -222,7 +222,7 @@ public class AdminPartyroomService {
         PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
         UserId djUserId = playback.getUserId();
 
-        List<CrewData> eligibleCrew = crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId).stream()
+        List<CrewData> eligibleCrew = crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId).stream()
                 .filter(crew -> !crew.getUserId().equals(djUserId))
                 .collect(Collectors.toList());
 

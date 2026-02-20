@@ -61,7 +61,7 @@ class GrabTrackServiceTest {
 
         when(trackRepository.findFirstByLinkId(linkId)).thenReturn(track);
         when(playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(trackRepository.findByPlaylistDataIdAndLinkId(grablist.getId(), linkId)).thenReturn(Optional.empty());
+        when(trackRepository.findByPlaylistIdAndLinkId(grablist.getId(), linkId)).thenReturn(Optional.empty());
 
         // when
         grabTrackService.grabTrack(userId, linkId);
@@ -90,7 +90,7 @@ class GrabTrackServiceTest {
 
         when(trackRepository.findFirstByLinkId(linkId)).thenReturn(track);
         when(playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(trackRepository.findByPlaylistDataIdAndLinkId(grablist.getId(), linkId))
+        when(trackRepository.findByPlaylistIdAndLinkId(grablist.getId(), linkId))
                 .thenReturn(Optional.of(track));
 
         // when & then
@@ -107,7 +107,7 @@ class GrabTrackServiceTest {
 
         when(trackRepository.findFirstByLinkId(linkId)).thenReturn(track);
         when(playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(trackRepository.findByPlaylistDataIdAndLinkId(grablist.getId(), linkId)).thenReturn(Optional.empty());
+        when(trackRepository.findByPlaylistIdAndLinkId(grablist.getId(), linkId)).thenReturn(Optional.empty());
 
         ArgumentCaptor<AddTrackRequest> captor = ArgumentCaptor.forClass(AddTrackRequest.class);
 

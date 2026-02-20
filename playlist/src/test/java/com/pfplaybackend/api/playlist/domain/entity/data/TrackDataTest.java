@@ -13,11 +13,8 @@ class TrackDataTest {
     @DisplayName("reorder()로 트랙 순서를 변경할 수 있다")
     void reorder_changesOrderNumber() {
         // given
-        PlaylistData playlist = PlaylistData.builder()
-                .name("테스트 플레이리스트")
-                .build();
         TrackData track = TrackData.builder()
-                .playlistData(playlist)
+                .playlistId(1L)
                 .orderNumber(1)
                 .name("테스트 곡")
                 .linkId("link1")
@@ -36,14 +33,8 @@ class TrackDataTest {
     @DisplayName("moveToPlaylist()로 트랙을 다른 플레이리스트로 이동할 수 있다")
     void moveToPlaylist_changesPlaylistAndOrder() {
         // given
-        PlaylistData sourcePlaylist = PlaylistData.builder()
-                .name("소스 플레이리스트")
-                .build();
-        PlaylistData targetPlaylist = PlaylistData.builder()
-                .name("타겟 플레이리스트")
-                .build();
         TrackData track = TrackData.builder()
-                .playlistData(sourcePlaylist)
+                .playlistId(1L)
                 .orderNumber(2)
                 .name("테스트 곡")
                 .linkId("link1")
@@ -52,10 +43,10 @@ class TrackDataTest {
                 .build();
 
         // when
-        track.moveToPlaylist(targetPlaylist, 3);
+        track.moveToPlaylist(2L, 3);
 
         // then
-        assertThat(track.getPlaylistData()).isEqualTo(targetPlaylist);
+        assertThat(track.getPlaylistId()).isEqualTo(2L);
         assertThat(track.getOrderNumber()).isEqualTo(3);
     }
 }

@@ -75,7 +75,7 @@ class TrackCommandServiceTest {
         AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
-        when(trackRepository.findByPlaylistDataIdAndLinkId(playlistId, "linkId1")).thenReturn(Optional.empty());
+        when(trackRepository.findByPlaylistIdAndLinkId(playlistId, "linkId1")).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(playlistId))
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 3L));
 
@@ -111,10 +111,10 @@ class TrackCommandServiceTest {
 
         AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
         TrackData existingTrack = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(1).build();
+                .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(1).build();
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
-        when(trackRepository.findByPlaylistDataIdAndLinkId(playlistId, "linkId1")).thenReturn(Optional.of(existingTrack));
+        when(trackRepository.findByPlaylistIdAndLinkId(playlistId, "linkId1")).thenReturn(Optional.of(existingTrack));
 
         // when & then
         assertThatThrownBy(() -> trackCommandService.addTrackInPlaylist(playlistId, request))
@@ -132,7 +132,7 @@ class TrackCommandServiceTest {
         AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
-        when(trackRepository.findByPlaylistDataIdAndLinkId(playlistId, "linkId1")).thenReturn(Optional.empty());
+        when(trackRepository.findByPlaylistIdAndLinkId(playlistId, "linkId1")).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(playlistId))
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 15L));
 
@@ -153,10 +153,10 @@ class TrackCommandServiceTest {
                 .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(3).build();
+                .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(3).build();
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
-        when(trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)).thenReturn(Optional.of(trackData));
+        when(trackRepository.findByIdAndPlaylistId(trackId, playlistId)).thenReturn(Optional.of(trackData));
 
         // when
         trackCommandService.deleteTrackInPlaylist(playlistId, trackId);
@@ -176,7 +176,7 @@ class TrackCommandServiceTest {
                 .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
-        when(trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)).thenReturn(Optional.empty());
+        when(trackRepository.findByIdAndPlaylistId(trackId, playlistId)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> trackCommandService.deleteTrackInPlaylist(playlistId, trackId))
@@ -200,14 +200,14 @@ class TrackCommandServiceTest {
                 .id(targetPlaylistId).ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
 
         TrackData trackData = TrackData.builder()
-                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
+                .playlistId(sourcePlaylist.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
 
         when(playlistRepository.findByIdAndOwnerId(sourcePlaylistId, userId)).thenReturn(Optional.of(sourcePlaylist));
         when(playlistRepository.findByIdAndOwnerId(targetPlaylistId, userId)).thenReturn(Optional.of(targetPlaylist));
-        when(trackRepository.findByIdAndPlaylistDataId(trackId, sourcePlaylistId)).thenReturn(Optional.of(trackData));
-        when(trackRepository.findByPlaylistDataIdAndLinkId(targetPlaylistId, "linkId1")).thenReturn(Optional.empty());
+        when(trackRepository.findByIdAndPlaylistId(trackId, sourcePlaylistId)).thenReturn(Optional.of(trackData));
+        when(trackRepository.findByPlaylistIdAndLinkId(targetPlaylistId, "linkId1")).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(targetPlaylistId))
                 .thenReturn(new PlaylistSummary(targetPlaylistId, "target", 1, PlaylistType.PLAYLIST, 5L));
 
@@ -217,7 +217,7 @@ class TrackCommandServiceTest {
         // then
         verify(trackRepository, times(1)).shiftUpOrderByDelete(sourcePlaylistId, 2);
         verify(trackRepository, times(1)).save(argThat(track ->
-                track.getPlaylistData().equals(targetPlaylist) && track.getOrderNumber() == 6
+                track.getPlaylistId().equals(targetPlaylist.getId()) && track.getOrderNumber() == 6
         ));
     }
 
@@ -272,16 +272,16 @@ class TrackCommandServiceTest {
                 .id(targetPlaylistId).ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
 
         TrackData trackData = TrackData.builder()
-                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
+                .playlistId(sourcePlaylist.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
         TrackData duplicateTrack = TrackData.builder()
-                .playlistData(targetPlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(1).build();
+                .playlistId(targetPlaylist.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(1).build();
 
         MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
 
         when(playlistRepository.findByIdAndOwnerId(sourcePlaylistId, userId)).thenReturn(Optional.of(sourcePlaylist));
         when(playlistRepository.findByIdAndOwnerId(targetPlaylistId, userId)).thenReturn(Optional.of(targetPlaylist));
-        when(trackRepository.findByIdAndPlaylistDataId(trackId, sourcePlaylistId)).thenReturn(Optional.of(trackData));
-        when(trackRepository.findByPlaylistDataIdAndLinkId(targetPlaylistId, "linkId1")).thenReturn(Optional.of(duplicateTrack));
+        when(trackRepository.findByIdAndPlaylistId(trackId, sourcePlaylistId)).thenReturn(Optional.of(trackData));
+        when(trackRepository.findByPlaylistIdAndLinkId(targetPlaylistId, "linkId1")).thenReturn(Optional.of(duplicateTrack));
 
         // when & then
         assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, request))
@@ -303,14 +303,14 @@ class TrackCommandServiceTest {
                 .id(targetPlaylistId).ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
 
         TrackData trackData = TrackData.builder()
-                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
+                .playlistId(sourcePlaylist.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
 
         when(playlistRepository.findByIdAndOwnerId(sourcePlaylistId, userId)).thenReturn(Optional.of(sourcePlaylist));
         when(playlistRepository.findByIdAndOwnerId(targetPlaylistId, userId)).thenReturn(Optional.of(targetPlaylist));
-        when(trackRepository.findByIdAndPlaylistDataId(trackId, sourcePlaylistId)).thenReturn(Optional.of(trackData));
-        when(trackRepository.findByPlaylistDataIdAndLinkId(targetPlaylistId, "linkId1")).thenReturn(Optional.empty());
+        when(trackRepository.findByIdAndPlaylistId(trackId, sourcePlaylistId)).thenReturn(Optional.of(trackData));
+        when(trackRepository.findByPlaylistIdAndLinkId(targetPlaylistId, "linkId1")).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(targetPlaylistId))
                 .thenReturn(new PlaylistSummary(targetPlaylistId, "target", 1, PlaylistType.PLAYLIST, 15L));
 
@@ -331,12 +331,12 @@ class TrackCommandServiceTest {
                 .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
+                .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(4);
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
-        when(trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)).thenReturn(Optional.of(trackData));
+        when(trackRepository.findByIdAndPlaylistId(trackId, playlistId)).thenReturn(Optional.of(trackData));
         when(playlistQueryService.getPlaylist(playlistId))
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 
@@ -358,12 +358,12 @@ class TrackCommandServiceTest {
                 .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(4).build();
+                .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(4).build();
 
         UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(2);
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
-        when(trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)).thenReturn(Optional.of(trackData));
+        when(trackRepository.findByIdAndPlaylistId(trackId, playlistId)).thenReturn(Optional.of(trackData));
         when(playlistQueryService.getPlaylist(playlistId))
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 
@@ -385,13 +385,13 @@ class TrackCommandServiceTest {
                 .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
+                .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         // nextOrderNumber == prevOrderNumber → invalid
         UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(2);
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
-        when(trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)).thenReturn(Optional.of(trackData));
+        when(trackRepository.findByIdAndPlaylistId(trackId, playlistId)).thenReturn(Optional.of(trackData));
         when(playlistQueryService.getPlaylist(playlistId))
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 

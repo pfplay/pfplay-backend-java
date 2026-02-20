@@ -57,7 +57,7 @@ public class DjManagementService {
         int nextOrder = queuedDjs.size() + 1;
 
         // Create and save DJ
-        DjData dj = DjData.create(partyroom, playlistId, crewId, nextOrder);
+        DjData dj = DjData.create(partyroom.getId(), playlistId, crewId, nextOrder);
         aggregatePort.saveDj(dj);
 
         playbackState.activate(null, null);

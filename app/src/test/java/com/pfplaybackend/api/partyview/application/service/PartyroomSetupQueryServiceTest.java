@@ -94,7 +94,7 @@ class PartyroomSetupQueryServiceTest {
         PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(playbackId.getId());
         aggregation.updateAggregation(5, 1, 2);
 
-        when(crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId()))
+        when(crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId()))
                 .thenReturn(List.of(crew1, djCrew));
         when(userProfileQueryPort.getUsersProfileSetting(any()))
                 .thenReturn(Map.of(
@@ -125,7 +125,7 @@ class PartyroomSetupQueryServiceTest {
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, false, null, null);
         CrewData crew = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
 
-        when(crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId()))
+        when(crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId()))
                 .thenReturn(List.of(crew));
         when(userProfileQueryPort.getUsersProfileSetting(any()))
                 .thenReturn(Map.of(userId, createProfileSetting("User1")));
@@ -151,7 +151,7 @@ class PartyroomSetupQueryServiceTest {
         CrewData crew1 = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.HOST).build();
         CrewData crew2 = CrewData.builder().id(2L).userId(user2).gradeType(GradeType.CLUBBER).build();
 
-        when(crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId()))
+        when(crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId()))
                 .thenReturn(List.of(crew1, crew2));
         when(userProfileQueryPort.getUsersProfileSetting(any()))
                 .thenReturn(Map.of(
@@ -173,7 +173,7 @@ class PartyroomSetupQueryServiceTest {
     @DisplayName("getSetupInfo — 활성 파티룸이 없으면 예외가 발생한다")
     void getSetupInfo_noActiveRoom_throws() {
         // given
-        when(crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId()))
+        when(crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId()))
                 .thenReturn(List.of());
         when(userProfileQueryPort.getUsersProfileSetting(any()))
                 .thenReturn(Map.of());

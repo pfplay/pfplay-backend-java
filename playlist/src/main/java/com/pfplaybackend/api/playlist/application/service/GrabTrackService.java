@@ -30,7 +30,7 @@ public class GrabTrackService {
 
         PlaylistData playlistData = playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST);
         // LinkId cannot be duplicated.
-        Optional<TrackData> optional = trackRepository.findByPlaylistDataIdAndLinkId(playlistData.getId(), linkId);
+        Optional<TrackData> optional = trackRepository.findByPlaylistIdAndLinkId(playlistData.getId(), linkId);
         if(optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
 
         AddTrackRequest request = new AddTrackRequest(

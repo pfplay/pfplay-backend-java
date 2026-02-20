@@ -43,7 +43,7 @@ public class TrackCommandService {
         PlaylistData playlistData = playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 트랙 중복 검사
-        Optional<TrackData> optional = trackRepository.findByPlaylistDataIdAndLinkId(playlistData.getId(), request.getLinkId());
+        Optional<TrackData> optional = trackRepository.findByPlaylistIdAndLinkId(playlistData.getId(), request.getLinkId());
         if (optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 최대 보유 한계치 초과 검사
         PlaylistSummary playlistSummary = playlistQueryService.getPlaylist(playlistId);
@@ -52,7 +52,7 @@ public class TrackCommandService {
         long nextMusicOrderNumber = playlistSummary.musicCount() == 0 ? 1 : playlistSummary.musicCount() + 1;
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData)
+                .playlistId(playlistData.getId())
                 .name(request.getName())
                 .linkId(request.getLinkId())
                 .duration(Duration.fromString(request.getDuration()))
@@ -71,7 +71,7 @@ public class TrackCommandService {
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         // 타겟 트랙 존재 여부 검사
-        TrackData trackData = trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)
+        TrackData trackData = trackRepository.findByIdAndPlaylistId(trackId, playlistId)
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
 
         Integer prevOrderNumber = trackData.getOrderNumber();
@@ -107,10 +107,10 @@ public class TrackCommandService {
         PlaylistData targetPlaylistData = playlistRepository.findByIdAndOwnerId(request.getTargetPlaylistId(), ownerId)
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 소스에서 트랙 조회
-        TrackData trackData = trackRepository.findByIdAndPlaylistDataId(trackId, sourcePlaylistId)
+        TrackData trackData = trackRepository.findByIdAndPlaylistId(trackId, sourcePlaylistId)
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
         // 타겟에 동일 linkId 중복 검사
-        Optional<TrackData> duplicate = trackRepository.findByPlaylistDataIdAndLinkId(targetPlaylistData.getId(), trackData.getLinkId());
+        Optional<TrackData> duplicate = trackRepository.findByPlaylistIdAndLinkId(targetPlaylistData.getId(), trackData.getLinkId());
         if (duplicate.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 타겟 트랙 개수 15개 제한 검사
         PlaylistSummary targetSummary = playlistQueryService.getPlaylist(request.getTargetPlaylistId());
@@ -119,7 +119,7 @@ public class TrackCommandService {
         trackRepository.shiftUpOrderByDelete(sourcePlaylistId, trackData.getOrderNumber());
         // 트랙을 타겟 플레이리스트로 이동
         int nextOrderNumber = (int) (targetSummary.musicCount() + 1);
-        trackData.moveToPlaylist(targetPlaylistData, nextOrderNumber);
+        trackData.moveToPlaylist(targetPlaylistData.getId(), nextOrderNumber);
         trackRepository.save(trackData);
     }
 
@@ -131,7 +131,7 @@ public class TrackCommandService {
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         // 타겟 트랙 존재 여부 검사
-        TrackData trackData = trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)
+        TrackData trackData = trackRepository.findByIdAndPlaylistId(trackId, playlistId)
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
 
         Integer deleteOrderNumber = trackData.getOrderNumber();

@@ -96,7 +96,7 @@ public class PartyroomAccessService {
         } else {
             log.info("[addOrActivateCrew] Adding new crew - userId={}, partyroomId={}, gradeType=LISTENER",
                     userId, partyroom.getPartyroomId().getId());
-            CrewData crew = CrewData.create(partyroom, userId, GradeType.LISTENER);
+            CrewData crew = CrewData.create(partyroom.getId(), userId, GradeType.LISTENER);
             return aggregatePort.saveCrew(crew);
         }
     }
@@ -107,7 +107,7 @@ public class PartyroomAccessService {
 
     @Transactional
     public void enterByHost(UserId hostId, PartyroomData partyroom) {
-        CrewData crew = CrewData.create(partyroom, hostId, GradeType.HOST);
+        CrewData crew = CrewData.create(partyroom.getId(), hostId, GradeType.HOST);
         aggregatePort.saveCrew(crew);
     }
 

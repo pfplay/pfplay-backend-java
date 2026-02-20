@@ -54,7 +54,7 @@ public class PartyroomSetupQueryService {
     }
 
     private List<CrewSetupDto> getCrewsForSetup(PartyroomId partyroomId) {
-        List<CrewData> crews = crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId());
+        List<CrewData> crews = crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId());
         List<UserId> userIds = crews.stream().map(CrewData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileQueryPort.getUsersProfileSetting(userIds);
 

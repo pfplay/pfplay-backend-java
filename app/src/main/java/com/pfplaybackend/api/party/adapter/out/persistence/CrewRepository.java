@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CrewRepository extends JpaRepository<CrewData, Long> {
-    List<CrewData> findByPartyroomDataIdAndIsActiveTrue(Long partyroomId);
-    Optional<CrewData> findByPartyroomDataIdAndUserId(Long partyroomId, UserId userId);
-    long countByPartyroomDataIdAndIsActiveTrue(Long partyroomId);
+    List<CrewData> findByPartyroomIdAndIsActiveTrue(Long partyroomId);
+    Optional<CrewData> findByPartyroomIdAndUserId(Long partyroomId, UserId userId);
+    long countByPartyroomIdAndIsActiveTrue(Long partyroomId);
 }

@@ -27,9 +27,8 @@ public class DjData extends BaseEntity {
     @Column(name = "dj_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partyroom_id")
-    private PartyroomData partyroomData;
+    @Column(name = "partyroom_id", nullable = false)
+    private Long partyroomId;
 
     @Embedded
     @AttributeOverrides({
@@ -50,9 +49,10 @@ public class DjData extends BaseEntity {
     }
 
     @Builder
-    public DjData(Long id, CrewId crewId, PlaylistId playlistId, int orderNumber,
+    public DjData(Long id, Long partyroomId, CrewId crewId, PlaylistId playlistId, int orderNumber,
                   LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.partyroomId = partyroomId;
         this.crewId = crewId;
         this.playlistId = playlistId;
         this.orderNumber = orderNumber;
@@ -60,21 +60,15 @@ public class DjData extends BaseEntity {
         this.updatedAt = updatedAt;
     }
 
-    public DjData assignPartyroomData(PartyroomData partyroomData) {
-        this.partyroomData = partyroomData;
-        return this;
-    }
-
     // ── Business Methods ──
 
-    public static DjData create(PartyroomData partyroomData, PlaylistId playlistId, CrewId crewId, int orderNumber) {
-        DjData dj = DjData.builder()
+    public static DjData create(Long partyroomId, PlaylistId playlistId, CrewId crewId, int orderNumber) {
+        return DjData.builder()
+                .partyroomId(partyroomId)
                 .playlistId(playlistId)
                 .crewId(crewId)
                 .orderNumber(orderNumber)
                 .build();
-        dj.assignPartyroomData(partyroomData);
-        return dj;
     }
 
     public void updateOrderNumber(int orderNumber) {

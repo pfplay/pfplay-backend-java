@@ -36,6 +36,6 @@ public class TrackQueryService {
 
     @Transactional(readOnly = true)
     public boolean isEmptyPlaylist(Long playlistId) {
-        return !trackRepository.existsByPlaylistDataId(playlistId);
+        return !trackRepository.existsByPlaylistId(playlistId);
     }
 }
