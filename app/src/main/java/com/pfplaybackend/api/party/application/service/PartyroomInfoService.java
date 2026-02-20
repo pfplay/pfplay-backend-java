@@ -133,6 +133,18 @@ public class PartyroomInfoService {
     }
 
     @Transactional(readOnly = true)
+    public CrewData getCrewOrThrow(Long partyroomId, UserId userId) {
+        return crewRepository.findByPartyroomDataIdAndUserId(partyroomId, userId)
+                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
+    }
+
+    @Transactional(readOnly = true)
+    public ActivePartyroomWithCrewDto getMyActivePartyroomWithCrewOrThrow(UserId userId) {
+        return getMyActivePartyroomWithCrewId(userId)
+                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
+    }
+
+    @Transactional(readOnly = true)
     public CrewProfileSummaryResult getProfileSummaryByCrewId(Long crewId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         ActivePartyroomWithCrewDto activePartyroomDto = getMyActivePartyroomWithCrewId(authContext.getUserId())

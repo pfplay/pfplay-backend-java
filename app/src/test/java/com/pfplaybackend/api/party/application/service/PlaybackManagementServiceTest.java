@@ -6,7 +6,6 @@ import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
@@ -48,10 +47,10 @@ class PlaybackManagementServiceTest {
     @Mock UserActivityPort userActivityPort;
     @Mock ApplicationEventPublisher eventPublisher;
     @Mock PartyroomRepository partyroomRepository;
-    @Mock CrewRepository crewRepository;
     @Mock DjRepository djRepository;
     @Mock ExpirationTaskScheduler scheduleService;
     @Mock PartyroomAggregateService partyroomAggregateService;
+    @Mock PartyroomInfoService partyroomInfoService;
 
     @InjectMocks PlaybackManagementService playbackManagementService;
 
@@ -76,7 +75,7 @@ class PlaybackManagementServiceTest {
     void complete_updatesDjScore() {
         // given — tryProceed에서 DJ가 없으면 deactivate
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroom));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())).thenReturn(false);
 
         // when
@@ -91,7 +90,7 @@ class PlaybackManagementServiceTest {
     void complete_noDjs_deactivates() {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroom));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())).thenReturn(false);
 
         // when
@@ -110,9 +109,9 @@ class PlaybackManagementServiceTest {
                 .id(1L).userId(userId).gradeType(GradeType.MODERATOR).build();
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
 
-        when(partyroomRepository.getActivePartyroomByUserId(userId)).thenReturn(Optional.of(activeDto));
-        when(crewRepository.findByPartyroomDataIdAndUserId(activeDto.id(), userId)).thenReturn(Optional.of(adjuster));
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroom));
+        when(partyroomInfoService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
+        when(partyroomInfoService.getCrewOrThrow(activeDto.id(), userId)).thenReturn(adjuster);
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())).thenReturn(false);
 
         // when
@@ -131,8 +130,8 @@ class PlaybackManagementServiceTest {
         CrewData adjuster = CrewData.builder()
                 .id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
 
-        when(partyroomRepository.getActivePartyroomByUserId(userId)).thenReturn(Optional.of(activeDto));
-        when(crewRepository.findByPartyroomDataIdAndUserId(activeDto.id(), userId)).thenReturn(Optional.of(adjuster));
+        when(partyroomInfoService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
+        when(partyroomInfoService.getCrewOrThrow(activeDto.id(), userId)).thenReturn(adjuster);
 
         // when & then
         assertThatThrownBy(() -> playbackManagementService.skipByManager(partyroomId))

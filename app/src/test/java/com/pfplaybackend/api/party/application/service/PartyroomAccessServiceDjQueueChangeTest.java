@@ -92,7 +92,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
                 .isPlaybackActivated(true)
                 .build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
         when(djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.of(dj));
         when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(1L))).thenReturn(false);
@@ -124,7 +124,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
                 .isPlaybackActivated(false)
                 .build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
         when(djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.empty());
 

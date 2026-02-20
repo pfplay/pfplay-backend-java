@@ -12,9 +12,7 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
-import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -25,22 +23,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class CrewGradeService {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final PartyroomRepository partyroomRepository;
     private final CrewRepository crewRepository;
+    private final PartyroomInfoService partyroomInfoService;
 
     @Transactional
     public void updateGrade(PartyroomId partyroomId, CrewId adjustedCrewId, AdjustGradeRequest request) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        partyroomRepository.findById(partyroomId.getId())
-                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        partyroomInfoService.getPartyroomById(partyroomId);
 
         CrewData adjustedCrew = crewRepository.findById(adjustedCrewId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
         AuthorityTier authorityTier = adjustedCrew.getAuthorityTier();
         GradeType prevGradeType = adjustedCrew.getGradeType();
         GradeType targetGradeType = request.getGradeType();
-        CrewData adjusterCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId())
-                .orElseThrow();
+        CrewData adjusterCrew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
 
         new GradeAdjustmentSpecification().validate(adjusterCrew, adjustedCrew, targetGradeType, authorityTier);
 

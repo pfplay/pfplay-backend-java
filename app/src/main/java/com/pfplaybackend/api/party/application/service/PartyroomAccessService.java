@@ -53,12 +53,7 @@ public class PartyroomAccessService {
         log.info("[tryEnter] START - userId={}, targetPartyroomId={}, authorityTier={}",
                 userId, partyroomId.getId(), authorityTier);
 
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
-                .orElseThrow(() -> {
-                    log.warn("[tryEnter] NOT_FOUND_ROOM - partyroomId={} does not exist in DB. userId={}",
-                            partyroomId.getId(), userId);
-                    return ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-                });
+        PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
         long activeCrewCount = crewRepository.countByPartyroomDataIdAndIsActiveTrue(partyroomId.getId());
         Optional<CrewData> existingCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId);
@@ -126,12 +121,7 @@ public class PartyroomAccessService {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         log.info("[exit] START - userId={}, partyroomId={}", authContext.getUserId(), partyroomId.getId());
 
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
-                .orElseThrow(() -> {
-                    log.warn("[exit] NOT_FOUND_ROOM - partyroomId={} not found. userId={}",
-                            partyroomId.getId(), authContext.getUserId());
-                    return ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-                });
+        PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
         Optional<CrewData> optionalCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId());
         if(optionalCrew.isEmpty()) {

@@ -82,7 +82,7 @@ class PartyroomAccessServiceTest {
                 .isTerminated(false)
                 .build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(crewRepository.countByPartyroomDataIdAndIsActiveTrue(partyroomId.getId())).thenReturn(10L);
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
 
@@ -120,7 +120,7 @@ class PartyroomAccessServiceTest {
                 .isTerminated(false)
                 .build();
 
-        when(partyroomRepository.findById(newRoomId.getId())).thenReturn(Optional.of(newPartyroomData));
+        when(partyroomInfoService.getPartyroomById(newRoomId)).thenReturn(newPartyroomData);
         when(crewRepository.countByPartyroomDataIdAndIsActiveTrue(newRoomId.getId())).thenReturn(5L);
 
         // 다른 룸에 이미 active
@@ -143,7 +143,7 @@ class PartyroomAccessServiceTest {
                 .isTerminated(false)
                 .build();
 
-        when(partyroomRepository.findById(oldRoomId.getId())).thenReturn(Optional.of(oldPartyroomData));
+        when(partyroomInfoService.getPartyroomById(oldRoomId)).thenReturn(oldPartyroomData);
         // exit() mock: crew lookup
         when(crewRepository.findByPartyroomDataIdAndUserId(oldRoomId.getId(), userId)).thenReturn(Optional.of(oldCrew));
         when(djRepository.findByPartyroomDataIdAndCrewId(oldRoomId.getId(), new CrewId(5L))).thenReturn(Optional.empty());

@@ -10,7 +10,6 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.value.*;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
@@ -36,12 +35,12 @@ import static org.mockito.Mockito.*;
 class DjManagementServiceDjQueueChangeTest {
 
     @Mock private PartyroomRepository partyroomRepository;
-    @Mock private CrewRepository crewRepository;
     @Mock private DjRepository djRepository;
     @Mock private PlaybackManagementService playbackManagementService;
     @Mock private PlaylistQueryPort playlistQueryPort;
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private PartyroomAggregateService partyroomAggregateService;
+    @Mock private PartyroomInfoService partyroomInfoService;
 
     @InjectMocks
     private DjManagementService djManagementService;
@@ -85,10 +84,10 @@ class DjManagementServiceDjQueueChangeTest {
                 .isQueueClosed(false)
                 .build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
         when(djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId.getId(), userId)).thenReturn(false);
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
         when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
         when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
 
@@ -126,8 +125,8 @@ class DjManagementServiceDjQueueChangeTest {
                 .isPlaybackActivated(true)
                 .build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
+        when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
         when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(1L))).thenReturn(false);
 
         // when
@@ -167,8 +166,8 @@ class DjManagementServiceDjQueueChangeTest {
                 .isPlaybackActivated(true)
                 .build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
+        when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
         when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(1L))).thenReturn(true);
 
         // when
@@ -212,8 +211,8 @@ class DjManagementServiceDjQueueChangeTest {
                 .isActive(true)
                 .build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), adminUserId)).thenReturn(Optional.of(adjusterCrew));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
+        when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adminUserId)).thenReturn(adjusterCrew);
         when(djRepository.findById(djId.getId())).thenReturn(Optional.of(targetDj));
         when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(2L))).thenReturn(false);
 

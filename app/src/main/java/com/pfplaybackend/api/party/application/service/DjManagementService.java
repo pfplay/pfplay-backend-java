@@ -12,11 +12,8 @@ import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.party.domain.specification.DjEnqueueSpecification;
 import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
-import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.DjException;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
-import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,18 +28,17 @@ import java.util.List;
 public class DjManagementService {
 
     private final PartyroomRepository partyroomRepository;
-    private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final PlaybackManagementService playbackManagementService;
     private final PlaylistQueryPort playlistQueryPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomAggregateService partyroomAggregateService;
+    private final PartyroomInfoService partyroomInfoService;
 
     @Transactional
     public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
-                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
         boolean isPostActivationProcessingRequired = !partyroom.isPlaybackActivated();
         boolean isAlreadyRegistered = djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId.getId(), authContext.getUserId());
@@ -50,8 +46,7 @@ public class DjManagementService {
         new DjEnqueueSpecification().validate(partyroom, isAlreadyRegistered, isEmptyPlaylist);
 
         // Find crew
-        CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId())
-                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
+        CrewData crew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
 
         // Calculate next order number
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId());
@@ -74,11 +69,9 @@ public class DjManagementService {
     @Transactional
     public void dequeueDj(PartyroomId partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
-                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
-        CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId())
-                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
+        CrewData crew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
         CrewId crewId = new CrewId(crew.getId());
 
         boolean wasCurrentDj = partyroom.isPlaybackActivated() && partyroomAggregateService.isCurrentDj(partyroomId.getId(), crewId);
@@ -93,12 +86,10 @@ public class DjManagementService {
     @Transactional
     public void dequeueDj(PartyroomId partyroomId, DjId djId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
-                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
         // 관리자 등급 체크
-        CrewData adjusterCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId())
-                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
+        CrewData adjusterCrew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
         if (adjusterCrew.isBelowGrade(GradeType.MODERATOR))
             throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
 

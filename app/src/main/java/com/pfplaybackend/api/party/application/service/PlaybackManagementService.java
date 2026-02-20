@@ -17,11 +17,9 @@ import com.pfplaybackend.api.party.domain.event.PlaybackDeactivatedEvent;
 import com.pfplaybackend.api.party.domain.event.PlaybackStartedEvent;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.in.listener.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
-import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
@@ -43,10 +41,10 @@ public class PlaybackManagementService {
     private final UserActivityPort userActivityPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomRepository partyroomRepository;
-    private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final ExpirationTaskScheduler scheduleService;
     private final PartyroomAggregateService partyroomAggregateService;
+    private final PartyroomInfoService partyroomInfoService;
 
     private void scheduleTask(PlaybackData playback) {
         long seconds = playback.getDuration().toSeconds();
@@ -69,8 +67,8 @@ public class PlaybackManagementService {
     @Transactional
     public void skipByManager(PartyroomId partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        ActivePartyroomDto activePartyroomDto = partyroomRepository.getActivePartyroomByUserId(authContext.getUserId()).orElseThrow();
-        CrewData adjusterCrew = crewRepository.findByPartyroomDataIdAndUserId(activePartyroomDto.id(), authContext.getUserId()).orElseThrow();
+        ActivePartyroomDto activePartyroomDto = partyroomInfoService.getMyActivePartyroom(authContext.getUserId()).orElseThrow();
+        CrewData adjusterCrew = partyroomInfoService.getCrewOrThrow(activePartyroomDto.id(), authContext.getUserId());
         if (adjusterCrew.isBelowGrade(GradeType.MODERATOR)) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
         cancelTask(partyroomId);
         tryProceed(partyroomId);
@@ -83,8 +81,7 @@ public class PlaybackManagementService {
     }
 
     private void tryProceed(PartyroomId partyroomId) {
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
-                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+        PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
         if(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())) {
             start(partyroom);
@@ -104,8 +101,7 @@ public class PlaybackManagementService {
 
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
         DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
-        CrewData djCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroom.getId(), nextDj.getUserId())
-                .orElseThrow();
+        CrewData djCrew = partyroomInfoService.getCrewOrThrow(partyroom.getId(), nextDj.getUserId());
         PlaybackData nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj);
 
         if (partyroom.getPlaybackTimeLimit().exceedsDuration(nextPlayback.getDuration())) {
@@ -113,8 +109,7 @@ public class PlaybackManagementService {
                 deactivateAndNotify(partyroom);
                 return;
             }
-            PartyroomData reloaded = partyroomRepository.findById(partyroom.getPartyroomId().getId())
-                    .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
+            PartyroomData reloaded = partyroomInfoService.getPartyroomById(partyroom.getPartyroomId());
             if (partyroomAggregateService.hasQueuedDjs(reloaded.getId())) {
                 doStart(reloaded, remainingAttempts - 1);
             } else {

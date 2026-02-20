@@ -12,7 +12,6 @@ import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.AddBlockRequest;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
@@ -30,14 +29,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CrewBlockService {
 
-    private final PartyroomRepository partyroomRepository;
     private final CrewRepository crewRepository;
     private final CrewBlockHistoryRepository blockHistoryRepository;
     private final UserProfileService userProfileService;
     private final CrewBlockHistoryRepository crewBlockHistoryRepository;
+    private final PartyroomInfoService partyroomInfoService;
 
     public List<BlockedCrewResult> getBlocks() {
-        ActivePartyroomWithCrewDto dto = getMyActivePartyroomOrThrow();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
+        ActivePartyroomWithCrewDto dto = partyroomInfoService.getMyActivePartyroomWithCrewOrThrow(authContext.getUserId());
 
         List<CrewBlockHistoryData> historyDataList = blockHistoryRepository.findAllByBlockerCrewIdAndUnblockedIsFalse(new CrewId(dto.crewId()));
         Map<UserId, ProfileSettingDto> map = userProfileService.getUsersProfileSetting(historyDataList.stream().map(CrewBlockHistoryData::getBlockedUserId).toList());
@@ -47,7 +47,8 @@ public class CrewBlockService {
 
     @Transactional
     public void addBlock(AddBlockRequest request) {
-        ActivePartyroomWithCrewDto dto = getMyActivePartyroomOrThrow();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
+        ActivePartyroomWithCrewDto dto = partyroomInfoService.getMyActivePartyroomWithCrewOrThrow(authContext.getUserId());
 
         CrewId blockerCrewId = new CrewId(dto.crewId());
         CrewId blockedCrewId = new CrewId(request.getCrewId());
@@ -70,7 +71,8 @@ public class CrewBlockService {
 
     @Transactional
     public void removeBlock(Long blockId) {
-        ActivePartyroomWithCrewDto dto = getMyActivePartyroomOrThrow();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
+        ActivePartyroomWithCrewDto dto = partyroomInfoService.getMyActivePartyroomWithCrewOrThrow(authContext.getUserId());
 
         CrewId blockerCrewId = new CrewId(dto.crewId());
         CrewBlockHistoryData historyData  = blockHistoryRepository.findByIdAndBlockerCrewIdAndUnblockedIsFalse(blockId, blockerCrewId)
@@ -82,9 +84,4 @@ public class CrewBlockService {
         crewBlockHistoryRepository.save(historyData);
     }
 
-    private ActivePartyroomWithCrewDto getMyActivePartyroomOrThrow() {
-        AuthContext authContext = ThreadLocalContext.getAuthContext();
-        return partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(authContext.getUserId())
-                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
-    }
 }

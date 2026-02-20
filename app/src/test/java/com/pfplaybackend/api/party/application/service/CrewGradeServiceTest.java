@@ -8,7 +8,6 @@ import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
@@ -35,8 +34,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CrewGradeServiceTest {
 
-    @Mock PartyroomRepository partyroomRepository;
     @Mock CrewRepository crewRepository;
+    @Mock PartyroomInfoService partyroomInfoService;
     @Mock ApplicationEventPublisher eventPublisher;
 
     @InjectMocks CrewGradeService crewGradeService;
@@ -73,10 +72,9 @@ class CrewGradeServiceTest {
         CrewData adjustedCrew = CrewData.builder()
                 .id(adjustedCrewId.getId()).userId(new UserId(2L)).authorityTier(AuthorityTier.FM).gradeType(GradeType.CLUBBER).build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroom));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(crewRepository.findById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), adjusterUserId))
-                .thenReturn(Optional.of(adjusterCrew));
+        when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
         when(crewRepository.save(any())).thenReturn(adjustedCrew);
 
         AdjustGradeRequest request = createRequest(GradeType.MODERATOR);
@@ -93,7 +91,8 @@ class CrewGradeServiceTest {
     @DisplayName("updateGrade — 파티룸이 존재하지 않으면 예외가 발생한다")
     void updateGrade_roomNotFound() {
         // given
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.empty());
+        when(partyroomInfoService.getPartyroomById(partyroomId))
+                .thenThrow(new NotFoundException("PTR-001", "Can not find Partyroom"));
         AdjustGradeRequest request = createRequest(GradeType.MODERATOR);
 
         // when & then
@@ -111,10 +110,9 @@ class CrewGradeServiceTest {
         CrewData adjustedCrew = CrewData.builder()
                 .id(adjustedCrewId.getId()).userId(new UserId(2L)).authorityTier(AuthorityTier.FM).gradeType(GradeType.LISTENER).build();
 
-        when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroom));
+        when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(crewRepository.findById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), adjusterUserId))
-                .thenReturn(Optional.of(adjusterCrew));
+        when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
 
         AdjustGradeRequest request = createRequest(GradeType.MODERATOR);
 
