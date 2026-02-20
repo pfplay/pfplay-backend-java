@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.domain.entity.data;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.DurationConverter;
-import com.pfplaybackend.api.party.application.dto.playback.PlaybackTrackDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;

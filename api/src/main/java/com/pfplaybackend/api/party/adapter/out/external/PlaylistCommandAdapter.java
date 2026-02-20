@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.adapter.out.external;
 
-import com.pfplaybackend.api.party.application.dto.playback.PlaybackTrackDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.playlist.application.service.GrabTrackService;

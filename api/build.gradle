@@ -6,6 +6,7 @@ def queryDslVersion = '5.0.0'
 
 dependencies {
 	implementation project(':common')
+	implementation project(':playlist')
 	implementation project(':realtime')
 
 	// Core Spring Boot Starters

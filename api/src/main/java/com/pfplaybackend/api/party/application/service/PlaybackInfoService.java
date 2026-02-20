@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.application.service;
 
-import com.pfplaybackend.api.party.application.dto.playback.PlaybackTrackDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;

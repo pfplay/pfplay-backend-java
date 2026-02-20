@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.party.application.dto.playback;
+package com.pfplaybackend.api.playlist.application.dto;
 
 public record PlaybackTrackDto(
         String linkId,

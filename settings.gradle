@@ -1,2 +1,2 @@
 rootProject.name = 'pfplay'
-include 'common', 'api', 'realtime'
+include 'common', 'playlist', 'api', 'realtime'

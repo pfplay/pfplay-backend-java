@@ -3,7 +3,7 @@ package com.pfplaybackend.api.playlist.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.playback.PlaybackTrackDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
