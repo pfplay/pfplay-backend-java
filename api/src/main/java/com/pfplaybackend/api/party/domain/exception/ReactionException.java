@@ -1,20 +1,20 @@
 package com.pfplaybackend.api.party.domain.exception;
 
 import com.pfplaybackend.api.common.exception.DomainException;
-import com.pfplaybackend.api.common.exception.http.ForbiddenException;
+import com.pfplaybackend.api.common.exception.ErrorType;
 import lombok.Getter;
 
 @Getter
 public enum ReactionException implements DomainException {
-    INVALID_REACTION("RCT-001", "Invalid reaction type", ForbiddenException.class);
+    INVALID_REACTION("RCT-001", "Invalid reaction type", ErrorType.FORBIDDEN);
 
     private final String errorCode;
     private final String message;
-    private final Class<?> aClass;
+    private final ErrorType errorType;
 
-    ReactionException(String errorCode, String message, Class<?> aClass) {
+    ReactionException(String errorCode, String message, ErrorType errorType) {
         this.message = message;
         this.errorCode = errorCode;
-        this.aClass = aClass;
+        this.errorType = errorType;
     }
 }

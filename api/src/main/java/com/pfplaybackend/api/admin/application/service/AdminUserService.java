@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.admin.application.service;
 
+import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.common.exception.http.ForbiddenException;
-import com.pfplaybackend.api.common.exception.http.NotFoundException;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import com.pfplaybackend.api.profile.domain.ProfileData;
@@ -122,7 +122,7 @@ public class AdminUserService {
 
         // 2. Verify it's a virtual member (ADMIN provider type)
         if (member.getProviderType() != ProviderType.ADMIN) {
-            throw new ForbiddenException("FORBIDDEN", "Cannot update avatar of non-virtual member");
+            throw ExceptionCreator.create(AdminException.NON_VIRTUAL_MEMBER_AVATAR_UPDATE);
         }
 
         // 3. Create new profile with updated avatar
@@ -157,7 +157,7 @@ public class AdminUserService {
 
         // 2. Verify it's a virtual member
         if (member.getProviderType() != ProviderType.ADMIN) {
-            throw new ForbiddenException("FORBIDDEN", "Cannot delete non-virtual member");
+            throw ExceptionCreator.create(AdminException.NON_VIRTUAL_MEMBER_DELETE);
         }
 
         // 3. Delete
@@ -177,7 +177,7 @@ public class AdminUserService {
         MemberData member = findMemberByUserId(userId);
 
         if (member.getProviderType() != ProviderType.ADMIN) {
-            throw new ForbiddenException("FORBIDDEN", "Not a virtual member");
+            throw ExceptionCreator.create(AdminException.NOT_VIRTUAL_MEMBER);
         }
 
         return member;
@@ -191,7 +191,7 @@ public class AdminUserService {
      */
     private MemberData findMemberByUserId(UserId userId) {
         return memberRepository.findById(userId.getUid())
-                .orElseThrow(() -> new NotFoundException("NOT_FOUND", "Member not found: " + userId.getUid()));
+                .orElseThrow(() -> ExceptionCreator.create(AdminException.MEMBER_NOT_FOUND));
     }
 
     /**
