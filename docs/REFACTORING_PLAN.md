@@ -3,17 +3,18 @@
 > **작성일**: 2026-02-18 (갱신: 2026-02-20)
 > **브랜치**: `refactor/ddd-cleanup` (`chore/playlist-tests` 에서 분기)
 > **목표**: 현재 구조를 DDD + 헥사고널 아키텍처 기반의 모듈러 모놀리스로 개편
+> **상태**: Phase 0~8 + 모듈 재구조화 **전체 완료** — 5모듈, 417 소스파일, 44 테스트파일(223 메서드)
 
 ---
 
-## 현재 상태 요약
+## 리팩토링 이전 상태 (참고용)
 
-### 코드베이스 기반
+### 코드베이스 기반 (리팩토링 시작 시점)
 - `chore/playlist-tests` 기반 (main 대비 184커밋 ahead)
 - 컴파일 성공, 테스트 18개 파일 전부 통과
 - 신규 패키지: `profile/` (23개 파일), `avatarresource/` (5개 파일)
 
-### 핵심 문제점
+### 당시 핵심 문제점 (전부 해결됨)
 
 1. **Domain Model ↔ Data Entity 이중 구조의 과도한 변환 비용**
    - 도메인 모델: party(4), user(8), playlist(1) = 13개
@@ -507,6 +508,136 @@ JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11" ./gradlew :realtime:compileJav
 
 ---
 
+## Phase 6: DDD Tactical Patterns ✅ 완료 (2026-02-20)
+
+### 목표
+Value Object, Rich Model, Specification, Aggregate 경계, Domain Event 등 DDD 전술 패턴을 전면 적용
+
+### 실제 수행 내역
+
+#### 6-1. Value Object 도입 (`6763f84`)
+- 원시값을 VO로 전환: `Duration`, `Score`, `Nickname`, `PlaybackTimeLimit`, `LinkDomain`
+- JPA `@Converter` / `@Embedded` 적용 (DB 스키마 변경 없음)
+
+#### 6-2. Specification / Policy 패턴 (`6763f84`)
+- `PartyroomEntrySpecification`, `DjEnqueueSpecification`, `GradeAdjustmentSpecification`
+- `PartyroomCreationPolicy`, `PlaylistCreationPolicy`
+- 서비스에서 검증 로직을 Specification으로 추출
+
+#### 6-3. Aggregate 경계 명확화 (`6763f84`)
+- `PartyroomAggregateService` 신규: DJ 큐 조작(`removeDjFromQueue`, `rotateDjQueue`, `deactivatePlayback`) 중앙화
+- `PlaybackDomainService` 및 5개 빈약 도메인 서비스 삭제
+
+#### 6-4. Domain Event 도입 (`6763f84`)
+- 9개 도메인 이벤트 생성, `@TransactionalEventListener(AFTER_COMMIT)` 기반
+- 7개 응용 서비스에서 `RedisMessagePublisher` 직접 호출 → `ApplicationEventPublisher` 전환
+- 도메인 ↔ Redis 인프라 디커플링 달성
+
+#### 6-5. User JOINED 상속 + ProfileData 분해 (`42383da`)
+- `UserAccountData` 추상 부모 + JOINED 상속 전략 (`MemberData`, `GuestData` 확장)
+- `UserAccountRepository`로 다형 쿼리 지원
+- `ProfileData`의 13+ 필드 → `Bio`, `AvatarSetting` `@Embeddable` VO로 분해 (DB 스키마 불변)
+
+### 완료 기준
+- [x] 주요 원시값이 VO로 전환됨
+- [x] 검증 로직이 Specification/Policy로 분리됨
+- [x] 도메인 이벤트로 인프라 디커플링됨
+- [x] User 엔티티에 JOINED 상속 적용됨
+- [x] 전체 테스트 통과
+
+---
+
+## Phase 7: 코드 품질 정비 ✅ 완료 (2026-02-20)
+
+### 목표
+데드 코드 제거, 네이밍 통일, 예외 아키텍처 정비, DTO Record 전환 등 전반적 코드 품질 향상
+
+### 실제 수행 내역
+
+#### 7-1. 데드 코드 제거 + 네이밍 통일 (`b83657c`, `b7d1622`)
+- `GuestDomainService`, `MusicSearchDomainService`, 미사용 Avatar VO 5개 삭제
+- **Music → Track 네이밍 통일**: 20+ 클래스/메서드 일괄 변경
+- CQRS 위반 수정: `getFirstTrack()+rotateTrackOrder()`를 Query→Command 서비스로 이동
+- 서비스 통합: `CrewInfoService` → `PartyroomInfoService`, `PartyroomInitializeService` → `PartyroomManagementService`
+
+#### 7-2. @Transactional 통일 + 쿼리 최적화 (`f55d2ac`)
+- `jakarta.transaction.Transactional` → Spring `@Transactional` (12파일)
+- 조회 메서드에 `@Transactional(readOnly = true)` 추가
+- `isEmptyPlaylist`: 페이지네이션 쿼리 → `existsByPlaylistDataId`로 교체
+
+#### 7-3. 예외 아키텍처 정비 (`58416b3`, `8f30765`, `cfc07b1`)
+- 리플렉션 기반 예외 생성(`InstanceCreator`) → Java 17 switch expression으로 교체
+- 도메인 예외 enum에서 HTTP 예외 클래스 import 제거 (도메인/인프라 분리)
+- `AdminException`(8개 상수), `AuthException`(2개 상수) 신규 생성
+- Redis 리스너 12개: `throw RuntimeException` → `log.error + return`
+- `System.out.println` → `log.warn` 교체
+
+#### 7-4. DTO/Message Record 전환 (`6062151`)
+- **51개 DTO/Message를 record로 전환** (Lombok 제거, 생성자 호출로 변경)
+- Redis 리스너 13개 → `GroupBroadcastTopicListener`로 통합
+- `docs/DTO_RECORD_POLICY.md` 문서 작성 (record vs class 판단 기준)
+
+### 완료 기준
+- [x] 데드 코드 제거 완료
+- [x] Music → Track 네이밍 통일 완료
+- [x] 예외 생성이 리플렉션 없이 switch expression 기반
+- [x] 51개 DTO가 record로 전환됨
+- [x] 전체 테스트 통과
+
+---
+
+## Gradle 모듈 재구조화 ✅ 완료 (2026-02-20)
+
+> 별도 문서: `docs/MODULE_RESTRUCTURING_PLAN.md`
+
+2모듈(api, realtime) → 5모듈(common, realtime, playlist, user, app) 전환.
+Phase A(common 승격) → B(playlist 분리) → C(api→app 개명) → D(profile+avatarresource→user 병합) → E(user 모듈 분리).
+
+---
+
+## Phase 8: 구조 개선 + 테스트 안전망 ✅ 완료 (2026-02-20)
+
+### 목표
+조회 집약 로직 분리, 응답 구조 통일, 관용적 Java 패턴 적용, 테스트 커버리지 확충
+
+### 실제 수행 내역
+
+#### 8-1. partyview 패키지 추출 (`6448d9c`)
+- Setup API의 크로스 도메인 조회 집약 로직을 `partyview` 패키지로 분리
+- `PartyroomSetupQueryService`(107줄) 신규 → `DisplayInfoService` 대체
+- 설정 관련 DTO(`CrewSetupDto`, `DisplayDto`, `ReactionDto`, `CurrentDjDto`) 재배치
+
+#### 8-2. 테스트 안전망 구축 (`f10f7ae`)
+- **13개 테스트 파일, 75개 테스트 메서드** 추가
+- VO/Model 테스트, Domain Entity 테스트, Domain Service 테스트, Application Service 테스트
+- 컨벤션: Korean `@DisplayName`, given/when/then, AssertJ
+
+#### 8-3. 응답 구조 통일 (`3f40e72`)
+- `ResponseEntity<?>` 와일드카드 → 타입 안전 제네릭 (24개 컨트롤러, ~44개 메서드)
+- `ApiErrorResponse` record 신규 (ApiCommonResponse와 분리)
+- 미래핑 엔드포인트 래핑, "OK" 문자열 → `ApiCommonResponse.ok()`
+- `ExceptionResult` 삭제
+
+#### 8-4. 관용적 Java 패턴 적용 (`9e1c9ba`)
+- `Optional` 베스트 프랙티스: `isPresent+get` → `orElseThrow`/`orElseGet`
+- PenaltyType if-chain → switch expression
+- `ThreadLocalContext.getAuthContext()` 타입 안전 메서드 추가 (36개 unsafe cast 제거)
+- `ReactionState` → record 전환
+- CrewPenaltyService N+1 쿼리 수정 (배치 조회)
+
+#### 8-5. 크루 조회 중복 제거 (`0b38a00`)
+- `PartyroomInfoService`에 `getCrewOrThrow()`, `getMyActivePartyroomWithCrewOrThrow()` 추가
+- 6개 서비스에서 ~25곳의 중복 repository+exception 패턴을 중앙 메서드로 교체
+
+### 완료 기준
+- [x] 조회 집약 로직이 partyview 패키지로 분리됨
+- [x] 테스트 44파일 223메서드 (안전망 확보)
+- [x] 모든 컨트롤러가 타입 안전 응답 사용
+- [x] 중복 조회 패턴 ~25곳 제거
+- [x] 전체 테스트 통과
+
+---
+
 ## Phase 간 의존 관계
 
 ```
@@ -518,21 +649,30 @@ Phase 2 (Aggregate 분리)           ✅ 완료
     ↓
 Phase 3 (헥사고널 패키지 구조)      ✅ 완료
     ↓
-Phase 4 (Gradle 멀티모듈 분리)     ✅ 완료 (2026-02-20)
+Phase 4 (Gradle 멀티모듈 분리)     ✅ 완료
     ↓
-Phase 5 (QueryDSL 정비)           ✅ 완료 (2026-02-20)
+Phase 5 (QueryDSL 정비)           ✅ 완료
+    ↓
+Phase 6 (DDD Tactical Patterns)   ✅ 완료
+    ↓
+Phase 7 (코드 품질 정비)           ✅ 완료
+    ↓
+모듈 재구조화 (Phase A~E)          ✅ 완료 (→ docs/MODULE_RESTRUCTURING_PLAN.md)
+    ↓
+Phase 8 (구조 개선 + 테스트)       ✅ 완료
 ```
 
 ---
 
-## 작업 시 주의사항
+## 현재 코드베이스 수치 요약
 
-1. **각 Phase 완료 후 반드시 커밋** — 롤백 가능한 단위 유지
-2. **Phase 1이 가장 위험** — 모든 서비스에 영향. 도메인별로 나눠서 진행 (party → playlist → user 순)
-3. **테스트 우선** — 기존 테스트(18개 파일)가 통과하는 상태를 항상 유지
-4. **컴파일 먼저** — 대규모 변경 시 `compileJava` 먼저 확인 후 테스트
-5. **한 번에 한 도메인** — Phase 1에서 party, playlist, user를 동시에 바꾸지 말 것
-6. **신규 패키지 주의** — `profile/`, `avatarresource/` 패키지도 리팩토링 대상에 포함
+| 항목 | 수치 |
+|------|------|
+| Gradle 모듈 | 5개 (common, realtime, playlist, user, app) |
+| 소스 파일 | 417개 (common 51, realtime 10, playlist 47, user 91, app 218) |
+| 테스트 파일 | 44개 (common 2, playlist 6, user 9, app 27) |
+| 테스트 메서드 | 223개 |
+| DTO record | 51개 |
 
 ---
 
@@ -543,21 +683,20 @@ Phase 5 (QueryDSL 정비)           ✅ 완료 (2026-02-20)
 export JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11"
 
 # 컴파일 확인 (루트에서)
-./gradlew :api:compileJava
+./gradlew :app:compileJava
 ./gradlew :realtime:compileJava
+./gradlew :playlist:compileJava
+./gradlew :user:compileJava
 
 # 전체 테스트
-./gradlew :api:test
+./gradlew :common:test :playlist:test :user:test :app:test
 
-# 특정 도메인 테스트
-./gradlew :api:test --tests "com.pfplaybackend.api.party.*"
-./gradlew :api:test --tests "com.pfplaybackend.api.playlist.*"
-
-# 빠른 빌드 확인 (테스트 제외)
-./gradlew :api:build -x test
+# 특정 모듈 테스트
+./gradlew :app:test --tests "com.pfplaybackend.api.party.*"
+./gradlew :playlist:test
 
 # 클린 빌드
-./gradlew clean :api:test
+./gradlew clean :app:test
 ```
 
 ---

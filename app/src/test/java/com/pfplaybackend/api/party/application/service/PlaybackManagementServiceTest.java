@@ -7,6 +7,7 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
@@ -47,6 +48,7 @@ class PlaybackManagementServiceTest {
     @Mock UserActivityPort userActivityPort;
     @Mock ApplicationEventPublisher eventPublisher;
     @Mock PartyroomRepository partyroomRepository;
+    @Mock PartyroomPlaybackRepository partyroomPlaybackRepository;
     @Mock DjRepository djRepository;
     @Mock ExpirationTaskScheduler scheduleService;
     @Mock PartyroomAggregateService partyroomAggregateService;
@@ -97,14 +99,14 @@ class PlaybackManagementServiceTest {
         playbackManagementService.complete(partyroomId, userId);
 
         // then
-        verify(partyroomAggregateService).deactivatePlayback(partyroom);
+        verify(partyroomAggregateService).deactivatePlayback(partyroomId.getId());
     }
 
     @Test
     @DisplayName("skipByManager — MODERATOR 이상 등급이면 스킵이 실행된다")
     void skipByManager_moderator_succeeds() {
         // given
-        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), true, false, new PlaybackId(1L), 1L);
+        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, true, new PlaybackId(1L), new CrewId(1L));
         CrewData adjuster = CrewData.builder()
                 .id(1L).userId(userId).gradeType(GradeType.MODERATOR).build();
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
@@ -119,14 +121,14 @@ class PlaybackManagementServiceTest {
 
         // then
         verify(scheduleService).deleteKey(String.valueOf(partyroomId.getId()));
-        verify(partyroomAggregateService).deactivatePlayback(partyroom);
+        verify(partyroomAggregateService).deactivatePlayback(partyroomId.getId());
     }
 
     @Test
     @DisplayName("skipByManager — MODERATOR 미만 등급이면 예외가 발생한다")
     void skipByManager_belowModerator_throws() {
         // given
-        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), true, false, new PlaybackId(1L), 1L);
+        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, true, new PlaybackId(1L), new CrewId(1L));
         CrewData adjuster = CrewData.builder()
                 .id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
 

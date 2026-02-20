@@ -5,7 +5,11 @@ import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.party.domain.exception.DjException;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.domain.value.*;
+import com.pfplaybackend.api.party.domain.value.LinkDomain;
+import com.pfplaybackend.api.party.domain.value.LinkDomainConverter;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
+import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimitConverter;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
@@ -59,14 +63,6 @@ public class PartyroomData extends BaseEntity {
 
     // 공지사항 내용
     private String noticeContent;
-    // 현재 진행중인 재생 식별자
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "current_playback_id")),
-    })
-    private PlaybackId currentPlaybackId;
-    // 재생이 활성화 되었는가 여부
-    private boolean isPlaybackActivated;
     // 대기열이 닫혔는가 여부
     private boolean isQueueClosed;
     // 폐쇄되었는가 여부
@@ -93,7 +89,7 @@ public class PartyroomData extends BaseEntity {
     @Builder
     public PartyroomData(Long id, PartyroomId partyroomId, UserId hostId, StageType stageType,
                          String title, String introduction, LinkDomain linkDomain, PlaybackTimeLimit playbackTimeLimit,
-                         String noticeContent, PlaybackId currentPlaybackId, boolean isPlaybackActivated, boolean isQueueClosed, boolean isTerminated,
+                         String noticeContent, boolean isQueueClosed, boolean isTerminated,
                          LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.partyroomId = partyroomId;
@@ -104,17 +100,10 @@ public class PartyroomData extends BaseEntity {
         this.linkDomain = linkDomain;
         this.playbackTimeLimit = playbackTimeLimit;
         this.noticeContent = noticeContent;
-        this.currentPlaybackId = currentPlaybackId;
-        this.isPlaybackActivated = isPlaybackActivated;
         this.isQueueClosed = isQueueClosed;
         this.isTerminated = isTerminated;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
-    }
-
-    public PartyroomData applyActivation() {
-        this.isPlaybackActivated = true;
-        return this;
     }
 
     // ── Factory Method ──
@@ -129,24 +118,12 @@ public class PartyroomData extends BaseEntity {
                 .linkDomain(linkDomain)
                 .playbackTimeLimit(timeLimit)
                 .noticeContent("")
-                .isPlaybackActivated(false)
                 .isQueueClosed(false)
                 .isTerminated(false)
                 .build();
     }
 
     // ── Business Methods ──
-
-    public PartyroomData updatePlaybackId(PlaybackId playbackId) {
-        this.currentPlaybackId = playbackId;
-        return this;
-    }
-
-    public PartyroomData applyDeactivation() {
-        this.isPlaybackActivated = false;
-        this.currentPlaybackId = null;
-        return this;
-    }
 
     public PartyroomData updateBaseInfo(String title, String introduction, LinkDomain linkDomain, PlaybackTimeLimit timeLimit) {
         this.title = title;

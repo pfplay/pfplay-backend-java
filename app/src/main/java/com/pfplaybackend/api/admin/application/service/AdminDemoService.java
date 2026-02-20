@@ -18,6 +18,7 @@ import com.pfplaybackend.api.party.application.service.PlaybackManagementService
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
@@ -26,6 +27,7 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
@@ -66,6 +68,7 @@ public class AdminDemoService {
     private final AdminUserService adminUserService;
     private final MemberRepository memberRepository;
     private final PartyroomRepository partyroomRepository;
+    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final PartyroomAccessService partyroomAccessService;
@@ -222,6 +225,7 @@ public class AdminDemoService {
                     PlaybackTimeLimit.ofMinutes(createRequest.getPlaybackTimeLimit()),
                     StageType.GENERAL, hostUserId);
             PartyroomData savedPartyroom = partyroomRepository.save(partyroom);
+            partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(savedPartyroom.getId()));
 
             // Enter host
             partyroomAccessService.enterByHost(hostUserId, savedPartyroom);
@@ -307,8 +311,9 @@ public class AdminDemoService {
 
         PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
+        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(loadedPartyroom.getId()).orElseThrow();
 
-        boolean isPostActivationProcessingRequired = !loadedPartyroom.isPlaybackActivated();
+        boolean isPostActivationProcessingRequired = !playbackState.isActivated();
 
         // Find crew
         CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(loadedPartyroom.getId(), userId)
@@ -328,8 +333,8 @@ public class AdminDemoService {
         DjData dj = DjData.create(loadedPartyroom, new PlaylistId(playlist.getId()), userId, new CrewId(crew.getId()), nextOrder);
         djRepository.save(dj);
 
-        loadedPartyroom.applyActivation();
-        partyroomRepository.save(loadedPartyroom);
+        playbackState.activate(null, null);
+        partyroomPlaybackRepository.save(playbackState);
 
         // Start playback if this is the first DJ
         if (isPostActivationProcessingRequired) {
@@ -431,6 +436,8 @@ public class AdminDemoService {
                 .map(p -> {
                     int crewCount = (int) crewRepository.countByPartyroomDataIdAndIsActiveTrue(p.getId());
                     int djCount = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(p.getId()).size();
+                    boolean isPlaybackActivated = partyroomPlaybackRepository.findById(p.getId())
+                            .map(PartyroomPlaybackData::isActivated).orElse(false);
                     return AdminPartyroomListResponse.PartyroomItem.builder()
                             .partyroomId(p.getId())
                             .stageType(p.getStageType().name())
@@ -438,7 +445,7 @@ public class AdminDemoService {
                             .linkDomain(p.getLinkDomain().getValue())
                             .crewCount(crewCount)
                             .djCount(djCount)
-                            .isPlaybackActivated(p.isPlaybackActivated())
+                            .isPlaybackActivated(isPlaybackActivated)
                             .build();
                 })
                 .toList();

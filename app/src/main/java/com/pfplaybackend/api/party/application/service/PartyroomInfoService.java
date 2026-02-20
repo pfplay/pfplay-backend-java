@@ -13,6 +13,7 @@ import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
@@ -20,6 +21,7 @@ import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.in.web.payload.response.info.QueryPartyroomSummaryResponse;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 public class PartyroomInfoService {
 
     private final PartyroomRepository partyroomRepository;
+    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final UserProfileQueryPort userProfileQueryPort;
@@ -109,8 +112,9 @@ public class PartyroomInfoService {
     public QueryPartyroomSummaryResponse getSummaryInfo(PartyroomId partyroomId) {
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        if(partyroom.isPlaybackActivated()) {
-            PlaybackData playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
+        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroomId.getId()).orElseThrow();
+        if(playbackState.isActivated()) {
+            PlaybackData playback = playbackInfoService.getPlaybackById(playbackState.getCurrentPlaybackId());
             CrewData djCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), playback.getUserId())
                     .orElseThrow();
             UserId djUserId = djCrew.getUserId();

@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.party.domain.service;
 
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
-import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ import java.util.List;
 public class PartyroomAggregateService {
 
     private final DjRepository djRepository;
-    private final PartyroomRepository partyroomRepository;
+    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
 
     /**
      * DJ큐에서 제거 + 순서 재배치 (atomic operation)
@@ -57,20 +57,12 @@ public class PartyroomAggregateService {
     /**
      * 재생 비활성화 + 전체 DJ 일괄 삭제
      */
-    public void deactivatePlayback(PartyroomData partyroom) {
-        partyroom.applyDeactivation();
-        partyroomRepository.save(partyroom);
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroom.getId());
-        djRepository.deleteAll(queuedDjs);
-    }
-
-    /**
-     * 현재 DJ 여부 판별 (큐에서 1번 순서인지)
-     */
-    public boolean isCurrentDj(Long partyroomId, CrewId crewId) {
+    public void deactivatePlayback(Long partyroomId) {
+        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroomId).orElseThrow();
+        playbackState.deactivate();
+        partyroomPlaybackRepository.save(playbackState);
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId);
-        return queuedDjs.stream()
-                .anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
+        djRepository.deleteAll(queuedDjs);
     }
 
     /**

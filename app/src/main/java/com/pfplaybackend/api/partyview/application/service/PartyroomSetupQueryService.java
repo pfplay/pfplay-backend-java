@@ -11,6 +11,7 @@ import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
+import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
@@ -64,13 +65,12 @@ public class PartyroomSetupQueryService {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         ActivePartyroomDto activePartyroom = partyroomRepository.getActivePartyroomByUserId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
-        PartyroomId partyroomId = new PartyroomId(activePartyroom.id());
         boolean isPlaybackActivated = activePartyroom.isPlaybackActivated();
 
         if (isPlaybackActivated) {
             PlaybackData playback = playbackRepository.findById(activePartyroom.currentPlaybackId().getId()).orElseThrow();
-            CrewData djInfo = getCurrentDjInfo(partyroomId, playback);
-            CurrentDjDto currentDjDto = new CurrentDjDto(djInfo.getId());
+            CrewId currentDjCrewId = activePartyroom.currentDjCrewId();
+            CurrentDjDto currentDjDto = new CurrentDjDto(currentDjCrewId.getId());
 
             Optional<PlaybackReactionHistoryData> optional = playbackReactionHistoryRepository.findByPlaybackIdAndUserId(
                     new PlaybackId(playback.getId()), authContext.getUserId());
@@ -81,10 +81,6 @@ public class PartyroomSetupQueryService {
         } else {
             return new DisplayDto(false, null, null, null);
         }
-    }
-
-    private CrewData getCurrentDjInfo(PartyroomId partyroomId, PlaybackData playback) {
-        return crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), playback.getUserId()).orElseThrow();
     }
 
     private static Map<String, Boolean> getHistory(Optional<PlaybackReactionHistoryData> optional) {

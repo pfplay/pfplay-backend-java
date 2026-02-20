@@ -3,7 +3,6 @@ package com.pfplaybackend.api.party.domain.entity.data;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.party.domain.enums.StageType;
-import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import org.junit.jupiter.api.DisplayName;
@@ -27,41 +26,11 @@ class PartyroomDataTest {
         PartyroomData partyroom = createPartyroom();
 
         // then
-        assertThat(partyroom.isPlaybackActivated()).isFalse();
         assertThat(partyroom.isQueueClosed()).isFalse();
         assertThat(partyroom.isTerminated()).isFalse();
         assertThat(partyroom.getNoticeContent()).isEmpty();
         assertThat(partyroom.getTitle()).isEqualTo("Test Room");
         assertThat(partyroom.getStageType()).isEqualTo(StageType.GENERAL);
-    }
-
-    @Test
-    @DisplayName("applyActivation — 재생 활성화 시 isPlaybackActivated이 true가 된다")
-    void applyActivation() {
-        // given
-        PartyroomData partyroom = createPartyroom();
-
-        // when
-        partyroom.applyActivation();
-
-        // then
-        assertThat(partyroom.isPlaybackActivated()).isTrue();
-    }
-
-    @Test
-    @DisplayName("applyDeactivation — 재생 비활성화 시 isPlaybackActivated이 false이고 currentPlaybackId가 null이 된다")
-    void applyDeactivation() {
-        // given
-        PartyroomData partyroom = createPartyroom();
-        partyroom.applyActivation();
-        partyroom.updatePlaybackId(new PlaybackId(10L));
-
-        // when
-        partyroom.applyDeactivation();
-
-        // then
-        assertThat(partyroom.isPlaybackActivated()).isFalse();
-        assertThat(partyroom.getCurrentPlaybackId()).isNull();
     }
 
     @Test
@@ -149,19 +118,5 @@ class PartyroomDataTest {
 
         // then
         assertThat(partyroom.isTerminated()).isTrue();
-    }
-
-    @Test
-    @DisplayName("updatePlaybackId — 재생 식별자를 업데이트하면 currentPlaybackId가 변경된다")
-    void updatePlaybackId() {
-        // given
-        PartyroomData partyroom = createPartyroom();
-        PlaybackId playbackId = new PlaybackId(42L);
-
-        // when
-        partyroom.updatePlaybackId(playbackId);
-
-        // then
-        assertThat(partyroom.getCurrentPlaybackId()).isEqualTo(playbackId);
     }
 }

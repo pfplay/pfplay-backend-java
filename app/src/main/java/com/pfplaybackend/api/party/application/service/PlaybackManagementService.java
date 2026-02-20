@@ -10,14 +10,17 @@ import com.pfplaybackend.api.party.application.service.task.ExpirationTaskSchedu
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.event.PlaybackDeactivatedEvent;
 import com.pfplaybackend.api.party.domain.event.PlaybackStartedEvent;
+import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.in.listener.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
@@ -41,6 +44,7 @@ public class PlaybackManagementService {
     private final UserActivityPort userActivityPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomRepository partyroomRepository;
+    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
     private final DjRepository djRepository;
     private final ExpirationTaskScheduler scheduleService;
     private final PartyroomAggregateService partyroomAggregateService;
@@ -119,9 +123,10 @@ public class PlaybackManagementService {
         }
 
         PlaybackData playbackData = playbackRepository.save(nextPlayback);
-        // Update 'CurrentPlaybackId'
-        partyroom.updatePlaybackId(new PlaybackId(playbackData.getId()));
-        partyroomRepository.save(partyroom);
+        // Update playback state in PARTYROOM_PLAYBACK
+        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroom.getId()).orElseThrow();
+        playbackState.updatePlayback(new PlaybackId(playbackData.getId()), new CrewId(djCrew.getId()));
+        partyroomPlaybackRepository.save(playbackState);
         // Schedule Task to wait for playback time
         scheduleTask(nextPlayback);
         // Propagation Websocket Event
@@ -133,7 +138,7 @@ public class PlaybackManagementService {
     }
 
     private void deactivateAndNotify(PartyroomData partyroom) {
-        partyroomAggregateService.deactivatePlayback(partyroom);
+        partyroomAggregateService.deactivatePlayback(partyroom.getId());
         eventPublisher.publishEvent(new PlaybackDeactivatedEvent(partyroom.getPartyroomId()));
     }
 }

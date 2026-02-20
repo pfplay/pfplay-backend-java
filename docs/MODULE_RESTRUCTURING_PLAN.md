@@ -1,9 +1,9 @@
 # Gradle 모듈 재구조화 계획
 
-> **Status: COMPLETED** — 4개 Phase 모두 완료 (2026-02-20)
+> **Status: COMPLETED** — 5개 Phase 모두 완료 (2026-02-20)
 >
-> 2개 모듈(api, realtime)을 4개 모듈(common, realtime, playlist, app)로 재구성하고,
-> profile/avatarresource 패키지를 user로 병합.
+> 2개 모듈(api, realtime)을 5개 모듈(common, realtime, playlist, user, app)로 재구성하고,
+> profile/avatarresource 패키지를 user로 병합 후 독립 모듈로 분리.
 >
 > | Phase | 내용 | Commit |
 > |-------|------|--------|
@@ -11,6 +11,7 @@
 > | B | playlist 모듈 분리 | `d0d543c` |
 > | C | api → app 개명 | `ad643af` |
 > | D | profile+avatarresource → user 병합 | `222b495` |
+> | E | user 모듈 분리 | `30288d2` |
 
 ---
 
@@ -101,12 +102,12 @@ REST API뿐 아니라 도메인 전체, Redis 리스너, STOMP 컨트롤러, 부
 
 ---
 
-## 목표 구조
+## 목표 구조 (달성)
 
 ```
 pfplay-backend-java/
 │
-├── common/           ◀ Gradle 모듈 (기존 common 패키지를 모듈로 승격)
+├── common/           ◀ Gradle 모듈 (51파일)
 │   └── com.pfplaybackend.api.common/
 │       ├── domain/value/         UserId, Duration, DurationConverter
 │       ├── domain/enums/         MessageTopic, AvatarCompositionType
@@ -119,7 +120,7 @@ pfplay-backend-java/
 │       ├── entity/               BaseEntity
 │       └── ApiCommonResponse, ThreadLocalContext
 │
-├── realtime/         ◀ Gradle 모듈 (변경 없음, 10파일)
+├── realtime/         ◀ Gradle 모듈 (10파일)
 │   └── com.pfplaybackend.realtime/
 │       ├── port/                 WebSocketAuthPort, SessionCachePort
 │       ├── config/               WebSocketConfig
@@ -128,7 +129,7 @@ pfplay-backend-java/
 │       ├── event/                4개 이벤트 핸들러
 │       └── controller/           HeartbeatController
 │
-├── playlist/         ◀ Gradle 모듈 (신규 분리, 46파일)
+├── playlist/         ◀ Gradle 모듈 (47파일)
 │   └── com.pfplaybackend.api.playlist/
 │       ├── adapter/in/web/       REST 컨트롤러 + payload/
 │       ├── adapter/out/persistence/  JPA 리포지토리 + QueryDSL impl
@@ -136,34 +137,36 @@ pfplay-backend-java/
 │       ├── application/dto/      PlaylistDto, PlaylistTrackDto, SearchResult*
 │       └── domain/               PlaylistData, TrackData, enums, value, exception
 │
-└── app/              ◀ Gradle 모듈 (api에서 개명, ~300파일)
+├── user/             ◀ Gradle 모듈 (91파일, profile+avatarresource 병합)
+│   └── com.pfplaybackend.api.user/
+│       ├── adapter/in/web/       기존 user + profile 컨트롤러 통합
+│       ├── application/
+│       │   ├── service/          UserProfileService, UserAvatarService 등 통합
+│       │   ├── port/out/         OAuth2RedirectPort, PlaylistSetupPort
+│       │   └── dto/              command/, shared/ (기존 유지)
+│       ├── domain/
+│       │   ├── entity/data/      MemberData, GuestData, ProfileData, AvatarResource*
+│       │   ├── service/          UserAvatarDomainService
+│       │   └── value/, enums/
+│       └── adapter/out/
+│           └── persistence/      기존 user + profile + avatarresource 리포지토리
+│
+└── app/              ◀ Gradle 모듈 (218파일)
     └── com.pfplaybackend.api/
-        ├── party/                Core 도메인 (162파일, 변경 없음)
-        ├── user/                 Identity 도메인 (91파일, profile+avatarresource 병합)
-        │   ├── adapter/in/web/   기존 user + profile 컨트롤러 통합
-        │   ├── application/
-        │   │   ├── service/      UserProfileService, UserAvatarService 등 통합
-        │   │   ├── port/out/     PlaylistSetupPort (기존 유지)
-        │   │   └── dto/          command/, shared/ (기존 유지)
-        │   ├── domain/
-        │   │   ├── entity/data/  MemberData, GuestData, ProfileData, AvatarResource*
-        │   │   ├── service/      UserAvatarDomainService
-        │   │   └── value/, enums/
-        │   └── adapter/out/
-        │       ├── persistence/  기존 user + profile + avatarresource 리포지토리
-        │       └── external/     PlaylistSetupAdapter
-        ├── auth/                 인증 (25파일, 변경 없음)
-        ├── admin/                관리 콘솔 (27파일, 변경 없음)
-        └── bootstrap/            Application 진입점 + 초기화
+        ├── party/                Core 도메인 (파티룸, 크루, DJ, 재생, 채팅)
+        ├── auth/                 인증 (OAuth, 로그인 플로우)
+        ├── admin/                관리 콘솔
+        └── bootstrap/            Composition Root + cross-module adapters
 ```
 
 ### Gradle 의존성 그래프
 
 ```
-common    → (없음)
+common    → realtime
 realtime  → (없음)
 playlist  → common
-app       → common, realtime, playlist
+user      → common
+app       → common, realtime, playlist, user
 ```
 
 순환 의존 없음. 모든 화살표가 단방향.
@@ -394,6 +397,76 @@ profile/, avatarresource/ 디렉터리가 비었으면 삭제.
 
 ---
 
+### Phase E: user 모듈 분리 ✅ 완료 (`30288d2`)
+
+**범위:** Phase D에서 병합된 user 패키지를 독립 Gradle 모듈로 분리
+**코드 변경:** Port 인터페이스 위치 조정, cross-module adapter 생성
+
+#### E-1. 디렉터리 구조 생성
+
+```
+user/
+└── src/main/java/com/pfplaybackend/api/user/
+    └── (app/src/main/java/.../user/ 하위 전체 이동)
+```
+
+#### E-2. user/build.gradle 생성
+
+```groovy
+dependencies {
+    implementation project(':common')
+    // Spring Boot starters (data-jpa, web, security, validation)
+    // QueryDSL, Swagger, Passay
+}
+```
+
+#### E-3. Port 인터페이스 배치
+
+| Port | 정의 위치 | 구현체 | 위치 |
+|------|-----------|--------|------|
+| `OAuth2RedirectPort` | user/application/port/out | `OAuth2RedirectAdapter` | app/bootstrap |
+| `PlaylistSetupPort` | user/application/port/out | `PlaylistSetupAdapter` | app/bootstrap |
+
+user 모듈이 auth나 playlist를 직접 의존하지 않도록 Port로 추상화.
+Adapter 구현체는 app/bootstrap (Composition Root)에 배치.
+
+#### E-4. settings.gradle 수정
+
+```groovy
+include 'common', 'realtime', 'playlist', 'user', 'app'
+```
+
+#### E-5. app/build.gradle 수정
+
+```groovy
+dependencies {
+    implementation project(':common')
+    implementation project(':realtime')
+    implementation project(':playlist')
+    implementation project(':user')
+}
+```
+
+#### E-6. 의존성 그래프 (최종)
+
+```
+common    → realtime
+realtime  → (없음)
+playlist  → common
+user      → common
+app       → common, realtime, playlist, user
+```
+
+#### E-7. 검증
+
+```bash
+./gradlew :user:compileJava     # 0 errors
+./gradlew :app:compileJava      # 0 errors
+./gradlew :app:test             # 0 failures
+```
+
+---
+
 ## 하지 않는 것과 근거
 
 ### auth 모듈 분리
@@ -449,31 +522,29 @@ profile/, avatarresource/ 디렉터리가 비었으면 삭제.
 | **B: playlist 모듈 분리** | build.gradle 분리, 파일 이동 | 최소 (Port 이미 존재) | 낮음 |
 | **C: api → app 개명** | 디렉터리 rename, settings.gradle | 없음 | 최저 |
 | **D: profile+avatar → user 병합** | 파일 이동, import 수정 (~50건) | 중간 (로직 불변) | 중간 |
+| **E: user 모듈 분리** | 파일 이동, Port/Adapter 생성 | 중간 (Port 신규) | 중간 |
 
-**권장 실행 순서:** A → B → C → D
-
-Phase A~C는 코드 변경이 거의 없어 안전하다.
-Phase D는 import 경로 변경이 수반되므로 별도 커밋으로 분리한다.
+**실행 순서:** A → B → C → D → E
 
 ---
 
-## 최종 상태 (예상)
+## 최종 상태 (실제)
 
 | 모듈 | 파일 수 | 의존 |
 |------|---------|------|
-| **common** | ~51 | 없음 |
+| **common** | 51 | realtime |
 | **realtime** | 10 | 없음 |
-| **playlist** | ~46 | common |
-| **app** | ~300 | common, realtime, playlist |
+| **playlist** | 47 | common |
+| **user** | 91 | common |
+| **app** | 218 | common, realtime, playlist, user |
 
-| 도메인 (app 내) | 파일 수 | 비고 |
-|-----------------|---------|------|
-| party | 162 | 변경 없음 |
-| user | ~91 | profile(22) + avatarresource(4) 병합 |
-| auth | 25 | 변경 없음 |
-| admin | 27 | 변경 없음 |
-| bootstrap | 1 | 변경 없음 |
+| 도메인 (app 내) | 비고 |
+|-----------------|------|
+| party | 파티룸, 크루, DJ, 재생, 채팅 |
+| auth | OAuth, 로그인 플로우 |
+| admin | 관리 콘솔 |
+| bootstrap | Composition Root + cross-module adapters |
 
 ---
 
-*작성: 2026-02-20*
+*작성: 2026-02-20 (Phase E 추가 갱신)*

@@ -3,10 +3,12 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.value.*;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.*;
 class DjManagementServiceDjQueueChangeTest {
 
     @Mock private PartyroomRepository partyroomRepository;
+    @Mock private PartyroomPlaybackRepository partyroomPlaybackRepository;
     @Mock private DjRepository djRepository;
     @Mock private PlaybackManagementService playbackManagementService;
     @Mock private PlaylistQueryPort playlistQueryPort;
@@ -80,16 +83,19 @@ class DjManagementServiceDjQueueChangeTest {
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
-                .isPlaybackActivated(true)
                 .isQueueClosed(false)
                 .build();
 
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        playbackState.activate(null, null);
+
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
+        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
         when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
         when(djRepository.existsByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(false);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
         when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
-        when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
+        when(partyroomPlaybackRepository.save(any(PartyroomPlaybackData.class))).thenReturn(playbackState);
 
         // when
         djManagementService.enqueueDj(partyroomId, playlistId);
@@ -110,24 +116,17 @@ class DjManagementServiceDjQueueChangeTest {
                 .isActive(true)
                 .build();
 
-        DjData dj = DjData.builder()
-                .id(100L)
-                .userId(userId)
-                .crewId(new CrewId(1L))
-                .playlistId(new PlaylistId(10L))
-                .orderNumber(2)
-
-                .build();
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
-                .isPlaybackActivated(true)
                 .build();
 
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        playbackState.activate(new PlaybackId(1L), new CrewId(99L));
+
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
+        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
-        when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(1L))).thenReturn(false);
 
         // when
         djManagementService.dequeueDj(partyroomId);
@@ -135,7 +134,7 @@ class DjManagementServiceDjQueueChangeTest {
         // then
         verify(partyroomAggregateService).removeDjFromQueue(partyroomId.getId(), new CrewId(1L));
         verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
-        // 대기 DJ(orderNumber != 1)이므로 skipBySystem은 호출되지 않아야 한다
+        // 대기 DJ(currentDj가 아님)이므로 skipBySystem은 호출되지 않아야 한다
         verify(playbackManagementService, never()).skipBySystem(any());
     }
 
@@ -151,24 +150,17 @@ class DjManagementServiceDjQueueChangeTest {
                 .isActive(true)
                 .build();
 
-        DjData dj = DjData.builder()
-                .id(100L)
-                .userId(userId)
-                .crewId(new CrewId(1L))
-                .playlistId(new PlaylistId(10L))
-                .orderNumber(1)
-
-                .build();
-
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
-                .isPlaybackActivated(true)
                 .build();
 
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        playbackState.activate(new PlaybackId(1L), new CrewId(1L));
+
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
+        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
-        when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(1L))).thenReturn(true);
 
         // when
         djManagementService.dequeueDj(partyroomId);
@@ -194,14 +186,15 @@ class DjManagementServiceDjQueueChangeTest {
                 .crewId(new CrewId(2L))
                 .playlistId(new PlaylistId(10L))
                 .orderNumber(2)
-
                 .build();
 
         PartyroomData partyroomData = PartyroomData.builder()
                 .id(1L)
                 .partyroomId(partyroomId)
-                .isPlaybackActivated(true)
                 .build();
+
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
         CrewData adjusterCrew = CrewData.builder()
                 .id(1L)
@@ -212,9 +205,9 @@ class DjManagementServiceDjQueueChangeTest {
                 .build();
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
+        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adminUserId)).thenReturn(adjusterCrew);
         when(djRepository.findById(djId.getId())).thenReturn(Optional.of(targetDj));
-        when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(2L))).thenReturn(false);
 
         // when
         djManagementService.dequeueDj(partyroomId, djId);

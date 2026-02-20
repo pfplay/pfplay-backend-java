@@ -1,12 +1,12 @@
 package com.pfplaybackend.api.party.domain.service;
 
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
-import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -27,7 +28,7 @@ import static org.mockito.Mockito.*;
 class PartyroomAggregateServiceTest {
 
     @Mock private DjRepository djRepository;
-    @Mock private PartyroomRepository partyroomRepository;
+    @Mock private PartyroomPlaybackRepository partyroomPlaybackRepository;
 
     @InjectMocks
     private PartyroomAggregateService service;
@@ -110,71 +111,29 @@ class PartyroomAggregateServiceTest {
     }
 
     @Nested
-    @DisplayName("isCurrentDj")
-    class IsCurrentDj {
-
-        @Test
-        @DisplayName("큐에서 1번 순서인 DJ는 현재 DJ이다")
-        void firstInQueueIsCurrentDj() {
-            // given
-            CrewId crewId = new CrewId(1L);
-            DjData dj = createDj(1L, crewId, 1);
-            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(List.of(dj));
-
-            // when / then
-            assertThat(service.isCurrentDj(10L, crewId)).isTrue();
-        }
-
-        @Test
-        @DisplayName("큐에서 2번 이후 순서인 DJ는 현재 DJ가 아니다")
-        void notFirstIsNotCurrentDj() {
-            // given
-            CrewId crewId = new CrewId(2L);
-            DjData dj1 = createDj(1L, new CrewId(1L), 1);
-            DjData dj2 = createDj(2L, crewId, 2);
-            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(List.of(dj1, dj2));
-
-            // when / then
-            assertThat(service.isCurrentDj(10L, crewId)).isFalse();
-        }
-
-        @Test
-        @DisplayName("빈 큐에서는 현재 DJ가 없다")
-        void emptyQueueHasNoCurrentDj() {
-            // given
-            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(Collections.emptyList());
-
-            // when / then
-            assertThat(service.isCurrentDj(10L, new CrewId(1L))).isFalse();
-        }
-    }
-
-    @Nested
     @DisplayName("deactivatePlayback")
     class DeactivatePlayback {
 
         @Test
-        @DisplayName("파티룸을 비활성화하고 모든 DJ를 삭제한다")
+        @DisplayName("playbackState를 비활성화하고 모든 DJ를 삭제한다")
         void deactivatesAndDeletesAll() {
             // given
-            PartyroomData partyroom = PartyroomData.builder()
-                    .id(10L)
-                    .partyroomId(new PartyroomId(10L))
-                    .isPlaybackActivated(true)
-                    .build();
+            PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(10L);
+            playbackState.activate(new PlaybackId(1L), new CrewId(1L));
 
             DjData dj1 = createDj(1L, new CrewId(1L), 1);
             DjData dj2 = createDj(2L, new CrewId(2L), 2);
             List<DjData> djs = new ArrayList<>(List.of(dj1, dj2));
 
+            when(partyroomPlaybackRepository.findById(10L)).thenReturn(Optional.of(playbackState));
             when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(djs);
 
             // when
-            service.deactivatePlayback(partyroom);
+            service.deactivatePlayback(10L);
 
             // then
-            assertThat(partyroom.isPlaybackActivated()).isFalse();
-            verify(partyroomRepository).save(partyroom);
+            assertThat(playbackState.isActivated()).isFalse();
+            verify(partyroomPlaybackRepository).save(playbackState);
             verify(djRepository).deleteAll(djs);
         }
     }

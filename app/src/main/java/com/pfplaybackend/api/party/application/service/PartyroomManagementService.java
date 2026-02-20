@@ -5,6 +5,7 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.party.domain.policy.PartyroomCreationPolicy;
@@ -12,6 +13,7 @@ import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.event.PartyroomClosedEvent;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
@@ -33,6 +35,7 @@ import java.util.UUID;
 public class PartyroomManagementService {
 
     private final PartyroomRepository partyroomRepository;
+    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
     private final PartyroomAccessService partyroomAccessService;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -63,7 +66,9 @@ public class PartyroomManagementService {
                 LinkDomain.of(request.getLinkDomain()),
                 PlaybackTimeLimit.ofMinutes(request.getPlaybackTimeLimit()),
                 stageType, hostId);
-        return partyroomRepository.save(partyroom);
+        PartyroomData saved = partyroomRepository.save(partyroom);
+        partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(saved.getId()));
+        return saved;
     }
 
     @Transactional

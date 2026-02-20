@@ -7,6 +7,7 @@ import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.party.domain.enums.AccessType;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
@@ -21,6 +22,7 @@ import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class PartyroomAccessService {
 
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomRepository partyroomRepository;
+    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final PartyroomAggregateService partyroomAggregateService;
@@ -153,8 +156,9 @@ public class PartyroomAccessService {
     private void handleDjQueueOnLeave(PartyroomData partyroom, CrewId crewId) {
         boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroom.getId(), crewId)
                 .isPresent();
-        boolean wasCurrentDj = partyroom.isPlaybackActivated() && wasInDjQueue
-                && partyroomAggregateService.isCurrentDj(partyroom.getId(), crewId);
+        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroom.getId()).orElseThrow();
+        boolean wasCurrentDj = playbackState.isActivated() && wasInDjQueue
+                && playbackState.isCurrentDj(crewId);
 
         partyroomAggregateService.removeDjFromQueue(partyroom.getId(), crewId);
 

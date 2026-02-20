@@ -16,6 +16,7 @@ import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.partyview.adapter.in.web.payload.response.QueryPartyroomSetupResponse;
@@ -76,7 +77,8 @@ class PartyroomSetupQueryServiceTest {
         // given
         UserId djUserId = new UserId(2L);
         PlaybackId playbackId = new PlaybackId(100L);
-        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), true, false, playbackId, 1L);
+        CrewId djCrewId = new CrewId(2L);
+        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, true, playbackId, djCrewId);
 
         CrewData crew1 = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).authorityTier(AuthorityTier.FM).build();
         CrewData djCrew = CrewData.builder().id(2L).userId(djUserId).gradeType(GradeType.CLUBBER).authorityTier(AuthorityTier.FM).build();
@@ -95,8 +97,6 @@ class PartyroomSetupQueryServiceTest {
                 ));
         when(partyroomRepository.getActivePartyroomByUserId(userId)).thenReturn(Optional.of(activeDto));
         when(playbackRepository.findById(playbackId.getId())).thenReturn(Optional.of(playback));
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), djUserId))
-                .thenReturn(Optional.of(djCrew));
         when(playbackReactionHistoryRepository.findByPlaybackIdAndUserId(any(), any()))
                 .thenReturn(Optional.empty());
 
@@ -115,7 +115,7 @@ class PartyroomSetupQueryServiceTest {
     @DisplayName("getSetupInfo — 비활성 재생일 때 DisplayDto의 재생/리액션/DJ 정보가 null이다")
     void getSetupInfo_inactivePlayback() {
         // given
-        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, false, null, 1L);
+        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, false, null, null);
         CrewData crew = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).authorityTier(AuthorityTier.FM).build();
 
         when(crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId()))
@@ -139,7 +139,7 @@ class PartyroomSetupQueryServiceTest {
     void getSetupInfo_crewsWithProfileSettings() {
         // given
         UserId user2 = new UserId(2L);
-        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, false, null, 1L);
+        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, false, null, null);
 
         CrewData crew1 = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.HOST).authorityTier(AuthorityTier.FM).build();
         CrewData crew2 = CrewData.builder().id(2L).userId(user2).gradeType(GradeType.CLUBBER).authorityTier(AuthorityTier.AM).build();

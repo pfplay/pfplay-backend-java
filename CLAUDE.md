@@ -69,16 +69,16 @@ adapter/out/external/    (Cross-domain Port Adapters)
 
 The project is organized into clear domain modules:
 
-| Module/Domain | Purpose | Key Entities |
-|--------|---------|--------------|
-| **auth** | Authentication & OAuth | OAuth tokens, StateStorePort |
-| **user** | User management | MemberData, GuestData, ActivityData |
-| **profile** | User profiles & avatars | ProfileData, Avatar VOs |
-| **party** | Party room core + chat | PartyroomData, CrewData, DjData, PlaybackData |
-| **playlist** | Music playlists | PlaylistData, TrackData |
-| **admin** | Administrative tools | Admin operations |
-| **common** | Cross-cutting concerns | Config, exceptions, adapters |
-| **realtime** *(Gradle module)* | WebSocket infrastructure | WebSocketAuthPort, SessionCachePort, SimpMessageSender |
+| Module/Domain | Gradle Module | Purpose | Key Entities |
+|--------|---------|---------|--------------|
+| **common** | `common` | Shared Kernel + infra config | UserId, Duration, Config, exceptions |
+| **realtime** | `realtime` | WebSocket infrastructure | WebSocketAuthPort, SessionCachePort, SimpMessageSender |
+| **playlist** | `playlist` | Music playlists | PlaylistData, TrackData |
+| **user** | `user` | User management + profiles + avatars | MemberData, GuestData, ProfileData, AvatarResource* |
+| **party** | `app` | Party room core + chat | PartyroomData, CrewData, DjData, PlaybackData |
+| **auth** | `app` | Authentication & OAuth | OAuth tokens, StateStorePort |
+| **admin** | `app` | Administrative tools | Admin operations |
+| **bootstrap** | `app` | Composition Root | Cross-module adapters |
 
 ## Package Structure Convention
 
@@ -107,15 +107,20 @@ com.pfplaybackend.api.{domain}/
     └── exception/            # Domain Exceptions
 ```
 
-### Gradle Multi-Module
+### Gradle Multi-Module (5 modules)
 
 ```
 pfplay-backend-java/          (root)
-├── api/                       # All domain code (depends on realtime)
-└── realtime/                  # WebSocket infrastructure (10 files, zero domain imports)
+├── common/                    # Shared Kernel + infra config (51 files)
+├── realtime/                  # WebSocket infrastructure (10 files, zero domain imports)
+├── playlist/                  # Playlist domain (47 files, depends: common)
+├── user/                      # User domain (91 files, depends: common)
+└── app/                       # auth, party, admin, bootstrap (218 files, depends: all)
 ```
 
-Build from root: `./gradlew :api:compileJava`, `./gradlew :api:test`
+Dependency direction: `app → user → common → realtime`, `app → playlist → common`
+
+Build from root: `./gradlew :app:compileJava`, `./gradlew :app:test`
 
 ## Naming Conventions
 

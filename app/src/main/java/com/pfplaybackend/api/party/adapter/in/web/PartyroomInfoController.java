@@ -2,11 +2,13 @@ package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.adapter.in.web.dto.PartyroomElement;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -29,6 +31,7 @@ public class PartyroomInfoController {
 
     private final PartyroomInfoService partyroomInfoService;
     private final PlaybackInfoService playbackInfoService;
+    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
 
     /**
      * 모든 파티룸의 정보를 조회한다.
@@ -53,12 +56,13 @@ public class PartyroomInfoController {
     @GetMapping("/{partyroomId}/dj-queue")
     public ResponseEntity<ApiCommonResponse<QueryDjQueueResponse>> getDjQueueInfo(@PathVariable Long partyroomId) {
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(new PartyroomId(partyroomId));
-        boolean isPlaybackActivated = partyroom.isPlaybackActivated();
+        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroom.getId()).orElseThrow();
+        boolean isPlaybackActivated = playbackState.isActivated();
         QueueStatus queueStatus = partyroom.isQueueClosed() ? QueueStatus.CLOSE :  QueueStatus.OPEN;
         boolean isRegistered = partyroomInfoService.isAlreadyRegistered(partyroom.getId());
         PlaybackData playback = null;
         if(isPlaybackActivated) {
-            playback = playbackInfoService.getPlaybackById(partyroom.getCurrentPlaybackId());
+            playback = playbackInfoService.getPlaybackById(playbackState.getCurrentPlaybackId());
         }
         List<DjWithProfileDto> djWithProfiles = partyroomInfoService.getDjs(partyroom.getId());
         return ResponseEntity.ok().body(ApiCommonResponse.success(QueryDjQueueResponse.from(isPlaybackActivated, queueStatus, isRegistered, playback, djWithProfiles)));

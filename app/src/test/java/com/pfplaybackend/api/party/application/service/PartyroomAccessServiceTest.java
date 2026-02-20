@@ -3,9 +3,11 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -36,6 +38,7 @@ class PartyroomAccessServiceTest {
 
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private PartyroomRepository partyroomRepository;
+    @Mock private PartyroomPlaybackRepository partyroomPlaybackRepository;
     @Mock private CrewRepository crewRepository;
     @Mock private DjRepository djRepository;
     @Mock private PartyroomAggregateService partyroomAggregateService;
@@ -143,10 +146,13 @@ class PartyroomAccessServiceTest {
                 .isTerminated(false)
                 .build();
 
+        PartyroomPlaybackData oldPlaybackState = PartyroomPlaybackData.createFor(1L);
+
         when(partyroomInfoService.getPartyroomById(oldRoomId)).thenReturn(oldPartyroomData);
         // exit() mock: crew lookup
         when(crewRepository.findByPartyroomDataIdAndUserId(oldRoomId.getId(), userId)).thenReturn(Optional.of(oldCrew));
         when(djRepository.findByPartyroomDataIdAndCrewId(oldRoomId.getId(), new CrewId(5L))).thenReturn(Optional.empty());
+        when(partyroomPlaybackRepository.findById(oldRoomId.getId())).thenReturn(Optional.of(oldPlaybackState));
 
         // addOrActivateCrew mock for new room: inactive crew found → reactivate
         when(crewRepository.findByPartyroomDataIdAndUserId(newRoomId.getId(), userId)).thenReturn(Optional.of(newRoomCrew));
