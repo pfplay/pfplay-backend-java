@@ -13,9 +13,6 @@ public class PlaybackDto {
     private String duration;
     private String thumbnailImage;
     private long endTime;
-    private int likeCount;
-    private int dislikeCount;
-    private int grabCount;
 
     @QueryProjection
     public PlaybackDto(long id, String linkId, String name, String duration, String thumbnailImage) {

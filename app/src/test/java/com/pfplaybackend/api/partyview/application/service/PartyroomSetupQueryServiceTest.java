@@ -8,12 +8,14 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackReactionHistoryRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -45,6 +47,7 @@ class PartyroomSetupQueryServiceTest {
     @Mock PartyroomRepository partyroomRepository;
     @Mock CrewRepository crewRepository;
     @Mock PlaybackRepository playbackRepository;
+    @Mock PlaybackAggregationRepository playbackAggregationRepository;
     @Mock PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
     @Mock UserProfileQueryPort userProfileQueryPort;
 
@@ -86,7 +89,10 @@ class PartyroomSetupQueryServiceTest {
         PlaybackData playback = PlaybackData.builder()
                 .id(playbackId.getId()).partyroomId(partyroomId).userId(djUserId)
                 .name("Song").linkId("link1").duration(Duration.fromString("3:00"))
-                .thumbnailImage("thumb.jpg").likeCount(5).dislikeCount(1).grabCount(2).endTime(999L).build();
+                .thumbnailImage("thumb.jpg").endTime(999L).build();
+
+        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(playbackId.getId());
+        aggregation.updateAggregation(5, 1, 2);
 
         when(crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId()))
                 .thenReturn(List.of(crew1, djCrew));
@@ -97,6 +103,7 @@ class PartyroomSetupQueryServiceTest {
                 ));
         when(partyroomRepository.getActivePartyroomByUserId(userId)).thenReturn(Optional.of(activeDto));
         when(playbackRepository.findById(playbackId.getId())).thenReturn(Optional.of(playback));
+        when(playbackAggregationRepository.findById(playbackId.getId())).thenReturn(Optional.of(aggregation));
         when(playbackReactionHistoryRepository.findByPlaybackIdAndUserId(any(), any()))
                 .thenReturn(Optional.empty());
 

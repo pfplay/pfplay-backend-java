@@ -5,6 +5,7 @@ import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessD
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackReactionPostProcessService;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
@@ -89,8 +90,8 @@ public class ReactionSimulationService {
 
         // Update playback aggregation (includes GRAB count)
         if (postProcessDto.isAggregationChanged()) {
-            playbackReactionPostProcessService.updatePlaybackAggregation(playback, postProcessDto.getDeltaRecord());
-            playbackReactionPostProcessService.publishAggregationChangedEvent(partyroomId, playback);
+            PlaybackAggregationData aggregation = playbackInfoService.updatePlaybackAggregation(playback.getId(), postProcessDto.getDeltaRecord());
+            playbackReactionPostProcessService.publishAggregationChangedEvent(partyroomId, aggregation);
         }
 
         // Publish motion event (includes GRAB motion)

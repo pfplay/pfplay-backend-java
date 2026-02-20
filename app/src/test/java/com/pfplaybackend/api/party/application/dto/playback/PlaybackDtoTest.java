@@ -8,31 +8,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PlaybackDtoTest {
 
     @Test
-    @DisplayName("withEndTime 팩토리로 생성 시 반응 수가 0으로 초기화되어야 한다")
-    void withEndTime_shouldInitializeReactionCountsToZero() {
+    @DisplayName("withEndTime 팩토리로 생성 시 endTime이 설정되어야 한다")
+    void withEndTime_shouldSetEndTime() {
         // when
         PlaybackDto dto = PlaybackDto.withEndTime(1L, "linkId", "name", "3:45", "thumb.jpg", 123456789L);
 
         // then
-        assertThat(dto.getLikeCount()).isZero();
-        assertThat(dto.getDislikeCount()).isZero();
-        assertThat(dto.getGrabCount()).isZero();
+        assertThat(dto.getEndTime()).isEqualTo(123456789L);
+        assertThat(dto.getName()).isEqualTo("name");
+        assertThat(dto.getLinkId()).isEqualTo("linkId");
     }
 
     @Test
-    @DisplayName("PlaybackDto에 likeCount, dislikeCount, grabCount 필드가 존재해야 한다")
-    void shouldHaveReactionCountFields() {
-        // given
-        PlaybackDto dto = new PlaybackDto();
-
+    @DisplayName("QueryProjection 생성자로 생성 시 기본 필드가 설정되어야 한다")
+    void queryProjectionConstructor() {
         // when
-        dto.setLikeCount(5);
-        dto.setDislikeCount(2);
-        dto.setGrabCount(3);
+        PlaybackDto dto = new PlaybackDto(1L, "linkId", "name", "3:45", "thumb.jpg");
 
         // then
-        assertThat(dto.getLikeCount()).isEqualTo(5);
-        assertThat(dto.getDislikeCount()).isEqualTo(2);
-        assertThat(dto.getGrabCount()).isEqualTo(3);
+        assertThat(dto.getId()).isEqualTo(1L);
+        assertThat(dto.getDuration()).isEqualTo("3:45");
+        assertThat(dto.getThumbnailImage()).isEqualTo("thumb.jpg");
     }
 }

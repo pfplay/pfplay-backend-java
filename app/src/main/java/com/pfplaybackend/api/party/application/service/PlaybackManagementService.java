@@ -11,6 +11,7 @@ import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
@@ -20,6 +21,7 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.in.listener.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
@@ -40,6 +42,7 @@ import java.util.concurrent.TimeUnit;
 public class PlaybackManagementService {
 
     private final PlaybackRepository playbackRepository;
+    private final PlaybackAggregationRepository playbackAggregationRepository;
     private final PlaybackInfoService playbackInfoService;
     private final UserActivityPort userActivityPort;
     private final ApplicationEventPublisher eventPublisher;
@@ -123,6 +126,7 @@ public class PlaybackManagementService {
         }
 
         PlaybackData playbackData = playbackRepository.save(nextPlayback);
+        playbackAggregationRepository.save(PlaybackAggregationData.createFor(playbackData.getId()));
         // Update playback state in PARTYROOM_PLAYBACK
         PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroom.getId()).orElseThrow();
         playbackState.updatePlayback(new PlaybackId(playbackData.getId()), new CrewId(djCrew.getId()));

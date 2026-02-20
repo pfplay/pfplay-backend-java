@@ -5,9 +5,11 @@ import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
@@ -25,6 +27,7 @@ public class PlaybackInfoService {
 
     private final PartyroomRepository partyroomRepository;
     private final PlaybackRepository playbackRepository;
+    private final PlaybackAggregationRepository playbackAggregationRepository;
     private final PlaylistCommandPort playlistCommandPort;
     private final UserProfileQueryPort userProfileQueryPort;
 
@@ -35,9 +38,10 @@ public class PlaybackInfoService {
     }
 
     @Transactional
-    public void updatePlaybackAggregation(PlaybackData playback, List<Integer> deltaRecord) {
-        playback.updateAggregation(deltaRecord.get(0), deltaRecord.get(1), deltaRecord.get(2));
-        playbackRepository.save(playback);
+    public PlaybackAggregationData updatePlaybackAggregation(Long playbackId, List<Integer> deltaRecord) {
+        PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playbackId).orElseThrow();
+        aggregation.updateAggregation(deltaRecord.get(0), deltaRecord.get(1), deltaRecord.get(2));
+        return playbackAggregationRepository.save(aggregation);
     }
 
     @Transactional(readOnly = true)

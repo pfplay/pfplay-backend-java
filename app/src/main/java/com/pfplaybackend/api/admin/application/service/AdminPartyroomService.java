@@ -13,6 +13,7 @@ import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
@@ -23,6 +24,7 @@ import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
@@ -51,6 +53,7 @@ public class AdminPartyroomService {
 
     private final PartyroomRepository partyroomRepository;
     private final PartyroomPlaybackRepository partyroomPlaybackRepository;
+    private final PlaybackAggregationRepository playbackAggregationRepository;
     private final CrewRepository crewRepository;
     private final PartyroomAccessService partyroomAccessService;
     private final AdminUserService adminUserService;
@@ -297,7 +300,7 @@ public class AdminPartyroomService {
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
 
-        PlaybackData updatedPlayback = playbackInfoService.getPlaybackById(playbackId);
+        PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playbackId.getId()).orElseThrow();
 
         log.info("Simulated reactions completed: partyroomId={}, playbackId={}, reactions={}, likes={}, grabs={}",
                 partyroomId, playbackId.getId(), reactions.size(), likeGroup.size(), grabGroup.size());
@@ -307,9 +310,9 @@ public class AdminPartyroomService {
                 .playbackId(playbackId.getId())
                 .reactions(reactions)
                 .aggregation(SimulateReactionsResponse.AggregationCounts.builder()
-                        .likeCount(updatedPlayback.getLikeCount())
-                        .dislikeCount(updatedPlayback.getDislikeCount())
-                        .grabCount(updatedPlayback.getGrabCount())
+                        .likeCount(aggregation.getLikeCount())
+                        .dislikeCount(aggregation.getDislikeCount())
+                        .grabCount(aggregation.getGrabCount())
                         .build())
                 .build();
     }

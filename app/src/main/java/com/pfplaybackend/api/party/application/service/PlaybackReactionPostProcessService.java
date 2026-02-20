@@ -5,6 +5,7 @@ import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.MotionType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
@@ -38,8 +39,8 @@ public class PlaybackReactionPostProcessService {
             updateDjActivityScore(playback.getUserId(), postProcessDto.getDeltaScore());
         }
         if(postProcessDto.isAggregationChanged()) {
-            updatePlaybackAggregation(playback, postProcessDto.getDeltaRecord());
-            publishAggregationChangedEvent(partyroomId, playback);
+            PlaybackAggregationData aggregation = playbackInfoService.updatePlaybackAggregation(playback.getId(), postProcessDto.getDeltaRecord());
+            publishAggregationChangedEvent(partyroomId, aggregation);
         }
         publishMotionChangedEvent(partyroomId, reactionType, postProcessDto.getDeterminedMotionType(), crewId);
     }
@@ -52,13 +53,9 @@ public class PlaybackReactionPostProcessService {
         userActivityPort.updateDjPointScore(djUserId, deltaScore);
     }
 
-    public void updatePlaybackAggregation(PlaybackData playback, List<Integer> deltaRecord) {
-        playbackInfoService.updatePlaybackAggregation(playback, deltaRecord);
-    }
-
-    public void publishAggregationChangedEvent(PartyroomId partyroomId, PlaybackData playback) {
+    public void publishAggregationChangedEvent(PartyroomId partyroomId, PlaybackAggregationData aggregation) {
         eventPublisher.publishEvent(new ReactionAggregationChangedEvent(
-                partyroomId, playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount()));
+                partyroomId, aggregation.getLikeCount(), aggregation.getDislikeCount(), aggregation.getGrabCount()));
     }
 
     public void grabTrack(UserId userId, PlaybackData playback) {

@@ -7,6 +7,8 @@ import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
@@ -15,7 +17,12 @@ import org.hibernate.annotations.DynamicUpdate;
 @Getter
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "PLAYBACK")
+@Table(
+        name = "PLAYBACK",
+        indexes = {
+                @Index(name = "playback_partyroom_id_IDX", columnList = "partyroom_id")
+        }
+)
 @Entity
 public class PlaybackData extends BaseEntity {
     @Id
@@ -45,13 +52,6 @@ public class PlaybackData extends BaseEntity {
     // 썸네일
     private String thumbnailImage;
 
-    // 그랩 횟수
-    private int grabCount;
-    // 좋아요 횟수
-    private int likeCount;
-    // 싫어요 횟수
-    private int dislikeCount;
-
     // 재생 종료 시각
     private Long endTime;
 
@@ -59,7 +59,7 @@ public class PlaybackData extends BaseEntity {
 
     @Builder
     public PlaybackData(Long id, PartyroomId partyroomId,
-                        UserId userId, String name, String linkId, Duration duration, String thumbnailImage, int grabCount, int likeCount, int dislikeCount, Long endTime) {
+                        UserId userId, String name, String linkId, Duration duration, String thumbnailImage, Long endTime) {
         this.id = id;
         this.partyroomId = partyroomId;
         this.userId = userId;
@@ -67,9 +67,6 @@ public class PlaybackData extends BaseEntity {
         this.linkId = linkId;
         this.duration = duration;
         this.thumbnailImage = thumbnailImage;
-        this.grabCount = grabCount;
-        this.likeCount = likeCount;
-        this.dislikeCount = dislikeCount;
         this.endTime = endTime;
     }
 
@@ -84,19 +81,7 @@ public class PlaybackData extends BaseEntity {
                 .duration(dur)
                 .linkId(trackDto.linkId())
                 .thumbnailImage(trackDto.thumbnailImage())
-                .grabCount(0)
-                .likeCount(0)
-                .dislikeCount(0)
                 .endTime(dur.calculateEndTimeEpochMilli())
                 .build();
-    }
-
-    // ── Business Methods ──
-
-    public PlaybackData updateAggregation(int deltaLikeCount, int deltaDislikeCount, int deltaGrabCount) {
-        this.likeCount += deltaLikeCount;
-        this.grabCount += deltaGrabCount;
-        this.dislikeCount += deltaDislikeCount;
-        return this;
     }
 }

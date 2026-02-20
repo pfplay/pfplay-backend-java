@@ -9,6 +9,7 @@ import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -16,6 +17,7 @@ import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackReactionHistoryRepository;
@@ -40,6 +42,7 @@ public class PartyroomSetupQueryService {
     private final PartyroomRepository partyroomRepository;
     private final CrewRepository crewRepository;
     private final PlaybackRepository playbackRepository;
+    private final PlaybackAggregationRepository playbackAggregationRepository;
     private final PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
     private final UserProfileQueryPort userProfileQueryPort;
 
@@ -74,7 +77,8 @@ public class PartyroomSetupQueryService {
 
             Optional<PlaybackReactionHistoryData> optional = playbackReactionHistoryRepository.findByPlaybackIdAndUserId(
                     new PlaybackId(playback.getId()), authContext.getUserId());
-            AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
+            PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playback.getId()).orElseThrow();
+            AggregationDto aggregationDto = new AggregationDto(aggregation.getLikeCount(), aggregation.getDislikeCount(), aggregation.getGrabCount());
             ReactionDto reactionDto = ReactionDto.from(getHistory(optional), aggregationDto);
             PlaybackDto playbackDto = PlaybackDto.withEndTime(playback.getId(), playback.getLinkId(), playback.getName(), playback.getDuration().toDisplayString(), playback.getThumbnailImage(), playback.getEndTime());
             return new DisplayDto(true, playbackDto, reactionDto, currentDjDto);

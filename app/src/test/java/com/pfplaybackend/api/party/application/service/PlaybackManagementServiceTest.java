@@ -7,6 +7,7 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
@@ -44,6 +45,7 @@ import static org.mockito.Mockito.*;
 class PlaybackManagementServiceTest {
 
     @Mock PlaybackRepository playbackRepository;
+    @Mock PlaybackAggregationRepository playbackAggregationRepository;
     @Mock PlaybackInfoService playbackInfoService;
     @Mock UserActivityPort userActivityPort;
     @Mock ApplicationEventPublisher eventPublisher;
