@@ -76,7 +76,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -112,7 +112,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -146,7 +146,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
         CrewData targetCrew = CrewData.builder()
                 .id(2L)
                 .userId(targetUserId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -182,7 +182,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
         CrewData targetCrew = CrewData.builder()
                 .id(2L)
                 .userId(targetUserId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();

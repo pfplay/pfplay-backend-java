@@ -8,6 +8,7 @@ import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
+import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
@@ -36,6 +37,7 @@ class CrewGradeServiceTest {
 
     @Mock CrewRepository crewRepository;
     @Mock PartyroomInfoService partyroomInfoService;
+    @Mock UserProfileQueryPort userProfileQueryPort;
     @Mock ApplicationEventPublisher eventPublisher;
 
     @InjectMocks CrewGradeService crewGradeService;
@@ -67,13 +69,15 @@ class CrewGradeServiceTest {
     void updateGrade_success() {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).build();
+        UserId adjustedUserId = new UserId(2L);
         CrewData adjusterCrew = CrewData.builder()
-                .id(1L).userId(adjusterUserId).authorityTier(AuthorityTier.FM).gradeType(GradeType.HOST).build();
+                .id(1L).userId(adjusterUserId).gradeType(GradeType.HOST).build();
         CrewData adjustedCrew = CrewData.builder()
-                .id(adjustedCrewId.getId()).userId(new UserId(2L)).authorityTier(AuthorityTier.FM).gradeType(GradeType.CLUBBER).build();
+                .id(adjustedCrewId.getId()).userId(adjustedUserId).gradeType(GradeType.CLUBBER).build();
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(crewRepository.findById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
+        when(userProfileQueryPort.getAuthorityTier(adjustedUserId)).thenReturn(AuthorityTier.FM);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
         when(crewRepository.save(any())).thenReturn(adjustedCrew);
 
@@ -105,13 +109,15 @@ class CrewGradeServiceTest {
     void updateGrade_specValidationFails() {
         // given — adjuster가 CLUBBER인데 MODERATOR로 변경 시도 (권한 부족)
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).build();
+        UserId adjustedUserId = new UserId(2L);
         CrewData adjusterCrew = CrewData.builder()
-                .id(1L).userId(adjusterUserId).authorityTier(AuthorityTier.FM).gradeType(GradeType.CLUBBER).build();
+                .id(1L).userId(adjusterUserId).gradeType(GradeType.CLUBBER).build();
         CrewData adjustedCrew = CrewData.builder()
-                .id(adjustedCrewId.getId()).userId(new UserId(2L)).authorityTier(AuthorityTier.FM).gradeType(GradeType.LISTENER).build();
+                .id(adjustedCrewId.getId()).userId(adjustedUserId).gradeType(GradeType.LISTENER).build();
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(crewRepository.findById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
+        when(userProfileQueryPort.getAuthorityTier(adjustedUserId)).thenReturn(AuthorityTier.FM);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
 
         AdjustGradeRequest request = createRequest(GradeType.MODERATOR);

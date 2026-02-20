@@ -90,7 +90,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         playbackDto,
                         qCrewData.id,
                         qCrewData.userId,
-                        qCrewData.authorityTier,
                         qCrewData.gradeType
                 )
                 .from(qPartyroomData)
@@ -116,7 +115,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                                 new CrewDto(
                                         tuple.get(qCrewData.id),
                                         tuple.get(qCrewData.userId),
-                                        tuple.get(qCrewData.authorityTier),
                                         tuple.get(qCrewData.gradeType)
                                 ),
                                 Collectors.toList()

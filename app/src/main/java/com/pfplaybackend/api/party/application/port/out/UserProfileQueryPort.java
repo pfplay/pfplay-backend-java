@@ -12,4 +12,5 @@ public interface UserProfileQueryPort {
     Map<UserId, ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds);
     ProfileSettingDto getUserProfileSetting(UserId userId);
     ProfileSummaryDto getOtherProfileSummary(UserId userId, AuthorityTier authorityTier);
+    AuthorityTier getAuthorityTier(UserId userId);
 }

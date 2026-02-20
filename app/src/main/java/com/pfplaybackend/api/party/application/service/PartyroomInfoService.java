@@ -161,7 +161,7 @@ public class PartyroomInfoService {
         CrewData crew = crewRepository.findById(crewId)
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
         UserId targetUserId = crew.getUserId();
-        AuthorityTier authorityTier = crew.getAuthorityTier();
+        AuthorityTier authorityTier = userProfileQueryPort.getAuthorityTier(targetUserId);
 
         ProfileSummaryDto profileSummaryDto = userProfileQueryPort.getOtherProfileSummary(targetUserId, authorityTier);
         return CrewProfileSummaryResult.from(crewId, profileSummaryDto);

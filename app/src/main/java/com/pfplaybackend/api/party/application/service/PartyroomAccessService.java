@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
@@ -52,9 +51,8 @@ public class PartyroomAccessService {
     public CrewData tryEnter(PartyroomId partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserId userId = authContext.getUserId();
-        AuthorityTier authorityTier = authContext.getAuthorityTier();
-        log.info("[tryEnter] START - userId={}, targetPartyroomId={}, authorityTier={}",
-                userId, partyroomId.getId(), authorityTier);
+        log.info("[tryEnter] START - userId={}, targetPartyroomId={}",
+                userId, partyroomId.getId());
 
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
@@ -87,13 +85,13 @@ public class PartyroomAccessService {
             }
         }
 
-        CrewData crew = addOrActivateCrew(partyroom, userId, authorityTier);
+        CrewData crew = addOrActivateCrew(partyroom, userId);
         log.info("[tryEnter] SUCCESS - userId={}, partyroomId={}, crewId={}", userId, partyroomId.getId(), crew.getId());
         publishAccessChangedEvent(partyroom.getPartyroomId(), crew, userId);
         return crew;
     }
 
-    private CrewData addOrActivateCrew(PartyroomData partyroom, UserId userId, AuthorityTier authorityTier) {
+    private CrewData addOrActivateCrew(PartyroomData partyroom, UserId userId) {
         Optional<CrewData> existingCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroom.getId(), userId);
         if (existingCrew.isPresent() && !existingCrew.get().isActive()) {
             CrewData crew = existingCrew.get();
@@ -104,7 +102,7 @@ public class PartyroomAccessService {
         } else {
             log.info("[addOrActivateCrew] Adding new crew - userId={}, partyroomId={}, gradeType=LISTENER",
                     userId, partyroom.getPartyroomId().getId());
-            CrewData crew = CrewData.create(partyroom, userId, authorityTier, GradeType.LISTENER);
+            CrewData crew = CrewData.create(partyroom, userId, GradeType.LISTENER);
             return crewRepository.save(crew);
         }
     }
@@ -115,7 +113,7 @@ public class PartyroomAccessService {
 
     @Transactional
     public void enterByHost(UserId hostId, PartyroomData partyroom) {
-        CrewData crew = CrewData.create(partyroom, hostId, AuthorityTier.FM, GradeType.HOST);
+        CrewData crew = CrewData.create(partyroom, hostId, GradeType.HOST);
         crewRepository.save(crew);
     }
 

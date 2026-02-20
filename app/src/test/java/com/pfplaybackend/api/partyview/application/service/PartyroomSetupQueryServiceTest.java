@@ -83,8 +83,8 @@ class PartyroomSetupQueryServiceTest {
         CrewId djCrewId = new CrewId(2L);
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, true, playbackId, djCrewId);
 
-        CrewData crew1 = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).authorityTier(AuthorityTier.FM).build();
-        CrewData djCrew = CrewData.builder().id(2L).userId(djUserId).gradeType(GradeType.CLUBBER).authorityTier(AuthorityTier.FM).build();
+        CrewData crew1 = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
+        CrewData djCrew = CrewData.builder().id(2L).userId(djUserId).gradeType(GradeType.CLUBBER).build();
 
         PlaybackData playback = PlaybackData.builder()
                 .id(playbackId.getId()).partyroomId(partyroomId).userId(djUserId)
@@ -123,7 +123,7 @@ class PartyroomSetupQueryServiceTest {
     void getSetupInfo_inactivePlayback() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, false, null, null);
-        CrewData crew = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).authorityTier(AuthorityTier.FM).build();
+        CrewData crew = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
 
         when(crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId()))
                 .thenReturn(List.of(crew));
@@ -148,8 +148,8 @@ class PartyroomSetupQueryServiceTest {
         UserId user2 = new UserId(2L);
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, false, null, null);
 
-        CrewData crew1 = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.HOST).authorityTier(AuthorityTier.FM).build();
-        CrewData crew2 = CrewData.builder().id(2L).userId(user2).gradeType(GradeType.CLUBBER).authorityTier(AuthorityTier.AM).build();
+        CrewData crew1 = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.HOST).build();
+        CrewData crew2 = CrewData.builder().id(2L).userId(user2).gradeType(GradeType.CLUBBER).build();
 
         when(crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId()))
                 .thenReturn(List.of(crew1, crew2));

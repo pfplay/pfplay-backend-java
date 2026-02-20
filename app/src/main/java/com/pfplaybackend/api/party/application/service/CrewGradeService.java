@@ -6,6 +6,7 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.event.CrewGradeChangedEvent;
 import com.pfplaybackend.api.party.domain.specification.GradeAdjustmentSpecification;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -25,6 +26,7 @@ public class CrewGradeService {
     private final ApplicationEventPublisher eventPublisher;
     private final CrewRepository crewRepository;
     private final PartyroomInfoService partyroomInfoService;
+    private final UserProfileQueryPort userProfileQueryPort;
 
     @Transactional
     public void updateGrade(PartyroomId partyroomId, CrewId adjustedCrewId, AdjustGradeRequest request) {
@@ -33,7 +35,7 @@ public class CrewGradeService {
 
         CrewData adjustedCrew = crewRepository.findById(adjustedCrewId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
-        AuthorityTier authorityTier = adjustedCrew.getAuthorityTier();
+        AuthorityTier authorityTier = userProfileQueryPort.getAuthorityTier(adjustedCrew.getUserId());
         GradeType prevGradeType = adjustedCrew.getGradeType();
         GradeType targetGradeType = request.getGradeType();
         CrewData adjusterCrew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());

@@ -277,7 +277,7 @@ public class AdminDemoService {
         PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
-        CrewData crew = CrewData.create(loadedPartyroom, userId, AuthorityTier.FM, GradeType.LISTENER);
+        CrewData crew = CrewData.create(loadedPartyroom, userId, GradeType.LISTENER);
         crewRepository.save(crew);
     }
 

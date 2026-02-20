@@ -65,6 +65,14 @@ public class UserProfileService {
                 .getProfileSummary();
     }
 
+    public AuthorityTier getAuthorityTier(UserId userId) {
+        return memberRepository.findByUserId(userId)
+                .map(UserAccountData::getAuthorityTier)
+                .orElseGet(() -> guestRepository.findByUserId(userId)
+                        .map(UserAccountData::getAuthorityTier)
+                        .orElseThrow());
+    }
+
     private UserAccountData findUserWithProfile(UserId userId, AuthorityTier tier) {
         if (tier == AuthorityTier.GT) {
             return guestRepository.findByUserId(userId).orElseThrow();

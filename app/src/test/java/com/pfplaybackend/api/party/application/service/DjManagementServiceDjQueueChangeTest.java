@@ -78,7 +78,7 @@ class DjManagementServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -115,7 +115,7 @@ class DjManagementServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -149,7 +149,7 @@ class DjManagementServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -202,7 +202,7 @@ class DjManagementServiceDjQueueChangeTest {
         CrewData adjusterCrew = CrewData.builder()
                 .id(1L)
                 .userId(adminUserId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.MODERATOR)
                 .isActive(true)
                 .build();

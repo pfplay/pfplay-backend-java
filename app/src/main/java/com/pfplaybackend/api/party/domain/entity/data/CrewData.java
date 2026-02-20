@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
@@ -41,10 +40,6 @@ public class CrewData extends BaseEntity {
     })
     private UserId userId;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private AuthorityTier authorityTier;
-
     // 파티룸에서 활동중 여부
     @Column(name = "is_active")
     private boolean isActive;
@@ -59,18 +54,13 @@ public class CrewData extends BaseEntity {
 
     // 데이터 엔티티 생성자
     public CrewData() {}
-    public CrewData(UserId userId, AuthorityTier authorityTier) {
-        this.userId = userId;
-        this.authorityTier = authorityTier;
-    }
 
     @Builder
-    public CrewData(Long id, UserId userId, AuthorityTier authorityTier, GradeType gradeType,
+    public CrewData(Long id, UserId userId, GradeType gradeType,
                     boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt,
                     LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.userId = userId;
-        this.authorityTier = authorityTier;
         this.gradeType = gradeType;
         this.isActive = isActive;
         this.isBanned = isBanned;
@@ -87,10 +77,9 @@ public class CrewData extends BaseEntity {
 
     // ── Business Methods ──
 
-    public static CrewData create(PartyroomData partyroomData, UserId userId, AuthorityTier authorityTier, GradeType gradeType) {
+    public static CrewData create(PartyroomData partyroomData, UserId userId, GradeType gradeType) {
         CrewData crew = CrewData.builder()
                 .userId(userId)
-                .authorityTier(authorityTier)
                 .gradeType(gradeType)
                 .isActive(true)
                 .isBanned(false)

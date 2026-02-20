@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
@@ -58,7 +57,6 @@ class PartyroomAccessServiceTest {
 
         AuthContext authContext = mock(AuthContext.class);
         when(authContext.getUserId()).thenReturn(userId);
-        when(authContext.getAuthorityTier()).thenReturn(AuthorityTier.FM);
         ThreadLocalContext.setContext(authContext);
     }
 
@@ -74,7 +72,7 @@ class PartyroomAccessServiceTest {
         CrewData crew = CrewData.builder()
                 .id(10L)
                 .userId(userId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -112,7 +110,7 @@ class PartyroomAccessServiceTest {
         CrewData newRoomCrew = CrewData.builder()
                 .id(20L)
                 .userId(userId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(false)
                 .build();
@@ -135,7 +133,7 @@ class PartyroomAccessServiceTest {
         CrewData oldCrew = CrewData.builder()
                 .id(5L)
                 .userId(userId)
-                .authorityTier(AuthorityTier.FM)
+
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();

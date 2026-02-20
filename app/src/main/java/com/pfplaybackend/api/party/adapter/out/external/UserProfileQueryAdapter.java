@@ -32,4 +32,9 @@ public class UserProfileQueryAdapter implements UserProfileQueryPort {
     public ProfileSummaryDto getOtherProfileSummary(UserId userId, AuthorityTier authorityTier) {
         return userProfileService.getOtherProfileSummary(userId, authorityTier);
     }
+
+    @Override
+    public AuthorityTier getAuthorityTier(UserId userId) {
+        return userProfileService.getAuthorityTier(userId);
+    }
 }
