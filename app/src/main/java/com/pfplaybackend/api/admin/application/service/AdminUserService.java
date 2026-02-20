@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
-import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;

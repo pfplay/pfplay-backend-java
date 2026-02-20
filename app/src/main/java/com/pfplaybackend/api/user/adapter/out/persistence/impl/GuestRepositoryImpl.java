@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.adapter.out.persistence.impl;
 
-import com.pfplaybackend.api.profile.domain.QProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.QProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.domain.entity.data.QGuestData;
 import com.pfplaybackend.api.common.domain.value.UserId;

@@ -8,8 +8,8 @@ import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentSt
 import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.admin.application.util.NicknameGenerator;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarBodyResourceRepository;
-import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarFaceResourceRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.AvatarBodyResourceRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.AvatarFaceResourceRepository;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;

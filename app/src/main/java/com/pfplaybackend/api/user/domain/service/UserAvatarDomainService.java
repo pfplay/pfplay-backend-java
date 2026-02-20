@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.user.domain.service;
 
-import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.profile.adapter.in.web.dto.request.SetAvatarRequest;
+import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.user.adapter.in.web.payload.request.SetAvatarRequest;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
-import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
+import com.pfplaybackend.api.user.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;

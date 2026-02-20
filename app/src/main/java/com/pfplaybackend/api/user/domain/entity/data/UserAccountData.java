@@ -3,7 +3,7 @@ package com.pfplaybackend.api.user.domain.entity.data;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import jakarta.persistence.*;
 import lombok.Getter;

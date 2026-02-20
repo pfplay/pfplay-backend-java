@@ -15,8 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserContextAspect {
 
-    @Pointcut("execution(* com.pfplaybackend.api.user.application.service.*.*(..))" +
-            " || execution(* com.pfplaybackend.api.profile.application.service..*(..))")
+    @Pointcut("execution(* com.pfplaybackend.api.user.application.service..*(..))")
     public void contextRequiredMethods() {}
 
     @Around("contextRequiredMethods()")

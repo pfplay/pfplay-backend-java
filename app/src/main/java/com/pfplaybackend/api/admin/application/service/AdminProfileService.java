@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.admin.application.service;
 
-import com.pfplaybackend.api.avatarresource.application.service.AvatarResourceService;
-import com.pfplaybackend.api.profile.domain.ProfileData;
-import com.pfplaybackend.api.profile.domain.value.Nickname;
+import com.pfplaybackend.api.user.application.service.AvatarResourceService;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
+import com.pfplaybackend.api.user.domain.value.Nickname;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
-import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;

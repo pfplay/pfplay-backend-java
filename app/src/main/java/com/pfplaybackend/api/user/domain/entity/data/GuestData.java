@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
-import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;

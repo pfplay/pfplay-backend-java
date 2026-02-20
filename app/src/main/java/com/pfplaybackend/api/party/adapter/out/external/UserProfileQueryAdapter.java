@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
-import com.pfplaybackend.api.profile.application.service.UserProfileService;
+import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

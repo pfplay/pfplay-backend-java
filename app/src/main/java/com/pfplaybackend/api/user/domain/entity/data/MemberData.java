@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.profile.domain.ProfileData;
-import com.pfplaybackend.api.profile.adapter.in.web.dto.request.AvatarFaceRequest;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
+import com.pfplaybackend.api.user.adapter.in.web.payload.request.AvatarFaceRequest;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
