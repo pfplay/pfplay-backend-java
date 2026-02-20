@@ -111,4 +111,13 @@ public class PartyroomManagementService {
         if (request.getQueueStatus().equals(QueueStatus.OPEN)) partyroom.openQueue();
         partyroomRepository.save(partyroom);
     }
+
+    public void initializeMainStage(UserId adminId) {
+        CreatePartyroomRequest request = new CreatePartyroomRequest(
+                "Main Stage",
+                "Welcome to the main stage",
+                "main",
+                10);
+        createMainStage(request, adminId);
+    }
 }

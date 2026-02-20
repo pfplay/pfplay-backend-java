@@ -20,7 +20,7 @@ public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRe
             "WHEN pm.orderNumber = 1 THEN :totalElements " +
             "ELSE pm.orderNumber - 1 END " +
             "WHERE pm.playlistData.id = :playlistId")
-    void reorderMusics(@Param("playlistId") Long playlistId, @Param("totalElements") long totalElements);
+    void reorderTracks(@Param("playlistId") Long playlistId, @Param("totalElements") long totalElements);
 
     @Modifying
     @Query("UPDATE TrackData pm " +

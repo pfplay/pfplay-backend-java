@@ -1,11 +1,11 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence.custom;
 
-import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface TrackRepositoryCustom {
-    Page<PlaylistMusicDto> getMusicsWithPagination(Long playlistId, Pageable pageable);
+    Page<PlaylistTrackDto> getTracksWithPagination(Long playlistId, Pageable pageable);
 }

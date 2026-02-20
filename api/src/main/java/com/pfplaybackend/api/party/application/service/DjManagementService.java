@@ -35,7 +35,7 @@ public class DjManagementService {
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final PlaybackManagementService playbackManagementService;
-    private final PlaylistQueryPort musicQueryService;
+    private final PlaylistQueryPort playlistQueryPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomAggregateService partyroomAggregateService;
 
@@ -47,7 +47,7 @@ public class DjManagementService {
 
         boolean isPostActivationProcessingRequired = !partyroom.isPlaybackActivated();
         boolean isAlreadyRegistered = djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId.getId(), authContext.getUserId());
-        boolean isEmptyPlaylist = musicQueryService.isEmptyPlaylist(playlistId.getId());
+        boolean isEmptyPlaylist = playlistQueryPort.isEmptyPlaylist(playlistId.getId());
         new DjEnqueueSpecification().validate(partyroom, isAlreadyRegistered, isEmptyPlaylist);
 
         // Find crew

@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.adapter.in.listener.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.party.adapter.in.listener.*;
 import com.pfplaybackend.realtime.sender.SimpMessageSender;
-import com.pfplaybackend.api.party.application.service.CrewProfileService;
+import com.pfplaybackend.api.party.application.service.CrewProfileChangeHandler;
 import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class RedisListenerConfig {
                                                         SimpMessageSender simpMessageSender,
                                                         RedisTemplate<String, Object> redisTemplate,
                                                         DistributedLockExecutor distributedLockExecutor,
-                                                        CrewProfileService crewProfileService,
+                                                        CrewProfileChangeHandler crewProfileService,
                                                         PlaybackManagementService playbackManagementService,
                                                         ObjectMapper objectMapper) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();

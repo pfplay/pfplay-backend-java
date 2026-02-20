@@ -3,6 +3,8 @@ package com.pfplaybackend.api.playlist.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.party.application.dto.playback.PlaybackTrackDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
@@ -17,6 +19,10 @@ import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository
 import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -132,5 +138,24 @@ public class TrackCommandService {
         Integer deleteOrderNumber = trackData.getOrderNumber();
         trackRepository.shiftUpOrderByDelete(playlistId, deleteOrderNumber);
         trackRepository.delete(trackData);
+    }
+
+    @Transactional
+    public PlaybackTrackDto getFirstTrack(Long playlistId) {
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.ASC, "orderNumber"));
+        Page<PlaylistTrackDto> page = trackRepository.getTracksWithPagination(playlistId, pageable);
+        rotateTrackOrder(playlistId, page.getTotalElements());
+        PlaylistTrackDto dto = page.getContent().get(0);
+        return new PlaybackTrackDto(
+                dto.getLinkId(),
+                dto.getName(),
+                dto.getThumbnailImage(),
+                dto.getDuration(),
+                dto.getOrderNumber()
+        );
+    }
+
+    public void rotateTrackOrder(Long playlistId, long totalCount) {
+        trackRepository.reorderTracks(playlistId, totalCount);
     }
 }

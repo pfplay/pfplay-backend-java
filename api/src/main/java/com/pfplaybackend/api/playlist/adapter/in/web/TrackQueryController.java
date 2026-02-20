@@ -25,7 +25,7 @@ public class TrackQueryController {
         return ResponseEntity
                 .ok()
                 .body(ApiCommonResponse.success(
-                        QueryTrackListResponse.from(trackQueryService.getMusics(playlistId, request.getPageNumber(), request.getPageSize()))
+                        QueryTrackListResponse.from(trackQueryService.getTracks(playlistId, request.getPageNumber(), request.getPageSize()))
                 ));
     }
 }

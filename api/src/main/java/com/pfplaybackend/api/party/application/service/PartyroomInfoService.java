@@ -3,9 +3,11 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
+import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
 import com.pfplaybackend.api.party.application.dto.crew.CrewSetupDto;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
@@ -15,6 +17,7 @@ import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
@@ -22,6 +25,7 @@ import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.in.web.payload.response.info.QueryPartyroomSummaryResponse;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -73,11 +77,6 @@ public class PartyroomInfoService {
         }).toList();
     }
 
-    // DjQueue 조회
-    public void getDjQueueInfo(PartyroomId partyroomId) {
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-    }
-
     @Transactional(readOnly = true)
     public PartyroomData getPartyroomById(PartyroomId partyroomId) {
         return partyroomRepository.findById(partyroomId.getId())
@@ -120,12 +119,6 @@ public class PartyroomInfoService {
         return partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(userId);
     }
 
-    public void getCrews(PartyroomId partyroomId) {
-        List<CrewData> crews = crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId());
-        List<UserId> crewUserIds = crews.stream().map(CrewData::getUserId).toList();
-        Map<UserId, ProfileSettingDto> profileSettings = userProfileService.getUsersProfileSetting(crewUserIds);
-    }
-
     public QueryPartyroomSummaryResponse getSummaryInfo(PartyroomId partyroomId) {
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
@@ -144,5 +137,19 @@ public class PartyroomInfoService {
     @Transactional(readOnly = true)
     public Optional<CrewData> getCrewByUserId(PartyroomId partyroomId, UserId userId) {
         return crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId);
+    }
+
+    public CrewProfileSummaryResult getProfileSummaryByCrewId(Long crewId) {
+        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        ActivePartyroomWithCrewDto activePartyroomDto = getMyActivePartyroomWithCrewId(authContext.getUserId())
+                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
+
+        CrewData crew = crewRepository.findById(crewId)
+                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
+        UserId targetUserId = crew.getUserId();
+        AuthorityTier authorityTier = crew.getAuthorityTier();
+
+        ProfileSummaryDto profileSummaryDto = userProfileService.getOtherProfileSummary(targetUserId, authorityTier);
+        return CrewProfileSummaryResult.from(crewId, profileSummaryDto);
     }
 }

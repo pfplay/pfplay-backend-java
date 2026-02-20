@@ -25,14 +25,14 @@ import java.util.List;
 public class PlaybackReactionPostProcessService {
     private final PlaybackInfoService playbackInfoService;
     private final ApplicationEventPublisher eventPublisher;
-    private final PlaylistCommandPort grabMusicService;
+    private final PlaylistCommandPort playlistCommandPort;
     private final UserActivityPort userActivityService;
 
     public void postProcess(ReactionPostProcessDto postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
         if(postProcessDto.isGrabStatusChanged()) {
-            grabMusic(authContext.getUserId(), playback);
+            grabTrack(authContext.getUserId(), playback);
         }
         if(postProcessDto.isDjActivityScoreChanged()) {
             updateDjActivityScore(playback.getUserId(), postProcessDto.getDeltaScore());
@@ -61,8 +61,8 @@ public class PlaybackReactionPostProcessService {
                 partyroomId, playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount()));
     }
 
-    public void grabMusic(UserId userId, PlaybackData playback) {
+    public void grabTrack(UserId userId, PlaybackData playback) {
         // TODO 이미 동일한 LinkId를 보유하고 있다면 예외 발생
-        grabMusicService.grabMusic(userId, playback.getLinkId());
+        playlistCommandPort.grabTrack(userId, playback.getLinkId());
     }
 }

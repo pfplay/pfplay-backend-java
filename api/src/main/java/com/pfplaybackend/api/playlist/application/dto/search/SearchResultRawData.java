@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class MusicRawData {
+public class SearchResultRawData {
     private String video_id;
     private String video_title;
     private String watch_url;

@@ -39,7 +39,7 @@ class DjManagementServiceDjQueueChangeTest {
     @Mock private CrewRepository crewRepository;
     @Mock private DjRepository djRepository;
     @Mock private PlaybackManagementService playbackManagementService;
-    @Mock private PlaylistQueryPort musicQueryService;
+    @Mock private PlaylistQueryPort playlistQueryPort;
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private PartyroomAggregateService partyroomAggregateService;
 
@@ -86,7 +86,7 @@ class DjManagementServiceDjQueueChangeTest {
                 .build();
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(musicQueryService.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
+        when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
         when(djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId.getId(), userId)).thenReturn(false);
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
         when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());

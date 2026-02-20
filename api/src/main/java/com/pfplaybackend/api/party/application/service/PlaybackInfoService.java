@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.party.application.service;
 
-import com.pfplaybackend.api.party.application.dto.playback.MusicDto;
+import com.pfplaybackend.api.party.application.dto.playback.PlaybackTrackDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
-import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
+import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
@@ -25,13 +25,13 @@ public class PlaybackInfoService {
 
     private final PartyroomRepository partyroomRepository;
     private final PlaybackRepository playbackRepository;
-    private final PlaylistQueryPort musicQueryService;
+    private final PlaylistCommandPort playlistCommandPort;
     private final UserProfileQueryPort userProfileService;
 
     @Transactional
     public PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj) {
-        MusicDto musicDto = musicQueryService.getFirstMusic(dj.getPlaylistId());
-        return PlaybackData.create(partyroomId, dj.getUserId(), musicDto);
+        PlaybackTrackDto trackDto = playlistCommandPort.getFirstTrack(dj.getPlaylistId());
+        return PlaybackData.create(partyroomId, dj.getUserId(), trackDto);
     }
 
     @Transactional

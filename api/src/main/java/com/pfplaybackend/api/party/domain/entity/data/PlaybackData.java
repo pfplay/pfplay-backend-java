@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.domain.entity.data;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.DurationConverter;
-import com.pfplaybackend.api.party.application.dto.playback.MusicDto;
+import com.pfplaybackend.api.party.application.dto.playback.PlaybackTrackDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
@@ -75,15 +75,15 @@ public class PlaybackData extends BaseEntity {
 
     // ── Factory Method ──
 
-    public static PlaybackData create(PartyroomId partyroomId, UserId userId, MusicDto musicDto) {
-        Duration dur = Duration.fromString(musicDto.getDuration());
+    public static PlaybackData create(PartyroomId partyroomId, UserId userId, PlaybackTrackDto trackDto) {
+        Duration dur = Duration.fromString(trackDto.getDuration());
         return PlaybackData.builder()
                 .partyroomId(partyroomId)
                 .userId(userId)
-                .name(musicDto.getName())
+                .name(trackDto.getName())
                 .duration(dur)
-                .linkId(musicDto.getLinkId())
-                .thumbnailImage(musicDto.getThumbnailImage())
+                .linkId(trackDto.getLinkId())
+                .thumbnailImage(trackDto.getThumbnailImage())
                 .grabCount(0)
                 .likeCount(0)
                 .dislikeCount(0)

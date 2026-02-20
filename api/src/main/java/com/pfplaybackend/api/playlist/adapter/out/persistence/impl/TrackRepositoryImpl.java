@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence.impl;
 
-import com.pfplaybackend.api.playlist.application.dto.PlaylistMusicDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
 import com.pfplaybackend.api.playlist.domain.entity.data.QTrackData;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.custom.TrackRepositoryCustom;
 import com.querydsl.core.types.Projections;
@@ -18,11 +18,11 @@ public class TrackRepositoryImpl implements TrackRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<PlaylistMusicDto> getMusicsWithPagination(Long playlistId, Pageable pageable) {
+    public Page<PlaylistTrackDto> getTracksWithPagination(Long playlistId, Pageable pageable) {
         QTrackData qTrackData = QTrackData.trackData;
 
-        List<PlaylistMusicDto> playlistMusics = queryFactory
-                .select(Projections.constructor(PlaylistMusicDto.class,
+        List<PlaylistTrackDto> tracks = queryFactory
+                .select(Projections.constructor(PlaylistTrackDto.class,
                         qTrackData.id,
                         qTrackData.linkId,
                         qTrackData.name,
@@ -44,6 +44,6 @@ public class TrackRepositoryImpl implements TrackRepositoryCustom {
 
         long total = count != null ? count : 0;
 
-        return new PageImpl<>(playlistMusics, pageable, total);
+        return new PageImpl<>(tracks, pageable, total);
     }
 }

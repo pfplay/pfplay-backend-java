@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.playlist.adapter.in.web.payload.response;
 
-import com.pfplaybackend.api.playlist.application.dto.search.MusicRawData;
-import com.pfplaybackend.api.playlist.application.dto.search.SearchMusicResultDto;
+import com.pfplaybackend.api.playlist.application.dto.search.SearchResultRawData;
+import com.pfplaybackend.api.playlist.application.dto.search.SearchResultDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.util.List;
 public class SearchMusicResponse {
     private List<MusicData> musicList;
 
-    public static SearchMusicResponse from(SearchMusicResultDto searchMusicResultDto) {
+    public static SearchMusicResponse from(SearchResultDto searchMusicResultDto) {
         return SearchMusicResponse.builder()
                 .musicList(searchMusicResultDto.getData().stream().map(it -> MusicData.builder()
                         .videoId(it.getVideo_id())

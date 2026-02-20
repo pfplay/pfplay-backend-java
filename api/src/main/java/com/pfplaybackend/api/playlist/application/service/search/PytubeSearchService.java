@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.application.service.search;
 
-import com.pfplaybackend.api.playlist.application.dto.search.SearchMusicResultDto;
+import com.pfplaybackend.api.playlist.application.dto.search.SearchResultDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -28,7 +28,7 @@ public class PytubeSearchService implements YoutubeSearchService {
     private final RestTemplate restTemplate;
 
     @Override
-    public SearchMusicResultDto searchByWord(String query, int rows) {
+    public SearchResultDto searchByWord(String query, int rows) {
         String prefix = "/api/v1/video/search";
         String url = BASE_URI + prefix;
 
@@ -44,12 +44,12 @@ public class PytubeSearchService implements YoutubeSearchService {
         headers.set("API_SECRET", API_SECRET);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<SearchMusicResultDto> response = restTemplate.exchange(
-                uri, HttpMethod.GET, entity, SearchMusicResultDto.class);
+        ResponseEntity<SearchResultDto> response = restTemplate.exchange(
+                uri, HttpMethod.GET, entity, SearchResultDto.class);
 
-        SearchMusicResultDto result = response.getBody();
+        SearchResultDto result = response.getBody();
         if (result != null && result.getData() != null) {
-            result = SearchMusicResultDto.builder()
+            result = SearchResultDto.builder()
                     .message(result.getMessage())
                     .data(result.getData().stream()
                             .filter(music -> music.getRunning_time() != null

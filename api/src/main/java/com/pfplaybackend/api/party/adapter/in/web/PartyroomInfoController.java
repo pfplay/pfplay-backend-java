@@ -52,18 +52,6 @@ public class PartyroomInfoController {
         return ResponseEntity.ok().body(partyroomInfoService.getSummaryInfo(new PartyroomId(partyroomId)));
     }
 
-    /**
-     * 특정 파티룸 내의 '활동중인 파티원 목록'을 조회한다.
-     * → 파티룸 입장 시 초기화 정보 조회 목적
-     */
-    @GetMapping("/{partyroomId}/crews")
-    public ResponseEntity<QueryCrewListResponse> getCrews(@PathVariable Long partyroomId,
-                                                          @RequestParam(value = "groupByGrade", required = false, defaultValue = "false") boolean groupByGrade) {
-        // Grade 별로 그루핑할 수 있는 옵션을 제공한다.
-        partyroomInfoService.getCrews(new PartyroomId(partyroomId));
-        return null;
-    }
-
     @GetMapping("/{partyroomId}/setup")
     public ResponseEntity<?> getSetupInfo(@PathVariable Long partyroomId) {
         List<CrewSetupDto> crewSetupDtoList = partyroomInfoService.getCrewsForSetup(new PartyroomId(partyroomId));

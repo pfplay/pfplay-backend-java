@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.adapter.in.listener;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pfplaybackend.api.party.application.service.CrewProfileService;
+import com.pfplaybackend.api.party.application.service.CrewProfileChangeHandler;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfilePreCheckMessage;
 import lombok.AllArgsConstructor;
@@ -14,7 +14,7 @@ public class CrewProfilePreCheckTopicListener implements MessageListener {
 
     private ObjectMapper objectMapper;
     private DistributedLockExecutor distributedLockExecutor;
-    private CrewProfileService crewProfileService;
+    private CrewProfileChangeHandler crewProfileService;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {

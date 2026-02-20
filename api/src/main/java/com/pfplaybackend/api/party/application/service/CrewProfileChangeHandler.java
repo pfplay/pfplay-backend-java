@@ -12,20 +12,16 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 /**
- * 해당 서비스는 User 도메인에서의 프로필(닉네임, 아바타 등) 설정 변경 시 호출되는 서비스
- *
+ * User 도메인에서의 프로필(닉네임, 아바타 등) 설정 변경 시 호출되는 핸들러.
+ * 같은 파티 멤버들에게 해당 변경 상태를 통지한다.
  */
 @Service
 @RequiredArgsConstructor
-public class CrewProfileService {
+public class CrewProfileChangeHandler {
 
     private final RedisMessagePublisher messagePublisher;
     private final PartyroomInfoService partyroomInfoService;
 
-    /**
-     * UserProfileService 로부터 아바타가 변경되었을 경우,
-     * 같은 파티 멤버들에게 해당 변경 상태를 통지한다.
-     */
     private void publishProfileChangedEvent(ActivePartyroomWithCrewDto dto, CrewProfilePreCheckMessage message) {
         messagePublisher.publish(MessageTopic.CREW_PROFILE.topic(),
                 CrewProfileMessage.from(new PartyroomId(dto.getId()), dto.getCrewId(), message));

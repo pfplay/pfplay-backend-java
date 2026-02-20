@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.bootstrap;
 
-import com.pfplaybackend.api.party.application.service.initialize.PartyroomInitializeService;
+import com.pfplaybackend.api.party.application.service.PartyroomManagementService;
 import com.pfplaybackend.api.user.application.service.initialize.AdminUserInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.AvatarResourceInitializeService;
 import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
@@ -20,7 +20,7 @@ public class ApplicationReadyEventListener {
     private final AvatarResourceInitializeService avatarResourceInitializeService;
     private final TemporaryUserInitializeService temporaryUserInitializeService;
     private final AdminUserInitializeService adminUserInitializeService;
-    private final PartyroomInitializeService partyroomInitializeService;
+    private final PartyroomManagementService partyroomManagementService;
 
     @EventListener(ApplicationReadyEvent.class)
     public void onApplicationEvent() {
@@ -33,7 +33,7 @@ public class ApplicationReadyEventListener {
         // Add AdminUser
         UserId adminId = adminUserInitializeService.addAdminUser();
         // Add Main Partyroom
-        partyroomInitializeService.addPartyroomByAdmin(adminId);
+        partyroomManagementService.initializeMainStage(adminId);
 
         if (environment.acceptsProfiles(Profiles.of("local"))) {
             temporaryUserInitializeService.addTemporaryUsers();

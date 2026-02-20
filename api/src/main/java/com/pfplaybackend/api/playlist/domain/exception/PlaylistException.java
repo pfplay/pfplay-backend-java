@@ -9,9 +9,9 @@ import lombok.Getter;
 @Getter
 public enum PlaylistException implements DomainException {
 
-    NO_WALLET("PLL-001", "", ForbiddenException.class),
-    EXCEEDED_PLAYLIST_LIMIT("PLL-002", "", ConflictException.class),
-    NOT_FOUND_PLAYLIST("PLL-003", "", NotFoundException.class);
+    NO_WALLET("PLL-001", "Wallet connection required", ForbiddenException.class),
+    EXCEEDED_PLAYLIST_LIMIT("PLL-002", "Playlist limit exceeded", ConflictException.class),
+    NOT_FOUND_PLAYLIST("PLL-003", "Playlist not found", NotFoundException.class);
 
     private final String errorCode;
     private final String message;

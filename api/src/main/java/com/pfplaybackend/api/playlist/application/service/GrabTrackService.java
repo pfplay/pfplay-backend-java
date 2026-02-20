@@ -17,15 +17,14 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class GrabMusicService {
+public class GrabTrackService {
 
     private final PlaylistRepository playlistRepository;
     private final TrackRepository trackRepository;
     private final TrackCommandService trackCommandService;
 
     @Transactional
-    public void grabMusic(UserId userId, String linkId) {
-        // Get 'PlaylistMusic' Record By linkId
+    public void grabTrack(UserId userId, String linkId) {
         TrackData targetTrackData = trackRepository.findFirstByLinkId(linkId);
 
         PlaylistData playlistData = playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST);

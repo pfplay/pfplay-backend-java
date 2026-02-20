@@ -144,20 +144,7 @@ public class PartyroomAccessService {
         crew.deactivatePresence();
         crewRepository.save(crew);
 
-        CrewId crewId = new CrewId(crew.getId());
-        boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), crewId)
-                .map(DjData::isQueued).orElse(false);
-        boolean wasCurrentDj = wasInDjQueue && partyroomAggregateService.isCurrentDj(partyroomId.getId(), crewId);
-
-        partyroomAggregateService.removeDjFromQueue(partyroomId.getId(), crewId);
-
-        if(wasInDjQueue) {
-            eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
-        }
-
-        if(wasCurrentDj) {
-            playbackManagementService.skipBySystem(partyroomId);
-        }
+        handleDjQueueOnLeave(partyroom, new CrewId(crew.getId()));
 
         eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), crew.getId(), authContext.getUserId(), AccessType.EXIT));
     }
@@ -168,7 +155,12 @@ public class PartyroomAccessService {
         if(isPermanent) crew.enforceBan();
         crewRepository.save(crew);
 
-        CrewId crewId = new CrewId(crew.getId());
+        handleDjQueueOnLeave(partyroom, new CrewId(crew.getId()));
+
+        eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), crew.getId(), crew.getUserId(), AccessType.EXIT));
+    }
+
+    private void handleDjQueueOnLeave(PartyroomData partyroom, CrewId crewId) {
         boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroom.getId(), crewId)
                 .map(DjData::isQueued).orElse(false);
         boolean wasCurrentDj = partyroom.isPlaybackActivated() && wasInDjQueue
@@ -176,15 +168,12 @@ public class PartyroomAccessService {
 
         partyroomAggregateService.removeDjFromQueue(partyroom.getId(), crewId);
 
-        if(wasInDjQueue) {
+        if (wasInDjQueue) {
             eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
         }
-
-        if(wasCurrentDj) {
+        if (wasCurrentDj) {
             playbackManagementService.skipBySystem(partyroom.getPartyroomId());
         }
-
-        eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), crew.getId(), crew.getUserId(), AccessType.EXIT));
     }
 
     @Transactional(readOnly = true)

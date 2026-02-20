@@ -1,7 +1,10 @@
 package com.pfplaybackend.api.party.application.port.out;
 
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.party.application.dto.playback.PlaybackTrackDto;
+import com.pfplaybackend.api.party.domain.value.PlaylistId;
 
 public interface PlaylistCommandPort {
-    void grabMusic(UserId userId, String linkId);
+    void grabTrack(UserId userId, String linkId);
+    PlaybackTrackDto getFirstTrack(PlaylistId playlistId);
 }

@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.playlist.application.service.search;
 
-import com.pfplaybackend.api.playlist.application.dto.search.SearchMusicResultDto;
+import com.pfplaybackend.api.playlist.application.dto.search.SearchResultDto;
 
 public interface YoutubeSearchService {
-    SearchMusicResultDto searchByWord(String query, int rows);
+    SearchResultDto searchByWord(String query, int rows);
 }

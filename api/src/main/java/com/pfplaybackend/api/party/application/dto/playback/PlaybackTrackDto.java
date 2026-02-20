@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MusicDto {
+public class PlaybackTrackDto {
     private String linkId;
     private String name;
     private String thumbnailImage;

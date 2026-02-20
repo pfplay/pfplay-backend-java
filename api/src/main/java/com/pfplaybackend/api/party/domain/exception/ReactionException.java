@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 public enum ReactionException implements DomainException {
-    INVALID_REACTION("RCT-001", "", ForbiddenException.class);
+    INVALID_REACTION("RCT-001", "Invalid reaction type", ForbiddenException.class);
 
     private final String errorCode;
     private final String message;
