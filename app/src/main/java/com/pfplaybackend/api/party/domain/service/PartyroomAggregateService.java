@@ -2,8 +2,7 @@ package com.pfplaybackend.api.party.domain.service;
 
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
-import com.pfplaybackend.api.party.domain.port.DjLoadPort;
-import com.pfplaybackend.api.party.domain.port.PlaybackStatePort;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,14 +13,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PartyroomAggregateService {
 
-    private final DjLoadPort djLoadPort;
-    private final PlaybackStatePort playbackStatePort;
+    private final PartyroomAggregatePort aggregatePort;
 
     /**
      * DJ큐에서 제거 + 순서 재배치 (atomic operation)
      */
     public void removeDjFromQueue(Long partyroomId, CrewId crewId) {
-        List<DjData> queuedDjs = djLoadPort.findByPartyroomIdOrdered(partyroomId);
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         List<DjData> toDelete = queuedDjs.stream()
                 .filter(dj -> dj.getCrewId().equals(crewId))
                 .toList();
@@ -29,20 +27,20 @@ public class PartyroomAggregateService {
                 .filter(dj -> !dj.getCrewId().equals(crewId))
                 .toList();
 
-        djLoadPort.removeAll(toDelete);
+        aggregatePort.removeDjs(toDelete);
 
         int order = 1;
         for (DjData dj : remaining) {
             dj.updateOrderNumber(order++);
         }
-        djLoadPort.saveAll(remaining);
+        aggregatePort.saveDjs(remaining);
     }
 
     /**
      * DJ큐 로테이션 (1번→마지막, 나머지 -1)
      */
     public void rotateDjQueue(Long partyroomId) {
-        List<DjData> queuedDjs = djLoadPort.findByPartyroomIdOrdered(partyroomId);
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         int totalElements = queuedDjs.size();
         queuedDjs.forEach(dj -> {
             if (dj.getOrderNumber() == 1) {
@@ -51,24 +49,24 @@ public class PartyroomAggregateService {
                 dj.updateOrderNumber(dj.getOrderNumber() - 1);
             }
         });
-        djLoadPort.saveAll(queuedDjs);
+        aggregatePort.saveDjs(queuedDjs);
     }
 
     /**
      * 재생 비활성화 + 전체 DJ 일괄 삭제
      */
     public void deactivatePlayback(Long partyroomId) {
-        PartyroomPlaybackData playbackState = playbackStatePort.findByPartyroomId(partyroomId);
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
         playbackState.deactivate();
-        playbackStatePort.save(playbackState);
-        List<DjData> queuedDjs = djLoadPort.findByPartyroomIdOrdered(partyroomId);
-        djLoadPort.removeAll(queuedDjs);
+        aggregatePort.savePlaybackState(playbackState);
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
+        aggregatePort.removeDjs(queuedDjs);
     }
 
     /**
      * DJ큐에 활성 DJ가 존재하는지 확인
      */
     public boolean hasQueuedDjs(Long partyroomId) {
-        return djLoadPort.existsByPartyroomId(partyroomId);
+        return aggregatePort.hasDjs(partyroomId);
     }
 }

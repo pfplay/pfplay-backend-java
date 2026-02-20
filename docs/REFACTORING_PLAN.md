@@ -1,9 +1,9 @@
 # PFPlay Backend - DDD Cleanup Refactoring Plan
 
-> **작성일**: 2026-02-18 (갱신: 2026-02-20)
+> **작성일**: 2026-02-18 (갱신: 2026-02-21)
 > **브랜치**: `refactor/ddd-cleanup` (`chore/playlist-tests` 에서 분기)
 > **목표**: 현재 구조를 DDD + 헥사고널 아키텍처 기반의 모듈러 모놀리스로 개편
-> **상태**: Phase 0~8 + 모듈 재구조화 **전체 완료** — 5모듈, 417 소스파일, 44 테스트파일(223 메서드)
+> **상태**: Phase 0~8 + 모듈 재구조화 + ERD 정규화(Phase ERD-1~6) **전체 완료** — 5모듈, 420 소스파일, 47 테스트파일(231 메서드)
 
 ---
 
@@ -638,6 +638,73 @@ Phase A(common 승격) → B(playlist 분리) → C(api→app 개명) → D(prof
 
 ---
 
+## ERD 정규화 (Phase ERD-1~6) ✅ 완료 (2026-02-21)
+
+### 목표
+PARTYROOM God Table 해체, 3NF 정규화, 도메인 개념 명시화
+
+### 실제 수행 내역
+
+#### ERD-1: PARTYROOM_PLAYBACK 엔티티 + 재생 상태 분리 (`54c7225`)
+- PARTYROOM에서 재생 관련 상태(`currentPlaybackId`, `isPlaybackActivated`, 현재 DJ)를 분리
+- `PartyroomPlaybackData` 신규 엔티티 (1:1 관계, partyroom_id = PK)
+- `PartyroomData`에서 4개 필드/메서드 제거 (`applyActivation`, `applyDeactivation`, `updatePlaybackId`, `isPlaybackActivated`)
+- 현재 DJ 식별: DJ 큐 스캔 O(n) → `playbackState.isCurrentDj(crewId)` 필드 비교 O(1)
+- `ActivePartyroomDto` 재설계: PARTYROOM + PARTYROOM_PLAYBACK JOIN 프로젝션
+- 8개 서비스 파일, QueryDSL 2개 쿼리, 8개 테스트 파일 수정
+
+#### ERD-2: DJ_QUEUE 엔티티 + 대기열 상태 분리 (`2a37d90`)
+- PARTYROOM에서 `isQueueClosed`를 분리하여 대기열 개념 명시화
+- `DjQueueData` 신규 엔티티 (1:1 관계, partyroom_id = PK)
+- `PartyroomData`에서 3개 필드/메서드 제거 (`isQueueClosed`, `openQueue`, `closeQueue`, `validateQueueOpen`)
+- `DjEnqueueSpecification`이 `DjQueueData` 파라미터를 직접 받도록 변경
+- QueryDSL에 DJ_QUEUE JOIN 추가
+
+#### ERD-3: PLAYBACK_AGGREGATION 엔티티 + 반응 집계 분리 (`d57254d`)
+- PLAYBACK을 불변 이력으로 만들고, 가변 반응 카운터(`likeCount`, `dislikeCount`, `grabCount`)를 분리
+- `PlaybackAggregationData` 신규 엔티티 (1:1 관계, playback_id = PK)
+- `PlaybackData`에서 3개 필드/메서드 제거, PLAYBACK이 append-only 불변 테이블로 전환
+- `PlaybackData`에 `@Index(partyroom_id)` 추가
+
+#### ERD-4: DJ.userId 제거 — 3NF 정규화 (`0d1466a`)
+- `DJ.userId`는 `crewId → CREW.userId`로 유도 가능한 이행 종속
+- `DjData`에서 `userId` 필드 제거, `DjRepository`에서 userId 기반 메서드 → crewId 기반으로 대체
+- `PlaybackManagementService`, `PlaybackInfoService`, `PartyroomInfoService`, `DjManagementService` 등 6개 서비스 변경
+- 8개 테스트 파일 수정
+
+#### ERD-5: CREW.authorityTier 제거 — 3NF 정규화 (`b666d14`)
+- `CREW.authorityTier`는 `userId → USER_ACCOUNT.authorityTier`로 유도 가능한 이행 종속
+- `CrewData`에서 `authorityTier` 필드 제거, `CrewDto`에서도 제거
+- `UserProfileQueryPort.getAuthorityTier(UserId)` 메서드 추가로 런타임 조회
+- `CrewGradeService`, `PartyroomInfoService`, `PartyroomAccessService` 등 서비스 변경
+- QueryDSL 프로젝션에서 `authorityTier` 제거
+- 6개 테스트 파일 수정
+
+#### ERD-6: UNIQUE 제약조건 (`bb45d7d`)
+- `CREW`: `UNIQUE(partyroom_id, user_id)` — 동일 파티룸에 동일 사용자 중복 방지
+- `PLAYBACK_REACTION_HISTORY`: `UNIQUE(user_id, playback_id)` — 동일 재생에 중복 반응 방지
+- `USER_ACTIVITY`: `UNIQUE(user_id, activity_type)` — 동일 활동 유형 중복 방지
+
+### 변경 전후 비교
+
+| 지표 | Before | After |
+|------|--------|-------|
+| 테이블 수 | 18 | 21 (+3) |
+| 3NF 위반 | 2건 | 0건 |
+| UNIQUE 제약 | 1개 | 4개 |
+| PARTYROOM 컬럼 | 14 | 10 |
+| PLAYBACK 불변성 | 불변+가변 혼합 | append-only |
+| 현재 DJ 식별 | 큐 스캔 O(n) | 필드 비교 O(1) |
+
+### 완료 기준
+- [x] 3개 신규 엔티티 생성 (PARTYROOM_PLAYBACK, DJ_QUEUE, PLAYBACK_AGGREGATION)
+- [x] 2개 이행 종속 제거 (DJ.userId, CREW.authorityTier)
+- [x] 3개 UNIQUE 제약조건 추가
+- [x] PARTYROOM 14→10 컬럼으로 축소
+- [x] 전체 138 테스트 통과
+
+---
+
 ## Phase 간 의존 관계
 
 ```
@@ -660,6 +727,17 @@ Phase 7 (코드 품질 정비)           ✅ 완료
 모듈 재구조화 (Phase A~E)          ✅ 완료 (→ docs/MODULE_RESTRUCTURING_PLAN.md)
     ↓
 Phase 8 (구조 개선 + 테스트)       ✅ 완료
+    ↓
+ERD 정규화 (Phase ERD-1~6)        ✅ 완료
+  ERD-1 (PARTYROOM_PLAYBACK)
+    ↓
+  ERD-2 (DJ_QUEUE)
+    ↓ (ERD-3, 4, 5는 상호 독립)
+  ERD-3 (PLAYBACK_AGGREGATION)
+  ERD-4 (DJ.userId 제거)
+  ERD-5 (CREW.authorityTier 제거)
+    ↓
+  ERD-6 (UNIQUE 제약조건)
 ```
 
 ---
@@ -669,10 +747,11 @@ Phase 8 (구조 개선 + 테스트)       ✅ 완료
 | 항목 | 수치 |
 |------|------|
 | Gradle 모듈 | 5개 (common, realtime, playlist, user, app) |
-| 소스 파일 | 417개 (common 51, realtime 10, playlist 47, user 91, app 218) |
-| 테스트 파일 | 44개 (common 2, playlist 6, user 9, app 27) |
-| 테스트 메서드 | 223개 |
+| 소스 파일 | 420개 (common 51, realtime 10, playlist 47, user 91, app 221) |
+| 테스트 파일 | 47개 (common 2, playlist 6, user 9, app 30) |
+| 테스트 메서드 | 231개 |
 | DTO record | 51개 |
+| DB 테이블 | 21개 (3NF 달성, UNIQUE 제약 4개) |
 
 ---
 
@@ -701,4 +780,4 @@ export JAVA_HOME="C:/Users/Eisen/.jdks/corretto-17.0.11"
 
 ---
 
-**문서 최종 업데이트**: 2026-02-20
+**문서 최종 업데이트**: 2026-02-21

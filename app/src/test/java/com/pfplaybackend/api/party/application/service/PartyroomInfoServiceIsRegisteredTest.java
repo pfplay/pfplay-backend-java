@@ -2,9 +2,8 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -25,8 +24,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PartyroomInfoServiceIsRegisteredTest {
 
-    @Mock private CrewRepository crewRepository;
-    @Mock private DjRepository djRepository;
+    @Mock private PartyroomAggregatePort aggregatePort;
     @InjectMocks
     private PartyroomInfoService partyroomInfoService;
 
@@ -52,9 +50,9 @@ class PartyroomInfoServiceIsRegisteredTest {
         // given
         Long partyroomId = 1L;
         CrewData crew = CrewData.builder().id(5L).userId(myUserId).build();
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId, myUserId))
+        when(aggregatePort.findCrew(partyroomId, myUserId))
                 .thenReturn(Optional.of(crew));
-        when(djRepository.existsByPartyroomDataIdAndCrewId(partyroomId, new CrewId(5L)))
+        when(aggregatePort.isDjRegistered(partyroomId, new CrewId(5L)))
                 .thenReturn(true);
 
         // when
@@ -70,9 +68,9 @@ class PartyroomInfoServiceIsRegisteredTest {
         // given
         Long partyroomId = 1L;
         CrewData crew = CrewData.builder().id(5L).userId(myUserId).build();
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId, myUserId))
+        when(aggregatePort.findCrew(partyroomId, myUserId))
                 .thenReturn(Optional.of(crew));
-        when(djRepository.existsByPartyroomDataIdAndCrewId(partyroomId, new CrewId(5L)))
+        when(aggregatePort.isDjRegistered(partyroomId, new CrewId(5L)))
                 .thenReturn(false);
 
         // when
@@ -87,7 +85,7 @@ class PartyroomInfoServiceIsRegisteredTest {
     void isAlreadyRegistered_shouldReturnFalse_whenCrewNotFound() {
         // given
         Long partyroomId = 1L;
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId, myUserId))
+        when(aggregatePort.findCrew(partyroomId, myUserId))
                 .thenReturn(Optional.empty());
 
         // when

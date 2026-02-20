@@ -3,6 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
+import com.pfplaybackend.api.party.application.port.out.PartyroomQueryPort;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
@@ -10,7 +11,6 @@ import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -25,7 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class PlaybackInfoService {
 
-    private final PartyroomRepository partyroomRepository;
+    private final PartyroomQueryPort partyroomQueryPort;
     private final PlaybackRepository playbackRepository;
     private final PlaybackAggregationRepository playbackAggregationRepository;
     private final PlaylistCommandPort playlistCommandPort;
@@ -51,7 +51,7 @@ public class PlaybackInfoService {
 
     @Transactional(readOnly = true)
     public List<PlaybackHistoryDto> getRecentPlaybackHistory(PartyroomId partyroomId) {
-        List<PlaybackData> playbackDataList = partyroomRepository.getRecentPlaybackHistory(partyroomId);
+        List<PlaybackData> playbackDataList = partyroomQueryPort.getRecentPlaybackHistory(partyroomId);
         if(playbackDataList.isEmpty()) {
             return List.of();
         }else {

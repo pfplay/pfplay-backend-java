@@ -12,10 +12,10 @@ import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.PenaltyType;
 import com.pfplaybackend.api.party.domain.exception.PenaltyException;
 import com.pfplaybackend.api.party.domain.event.CrewPenalizedEvent;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewPenaltyHistoryRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.PunishPenaltyRequest;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 public class CrewPenaltyService {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final CrewRepository crewRepository;
+    private final PartyroomAggregatePort aggregatePort;
     private final PartyroomAccessService partyroomAccessService;
     private final CrewPenaltyHistoryRepository crewPenaltyHistoryRepository;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -52,7 +52,7 @@ public class CrewPenaltyService {
                 .map(history -> history.getPunishedCrewId().getId())
                 .distinct()
                 .toList();
-        Map<Long, CrewData> crewMap = crewRepository.findAllById(crewIds).stream()
+        Map<Long, CrewData> crewMap = aggregatePort.findCrewsByIds(crewIds).stream()
                 .collect(Collectors.toMap(CrewData::getId, Function.identity()));
 
         List<UserId> punishedUserIds = crewPenaltyHistoryDataList.stream()
@@ -73,7 +73,7 @@ public class CrewPenaltyService {
 
         CrewId punishedCrewId = new CrewId(request.getCrewId());
         CrewData punisherCrew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
-        CrewData punishedCrew = crewRepository.findById(punishedCrewId.getId())
+        CrewData punishedCrew = aggregatePort.findCrewById(punishedCrewId.getId())
                 .orElseThrow();
         GradeType punishedGradeType = punishedCrew.getGradeType();
         PenaltyType penaltyType = request.getPenaltyType();
@@ -124,10 +124,10 @@ public class CrewPenaltyService {
                 .orElseThrow(() -> ExceptionCreator.create(PenaltyException.PENALTY_HISTORY_NOT_FOUND));
 
         // 1. Release ban on crew
-        CrewData crew = crewRepository.findById(historyData.getPunishedCrewId().getId())
+        CrewData crew = aggregatePort.findCrewById(historyData.getPunishedCrewId().getId())
                 .orElseThrow();
         crew.releaseBan();
-        crewRepository.save(crew);
+        aggregatePort.saveCrew(crew);
 
         // 2. Update history
         historyData.release(new CrewId(releaserCrewForValidation.getId()));

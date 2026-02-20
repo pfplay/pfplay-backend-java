@@ -62,6 +62,20 @@ class HexagonalArchitectureTest {
         }
 
         @Test
+        @DisplayName("application service는 Partyroom Aggregate 내부 Repository를 직접 import하지 않는다")
+        void applicationServiceShouldNotImportAggregateRepositories() {
+            // Partyroom aggregate 엔티티(Partyroom, Crew, DJ, PartyroomPlayback, DjQueue)에 대한
+            // Repository는 PartyroomAggregatePort를 통해서만 접근해야 한다.
+            // 별도 Aggregate인 Playback*, CrewPenaltyHistory, CrewBlockHistory Repository는 허용.
+            ArchRule rule = noClasses()
+                    .that().resideInAPackage("..party.application.service..")
+                    .should().dependOnClassesThat()
+                    .haveNameMatching(".*(PartyroomRepository|CrewRepository|DjRepository|DjQueueRepository|PartyroomPlaybackRepository)");
+
+            rule.check(partyClasses);
+        }
+
+        @Test
         @DisplayName("application 패키지는 adapter.in 패키지에 의존하지 않는다 (Request/Message DTO 참조 예외)")
         void applicationShouldNotDependOnInboundAdapter() {
             // TODO: 다수의 Application Service가 adapter.in의 Request/Message DTO를 직접 참조 중

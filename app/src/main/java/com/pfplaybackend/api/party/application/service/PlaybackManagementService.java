@@ -17,17 +17,14 @@ import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.event.PlaybackDeactivatedEvent;
 import com.pfplaybackend.api.party.domain.event.PlaybackStartedEvent;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.in.listener.message.PlaybackDurationWaitMessage;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -47,10 +44,7 @@ public class PlaybackManagementService {
     private final PlaybackInfoService playbackInfoService;
     private final UserActivityPort userActivityPort;
     private final ApplicationEventPublisher eventPublisher;
-    private final PartyroomRepository partyroomRepository;
-    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
-    private final CrewRepository crewRepository;
-    private final DjRepository djRepository;
+    private final PartyroomAggregatePort aggregatePort;
     private final ExpirationTaskScheduler scheduleService;
     private final PartyroomAggregateService partyroomAggregateService;
     private final PartyroomInfoService partyroomInfoService;
@@ -100,7 +94,7 @@ public class PlaybackManagementService {
     }
 
     public void start(PartyroomData partyroom) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroom.getId());
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getId());
         int maxAttempts = queuedDjs.size();
         doStart(partyroom, maxAttempts);
     }
@@ -108,9 +102,9 @@ public class PlaybackManagementService {
     private void doStart(PartyroomData partyroom, int remainingAttempts) {
         partyroomAggregateService.rotateDjQueue(partyroom.getId());
 
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroom.getId());
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getId());
         DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
-        CrewData djCrew = crewRepository.findById(nextDj.getCrewId().getId()).orElseThrow();
+        CrewData djCrew = aggregatePort.findCrewById(nextDj.getCrewId().getId()).orElseThrow();
         PlaybackData nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj, djCrew.getUserId());
 
         if (partyroom.getPlaybackTimeLimit().exceedsDuration(nextPlayback.getDuration())) {
@@ -130,9 +124,9 @@ public class PlaybackManagementService {
         PlaybackData playbackData = playbackRepository.save(nextPlayback);
         playbackAggregationRepository.save(PlaybackAggregationData.createFor(playbackData.getId()));
         // Update playback state in PARTYROOM_PLAYBACK
-        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroom.getId()).orElseThrow();
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getId());
         playbackState.updatePlayback(new PlaybackId(playbackData.getId()), new CrewId(djCrew.getId()));
-        partyroomPlaybackRepository.save(playbackState);
+        aggregatePort.savePlaybackState(playbackState);
         // Schedule Task to wait for playback time
         scheduleTask(nextPlayback);
         // Propagation Websocket Event

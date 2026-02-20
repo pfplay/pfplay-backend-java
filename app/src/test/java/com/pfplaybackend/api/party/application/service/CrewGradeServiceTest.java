@@ -7,12 +7,12 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.CrewGradeChangedEvent;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import org.junit.jupiter.api.AfterEach;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class CrewGradeServiceTest {
 
-    @Mock CrewRepository crewRepository;
+    @Mock PartyroomAggregatePort aggregatePort;
     @Mock PartyroomInfoService partyroomInfoService;
     @Mock UserProfileQueryPort userProfileQueryPort;
     @Mock ApplicationEventPublisher eventPublisher;
@@ -76,10 +76,10 @@ class CrewGradeServiceTest {
                 .id(adjustedCrewId.getId()).userId(adjustedUserId).gradeType(GradeType.CLUBBER).build();
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(crewRepository.findById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
+        when(aggregatePort.findCrewById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
         when(userProfileQueryPort.getAuthorityTier(adjustedUserId)).thenReturn(AuthorityTier.FM);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
-        when(crewRepository.save(any())).thenReturn(adjustedCrew);
+        when(aggregatePort.saveCrew(any())).thenReturn(adjustedCrew);
 
         AdjustGradeRequest request = createRequest(GradeType.MODERATOR);
 
@@ -116,7 +116,7 @@ class CrewGradeServiceTest {
                 .id(adjustedCrewId.getId()).userId(adjustedUserId).gradeType(GradeType.LISTENER).build();
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(crewRepository.findById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
+        when(aggregatePort.findCrewById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
         when(userProfileQueryPort.getAuthorityTier(adjustedUserId)).thenReturn(AuthorityTier.FM);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
 

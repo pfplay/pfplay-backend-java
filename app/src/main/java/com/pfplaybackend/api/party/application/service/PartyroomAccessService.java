@@ -12,6 +12,7 @@ import com.pfplaybackend.api.party.domain.enums.AccessType;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.specification.PartyroomEntrySpecification;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
@@ -19,10 +20,6 @@ import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,10 +36,7 @@ import java.util.Optional;
 public class PartyroomAccessService {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final PartyroomRepository partyroomRepository;
-    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
-    private final CrewRepository crewRepository;
-    private final DjRepository djRepository;
+    private final PartyroomAggregatePort aggregatePort;
     private final PartyroomAggregateService partyroomAggregateService;
     private final PartyroomInfoService partyroomInfoService;
     private final PlaybackManagementService playbackManagementService;
@@ -56,8 +50,8 @@ public class PartyroomAccessService {
 
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
-        long activeCrewCount = crewRepository.countByPartyroomDataIdAndIsActiveTrue(partyroomId.getId());
-        Optional<CrewData> existingCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId);
+        long activeCrewCount = aggregatePort.countActiveCrews(partyroomId.getId());
+        Optional<CrewData> existingCrew = aggregatePort.findCrew(partyroomId.getId(), userId);
         log.debug("[tryEnter] Partyroom found - partyroomId={}, isTerminated={}, crewCount={}",
                 partyroomId.getId(), partyroom.isTerminated(), activeCrewCount);
 
@@ -78,7 +72,7 @@ public class PartyroomAccessService {
                 exit(new PartyroomId(activeRoomInfo.id()));
             } else {
                 log.info("[tryEnter] Same room re-entry - userId={}, partyroomId={}", userId, partyroomId.getId());
-                CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)
+                CrewData crew = aggregatePort.findCrew(partyroomId.getId(), userId)
                         .orElseThrow();
                 publishAccessChangedEvent(partyroom.getPartyroomId(), crew, userId);
                 return crew;
@@ -92,18 +86,18 @@ public class PartyroomAccessService {
     }
 
     private CrewData addOrActivateCrew(PartyroomData partyroom, UserId userId) {
-        Optional<CrewData> existingCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroom.getId(), userId);
+        Optional<CrewData> existingCrew = aggregatePort.findCrew(partyroom.getId(), userId);
         if (existingCrew.isPresent() && !existingCrew.get().isActive()) {
             CrewData crew = existingCrew.get();
             log.info("[addOrActivateCrew] Reactivating inactive crew - userId={}, partyroomId={}",
                     userId, partyroom.getPartyroomId().getId());
             crew.activatePresence();
-            return crewRepository.save(crew);
+            return aggregatePort.saveCrew(crew);
         } else {
             log.info("[addOrActivateCrew] Adding new crew - userId={}, partyroomId={}, gradeType=LISTENER",
                     userId, partyroom.getPartyroomId().getId());
             CrewData crew = CrewData.create(partyroom, userId, GradeType.LISTENER);
-            return crewRepository.save(crew);
+            return aggregatePort.saveCrew(crew);
         }
     }
 
@@ -114,7 +108,7 @@ public class PartyroomAccessService {
     @Transactional
     public void enterByHost(UserId hostId, PartyroomData partyroom) {
         CrewData crew = CrewData.create(partyroom, hostId, GradeType.HOST);
-        crewRepository.save(crew);
+        aggregatePort.saveCrew(crew);
     }
 
     @Transactional
@@ -124,7 +118,7 @@ public class PartyroomAccessService {
 
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
-        Optional<CrewData> optionalCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId());
+        Optional<CrewData> optionalCrew = aggregatePort.findCrew(partyroomId.getId(), authContext.getUserId());
         if(optionalCrew.isEmpty()) {
             log.warn("[exit] INVALID_ACTIVE_ROOM - userId={} has no active crew in partyroomId={}",
                     authContext.getUserId(), partyroomId.getId());
@@ -133,7 +127,7 @@ public class PartyroomAccessService {
 
         CrewData crew = optionalCrew.get();
         crew.deactivatePresence();
-        crewRepository.save(crew);
+        aggregatePort.saveCrew(crew);
 
         handleDjQueueOnLeave(partyroom, new CrewId(crew.getId()));
 
@@ -144,7 +138,7 @@ public class PartyroomAccessService {
     public void expel(PartyroomData partyroom, CrewData crew, boolean isPermanent)  {
         crew.deactivatePresence();
         if(isPermanent) crew.enforceBan();
-        crewRepository.save(crew);
+        aggregatePort.saveCrew(crew);
 
         handleDjQueueOnLeave(partyroom, new CrewId(crew.getId()));
 
@@ -152,9 +146,9 @@ public class PartyroomAccessService {
     }
 
     private void handleDjQueueOnLeave(PartyroomData partyroom, CrewId crewId) {
-        boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroom.getId(), crewId)
+        boolean wasInDjQueue = aggregatePort.findDj(partyroom.getId(), crewId)
                 .isPresent();
-        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroom.getId()).orElseThrow();
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getId());
         boolean wasCurrentDj = playbackState.isActivated() && wasInDjQueue
                 && playbackState.isCurrentDj(crewId);
 
@@ -170,7 +164,7 @@ public class PartyroomAccessService {
 
     @Transactional(readOnly = true)
     public Map<String, Long> getRedirectUri(String linkDomain) {
-        PartyroomData partyroomData = partyroomRepository.findByLinkDomain(LinkDomain.of(linkDomain))
+        PartyroomData partyroomData = aggregatePort.findByLinkDomain(LinkDomain.of(linkDomain))
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         return Map.of(
                 "partyroomId", partyroomData.getId()

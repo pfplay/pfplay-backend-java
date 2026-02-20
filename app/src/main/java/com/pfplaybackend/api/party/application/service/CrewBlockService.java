@@ -9,9 +9,9 @@ import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewBlockHistoryData;
 import com.pfplaybackend.api.party.domain.exception.BlockException;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.AddBlockRequest;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
@@ -29,7 +29,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CrewBlockService {
 
-    private final CrewRepository crewRepository;
+    private final PartyroomAggregatePort aggregatePort;
     private final CrewBlockHistoryRepository blockHistoryRepository;
     private final UserProfileService userProfileService;
     private final CrewBlockHistoryRepository crewBlockHistoryRepository;
@@ -55,7 +55,7 @@ public class CrewBlockService {
         Optional<CrewBlockHistoryData> historyDataOptional = blockHistoryRepository.findByBlockerCrewIdAndBlockedCrewIdAndUnblockedIsFalse(blockerCrewId, blockedCrewId);
         if(historyDataOptional.isPresent()) throw ExceptionCreator.create(BlockException.ALREADY_BLOCKED_CREW);
 
-        CrewData blockedCrew = crewRepository.findById(blockedCrewId.getId())
+        CrewData blockedCrew = aggregatePort.findCrewById(blockedCrewId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
         CrewBlockHistoryData historyData = CrewBlockHistoryData.builder()

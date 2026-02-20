@@ -3,7 +3,6 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -11,13 +10,11 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -40,10 +37,7 @@ import static org.mockito.Mockito.*;
 class PartyroomAccessServiceDjQueueChangeTest {
 
     @Mock private ApplicationEventPublisher eventPublisher;
-    @Mock private PartyroomRepository partyroomRepository;
-    @Mock private PartyroomPlaybackRepository partyroomPlaybackRepository;
-    @Mock private CrewRepository crewRepository;
-    @Mock private DjRepository djRepository;
+    @Mock private PartyroomAggregatePort aggregatePort;
     @Mock private PartyroomAggregateService partyroomAggregateService;
     @Mock private PartyroomInfoService partyroomInfoService;
     @Mock private PlaybackManagementService playbackManagementService;
@@ -76,7 +70,6 @@ class PartyroomAccessServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -90,11 +83,11 @@ class PartyroomAccessServiceDjQueueChangeTest {
         playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
-        when(djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.of(
+        when(aggregatePort.findCrew(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(aggregatePort.findDj(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.of(
                 DjData.builder().id(100L).crewId(new CrewId(1L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
         ));
-        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
+        when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
 
         // when
         partyroomAccessService.exit(partyroomId);
@@ -112,7 +105,6 @@ class PartyroomAccessServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -125,9 +117,9 @@ class PartyroomAccessServiceDjQueueChangeTest {
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
-        when(djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.empty());
-        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
+        when(aggregatePort.findCrew(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(aggregatePort.findDj(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.empty());
+        when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
 
         // when
         partyroomAccessService.exit(partyroomId);
@@ -146,7 +138,6 @@ class PartyroomAccessServiceDjQueueChangeTest {
         CrewData targetCrew = CrewData.builder()
                 .id(2L)
                 .userId(targetUserId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -159,10 +150,10 @@ class PartyroomAccessServiceDjQueueChangeTest {
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
         playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
-        when(djRepository.findByPartyroomDataIdAndCrewId(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.of(
+        when(aggregatePort.findDj(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.of(
                 DjData.builder().id(100L).crewId(new CrewId(2L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
         ));
-        when(partyroomPlaybackRepository.findById(partyroomData.getId())).thenReturn(Optional.of(playbackState));
+        when(aggregatePort.findPlaybackState(partyroomData.getId())).thenReturn(playbackState);
 
         // when
         partyroomAccessService.expel(partyroomData, targetCrew, false);
@@ -182,7 +173,6 @@ class PartyroomAccessServiceDjQueueChangeTest {
         CrewData targetCrew = CrewData.builder()
                 .id(2L)
                 .userId(targetUserId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -194,8 +184,8 @@ class PartyroomAccessServiceDjQueueChangeTest {
 
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
 
-        when(djRepository.findByPartyroomDataIdAndCrewId(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.empty());
-        when(partyroomPlaybackRepository.findById(partyroomData.getId())).thenReturn(Optional.of(playbackState));
+        when(aggregatePort.findDj(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.empty());
+        when(aggregatePort.findPlaybackState(partyroomData.getId())).thenReturn(playbackState);
 
         // when
         partyroomAccessService.expel(partyroomData, targetCrew, false);

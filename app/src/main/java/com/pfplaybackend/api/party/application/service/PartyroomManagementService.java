@@ -10,13 +10,11 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.party.domain.policy.PartyroomCreationPolicy;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.event.PartyroomClosedEvent;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateDjQueueStatusRequest;
@@ -36,9 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PartyroomManagementService {
 
-    private final PartyroomRepository partyroomRepository;
-    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
-    private final DjQueueRepository djQueueRepository;
+    private final PartyroomAggregatePort aggregatePort;
     private final PartyroomAccessService partyroomAccessService;
     private final ApplicationEventPublisher eventPublisher;
 
@@ -52,7 +48,7 @@ public class PartyroomManagementService {
     public PartyroomData createGeneralPartyRoom(CreatePartyroomRequest request) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         new PartyroomCreationPolicy().enforce(authContext.getAuthorityTier());
-        Optional<PartyroomData> optionalActive = partyroomRepository.findActiveHostRoom(authContext.getUserId());
+        Optional<PartyroomData> optionalActive = aggregatePort.findActiveHostRoom(authContext.getUserId());
         if(optionalActive.isPresent()) throw ExceptionCreator.create(PartyroomException.ALREADY_HOST);
 
         if(request.getLinkDomain().isEmpty()) {
@@ -69,22 +65,22 @@ public class PartyroomManagementService {
                 LinkDomain.of(request.getLinkDomain()),
                 PlaybackTimeLimit.ofMinutes(request.getPlaybackTimeLimit()),
                 stageType, hostId);
-        PartyroomData saved = partyroomRepository.save(partyroom);
-        partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(saved.getId()));
-        djQueueRepository.save(DjQueueData.createFor(saved.getId()));
+        PartyroomData saved = aggregatePort.savePartyroom(partyroom);
+        aggregatePort.savePlaybackState(PartyroomPlaybackData.createFor(saved.getId()));
+        aggregatePort.saveDjQueueState(DjQueueData.createFor(saved.getId()));
         return saved;
     }
 
     @Transactional
     public void updatePartyroom(PartyroomId partyroomId, UpdatePartyroomRequest request) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+        PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.validateHost(authContext.getUserId());
         partyroom.updateBaseInfo(request.getTitle(), request.getIntroduction(),
                 LinkDomain.of(request.getLinkDomain()),
                 PlaybackTimeLimit.ofMinutes(request.getPlaybackTimeLimit()));
-        partyroomRepository.save(partyroom);
+        aggregatePort.savePartyroom(partyroom);
     }
 
     @Transactional
@@ -93,20 +89,20 @@ public class PartyroomManagementService {
         if (authContext.getAuthorityTier() != AuthorityTier.FM) {
             throw ExceptionCreator.create(PartyroomException.RESTRICTED_AUTHORITY);
         }
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+        PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.terminate();
-        partyroomRepository.save(partyroom);
+        aggregatePort.savePartyroom(partyroom);
         eventPublisher.publishEvent(new PartyroomClosedEvent(partyroom.getPartyroomId()));
     }
 
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
     public void deleteUnusedPartyroom() {
-        List<PartyroomData> unusedPartyroomDataList = partyroomRepository.findAllUnusedPartyroomDataByDay(30);
+        List<PartyroomData> unusedPartyroomDataList = aggregatePort.findAllUnusedPartyroomDataByDay(30);
         unusedPartyroomDataList.forEach(partyroom -> {
             partyroom.terminate();
-            partyroomRepository.save(partyroom);
+            aggregatePort.savePartyroom(partyroom);
             eventPublisher.publishEvent(new PartyroomClosedEvent(partyroom.getPartyroomId()));
         });
     }
@@ -114,13 +110,13 @@ public class PartyroomManagementService {
     @Transactional
     public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+        PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.validateHost(authContext.getUserId());
-        DjQueueData djQueue = djQueueRepository.findById(partyroomId.getId()).orElseThrow();
+        DjQueueData djQueue = aggregatePort.findDjQueueState(partyroomId.getId());
         if (request.getQueueStatus().equals(QueueStatus.CLOSE)) djQueue.close();
         if (request.getQueueStatus().equals(QueueStatus.OPEN)) djQueue.open();
-        djQueueRepository.save(djQueue);
+        aggregatePort.saveDjQueueState(djQueue);
     }
 
     public void initializeMainStage(UserId adminId) {

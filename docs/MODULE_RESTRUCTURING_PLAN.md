@@ -4,6 +4,7 @@
 >
 > 2개 모듈(api, realtime)을 5개 모듈(common, realtime, playlist, user, app)로 재구성하고,
 > profile/avatarresource 패키지를 user로 병합 후 독립 모듈로 분리.
+> 이후 ERD 정규화(Phase ERD-1~6)로 app 모듈 내 엔티티 3개 추가, 파일 수 변동 반영.
 >
 > | Phase | 내용 | Commit |
 > |-------|------|--------|
@@ -29,7 +30,8 @@ pfplay-backend-java/
 
 | 패키지 | 파일 수 | 역할 |
 |--------|---------|------|
-| party | 162 | Core — 파티룸, 크루, DJ, 재생, 채팅 |
+| party | 158 | Core — 파티룸, 크루, DJ, 재생, 채팅 |
+| partyview | 7 | 조회 집약 — Setup API |
 | user | 65 | Identity — 회원, 게스트, 활동 |
 | common | 51 | Shared Kernel — config, 예외, 공유 VO |
 | playlist | 46 | Media — 플레이리스트, 트랙 |
@@ -151,9 +153,10 @@ pfplay-backend-java/
 │       └── adapter/out/
 │           └── persistence/      기존 user + profile + avatarresource 리포지토리
 │
-└── app/              ◀ Gradle 모듈 (218파일)
+└── app/              ◀ Gradle 모듈 (221파일)
     └── com.pfplaybackend.api/
         ├── party/                Core 도메인 (파티룸, 크루, DJ, 재생, 채팅)
+        ├── partyview/            조회 집약 (Setup API)
         ├── auth/                 인증 (OAuth, 로그인 플로우)
         ├── admin/                관리 콘솔
         └── bootstrap/            Composition Root + cross-module adapters
@@ -491,7 +494,7 @@ app       → common, realtime, playlist, user
 
 | 항목 | 내용 |
 |------|------|
-| **현재 상태** | 162파일, 단일 Aggregate (JPA FK + 트랜잭션 원자성) |
+| **현재 상태** | 158파일, 단일 Aggregate (JPA FK + 트랜잭션 원자성) |
 | **분리 비용** | 트랜잭션 경계 재설계, eventual consistency 도입 필요 |
 | **이점** | 독립 배포 가능성 (현재 불필요) |
 | **판단** | PartyroomData-CrewData-DjData-PlaybackData가 FK로 연결된 단일 Aggregate. 분리 시 데이터 정합성 보장 비용이 현재 규모에서 과잉. |
@@ -536,15 +539,16 @@ app       → common, realtime, playlist, user
 | **realtime** | 10 | 없음 |
 | **playlist** | 47 | common |
 | **user** | 91 | common |
-| **app** | 218 | common, realtime, playlist, user |
+| **app** | 221 | common, realtime, playlist, user |
 
-| 도메인 (app 내) | 비고 |
-|-----------------|------|
-| party | 파티룸, 크루, DJ, 재생, 채팅 |
-| auth | OAuth, 로그인 플로우 |
-| admin | 관리 콘솔 |
-| bootstrap | Composition Root + cross-module adapters |
+| 도메인 (app 내) | 파일 수 | 비고 |
+|-----------------|---------|------|
+| party | 158 | 파티룸, 크루, DJ, 재생, 채팅 |
+| partyview | 7 | 조회 집약 (Setup API) |
+| auth | 26 | OAuth, 로그인 플로우 |
+| admin | 27 | 관리 콘솔 |
+| bootstrap | 2 | Composition Root + cross-module adapters |
 
 ---
 
-*작성: 2026-02-20 (Phase E 추가 갱신)*
+*작성: 2026-02-20 (Phase E 추가 갱신, 2026-02-21 ERD 정규화 후 파일 수 반영)*

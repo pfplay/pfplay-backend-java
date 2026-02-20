@@ -2,18 +2,15 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -36,10 +33,7 @@ import static org.mockito.Mockito.*;
 class PartyroomAccessServiceTest {
 
     @Mock private ApplicationEventPublisher eventPublisher;
-    @Mock private PartyroomRepository partyroomRepository;
-    @Mock private PartyroomPlaybackRepository partyroomPlaybackRepository;
-    @Mock private CrewRepository crewRepository;
-    @Mock private DjRepository djRepository;
+    @Mock private PartyroomAggregatePort aggregatePort;
     @Mock private PartyroomAggregateService partyroomAggregateService;
     @Mock private PartyroomInfoService partyroomInfoService;
     @Mock private PlaybackManagementService playbackManagementService;
@@ -72,7 +66,6 @@ class PartyroomAccessServiceTest {
         CrewData crew = CrewData.builder()
                 .id(10L)
                 .userId(userId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -84,8 +77,8 @@ class PartyroomAccessServiceTest {
                 .build();
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(crewRepository.countByPartyroomDataIdAndIsActiveTrue(partyroomId.getId())).thenReturn(10L);
-        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(aggregatePort.countActiveCrews(partyroomId.getId())).thenReturn(10L);
+        when(aggregatePort.findCrew(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
 
         // 같은 룸에 이미 active
         ActivePartyroomDto activeRoomInfo = mock(ActivePartyroomDto.class);
@@ -110,7 +103,6 @@ class PartyroomAccessServiceTest {
         CrewData newRoomCrew = CrewData.builder()
                 .id(20L)
                 .userId(userId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(false)
                 .build();
@@ -122,7 +114,7 @@ class PartyroomAccessServiceTest {
                 .build();
 
         when(partyroomInfoService.getPartyroomById(newRoomId)).thenReturn(newPartyroomData);
-        when(crewRepository.countByPartyroomDataIdAndIsActiveTrue(newRoomId.getId())).thenReturn(5L);
+        when(aggregatePort.countActiveCrews(newRoomId.getId())).thenReturn(5L);
 
         // 다른 룸에 이미 active
         ActivePartyroomDto activeRoomInfo = mock(ActivePartyroomDto.class);
@@ -133,7 +125,6 @@ class PartyroomAccessServiceTest {
         CrewData oldCrew = CrewData.builder()
                 .id(5L)
                 .userId(userId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -148,13 +139,13 @@ class PartyroomAccessServiceTest {
 
         when(partyroomInfoService.getPartyroomById(oldRoomId)).thenReturn(oldPartyroomData);
         // exit() mock: crew lookup
-        when(crewRepository.findByPartyroomDataIdAndUserId(oldRoomId.getId(), userId)).thenReturn(Optional.of(oldCrew));
-        when(djRepository.findByPartyroomDataIdAndCrewId(oldRoomId.getId(), new CrewId(5L))).thenReturn(Optional.empty());
-        when(partyroomPlaybackRepository.findById(oldRoomId.getId())).thenReturn(Optional.of(oldPlaybackState));
+        when(aggregatePort.findCrew(oldRoomId.getId(), userId)).thenReturn(Optional.of(oldCrew));
+        when(aggregatePort.findDj(oldRoomId.getId(), new CrewId(5L))).thenReturn(Optional.empty());
+        when(aggregatePort.findPlaybackState(oldRoomId.getId())).thenReturn(oldPlaybackState);
 
         // addOrActivateCrew mock for new room: inactive crew found → reactivate
-        when(crewRepository.findByPartyroomDataIdAndUserId(newRoomId.getId(), userId)).thenReturn(Optional.of(newRoomCrew));
-        when(crewRepository.save(any(CrewData.class))).thenReturn(newRoomCrew);
+        when(aggregatePort.findCrew(newRoomId.getId(), userId)).thenReturn(Optional.of(newRoomCrew));
+        when(aggregatePort.saveCrew(any(CrewData.class))).thenReturn(newRoomCrew);
 
         // when — 예외 없이 정상 실행되어야 함
         partyroomAccessService.tryEnter(newRoomId);

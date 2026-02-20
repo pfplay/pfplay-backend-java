@@ -3,8 +3,6 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
@@ -13,9 +11,8 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.*;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -38,10 +35,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DjManagementServiceDjQueueChangeTest {
 
-    @Mock private PartyroomRepository partyroomRepository;
-    @Mock private PartyroomPlaybackRepository partyroomPlaybackRepository;
-    @Mock private DjQueueRepository djQueueRepository;
-    @Mock private DjRepository djRepository;
+    @Mock private PartyroomAggregatePort aggregatePort;
     @Mock private PlaybackManagementService playbackManagementService;
     @Mock private PlaylistQueryPort playlistQueryPort;
     @Mock private ApplicationEventPublisher eventPublisher;
@@ -78,7 +72,6 @@ class DjManagementServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -93,13 +86,12 @@ class DjManagementServiceDjQueueChangeTest {
         DjQueueData djQueue = DjQueueData.createFor(1L);
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
-        when(djQueueRepository.findById(partyroomId.getId())).thenReturn(Optional.of(djQueue));
+        when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
+        when(aggregatePort.findDjQueueState(partyroomId.getId())).thenReturn(djQueue);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
         when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
-        when(djRepository.existsByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(false);
-        when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
-        when(partyroomPlaybackRepository.save(any(PartyroomPlaybackData.class))).thenReturn(playbackState);
+        when(aggregatePort.isDjRegistered(partyroomId.getId(), new CrewId(1L))).thenReturn(false);
+        when(aggregatePort.findDjsOrdered(partyroomId.getId())).thenReturn(Collections.emptyList());
 
         // when
         djManagementService.enqueueDj(partyroomId, playlistId);
@@ -115,7 +107,6 @@ class DjManagementServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -129,7 +120,7 @@ class DjManagementServiceDjQueueChangeTest {
         playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
+        when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
 
         // when
@@ -149,7 +140,6 @@ class DjManagementServiceDjQueueChangeTest {
         CrewData crew = CrewData.builder()
                 .id(1L)
                 .userId(userId)
-
                 .gradeType(GradeType.LISTENER)
                 .isActive(true)
                 .build();
@@ -163,7 +153,7 @@ class DjManagementServiceDjQueueChangeTest {
         playbackState.activate(new PlaybackId(1L), new CrewId(1L));
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
+        when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
 
         // when
@@ -202,15 +192,14 @@ class DjManagementServiceDjQueueChangeTest {
         CrewData adjusterCrew = CrewData.builder()
                 .id(1L)
                 .userId(adminUserId)
-
                 .gradeType(GradeType.MODERATOR)
                 .isActive(true)
                 .build();
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
+        when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adminUserId)).thenReturn(adjusterCrew);
-        when(djRepository.findById(djId.getId())).thenReturn(Optional.of(targetDj));
+        when(aggregatePort.findDjById(djId.getId())).thenReturn(Optional.of(targetDj));
 
         // when
         djManagementService.dequeueDj(partyroomId, djId);

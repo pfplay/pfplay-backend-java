@@ -9,6 +9,7 @@ import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
 import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.port.out.PartyroomQueryPort;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
@@ -17,14 +18,11 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.in.web.payload.response.info.QueryPartyroomSummaryResponse;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -39,16 +37,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PartyroomInfoService {
 
-    private final PartyroomRepository partyroomRepository;
-    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
-    private final CrewRepository crewRepository;
-    private final DjRepository djRepository;
+    private final PartyroomAggregatePort aggregatePort;
+    private final PartyroomQueryPort queryPort;
     private final UserProfileQueryPort userProfileQueryPort;
     private final PlaybackInfoService playbackInfoService;
 
     @Transactional(readOnly = true)
     public List<PartyroomWithCrewDto> getAllPartyrooms() {
-        return partyroomRepository.getCrewDataByPartyroomId().stream().map(partyroomWithCrewDto -> {
+        return queryPort.getCrewDataByPartyroomId().stream().map(partyroomWithCrewDto -> {
             List<CrewDto> filteredCrews = partyroomWithCrewDto.crews().stream()
                                 .filter(crewDto -> crewDto.gradeType().isEqualOrHigherThan(GradeType.MODERATOR))
                                 .limit(3)
@@ -70,24 +66,24 @@ public class PartyroomInfoService {
 
     @Transactional(readOnly = true)
     public PartyroomData getPartyroomById(PartyroomId partyroomId) {
-        return partyroomRepository.findById(partyroomId.getId())
+        return aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
     }
 
     @Transactional(readOnly = true)
     public boolean isAlreadyRegistered(Long partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        Optional<CrewData> crew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId, authContext.getUserId());
+        Optional<CrewData> crew = aggregatePort.findCrew(partyroomId, authContext.getUserId());
         if (crew.isEmpty()) return false;
-        return djRepository.existsByPartyroomDataIdAndCrewId(partyroomId, new CrewId(crew.get().getId()));
+        return aggregatePort.isDjRegistered(partyroomId, new CrewId(crew.get().getId()));
     }
 
     @Transactional(readOnly = true)
     public List<DjWithProfileDto> getDjs(Long partyroomId) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId);
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         // Resolve userIds via crew lookup
         List<Long> crewIds = queuedDjs.stream().map(dj -> dj.getCrewId().getId()).toList();
-        List<CrewData> crews = crewRepository.findAllById(crewIds);
+        List<CrewData> crews = aggregatePort.findCrewsByIds(crewIds);
         Map<Long, UserId> crewIdToUserId = crews.stream()
                 .collect(Collectors.toMap(CrewData::getId, CrewData::getUserId));
         List<UserId> userIds = queuedDjs.stream()
@@ -110,22 +106,22 @@ public class PartyroomInfoService {
     @Transactional(readOnly = true)
     public Optional<ActivePartyroomDto> getMyActivePartyroom() {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        return partyroomRepository.getActivePartyroomByUserId(authContext.getUserId());
+        return queryPort.getActivePartyroomByUserId(authContext.getUserId());
     }
 
     @Transactional(readOnly = true)
     public Optional<ActivePartyroomDto> getMyActivePartyroom(UserId userId) {
-        return partyroomRepository.getActivePartyroomByUserId(userId);
+        return queryPort.getActivePartyroomByUserId(userId);
     }
 
     @Transactional(readOnly = true)
     public QueryPartyroomSummaryResponse getSummaryInfo(PartyroomId partyroomId) {
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
+        PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroomId.getId()).orElseThrow();
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
         if(playbackState.isActivated()) {
             PlaybackData playback = playbackInfoService.getPlaybackById(playbackState.getCurrentPlaybackId());
-            CrewData djCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), playback.getUserId())
+            CrewData djCrew = aggregatePort.findCrew(partyroomId.getId(), playback.getUserId())
                     .orElseThrow();
             UserId djUserId = djCrew.getUserId();
             ProfileSettingDto profileSettingDto = userProfileQueryPort.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
@@ -137,12 +133,12 @@ public class PartyroomInfoService {
 
     @Transactional(readOnly = true)
     public Optional<CrewData> getCrewByUserId(PartyroomId partyroomId, UserId userId) {
-        return crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId);
+        return aggregatePort.findCrew(partyroomId.getId(), userId);
     }
 
     @Transactional(readOnly = true)
     public CrewData getCrewOrThrow(Long partyroomId, UserId userId) {
-        return crewRepository.findByPartyroomDataIdAndUserId(partyroomId, userId)
+        return aggregatePort.findCrew(partyroomId, userId)
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
     }
 
@@ -158,7 +154,7 @@ public class PartyroomInfoService {
         ActivePartyroomDto activePartyroomDto = getMyActivePartyroom(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
-        CrewData crew = crewRepository.findById(crewId)
+        CrewData crew = aggregatePort.findCrewById(crewId)
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
         UserId targetUserId = crew.getUserId();
         AuthorityTier authorityTier = userProfileQueryPort.getAuthorityTier(targetUserId);

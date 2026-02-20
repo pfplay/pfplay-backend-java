@@ -2,10 +2,10 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
+import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 public class PartyroomNoticeService {
 
     private final RedisMessagePublisher messagePublisher;
-    private final PartyroomRepository partyroomRepository;
+    private final PartyroomAggregatePort aggregatePort;
 
     @Transactional
     void updateNotice() {
@@ -38,7 +38,7 @@ public class PartyroomNoticeService {
 
     @Transactional(readOnly = true)
     public String getNotice(PartyroomId partyroomId) {
-        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId())
+        PartyroomData partyroomData = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         return partyroomData.getNoticeContent();
     }
