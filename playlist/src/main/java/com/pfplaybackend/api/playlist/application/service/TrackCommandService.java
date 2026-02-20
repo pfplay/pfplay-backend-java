@@ -15,8 +15,8 @@ import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MoveTrackRe
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdateTrackOrderRequest;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
+import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
+import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,18 +32,18 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class TrackCommandService {
 
-    private final PlaylistRepository playlistRepository;
-    private final TrackRepository trackRepository;
+    private final PlaylistAggregatePort aggregatePort;
+    private final PlaylistQueryPort queryPort;
     private final PlaylistQueryService playlistQueryService;
 
     @Transactional
     public void addTrackInPlaylist(Long playlistId, AddTrackRequest request) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         // 플레이리스트 접근 권한 검사
-        PlaylistData playlistData = playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
+        PlaylistData playlistData = aggregatePort.findPlaylistByIdAndOwner(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 트랙 중복 검사
-        Optional<TrackData> optional = trackRepository.findByPlaylistIdAndLinkId(playlistData.getId(), request.getLinkId());
+        Optional<TrackData> optional = aggregatePort.findTrackByPlaylistAndLink(playlistData.getId(), request.getLinkId());
         if (optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 최대 보유 한계치 초과 검사
         PlaylistSummary playlistSummary = playlistQueryService.getPlaylist(playlistId);
@@ -60,18 +60,18 @@ public class TrackCommandService {
                 .thumbnailImage(request.getThumbnailImage())
                 .build();
 
-        trackRepository.save(trackData);
+        aggregatePort.saveTrack(trackData);
     }
 
     @Transactional
     public void updateTrackOrderInPlaylist(Long playlistId, Long trackId, UpdateTrackOrderRequest request) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         // 플레이리스트 접근 권한 검사
-        playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
+        aggregatePort.findPlaylistByIdAndOwner(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         // 타겟 트랙 존재 여부 검사
-        TrackData trackData = trackRepository.findByIdAndPlaylistId(trackId, playlistId)
+        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
 
         Integer prevOrderNumber = trackData.getOrderNumber();
@@ -85,15 +85,15 @@ public class TrackCommandService {
 
         if (prevOrderNumber < nextOrderNumber) {
             // prevOrderNumber < x <= nextOrderNumber 사이에 있는 Track 레코드의 order_number 를 -1씩 변경
-            trackRepository.shiftUpOrderByDnD(playlistId, prevOrderNumber, nextOrderNumber);
+            aggregatePort.shiftUpTrackOrderByDnD(playlistId, prevOrderNumber, nextOrderNumber);
         }
         if (prevOrderNumber > nextOrderNumber) {
             // nextOrderNumber <= x < prevOrderNumber  사이에 있는 Track 레코드의 order_number 를 +1씩 변경
-            trackRepository.shiftDownOrderByDnD(playlistId, prevOrderNumber, nextOrderNumber);
+            aggregatePort.shiftDownTrackOrderByDnD(playlistId, prevOrderNumber, nextOrderNumber);
         }
 
         trackData.reorder(nextOrderNumber);
-        trackRepository.save(trackData);
+        aggregatePort.saveTrack(trackData);
     }
 
     @Transactional
@@ -101,48 +101,48 @@ public class TrackCommandService {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserId ownerId = authContext.getUserId();
         // 소스 플레이리스트 소유권 검증
-        playlistRepository.findByIdAndOwnerId(sourcePlaylistId, ownerId)
+        aggregatePort.findPlaylistByIdAndOwner(sourcePlaylistId, ownerId)
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 타겟 플레이리스트 소유권 검증
-        PlaylistData targetPlaylistData = playlistRepository.findByIdAndOwnerId(request.getTargetPlaylistId(), ownerId)
+        PlaylistData targetPlaylistData = aggregatePort.findPlaylistByIdAndOwner(request.getTargetPlaylistId(), ownerId)
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 소스에서 트랙 조회
-        TrackData trackData = trackRepository.findByIdAndPlaylistId(trackId, sourcePlaylistId)
+        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, sourcePlaylistId)
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
         // 타겟에 동일 linkId 중복 검사
-        Optional<TrackData> duplicate = trackRepository.findByPlaylistIdAndLinkId(targetPlaylistData.getId(), trackData.getLinkId());
+        Optional<TrackData> duplicate = aggregatePort.findTrackByPlaylistAndLink(targetPlaylistData.getId(), trackData.getLinkId());
         if (duplicate.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 타겟 트랙 개수 15개 제한 검사
         PlaylistSummary targetSummary = playlistQueryService.getPlaylist(request.getTargetPlaylistId());
         if (targetSummary.musicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
         // 소스 orderNumber 재정렬
-        trackRepository.shiftUpOrderByDelete(sourcePlaylistId, trackData.getOrderNumber());
+        aggregatePort.shiftUpTrackOrderByDelete(sourcePlaylistId, trackData.getOrderNumber());
         // 트랙을 타겟 플레이리스트로 이동
         int nextOrderNumber = (int) (targetSummary.musicCount() + 1);
         trackData.moveToPlaylist(targetPlaylistData.getId(), nextOrderNumber);
-        trackRepository.save(trackData);
+        aggregatePort.saveTrack(trackData);
     }
 
     @Transactional
     public void deleteTrackInPlaylist(Long playlistId, Long trackId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         // 플레이리스트 접근 권한 검사
-        playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
+        aggregatePort.findPlaylistByIdAndOwner(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         // 타겟 트랙 존재 여부 검사
-        TrackData trackData = trackRepository.findByIdAndPlaylistId(trackId, playlistId)
+        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
 
         Integer deleteOrderNumber = trackData.getOrderNumber();
-        trackRepository.shiftUpOrderByDelete(playlistId, deleteOrderNumber);
-        trackRepository.delete(trackData);
+        aggregatePort.shiftUpTrackOrderByDelete(playlistId, deleteOrderNumber);
+        aggregatePort.deleteTrack(trackData);
     }
 
     @Transactional
     public PlaybackTrackDto getFirstTrack(Long playlistId) {
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.ASC, "orderNumber"));
-        Page<PlaylistTrackDto> page = trackRepository.getTracksWithPagination(playlistId, pageable);
+        Page<PlaylistTrackDto> page = queryPort.getTracksWithPagination(playlistId, pageable);
         rotateTrackOrder(playlistId, page.getTotalElements());
         PlaylistTrackDto dto = page.getContent().get(0);
         return new PlaybackTrackDto(
@@ -155,6 +155,6 @@ public class TrackCommandService {
     }
 
     public void rotateTrackOrder(Long playlistId, long totalCount) {
-        trackRepository.reorderTracks(playlistId, totalCount);
+        aggregatePort.rotateTrackOrder(playlistId, totalCount);
     }
 }

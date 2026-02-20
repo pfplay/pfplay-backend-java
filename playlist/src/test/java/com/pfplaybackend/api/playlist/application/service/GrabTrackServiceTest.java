@@ -5,11 +5,10 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
+import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +28,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class GrabTrackServiceTest {
 
-    @Mock PlaylistRepository playlistRepository;
-    @Mock TrackRepository trackRepository;
+    @Mock PlaylistAggregatePort aggregatePort;
     @Mock TrackCommandService trackCommandService;
 
     @InjectMocks GrabTrackService grabTrackService;
@@ -59,9 +57,9 @@ class GrabTrackServiceTest {
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();
 
-        when(trackRepository.findFirstByLinkId(linkId)).thenReturn(track);
-        when(playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(trackRepository.findByPlaylistIdAndLinkId(grablist.getId(), linkId)).thenReturn(Optional.empty());
+        when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
+        when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
+        when(aggregatePort.findTrackByPlaylistAndLink(grablist.getId(), linkId)).thenReturn(Optional.empty());
 
         // when
         grabTrackService.grabTrack(userId, linkId);
@@ -74,7 +72,7 @@ class GrabTrackServiceTest {
     @DisplayName("grabTrack — 존재하지 않는 트랙으로 그랩 시 NotFoundException이 발생한다")
     void grabTrack_trackNotFound() {
         // given
-        when(trackRepository.findFirstByLinkId(linkId)).thenReturn(null);
+        when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(null);
 
         // when & then
         assertThatThrownBy(() -> grabTrackService.grabTrack(userId, linkId))
@@ -88,9 +86,9 @@ class GrabTrackServiceTest {
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();
 
-        when(trackRepository.findFirstByLinkId(linkId)).thenReturn(track);
-        when(playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(trackRepository.findByPlaylistIdAndLinkId(grablist.getId(), linkId))
+        when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
+        when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
+        when(aggregatePort.findTrackByPlaylistAndLink(grablist.getId(), linkId))
                 .thenReturn(Optional.of(track));
 
         // when & then
@@ -105,9 +103,9 @@ class GrabTrackServiceTest {
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();
 
-        when(trackRepository.findFirstByLinkId(linkId)).thenReturn(track);
-        when(playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(trackRepository.findByPlaylistIdAndLinkId(grablist.getId(), linkId)).thenReturn(Optional.empty());
+        when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
+        when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
+        when(aggregatePort.findTrackByPlaylistAndLink(grablist.getId(), linkId)).thenReturn(Optional.empty());
 
         ArgumentCaptor<AddTrackRequest> captor = ArgumentCaptor.forClass(AddTrackRequest.class);
 

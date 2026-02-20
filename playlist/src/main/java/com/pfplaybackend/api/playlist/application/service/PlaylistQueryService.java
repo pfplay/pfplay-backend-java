@@ -3,7 +3,7 @@ package com.pfplaybackend.api.playlist.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
+import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,17 +17,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlaylistQueryService {
 
-    private final PlaylistRepository playlistRepository;
+    private final PlaylistQueryPort queryPort;
 
     @Transactional(readOnly = true)
     public List<PlaylistSummary> getPlaylists() {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        return playlistRepository.findAllByUserId(authContext.getUserId());
+        return queryPort.findAllByUserId(authContext.getUserId());
     }
 
     @Transactional(readOnly = true)
     public PlaylistSummary getPlaylist(Long playlistId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        return playlistRepository.findByIdAndUserId(playlistId, authContext.getUserId());
+        return queryPort.findByIdAndUserId(playlistId, authContext.getUserId());
     }
 }

@@ -7,7 +7,7 @@ import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
+import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 class PlaylistCommandServiceTest {
 
     @Mock
-    private PlaylistRepository playlistRepository;
+    private PlaylistAggregatePort aggregatePort;
 
     @InjectMocks
     private PlaylistCommandService playlistCommandService;
@@ -59,18 +59,18 @@ class PlaylistCommandServiceTest {
     void createPlaylist_success() {
         // given
         String playlistName = "My Playlist";
-        when(playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST))
+        when(aggregatePort.findPlaylistsByOwnerAndType(userId, PlaylistType.PLAYLIST))
                 .thenReturn(Collections.emptyList());
 
         PlaylistData savedData = PlaylistData.builder()
                 .id(1L).ownerId(userId).name(playlistName).type(PlaylistType.PLAYLIST).orderNumber(1).build();
-        when(playlistRepository.save(any(PlaylistData.class))).thenReturn(savedData);
+        when(aggregatePort.savePlaylist(any(PlaylistData.class))).thenReturn(savedData);
 
         // when
         PlaylistData result = playlistCommandService.createPlaylist(playlistName);
 
         // then
-        verify(playlistRepository, times(1)).save(any(PlaylistData.class));
+        verify(aggregatePort, times(1)).savePlaylist(any(PlaylistData.class));
         assertThat(result.getName()).isEqualTo(playlistName);
     }
 
@@ -81,7 +81,7 @@ class PlaylistCommandServiceTest {
         String playlistName = "My Playlist";
         List<PlaylistData> existingPlaylists = Collections.nCopies(10,
                 PlaylistData.builder().ownerId(userId).name("pl").type(PlaylistType.PLAYLIST).orderNumber(0).build());
-        when(playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST))
+        when(aggregatePort.findPlaylistsByOwnerAndType(userId, PlaylistType.PLAYLIST))
                 .thenReturn(existingPlaylists);
 
         // when & then — PlaylistCreationPolicy.enforce(FM, 10) throws ConflictException since FM limit is 10
@@ -101,15 +101,15 @@ class PlaylistCommandServiceTest {
         PlaylistData playlistData = PlaylistData.builder()
                 .id(playlistId).ownerId(userId).name("Old Name").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
-        when(playlistRepository.findByIdAndOwnerIdAndType(playlistId, userId, PlaylistType.PLAYLIST))
+        when(aggregatePort.findPlaylistByIdAndOwnerAndType(playlistId, userId, PlaylistType.PLAYLIST))
                 .thenReturn(Optional.of(playlistData));
-        when(playlistRepository.save(any(PlaylistData.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(aggregatePort.savePlaylist(any(PlaylistData.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
         PlaylistData result = playlistCommandService.renamePlaylist(playlistId, newName);
 
         // then
-        verify(playlistRepository, times(1)).save(any(PlaylistData.class));
+        verify(aggregatePort, times(1)).savePlaylist(any(PlaylistData.class));
         assertThat(result.getName()).isEqualTo(newName);
     }
 
@@ -118,7 +118,7 @@ class PlaylistCommandServiceTest {
     void renamePlaylist_notFound() {
         // given
         Long playlistId = 999L;
-        when(playlistRepository.findByIdAndOwnerIdAndType(playlistId, userId, PlaylistType.PLAYLIST))
+        when(aggregatePort.findPlaylistByIdAndOwnerAndType(playlistId, userId, PlaylistType.PLAYLIST))
                 .thenReturn(Optional.empty());
 
         // when & then
@@ -129,7 +129,7 @@ class PlaylistCommandServiceTest {
     // ========== deletePlaylist ==========
 
     @Test
-    @DisplayName("플레이리스트 삭제 성공 — deleteByListIds 호출")
+    @DisplayName("플레이리스트 삭제 성공 — deletePlaylistsByIds 호출")
     void deletePlaylist_success() {
         // given
         List<Long> playlistIds = List.of(1L, 2L);
@@ -137,14 +137,14 @@ class PlaylistCommandServiceTest {
         PlaylistData pd1 = PlaylistData.builder().id(1L).ownerId(userId).name("p1").type(PlaylistType.PLAYLIST).orderNumber(0).build();
         PlaylistData pd2 = PlaylistData.builder().id(2L).ownerId(userId).name("p2").type(PlaylistType.PLAYLIST).orderNumber(1).build();
 
-        when(playlistRepository.findAllByOwnerId(userId)).thenReturn(List.of(pd1, pd2));
-        when(playlistRepository.deleteByListIds(playlistIds)).thenReturn(2L);
+        when(aggregatePort.findAllPlaylistsByOwner(userId)).thenReturn(List.of(pd1, pd2));
+        when(aggregatePort.deletePlaylistsByIds(playlistIds)).thenReturn(2L);
 
         // when
         playlistCommandService.deletePlaylist(playlistIds);
 
         // then
-        verify(playlistRepository, times(1)).deleteByListIds(playlistIds);
+        verify(aggregatePort, times(1)).deletePlaylistsByIds(playlistIds);
     }
 
     @Test
@@ -155,7 +155,7 @@ class PlaylistCommandServiceTest {
 
         PlaylistData pd1 = PlaylistData.builder().id(1L).ownerId(userId).name("p1").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
-        when(playlistRepository.findAllByOwnerId(userId)).thenReturn(List.of(pd1));
+        when(aggregatePort.findAllPlaylistsByOwner(userId)).thenReturn(List.of(pd1));
 
         // when & then
         assertThatThrownBy(() -> playlistCommandService.deletePlaylist(playlistIds))

@@ -5,9 +5,8 @@ import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
+import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,18 +18,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class GrabTrackService {
 
-    private final PlaylistRepository playlistRepository;
-    private final TrackRepository trackRepository;
+    private final PlaylistAggregatePort aggregatePort;
     private final TrackCommandService trackCommandService;
 
     @Transactional
     public void grabTrack(UserId userId, String linkId) {
-        TrackData targetTrackData = trackRepository.findFirstByLinkId(linkId);
+        TrackData targetTrackData = aggregatePort.findFirstTrackByLink(linkId);
         if (targetTrackData == null) throw ExceptionCreator.create(TrackException.NOT_FOUND_TRACK);
 
-        PlaylistData playlistData = playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST);
+        PlaylistData playlistData = aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST);
         // LinkId cannot be duplicated.
-        Optional<TrackData> optional = trackRepository.findByPlaylistIdAndLinkId(playlistData.getId(), linkId);
+        Optional<TrackData> optional = aggregatePort.findTrackByPlaylistAndLink(playlistData.getId(), linkId);
         if(optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
 
         AddTrackRequest request = new AddTrackRequest(
