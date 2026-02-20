@@ -15,6 +15,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "USER_ACTIVITY",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_activity_user_type", columnNames = {"user_id", "activity_type"})
+        },
         indexes = {
                 @Index(name = "user_activity_user_id_IDX", columnList = "user_id")
         })

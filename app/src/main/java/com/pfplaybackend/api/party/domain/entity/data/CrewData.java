@@ -19,6 +19,9 @@ import java.util.Objects;
 @DynamicUpdate
 @Table(
         name = "CREW",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_crew_partyroom_user", columnNames = {"partyroom_id", "user_id"})
+        },
         indexes = {
                 @Index(name = "crew_partyroom_id_user_id_IDX", columnList = "partyroom_id, user_id"),
                 @Index(name = "crew_user_id_is_active_IDX", columnList = "user_id, is_active")

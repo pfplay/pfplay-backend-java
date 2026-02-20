@@ -13,7 +13,10 @@ import org.hibernate.annotations.DynamicUpdate;
 @DynamicInsert
 @DynamicUpdate
 @Table(
-        name = "PLAYBACK_REACTION_HISTORY"
+        name = "PLAYBACK_REACTION_HISTORY",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_reaction_user_playback", columnNames = {"user_id", "playback_id"})
+        }
 )
 @Entity
 public class PlaybackReactionHistoryData extends BaseEntity {
