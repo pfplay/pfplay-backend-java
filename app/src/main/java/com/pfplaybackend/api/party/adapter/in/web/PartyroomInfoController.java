@@ -1,10 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
-import com.pfplaybackend.api.party.application.dto.playback.DisplayDto;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
-import com.pfplaybackend.api.party.application.dto.crew.CrewSetupDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
-import com.pfplaybackend.api.party.application.service.DisplayInfoService;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -29,7 +26,6 @@ import java.util.Map;
 public class PartyroomInfoController {
 
     private final PartyroomInfoService partyroomInfoService;
-    private final DisplayInfoService displayInfoService;
     private final PlaybackInfoService playbackInfoService;
 
     /**
@@ -50,14 +46,6 @@ public class PartyroomInfoController {
     @GetMapping("/{partyroomId}/summary")
     public ResponseEntity<QueryPartyroomSummaryResponse> getPartyroomSummaryInfo(@PathVariable Long partyroomId) {
         return ResponseEntity.ok().body(partyroomInfoService.getSummaryInfo(new PartyroomId(partyroomId)));
-    }
-
-    @GetMapping("/{partyroomId}/setup")
-    public ResponseEntity<?> getSetupInfo(@PathVariable Long partyroomId) {
-        List<CrewSetupDto> crewSetupDtoList = partyroomInfoService.getCrewsForSetup(new PartyroomId(partyroomId));
-        DisplayDto displayDto = displayInfoService.getDisplayInfo();
-        // TODO 현재 채팅 차단된 크루 목록 반환
-        return ResponseEntity.ok().body(QueryPartyroomSetupResponse.from(crewSetupDtoList, displayDto));
     }
 
     @GetMapping("/{partyroomId}/dj-queue")

@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.party.application.dto.crew;
+package com.pfplaybackend.api.partyview.application.dto;
 
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;

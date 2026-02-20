@@ -1,7 +1,7 @@
-package com.pfplaybackend.api.party.adapter.in.web.payload.response.info;
+package com.pfplaybackend.api.partyview.adapter.in.web.payload.response;
 
-import com.pfplaybackend.api.party.application.dto.playback.DisplayDto;
-import com.pfplaybackend.api.party.application.dto.crew.CrewSetupDto;
+import com.pfplaybackend.api.partyview.application.dto.DisplayDto;
+import com.pfplaybackend.api.partyview.application.dto.CrewSetupDto;
 import lombok.Builder;
 import lombok.Data;
 

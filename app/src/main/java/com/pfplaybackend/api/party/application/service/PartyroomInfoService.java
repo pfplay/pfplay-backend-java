@@ -8,7 +8,6 @@ import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
 import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
-import com.pfplaybackend.api.party.application.dto.crew.CrewSetupDto;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
@@ -64,19 +63,6 @@ public class PartyroomInfoService {
                 .flatMap(List::stream)
                 .map(CrewDto::userId).toList();
         return userProfileQueryPort.getUsersProfileSetting(primaryUserIds);
-    }
-
-    // 초기화를 위한 파티멤버 목록 조회
-    @Transactional(readOnly = true)
-    public List<CrewSetupDto> getCrewsForSetup(PartyroomId partyroomId) {
-        List<CrewData> crews = crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId());
-        List<UserId> userIds = crews.stream().map(CrewData::getUserId).toList();
-        Map<UserId, ProfileSettingDto> profileSettingMap = userProfileQueryPort.getUsersProfileSetting(userIds);
-
-        return crews.stream().map(crew -> {
-            UserId userId = crew.getUserId();
-            return CrewSetupDto.from(crew, profileSettingMap.get(userId));
-        }).toList();
     }
 
     @Transactional(readOnly = true)
