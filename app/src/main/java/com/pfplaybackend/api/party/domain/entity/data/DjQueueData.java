@@ -21,7 +21,7 @@ public class DjQueueData extends BaseEntity {
 
     private boolean isClosed;
 
-    public DjQueueData() {}
+    protected DjQueueData() {}
 
     private DjQueueData(Long partyroomId) {
         this.partyroomId = partyroomId;

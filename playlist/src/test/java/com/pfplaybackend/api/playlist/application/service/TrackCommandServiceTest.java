@@ -70,9 +70,7 @@ class TrackCommandServiceTest {
         // given
         Long playlistId = 1L;
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        // PlaylistData has @GeneratedValue id, set it via setter
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
 
@@ -109,8 +107,7 @@ class TrackCommandServiceTest {
         // given
         Long playlistId = 1L;
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
         TrackData existingTrack = TrackData.builder()
@@ -130,8 +127,7 @@ class TrackCommandServiceTest {
         // given
         Long playlistId = 1L;
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
 
@@ -154,8 +150,7 @@ class TrackCommandServiceTest {
         Long playlistId = 1L;
         Long trackId = 10L;
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         TrackData trackData = TrackData.builder()
                 .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(3).build();
@@ -178,8 +173,7 @@ class TrackCommandServiceTest {
         Long playlistId = 1L;
         Long trackId = 999L;
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)).thenReturn(Optional.empty());
@@ -200,12 +194,10 @@ class TrackCommandServiceTest {
         Long trackId = 10L;
 
         PlaylistData sourcePlaylist = PlaylistData.builder()
-                .ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        sourcePlaylist.setId(sourcePlaylistId);
+                .id(sourcePlaylistId).ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         PlaylistData targetPlaylist = PlaylistData.builder()
-                .ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
-        targetPlaylist.setId(targetPlaylistId);
+                .id(targetPlaylistId).ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
 
         TrackData trackData = TrackData.builder()
                 .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
@@ -253,8 +245,7 @@ class TrackCommandServiceTest {
         Long trackId = 10L;
 
         PlaylistData sourcePlaylist = PlaylistData.builder()
-                .ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        sourcePlaylist.setId(sourcePlaylistId);
+                .id(sourcePlaylistId).ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
 
@@ -275,12 +266,10 @@ class TrackCommandServiceTest {
         Long trackId = 10L;
 
         PlaylistData sourcePlaylist = PlaylistData.builder()
-                .ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        sourcePlaylist.setId(sourcePlaylistId);
+                .id(sourcePlaylistId).ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         PlaylistData targetPlaylist = PlaylistData.builder()
-                .ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
-        targetPlaylist.setId(targetPlaylistId);
+                .id(targetPlaylistId).ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
 
         TrackData trackData = TrackData.builder()
                 .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
@@ -308,12 +297,10 @@ class TrackCommandServiceTest {
         Long trackId = 10L;
 
         PlaylistData sourcePlaylist = PlaylistData.builder()
-                .ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        sourcePlaylist.setId(sourcePlaylistId);
+                .id(sourcePlaylistId).ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         PlaylistData targetPlaylist = PlaylistData.builder()
-                .ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
-        targetPlaylist.setId(targetPlaylistId);
+                .id(targetPlaylistId).ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
 
         TrackData trackData = TrackData.builder()
                 .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
@@ -341,8 +328,7 @@ class TrackCommandServiceTest {
         Long playlistId = 1L;
         Long trackId = 10L;
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         TrackData trackData = TrackData.builder()
                 .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
@@ -369,8 +355,7 @@ class TrackCommandServiceTest {
         Long playlistId = 1L;
         Long trackId = 10L;
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         TrackData trackData = TrackData.builder()
                 .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(4).build();
@@ -397,8 +382,7 @@ class TrackCommandServiceTest {
         Long playlistId = 1L;
         Long trackId = 10L;
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         TrackData trackData = TrackData.builder()
                 .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();

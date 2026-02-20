@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -15,7 +14,6 @@ import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
-@Setter
 @Getter
 @DynamicInsert
 @DynamicUpdate
@@ -55,5 +53,12 @@ public class CrewBlockHistoryData extends BaseEntity {
     @Column(name = "unblock_date")
     private LocalDateTime unblockDate;
 
-    public CrewBlockHistoryData() {}
+    protected CrewBlockHistoryData() {}
+
+    // ── Business Methods ──
+
+    public void unblock() {
+        this.unblocked = true;
+        this.unblockDate = LocalDateTime.now();
+    }
 }

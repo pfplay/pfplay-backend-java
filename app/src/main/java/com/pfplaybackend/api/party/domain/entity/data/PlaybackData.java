@@ -55,7 +55,7 @@ public class PlaybackData extends BaseEntity {
     // 재생 종료 시각
     private Long endTime;
 
-    public PlaybackData() {}
+    protected PlaybackData() {}
 
     @Builder
     public PlaybackData(Long id, PartyroomId partyroomId,

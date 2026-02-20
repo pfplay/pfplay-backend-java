@@ -6,13 +6,11 @@ import com.pfplaybackend.api.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 
-@Setter
 @Getter
 @DynamicInsert
 @DynamicUpdate
@@ -60,5 +58,16 @@ public class TrackData extends BaseEntity {
         this.duration = duration;
         this.linkId = linkId;
         this.thumbnailImage = thumbnailImage;
+    }
+
+    // ── Business Methods ──
+
+    public void reorder(int newOrderNumber) {
+        this.orderNumber = newOrderNumber;
+    }
+
+    public void moveToPlaylist(PlaylistData targetPlaylist, int newOrderNumber) {
+        this.playlistData = targetPlaylist;
+        this.orderNumber = newOrderNumber;
     }
 }

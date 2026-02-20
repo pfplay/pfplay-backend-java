@@ -21,7 +21,7 @@ public class PlaybackAggregationData extends BaseEntity {
     private int dislikeCount;
     private int grabCount;
 
-    public PlaybackAggregationData() {}
+    protected PlaybackAggregationData() {}
 
     private PlaybackAggregationData(Long playbackId) {
         this.playbackId = playbackId;

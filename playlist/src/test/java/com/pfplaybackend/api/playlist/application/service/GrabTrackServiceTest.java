@@ -48,9 +48,8 @@ class GrabTrackServiceTest {
     }
 
     private PlaylistData createGrablist() {
-        PlaylistData playlist = PlaylistData.create(0, "Grab", PlaylistType.GRABLIST, userId);
-        playlist.setId(100L);
-        return playlist;
+        return PlaylistData.builder()
+                .id(100L).ownerId(userId).orderNumber(0).name("Grab").type(PlaylistType.GRABLIST).build();
     }
 
     @Test

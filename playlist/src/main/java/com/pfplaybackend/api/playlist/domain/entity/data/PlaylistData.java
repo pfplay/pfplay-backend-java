@@ -6,12 +6,10 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-@Setter
 @Getter
 @DynamicInsert
 @DynamicUpdate
@@ -50,7 +48,8 @@ public class PlaylistData extends BaseEntity {
     protected PlaylistData() { }
 
     @Builder
-    public PlaylistData(UserId ownerId, Integer orderNumber, String name, PlaylistType type) {
+    public PlaylistData(Long id, UserId ownerId, Integer orderNumber, String name, PlaylistType type) {
+        this.id = id;
         this.ownerId = ownerId;
         this.orderNumber = orderNumber;
         this.name = name;

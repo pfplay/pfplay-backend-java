@@ -33,7 +33,7 @@ public class PartyroomPlaybackData extends BaseEntity {
 
     private boolean isActivated;
 
-    public PartyroomPlaybackData() {}
+    protected PartyroomPlaybackData() {}
 
     private PartyroomPlaybackData(Long partyroomId) {
         this.partyroomId = partyroomId;

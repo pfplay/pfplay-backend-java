@@ -6,7 +6,6 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -16,14 +15,13 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @Table(name = "GUEST")
 @Getter
-@Setter
 @Entity
 @DiscriminatorValue("GUEST")
 public class GuestData extends UserAccountData {
 
     private String agent;
 
-    public GuestData() {}
+    protected GuestData() {}
 
     @Builder
     public GuestData(UserId userId, AuthorityTier authorityTier, String agent, ProfileData profileData, boolean isProfileUpdated,

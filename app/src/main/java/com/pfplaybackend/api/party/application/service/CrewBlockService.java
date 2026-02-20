@@ -78,8 +78,7 @@ public class CrewBlockService {
         CrewBlockHistoryData historyData  = blockHistoryRepository.findByIdAndBlockerCrewIdAndUnblockedIsFalse(blockId, blockerCrewId)
                 .orElseThrow(() -> ExceptionCreator.create(BlockException.BLOCK_HISTORY_NOT_FOUND));
 
-        historyData.setUnblocked(true);
-        historyData.setUnblockDate(LocalDateTime.now());
+        historyData.unblock();
 
         crewBlockHistoryRepository.save(historyData);
     }

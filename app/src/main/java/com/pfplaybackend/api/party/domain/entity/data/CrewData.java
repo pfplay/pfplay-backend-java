@@ -56,7 +56,7 @@ public class CrewData extends BaseEntity {
     private LocalDateTime exitedAt;
 
     // 데이터 엔티티 생성자
-    public CrewData() {}
+    protected CrewData() {}
 
     @Builder
     public CrewData(Long id, UserId userId, GradeType gradeType,

@@ -46,7 +46,7 @@ public class DjData extends BaseEntity {
     private int orderNumber;
 
     // 데이터 엔티티 생성자
-    public DjData() {
+    protected DjData() {
     }
 
     @Builder

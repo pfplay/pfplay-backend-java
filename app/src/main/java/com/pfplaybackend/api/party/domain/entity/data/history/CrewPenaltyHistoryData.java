@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 
 @Builder
 @Getter
-@Setter
 @DynamicInsert
 @DynamicUpdate
 @Table(
@@ -69,7 +67,7 @@ public class CrewPenaltyHistoryData extends BaseEntity {
     })
     private CrewId releasedByCrewId;
 
-    public CrewPenaltyHistoryData() {}
+    protected CrewPenaltyHistoryData() {}
 
     public void release(CrewId releaserCrewId) {
         this.released = true;

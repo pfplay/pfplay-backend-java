@@ -81,7 +81,7 @@ public class PartyroomData extends BaseEntity {
     }
 
     // 데이터 엔티티 생성자
-    public PartyroomData() {}
+    protected PartyroomData() {}
 
     @Builder
     public PartyroomData(Long id, PartyroomId partyroomId, UserId hostId, StageType stageType,

@@ -14,7 +14,6 @@ import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -32,7 +31,6 @@ import java.util.stream.Collectors;
         }
 )
 @Getter
-@Setter
 @Entity
 @DiscriminatorValue("MEMBER")
 public class MemberData extends UserAccountData {
@@ -48,7 +46,7 @@ public class MemberData extends UserAccountData {
     @MapKeyEnumerated(EnumType.STRING)
     private Map<ActivityType, ActivityData> activityDataMap;
 
-    public MemberData() {}
+    protected MemberData() {}
 
     @Builder
     public MemberData(UserId userId, AuthorityTier authorityTier, String email, ProviderType providerType, ProfileData profileData, boolean isProfileUpdated, Map<ActivityType, ActivityData> activityDataMap,

@@ -52,5 +52,5 @@ public class CrewGradeHistoryData extends BaseEntity {
     @Column(name = "adjustment_date", nullable = false)
     private LocalDateTime adjustmentDate;
 
-    public CrewGradeHistoryData() {}
+    protected CrewGradeHistoryData() {}
 }

@@ -63,8 +63,7 @@ class PlaylistCommandServiceTest {
                 .thenReturn(Collections.emptyList());
 
         PlaylistData savedData = PlaylistData.builder()
-                .ownerId(userId).name(playlistName).type(PlaylistType.PLAYLIST).orderNumber(1).build();
-        savedData.setId(1L);
+                .id(1L).ownerId(userId).name(playlistName).type(PlaylistType.PLAYLIST).orderNumber(1).build();
         when(playlistRepository.save(any(PlaylistData.class))).thenReturn(savedData);
 
         // when
@@ -100,8 +99,7 @@ class PlaylistCommandServiceTest {
         String newName = "Renamed Playlist";
 
         PlaylistData playlistData = PlaylistData.builder()
-                .ownerId(userId).name("Old Name").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        playlistData.setId(playlistId);
+                .id(playlistId).ownerId(userId).name("Old Name").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         when(playlistRepository.findByIdAndOwnerIdAndType(playlistId, userId, PlaylistType.PLAYLIST))
                 .thenReturn(Optional.of(playlistData));
@@ -136,10 +134,8 @@ class PlaylistCommandServiceTest {
         // given
         List<Long> playlistIds = List.of(1L, 2L);
 
-        PlaylistData pd1 = PlaylistData.builder().ownerId(userId).name("p1").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        pd1.setId(1L);
-        PlaylistData pd2 = PlaylistData.builder().ownerId(userId).name("p2").type(PlaylistType.PLAYLIST).orderNumber(1).build();
-        pd2.setId(2L);
+        PlaylistData pd1 = PlaylistData.builder().id(1L).ownerId(userId).name("p1").type(PlaylistType.PLAYLIST).orderNumber(0).build();
+        PlaylistData pd2 = PlaylistData.builder().id(2L).ownerId(userId).name("p2").type(PlaylistType.PLAYLIST).orderNumber(1).build();
 
         when(playlistRepository.findAllByOwnerId(userId)).thenReturn(List.of(pd1, pd2));
         when(playlistRepository.deleteByListIds(playlistIds)).thenReturn(2L);
@@ -157,8 +153,7 @@ class PlaylistCommandServiceTest {
         // given
         List<Long> playlistIds = List.of(1L, 999L);
 
-        PlaylistData pd1 = PlaylistData.builder().ownerId(userId).name("p1").type(PlaylistType.PLAYLIST).orderNumber(0).build();
-        pd1.setId(1L);
+        PlaylistData pd1 = PlaylistData.builder().id(1L).ownerId(userId).name("p1").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
         when(playlistRepository.findAllByOwnerId(userId)).thenReturn(List.of(pd1));
 

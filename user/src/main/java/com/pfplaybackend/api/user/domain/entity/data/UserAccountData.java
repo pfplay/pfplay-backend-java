@@ -7,7 +7,6 @@ import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @Table(name = "USER_ACCOUNT")
 @Getter
-@Setter
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "user_type", discriminatorType = DiscriminatorType.STRING)

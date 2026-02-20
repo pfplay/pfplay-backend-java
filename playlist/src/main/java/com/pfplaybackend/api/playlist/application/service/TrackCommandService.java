@@ -92,7 +92,7 @@ public class TrackCommandService {
             trackRepository.shiftDownOrderByDnD(playlistId, prevOrderNumber, nextOrderNumber);
         }
 
-        trackData.setOrderNumber(nextOrderNumber);
+        trackData.reorder(nextOrderNumber);
         trackRepository.save(trackData);
     }
 
@@ -119,8 +119,7 @@ public class TrackCommandService {
         trackRepository.shiftUpOrderByDelete(sourcePlaylistId, trackData.getOrderNumber());
         // 트랙을 타겟 플레이리스트로 이동
         int nextOrderNumber = (int) (targetSummary.musicCount() + 1);
-        trackData.setPlaylistData(targetPlaylistData);
-        trackData.setOrderNumber(nextOrderNumber);
+        trackData.moveToPlaylist(targetPlaylistData, nextOrderNumber);
         trackRepository.save(trackData);
     }
 

@@ -45,7 +45,7 @@ public class PlaybackReactionHistoryData extends BaseEntity {
     @Column(name = "grabbed")
     private boolean grabbed;
 
-    public PlaybackReactionHistoryData() {}
+    protected PlaybackReactionHistoryData() {}
 
     public PlaybackReactionHistoryData(UserId userId, PlaybackId playbackId) {
         this.userId = userId;
