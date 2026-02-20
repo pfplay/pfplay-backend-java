@@ -36,12 +36,10 @@ class HexagonalArchitectureTest {
     class PartyDomainLayerRules {
 
         @Test
-        @DisplayName("domain 패키지는 adapter 패키지에 의존하지 않는다 (PartyroomAggregateService 예외)")
+        @DisplayName("domain 패키지는 adapter 패키지에 의존하지 않는다")
         void domainShouldNotDependOnAdapter() {
             ArchRule rule = noClasses()
                     .that().resideInAPackage("..party.domain..")
-                    // Phase 2에서 해소 예정: PartyroomAggregateService → DjRepository, PartyroomPlaybackRepository
-                    .and().doNotHaveSimpleName("PartyroomAggregateService")
                     .should().dependOnClassesThat()
                     .resideInAPackage("..party.adapter..");
 
