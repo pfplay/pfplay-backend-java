@@ -3,12 +3,14 @@ package com.pfplaybackend.api.party.application.service.lock;
 import com.pfplaybackend.api.common.config.redis.lock.RedisLockService;
 import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DistributedLockExecutor {
@@ -29,7 +31,7 @@ public class DistributedLockExecutor {
                 redisLockService.releaseLock(LOCK_KEY, lockValue);
             }
         } else {
-            System.out.println("Could not acquire lock, another process is holding it.");
+            log.warn("Could not acquire lock, another process is holding it. key={}", LOCK_KEY);
         }
     }
 }

@@ -25,7 +25,6 @@ public class PartyroomSessionCacheManager implements SessionCachePort {
     public void saveSessionCache(String sessionId, String userId, String destination) {
         UserId userIdObj = UserId.fromString(userId);
         String[] parts = destination.split("/");
-        System.out.println();
         if(parts[1].equals("sub")) {
             String topic = parts[2];
             String separator = parts[3];

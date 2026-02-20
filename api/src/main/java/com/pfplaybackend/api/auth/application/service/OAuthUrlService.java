@@ -3,7 +3,9 @@ package com.pfplaybackend.api.auth.application.service;
 import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
 import com.pfplaybackend.api.auth.adapter.in.web.dto.response.OAuthUrlResponse;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
+import com.pfplaybackend.api.auth.domain.exception.AuthException;
 import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -103,14 +105,14 @@ public class OAuthUrlService {
             byte[] hash = digest.digest(codeVerifier.getBytes(StandardCharsets.UTF_8));
             return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate code challenge", e);
+            throw ExceptionCreator.create(AuthException.CODE_CHALLENGE_FAILED);
         }
     }
 
     private OAuth2Properties.Provider getProviderConfig(OAuthProvider provider) {
         OAuth2Properties.Provider config = oAuth2Properties.getProviders().get(provider.getValue());
         if (config == null) {
-            throw new IllegalArgumentException("Provider not configured: " + provider);
+            throw ExceptionCreator.create(AuthException.PROVIDER_NOT_CONFIGURED);
         }
         return config;
     }
