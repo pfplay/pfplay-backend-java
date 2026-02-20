@@ -22,4 +22,9 @@ public class CrewPenalizedEvent extends DomainEvent {
         this.detail = detail;
         this.penaltyType = penaltyType;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }

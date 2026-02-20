@@ -11,4 +11,9 @@ public class DjQueueChangedEvent extends DomainEvent {
     public DjQueueChangedEvent(PartyroomId partyroomId) {
         this.partyroomId = partyroomId;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }

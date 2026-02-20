@@ -20,4 +20,9 @@ public class ReactionMotionChangedEvent extends DomainEvent {
         this.motionType = motionType;
         this.crewId = crewId;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }

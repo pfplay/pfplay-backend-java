@@ -11,4 +11,9 @@ public class PlaybackDeactivatedEvent extends DomainEvent {
     public PlaybackDeactivatedEvent(PartyroomId partyroomId) {
         this.partyroomId = partyroomId;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }

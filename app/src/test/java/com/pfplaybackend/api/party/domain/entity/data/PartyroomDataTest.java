@@ -1,12 +1,16 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.event.DomainEvent;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.party.domain.enums.StageType;
+import com.pfplaybackend.api.party.domain.event.PartyroomClosedEvent;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
@@ -78,5 +82,35 @@ class PartyroomDataTest {
 
         // then
         assertThat(partyroom.isTerminated()).isTrue();
+    }
+
+    @Test
+    @DisplayName("terminate — 종료 시 PartyroomClosedEvent가 도메인 이벤트로 등록된다")
+    void terminate_registersPartyroomClosedEvent() {
+        // given
+        PartyroomData partyroom = createPartyroom();
+
+        // when
+        partyroom.terminate();
+
+        // then
+        List<DomainEvent> events = partyroom.pollDomainEvents();
+        assertThat(events).hasSize(1);
+        assertThat(events.get(0)).isInstanceOf(PartyroomClosedEvent.class);
+    }
+
+    @Test
+    @DisplayName("pollDomainEvents — 호출 후 이벤트 목록이 비워진다")
+    void pollDomainEvents_clearsAfterPoll() {
+        // given
+        PartyroomData partyroom = createPartyroom();
+        partyroom.terminate();
+        partyroom.pollDomainEvents();
+
+        // when
+        List<DomainEvent> secondPoll = partyroom.pollDomainEvents();
+
+        // then
+        assertThat(secondPoll).isEmpty();
     }
 }

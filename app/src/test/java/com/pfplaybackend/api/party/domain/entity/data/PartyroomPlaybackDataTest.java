@@ -1,9 +1,13 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.event.DomainEvent;
+import com.pfplaybackend.api.party.domain.event.PlaybackDeactivatedEvent;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -104,5 +108,23 @@ class PartyroomPlaybackDataTest {
 
         // when & then
         assertThat(playbackState.isCurrentDj(new CrewId(5L))).isFalse();
+    }
+
+    @Test
+    @DisplayName("deactivate — 비활성화 시 PlaybackDeactivatedEvent가 도메인 이벤트로 등록된다")
+    void deactivate_registersPlaybackDeactivatedEvent() {
+        // given
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        playbackState.activate(new PlaybackId(10L), new CrewId(5L));
+
+        // when
+        playbackState.deactivate();
+
+        // then
+        List<DomainEvent> events = playbackState.pollDomainEvents();
+        assertThat(events).hasSize(1);
+        assertThat(events.get(0)).isInstanceOf(PlaybackDeactivatedEvent.class);
+        PlaybackDeactivatedEvent event = (PlaybackDeactivatedEvent) events.get(0);
+        assertThat(event.getPartyroomId().getId()).isEqualTo(1L);
     }
 }

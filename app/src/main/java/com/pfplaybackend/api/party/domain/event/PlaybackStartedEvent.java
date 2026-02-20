@@ -16,4 +16,9 @@ public class PlaybackStartedEvent extends DomainEvent {
         this.crewId = crewId;
         this.playback = playback;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }

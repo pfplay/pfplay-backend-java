@@ -15,7 +15,6 @@ import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
-import com.pfplaybackend.api.party.domain.event.PlaybackDeactivatedEvent;
 import com.pfplaybackend.api.party.domain.event.PlaybackStartedEvent;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -138,7 +137,7 @@ public class PlaybackManagementService {
     }
 
     private void deactivateAndNotify(PartyroomData partyroom) {
-        partyroomAggregateService.deactivatePlayback(partyroom.getId());
-        eventPublisher.publishEvent(new PlaybackDeactivatedEvent(partyroom.getPartyroomId()));
+        partyroomAggregateService.deactivatePlayback(partyroom.getId())
+                .forEach(eventPublisher::publishEvent);
     }
 }

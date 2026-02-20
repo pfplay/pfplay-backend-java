@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.party.domain.service;
 
+import com.pfplaybackend.api.common.domain.event.DomainEvent;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
@@ -54,13 +55,15 @@ public class PartyroomAggregateService {
 
     /**
      * 재생 비활성화 + 전체 DJ 일괄 삭제
+     * @return 엔티티에서 수집된 도메인 이벤트 목록
      */
-    public void deactivatePlayback(Long partyroomId) {
+    public List<DomainEvent> deactivatePlayback(Long partyroomId) {
         PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
         playbackState.deactivate();
         aggregatePort.savePlaybackState(playbackState);
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         aggregatePort.removeDjs(queuedDjs);
+        return playbackState.pollDomainEvents();
     }
 
     /**

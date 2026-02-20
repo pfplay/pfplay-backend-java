@@ -14,7 +14,6 @@ import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
-import com.pfplaybackend.api.party.domain.event.PartyroomClosedEvent;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateDjQueueStatusRequest;
@@ -93,7 +92,7 @@ public class PartyroomManagementService {
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.terminate();
         aggregatePort.savePartyroom(partyroom);
-        eventPublisher.publishEvent(new PartyroomClosedEvent(partyroom.getPartyroomId()));
+        partyroom.pollDomainEvents().forEach(eventPublisher::publishEvent);
     }
 
     @Scheduled(cron = "0 0 3 * * *")
@@ -103,7 +102,7 @@ public class PartyroomManagementService {
         unusedPartyroomDataList.forEach(partyroom -> {
             partyroom.terminate();
             aggregatePort.savePartyroom(partyroom);
-            eventPublisher.publishEvent(new PartyroomClosedEvent(partyroom.getPartyroomId()));
+            partyroom.pollDomainEvents().forEach(eventPublisher::publishEvent);
         });
     }
 

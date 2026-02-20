@@ -19,4 +19,9 @@ public class CrewAccessedEvent extends DomainEvent {
         this.userId = userId;
         this.accessType = accessType;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }

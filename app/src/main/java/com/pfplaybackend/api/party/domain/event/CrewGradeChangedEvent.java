@@ -22,4 +22,9 @@ public class CrewGradeChangedEvent extends DomainEvent {
         this.prevGrade = prevGrade;
         this.currGrade = currGrade;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }

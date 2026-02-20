@@ -11,4 +11,9 @@ public class PartyroomClosedEvent extends DomainEvent {
     public PartyroomClosedEvent(PartyroomId partyroomId) {
         this.partyroomId = partyroomId;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }

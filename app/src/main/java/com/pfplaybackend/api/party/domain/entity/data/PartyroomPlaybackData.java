@@ -1,7 +1,9 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.party.domain.event.PlaybackDeactivatedEvent;
 import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -58,6 +60,7 @@ public class PartyroomPlaybackData extends BaseEntity {
         this.currentPlaybackId = null;
         this.currentDjCrewId = null;
         this.isActivated = false;
+        registerEvent(new PlaybackDeactivatedEvent(new PartyroomId(this.partyroomId)));
     }
 
     public void updatePlayback(PlaybackId playbackId, CrewId djCrewId) {

@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.party.domain.event.PartyroomClosedEvent;
 import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
@@ -144,6 +145,7 @@ public class PartyroomData extends BaseEntity {
 
     public void terminate() {
         this.isTerminated = true;
+        registerEvent(new PartyroomClosedEvent(this.partyroomId));
     }
 
     public PartyroomData assignPartyroomId(PartyroomId partyroomId) {

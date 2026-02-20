@@ -18,4 +18,9 @@ public class ReactionAggregationChangedEvent extends DomainEvent {
         this.dislikeCount = dislikeCount;
         this.grabCount = grabCount;
     }
+
+    @Override
+    public String getAggregateId() {
+        return String.valueOf(partyroomId.getId());
+    }
 }
