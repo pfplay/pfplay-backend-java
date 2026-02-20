@@ -34,7 +34,8 @@ public class PlaybackInfoService {
     @Transactional
     public PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj, UserId djUserId) {
         PlaybackTrackDto trackDto = playlistCommandPort.getFirstTrack(dj.getPlaylistId());
-        return PlaybackData.create(partyroomId, djUserId, trackDto);
+        return PlaybackData.create(partyroomId, djUserId,
+                trackDto.name(), trackDto.duration(), trackDto.linkId(), trackDto.thumbnailImage());
     }
 
     @Transactional

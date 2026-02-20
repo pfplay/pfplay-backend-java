@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.party.domain.value;
+package com.pfplaybackend.api.party.domain.model;
 
 import com.pfplaybackend.api.party.domain.enums.MotionType;
 import lombok.*;

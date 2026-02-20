@@ -23,14 +23,10 @@ class UserArchitectureTest {
     }
 
     @Test
-    @DisplayName("domain 패키지는 adapter 패키지에 의존하지 않는다 (MemberData, UserAvatarDomainService 예외)")
+    @DisplayName("domain 패키지는 adapter 패키지에 의존하지 않는다")
     void domainShouldNotDependOnAdapter() {
-        // TODO: MemberData가 AvatarFaceRequest를, UserAvatarDomainService가 SetAvatarRequest를 참조 중
-        //       향후 메서드 시그니처를 도메인 타입으로 변경하여 해소 예정
         ArchRule rule = noClasses()
                 .that().resideInAPackage("..user.domain..")
-                .and().doNotHaveSimpleName("MemberData")
-                .and().doNotHaveSimpleName("UserAvatarDomainService")
                 .should().dependOnClassesThat()
                 .resideInAPackage("..user.adapter..");
 

@@ -3,7 +3,6 @@ package com.pfplaybackend.api.party.domain.entity.data;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.DurationConverter;
-import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
@@ -72,15 +71,16 @@ public class PlaybackData extends BaseEntity {
 
     // ── Factory Method ──
 
-    public static PlaybackData create(PartyroomId partyroomId, UserId userId, PlaybackTrackDto trackDto) {
-        Duration dur = Duration.fromString(trackDto.duration());
+    public static PlaybackData create(PartyroomId partyroomId, UserId userId,
+                                       String name, String duration, String linkId, String thumbnailImage) {
+        Duration dur = Duration.fromString(duration);
         return PlaybackData.builder()
                 .partyroomId(partyroomId)
                 .userId(userId)
-                .name(trackDto.name())
+                .name(name)
                 .duration(dur)
-                .linkId(trackDto.linkId())
-                .thumbnailImage(trackDto.thumbnailImage())
+                .linkId(linkId)
+                .thumbnailImage(thumbnailImage)
                 .endTime(dur.calculateEndTimeEpochMilli())
                 .build();
     }

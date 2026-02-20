@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.SimulateReactionsResponse;
-import com.pfplaybackend.api.party.domain.value.ReactionPostProcessResult;
+import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackReactionPostProcessService;

@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.domain.service;
 
-import com.pfplaybackend.api.party.domain.value.ReactionPostProcessResult;
+import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
