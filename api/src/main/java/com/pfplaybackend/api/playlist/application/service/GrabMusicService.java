@@ -36,7 +36,7 @@ public class GrabMusicService {
         AddTrackRequest request = new AddTrackRequest(
                 targetTrackData.getName(),
                 targetTrackData.getLinkId(),
-                targetTrackData.getDuration(),
+                targetTrackData.getDuration().toDisplayString(),
                 targetTrackData.getThumbnailImage()
         );
         trackCommandService.addTrackInPlaylist(playlistData.getId(), request);

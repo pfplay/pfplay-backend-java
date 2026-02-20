@@ -1,5 +1,7 @@
 package com.pfplaybackend.api.playlist.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.value.Duration;
+import com.pfplaybackend.api.common.domain.value.DurationConverter;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -42,7 +44,8 @@ public class TrackData extends BaseEntity {
     private String linkId;
 
     @Comment("곡 총 재생 시간")
-    private String duration;
+    @Convert(converter = DurationConverter.class)
+    private Duration duration;
 
     @Comment("썸네일 이미지 url")
     private String thumbnailImage;
@@ -50,7 +53,7 @@ public class TrackData extends BaseEntity {
     protected TrackData() { }
 
     @Builder
-    public TrackData(PlaylistData playlistData, Integer orderNumber, String name, String duration, String linkId, String thumbnailImage) {
+    public TrackData(PlaylistData playlistData, Integer orderNumber, String name, Duration duration, String linkId, String thumbnailImage) {
         this.playlistData = playlistData;
         this.orderNumber = orderNumber;
         this.name = name;

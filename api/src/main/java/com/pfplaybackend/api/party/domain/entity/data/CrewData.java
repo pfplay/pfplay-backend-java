@@ -113,6 +113,14 @@ public class CrewData extends BaseEntity {
         this.gradeType = gradeType;
     }
 
+    public boolean isBelowGrade(GradeType threshold) {
+        return this.gradeType.isLowerThan(threshold);
+    }
+
+    public boolean isGradeHigherThan(CrewData other) {
+        return this.gradeType.isHigherThan(other.gradeType);
+    }
+
     public void enforceBan() {
         this.isBanned = true;
     }

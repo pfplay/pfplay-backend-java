@@ -2,22 +2,20 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.enums.MotionType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
+import com.pfplaybackend.api.party.domain.event.ReactionAggregationChangedEvent;
+import com.pfplaybackend.api.party.domain.event.ReactionMotionChangedEvent;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.party.adapter.in.listener.message.ReactionAggregationMessage;
-import com.pfplaybackend.api.party.adapter.in.listener.message.ReactionMotionMessage;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,9 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlaybackReactionPostProcessService {
     private final PlaybackInfoService playbackInfoService;
-    // Using RedisMessagePublisher
-    private final RedisMessagePublisher messagePublisher;
-    // Using Proxy Services
+    private final ApplicationEventPublisher eventPublisher;
     private final PlaylistCommandPort grabMusicService;
     private final UserActivityPort userActivityService;
 
@@ -48,10 +44,8 @@ public class PlaybackReactionPostProcessService {
         publishMotionChangedEvent(partyroomId, reactionType, postProcessDto.getDeterminedMotionType(), crewId);
     }
 
-    // PostProcess After Playback Reaction
     public void publishMotionChangedEvent(PartyroomId partyroomId, ReactionType reactionType, MotionType motionType, CrewId crewId) {
-        ReactionMotionMessage reactionMotionMessage = ReactionMotionMessage.from(partyroomId, reactionType, motionType, crewId);
-        messagePublisher.publish(MessageTopic.REACTION_MOTION.topic(), reactionMotionMessage);
+        eventPublisher.publishEvent(new ReactionMotionChangedEvent(partyroomId, reactionType, motionType, crewId.getId()));
     }
 
     public void updateDjActivityScore(UserId djUserId, int deltaScore) {
@@ -63,9 +57,8 @@ public class PlaybackReactionPostProcessService {
     }
 
     public void publishAggregationChangedEvent(PartyroomId partyroomId, PlaybackData playback) {
-        AggregationDto aggregationDto = new AggregationDto(playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount());
-        messagePublisher.publish(MessageTopic.REACTION_AGGREGATION.topic(),
-                new ReactionAggregationMessage(partyroomId, MessageTopic.REACTION_AGGREGATION, aggregationDto));
+        eventPublisher.publishEvent(new ReactionAggregationChangedEvent(
+                partyroomId, playback.getLikeCount(), playback.getDislikeCount(), playback.getGrabCount()));
     }
 
     public void grabMusic(UserId userId, PlaybackData playback) {

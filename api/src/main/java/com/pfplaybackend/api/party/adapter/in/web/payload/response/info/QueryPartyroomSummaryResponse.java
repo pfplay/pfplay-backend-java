@@ -23,11 +23,11 @@ public class QueryPartyroomSummaryResponse {
     public static QueryPartyroomSummaryResponse from(PartyroomData partyroom, CrewData crew, ProfileSettingDto profileSettingDto) {
         if(crew != null) {
             return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
-                    partyroom.getLinkDomain(), partyroom.getPlaybackTimeLimit(),
+                    partyroom.getLinkDomain().getValue(), partyroom.getPlaybackTimeLimit().getMinutes(),
                     new CurrentDjWithProfileDto(crew.getId(), profileSettingDto.getNickname(), profileSettingDto.getAvatarIconUri()));
         } else {
             return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
-                    partyroom.getLinkDomain(), partyroom.getPlaybackTimeLimit(), null);
+                    partyroom.getLinkDomain().getValue(), partyroom.getPlaybackTimeLimit().getMinutes(), null);
         }
     }
 }

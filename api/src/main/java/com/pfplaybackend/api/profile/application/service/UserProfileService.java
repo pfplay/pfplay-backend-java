@@ -3,6 +3,7 @@ package com.pfplaybackend.api.profile.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.profile.domain.ProfileData;
+import com.pfplaybackend.api.profile.domain.value.Nickname;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
@@ -14,7 +15,7 @@ import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.service.GuestDomainService;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.user.domain.service.UserDomainService;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import com.pfplaybackend.api.profile.adapter.out.persistence.UserProfileRepository;
@@ -32,7 +33,6 @@ public class UserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final GuestRepository guestRepository;
     private final MemberRepository memberRepository;
-    private final UserDomainService userDomainService;
     private final GuestDomainService guestDomainService;
     private final UserAvatarService userAvatarService;
 
@@ -40,7 +40,7 @@ public class UserProfileService {
         AvatarBodyResourceData avatarBodyResource = userAvatarService.getDefaultAvatarBodyResourceData();
         return ProfileData.builder()
                 .userId(userId)
-                .nickname(guestDomainService.generateRandomNickname())
+                .nickname(new Nickname(guestDomainService.generateRandomNickname()))
                 .avatarCompositionType(AvatarCompositionType.BODY_WITH_FACE)
                 .faceSourceType(FaceSourceType.INTERNAL_IMAGE)
                 .avatarBodyUri(userAvatarService.getDefaultAvatarBodyUri())
@@ -59,7 +59,7 @@ public class UserProfileService {
 
     public ProfileSummaryDto getMyProfileSummary() {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        if(userDomainService.isGuest(authContext)) {
+        if(authContext.getAuthorityTier() == AuthorityTier.GT) {
             GuestData guestData = guestRepository.findByUserId(authContext.getUserId()).orElseThrow();
             return guestData.getProfileSummary();
         }else {
@@ -69,7 +69,7 @@ public class UserProfileService {
     }
 
     public ProfileSummaryDto getOtherProfileSummary(UserId otherUserId, AuthorityTier authorityTier) {
-        if(userDomainService.isGuest(authorityTier)) {
+        if(authorityTier == AuthorityTier.GT) {
             GuestData guestData = guestRepository.findByUserId(otherUserId).orElseThrow();
             return guestData.getProfileSummary();
         }else {
@@ -84,7 +84,7 @@ public class UserProfileService {
         List<ProfileData> list = userProfileRepository.findAllByUserIdIn(userIds);
         return userProfileRepository.findAllByUserIdIn(userIds).stream()
                 .collect(Collectors.toMap(ProfileData::getUserId, profileData ->
-                        new ProfileSettingDto(profileData.getNickname(),
+                        new ProfileSettingDto(profileData.getNicknameValue(),
                                 profileData.getAvatarCompositionType(),
                                 profileData.getAvatarBodyUri().getAvatarBodyUri(),
                                 profileData.getAvatarFaceUri().getAvatarFaceUri(),
@@ -102,7 +102,7 @@ public class UserProfileService {
     @Transactional
     public ProfileSettingDto getUserProfileSetting(UserId userId) {
         ProfileData profileData = userProfileRepository.findByUserId(userId);
-        return new ProfileSettingDto(profileData.getNickname(),
+        return new ProfileSettingDto(profileData.getNicknameValue(),
                 profileData.getAvatarCompositionType(),
                 profileData.getAvatarBodyUri().getAvatarBodyUri(),
                 profileData.getAvatarFaceUri().getAvatarFaceUri(),

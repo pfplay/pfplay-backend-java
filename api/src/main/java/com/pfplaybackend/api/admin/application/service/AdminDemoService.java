@@ -8,6 +8,7 @@ import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentSt
 import com.pfplaybackend.api.admin.application.util.NicknameGenerator;
 import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarBodyResourceRepository;
 import com.pfplaybackend.api.avatarresource.adapter.out.persistence.AvatarFaceResourceRepository;
+import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
@@ -17,6 +18,8 @@ import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.StageType;
+import com.pfplaybackend.api.party.domain.value.LinkDomain;
+import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
@@ -185,7 +188,7 @@ public class AdminDemoService {
                 .playlistData(savedPlaylist)
                 .name(track.getName())
                 .linkId(track.getLinkId())
-                .duration(track.getDuration())
+                .duration(Duration.fromString(track.getDuration()))
                 .thumbnailImage(track.getThumbnailImage())
                 .orderNumber(1)
                 .build();
@@ -211,7 +214,11 @@ public class AdminDemoService {
                     request.getPlaybackTimeLimit()
             );
 
-            PartyroomData partyroom = PartyroomData.create(createRequest, StageType.GENERAL, hostUserId);
+            PartyroomData partyroom = PartyroomData.create(
+                    createRequest.getTitle(), createRequest.getIntroduction(),
+                    LinkDomain.of(createRequest.getLinkDomain()),
+                    PlaybackTimeLimit.ofMinutes(createRequest.getPlaybackTimeLimit()),
+                    StageType.GENERAL, hostUserId);
             PartyroomData savedPartyroom = partyroomRepository.save(partyroom);
 
             // Enter host
@@ -347,7 +354,7 @@ public class AdminDemoService {
                 .partyroomId(mainStage.getPartyroomId().getId())
                 .stageType(mainStage.getStageType().name())
                 .title(mainStage.getTitle())
-                .linkDomain(mainStage.getLinkDomain())
+                .linkDomain(mainStage.getLinkDomain().getValue())
                 .hostUserId(null)
                 .totalCrewCount(MAIN_STAGE_CREW)
                 .djUserId(mainStageDjUserId.getUid().toString())
@@ -364,7 +371,7 @@ public class AdminDemoService {
                     .partyroomId(room.getPartyroomId().getId())
                     .stageType(room.getStageType().name())
                     .title(room.getTitle())
-                    .linkDomain(room.getLinkDomain())
+                    .linkDomain(room.getLinkDomain().getValue())
                     .hostUserId(hostUserId.getUid().toString())
                     .totalCrewCount(GENERAL_ROOM_CREW)
                     .djUserId(hostUserId.getUid().toString())
@@ -426,7 +433,7 @@ public class AdminDemoService {
                             .partyroomId(p.getId())
                             .stageType(p.getStageType().name())
                             .title(p.getTitle())
-                            .linkDomain(p.getLinkDomain())
+                            .linkDomain(p.getLinkDomain().getValue())
                             .crewCount(crewCount)
                             .djCount(djCount)
                             .isPlaybackActivated(p.isPlaybackActivated())

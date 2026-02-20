@@ -1,22 +1,19 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
-import com.pfplaybackend.api.party.domain.service.CrewDomainService;
-import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
+import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
+import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,12 +24,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import org.springframework.context.ApplicationEventPublisher;
+
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,12 +38,10 @@ class DjManagementServiceDjQueueChangeTest {
     @Mock private PartyroomRepository partyroomRepository;
     @Mock private CrewRepository crewRepository;
     @Mock private DjRepository djRepository;
-    @Mock private PartyroomDomainService partyroomDomainService;
-    @Mock private CrewDomainService crewDomainService;
-    @Mock private PartyroomInfoService partyroomInfoService;
     @Mock private PlaybackManagementService playbackManagementService;
     @Mock private PlaylistQueryPort musicQueryService;
-    @Mock private RedisMessagePublisher messagePublisher;
+    @Mock private ApplicationEventPublisher eventPublisher;
+    @Mock private PartyroomAggregateService partyroomAggregateService;
 
     @InjectMocks
     private DjManagementService djManagementService;
@@ -96,15 +91,12 @@ class DjManagementServiceDjQueueChangeTest {
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
         when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
         when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
-        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(List.of(
-                new DjWithProfileDto(1L, 1, "nick1", "icon1")
-        ));
 
         // when
         djManagementService.enqueueDj(partyroomId, playlistId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
     }
 
     @Test
@@ -136,14 +128,14 @@ class DjManagementServiceDjQueueChangeTest {
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
-        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(List.of(dj));
-        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(Collections.emptyList());
+        when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(1L))).thenReturn(false);
 
         // when
         djManagementService.dequeueDj(partyroomId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(partyroomAggregateService).removeDjFromQueue(partyroomId.getId(), new CrewId(1L));
+        verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
         // 대기 DJ(orderNumber != 1)이므로 skipBySystem은 호출되지 않아야 한다
         verify(playbackManagementService, never()).skipBySystem(any());
     }
@@ -177,14 +169,14 @@ class DjManagementServiceDjQueueChangeTest {
 
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
-        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(List.of(dj));
-        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(Collections.emptyList());
+        when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(1L))).thenReturn(true);
 
         // when
         djManagementService.dequeueDj(partyroomId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(partyroomAggregateService).removeDjFromQueue(partyroomId.getId(), new CrewId(1L));
+        verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
         verify(playbackManagementService).skipBySystem(partyroomId);
     }
 
@@ -212,16 +204,23 @@ class DjManagementServiceDjQueueChangeTest {
                 .isPlaybackActivated(true)
                 .build();
 
+        CrewData adjusterCrew = CrewData.builder()
+                .id(1L)
+                .userId(adminUserId)
+                .authorityTier(AuthorityTier.FM)
+                .gradeType(GradeType.MODERATOR)
+                .isActive(true)
+                .build();
+
         when(partyroomRepository.findById(partyroomId.getId())).thenReturn(Optional.of(partyroomData));
-        when(crewDomainService.isBelowManagerGrade(partyroomId.getId(), adminUserId)).thenReturn(false);
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), adminUserId)).thenReturn(Optional.of(adjusterCrew));
         when(djRepository.findById(djId.getId())).thenReturn(Optional.of(targetDj));
-        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(List.of(targetDj));
-        when(partyroomInfoService.getDjs(partyroomId.getId())).thenReturn(Collections.emptyList());
+        when(partyroomAggregateService.isCurrentDj(partyroomId.getId(), new CrewId(2L))).thenReturn(false);
 
         // when
         djManagementService.dequeueDj(partyroomId, djId);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
     }
 }

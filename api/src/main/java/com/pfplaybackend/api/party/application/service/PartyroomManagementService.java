@@ -5,19 +5,21 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
+import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import com.pfplaybackend.api.party.domain.enums.StageType;
-import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
+import com.pfplaybackend.api.party.domain.policy.PartyroomCreationPolicy;
+import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
+import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
+import com.pfplaybackend.api.party.domain.event.PartyroomClosedEvent;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import com.pfplaybackend.api.party.adapter.in.listener.message.PartyroomClosedMessage;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateDjQueueStatusRequest;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdatePartyroomRequest;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,9 +33,8 @@ import java.util.UUID;
 public class PartyroomManagementService {
 
     private final PartyroomRepository partyroomRepository;
-    private final PartyroomDomainService partyroomDomainService;
     private final PartyroomAccessService partyroomAccessService;
-    private final RedisMessagePublisher messagePublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void createMainStage(CreatePartyroomRequest request, UserId adminId) {
@@ -44,21 +45,24 @@ public class PartyroomManagementService {
     @Transactional
     public PartyroomData createGeneralPartyRoom(CreatePartyroomRequest request) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        partyroomDomainService.checkIsQualifiedToCreate(authContext.getAuthorityTier());
+        new PartyroomCreationPolicy().enforce(authContext.getAuthorityTier());
         Optional<PartyroomData> optionalActive = partyroomRepository.findActiveHostRoom(authContext.getUserId());
         if(optionalActive.isPresent()) throw ExceptionCreator.create(PartyroomException.ALREADY_HOST);
 
         if(request.getLinkDomain().isEmpty()) {
             request.setLinkDomain(UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12));
         }
-        partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
         PartyroomData createdPartyroom = createPartyroom(request, StageType.GENERAL, authContext.getUserId());
         partyroomAccessService.enterByHost(authContext.getUserId(), createdPartyroom);
         return createdPartyroom;
     }
 
     private PartyroomData createPartyroom(CreatePartyroomRequest request, StageType stageType, UserId hostId) {
-        PartyroomData partyroom = PartyroomData.create(request, stageType, hostId);
+        PartyroomData partyroom = PartyroomData.create(
+                request.getTitle(), request.getIntroduction(),
+                LinkDomain.of(request.getLinkDomain()),
+                PlaybackTimeLimit.ofMinutes(request.getPlaybackTimeLimit()),
+                stageType, hostId);
         return partyroomRepository.save(partyroom);
     }
 
@@ -67,9 +71,10 @@ public class PartyroomManagementService {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        partyroomDomainService.checkIsHost(partyroom, authContext.getUserId());
-        partyroomDomainService.checkIsLinkAddressDuplicated(request.getLinkDomain());
-        partyroom.updateBaseInfo(request);
+        partyroom.validateHost(authContext.getUserId());
+        partyroom.updateBaseInfo(request.getTitle(), request.getIntroduction(),
+                LinkDomain.of(request.getLinkDomain()),
+                PlaybackTimeLimit.ofMinutes(request.getPlaybackTimeLimit()));
         partyroomRepository.save(partyroom);
     }
 
@@ -83,10 +88,7 @@ public class PartyroomManagementService {
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.terminate();
         partyroomRepository.save(partyroom);
-        messagePublisher.publish(
-                MessageTopic.PARTYROOM_CLOSED.topic(),
-                new PartyroomClosedMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
-        );
+        eventPublisher.publishEvent(new PartyroomClosedEvent(partyroom.getPartyroomId()));
     }
 
     @Scheduled(cron = "0 0 3 * * *")
@@ -96,10 +98,7 @@ public class PartyroomManagementService {
         unusedPartyroomDataList.forEach(partyroom -> {
             partyroom.terminate();
             partyroomRepository.save(partyroom);
-            messagePublisher.publish(
-                    MessageTopic.PARTYROOM_CLOSED.topic(),
-                    new PartyroomClosedMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED)
-            );
+            eventPublisher.publishEvent(new PartyroomClosedEvent(partyroom.getPartyroomId()));
         });
     }
 
@@ -108,7 +107,8 @@ public class PartyroomManagementService {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        partyroom.updatedQueueStatus(request);
+        if (request.getQueueStatus().equals(QueueStatus.CLOSE)) partyroom.closeQueue();
+        if (request.getQueueStatus().equals(QueueStatus.OPEN)) partyroom.openQueue();
         partyroomRepository.save(partyroom);
     }
 }

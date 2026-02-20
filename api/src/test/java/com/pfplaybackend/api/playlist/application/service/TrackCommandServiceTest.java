@@ -15,6 +15,7 @@ import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MoveTrackRe
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdateTrackOrderRequest;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
+import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,7 +114,7 @@ class TrackCommandServiceTest {
 
         AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
         TrackData existingTrack = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration("03:00").orderNumber(1).build();
+                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(1).build();
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(trackRepository.findByPlaylistDataIdAndLinkId(playlistId, "linkId1")).thenReturn(Optional.of(existingTrack));
@@ -157,7 +158,7 @@ class TrackCommandServiceTest {
         playlistData.setId(playlistId);
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration("03:00").orderNumber(3).build();
+                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(3).build();
 
         when(playlistRepository.findByIdAndOwnerId(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(trackRepository.findByIdAndPlaylistDataId(trackId, playlistId)).thenReturn(Optional.of(trackData));
@@ -207,7 +208,7 @@ class TrackCommandServiceTest {
         targetPlaylist.setId(targetPlaylistId);
 
         TrackData trackData = TrackData.builder()
-                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration("03:00").orderNumber(2).build();
+                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
 
@@ -282,9 +283,9 @@ class TrackCommandServiceTest {
         targetPlaylist.setId(targetPlaylistId);
 
         TrackData trackData = TrackData.builder()
-                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration("03:00").orderNumber(2).build();
+                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
         TrackData duplicateTrack = TrackData.builder()
-                .playlistData(targetPlaylist).name("song").linkId("linkId1").duration("03:00").orderNumber(1).build();
+                .playlistData(targetPlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(1).build();
 
         MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
 
@@ -315,7 +316,7 @@ class TrackCommandServiceTest {
         targetPlaylist.setId(targetPlaylistId);
 
         TrackData trackData = TrackData.builder()
-                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration("03:00").orderNumber(2).build();
+                .playlistData(sourcePlaylist).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
 
@@ -344,7 +345,7 @@ class TrackCommandServiceTest {
         playlistData.setId(playlistId);
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration("03:00").orderNumber(2).build();
+                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(4);
 
@@ -372,7 +373,7 @@ class TrackCommandServiceTest {
         playlistData.setId(playlistId);
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration("03:00").orderNumber(4).build();
+                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(4).build();
 
         UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(2);
 
@@ -400,7 +401,7 @@ class TrackCommandServiceTest {
         playlistData.setId(playlistId);
 
         TrackData trackData = TrackData.builder()
-                .playlistData(playlistData).name("song").linkId("linkId1").duration("03:00").orderNumber(2).build();
+                .playlistData(playlistData).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         // nextOrderNumber == prevOrderNumber → invalid
         UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(2);

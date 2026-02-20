@@ -27,7 +27,7 @@ public class UserAvatarDomainService {
         if(obtainmentType.equals(ObtainmentType.BASIC)) return true;
         // Comparison of Scores
         ActivityType activityType = convertToActivityType(avatarBodyDto.getObtainableType());
-        return activityMap.get(activityType).getScore() >= avatarBodyDto.getObtainableScore();
+        return activityMap.get(activityType).getScore().isAtLeast(avatarBodyDto.getObtainableScore());
     }
 
     private ActivityType convertToActivityType(ObtainmentType obtainmentType) {

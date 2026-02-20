@@ -7,7 +7,6 @@ import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.playlist.domain.service.PlaylistDomainService;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -26,14 +25,11 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PlaylistCommandServiceTest {
 
-    @Mock
-    private PlaylistDomainService playlistDomainService;
     @Mock
     private PlaylistRepository playlistRepository;
 
@@ -65,7 +61,6 @@ class PlaylistCommandServiceTest {
         String playlistName = "My Playlist";
         when(playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST))
                 .thenReturn(Collections.emptyList());
-        doNothing().when(playlistDomainService).checkWhetherExceedConstraints(AuthorityTier.FM, 0);
 
         PlaylistData savedData = PlaylistData.builder()
                 .ownerId(userId).name(playlistName).type(PlaylistType.PLAYLIST).orderNumber(1).build();
@@ -89,10 +84,8 @@ class PlaylistCommandServiceTest {
                 PlaylistData.builder().ownerId(userId).name("pl").type(PlaylistType.PLAYLIST).orderNumber(0).build());
         when(playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST))
                 .thenReturn(existingPlaylists);
-        doThrow(new ConflictException("PLL-002", "")).when(playlistDomainService)
-                .checkWhetherExceedConstraints(AuthorityTier.FM, 10);
 
-        // when & then
+        // when & then — PlaylistCreationPolicy.enforce(FM, 10) throws ConflictException since FM limit is 10
         assertThatThrownBy(() -> playlistCommandService.createPlaylist(playlistName))
                 .isInstanceOf(ConflictException.class);
     }

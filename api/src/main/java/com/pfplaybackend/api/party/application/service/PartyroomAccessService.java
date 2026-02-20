@@ -4,53 +4,45 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
-import com.pfplaybackend.api.party.application.dto.crew.CrewSummaryDto;
-import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
-import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
+import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.party.domain.enums.AccessType;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
+import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
+import com.pfplaybackend.api.party.domain.specification.PartyroomEntrySpecification;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
-import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
+import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.party.adapter.in.listener.message.DjQueueChangeMessage;
-import com.pfplaybackend.api.party.adapter.in.listener.message.PartyroomAccessMessage;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.domain.exception.PenaltyException;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class PartyroomAccessService {
 
-    private final RedisMessagePublisher messagePublisher;
+    private final ApplicationEventPublisher eventPublisher;
     private final PartyroomRepository partyroomRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
-    private final PartyroomDomainService partyroomDomainService;
+    private final PartyroomAggregateService partyroomAggregateService;
     private final PartyroomInfoService partyroomInfoService;
-    private final UserProfileQueryPort userProfileService;
     private final PlaybackManagementService playbackManagementService;
 
     @Transactional
@@ -69,14 +61,11 @@ public class PartyroomAccessService {
                 });
 
         long activeCrewCount = crewRepository.countByPartyroomDataIdAndIsActiveTrue(partyroomId.getId());
+        Optional<CrewData> existingCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId);
         log.debug("[tryEnter] Partyroom found - partyroomId={}, isTerminated={}, crewCount={}",
                 partyroomId.getId(), partyroom.isTerminated(), activeCrewCount);
 
-        if(partyroom.isTerminated()) {
-            log.warn("[tryEnter] ALREADY_TERMINATED - partyroomId={}, userId={}", partyroomId.getId(), userId);
-            throw ExceptionCreator.create(PartyroomException.ALREADY_TERMINATED);
-        }
-        if(activeCrewCount > 49) throw ExceptionCreator.create(PartyroomException.EXCEEDED_LIMIT);
+        new PartyroomEntrySpecification().validate(partyroom, activeCrewCount, existingCrew);
 
         // Validate Crew Condition
         Optional<ActivePartyroomWithCrewDto> optActiveRoomInfo = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
@@ -87,7 +76,7 @@ public class PartyroomAccessService {
 
         if (optActiveRoomInfo.isPresent()) {
             ActivePartyroomWithCrewDto activeRoomInfo = optActiveRoomInfo.get();
-            if(partyroomDomainService.isActiveInAnotherRoom(partyroomId, new PartyroomId(activeRoomInfo.getId()))) {
+            if(!partyroomId.equals(new PartyroomId(activeRoomInfo.getId()))) {
                 log.info("[tryEnter] Auto-exit from another room - userId={}, exitingRoomId={}, enteringRoomId={}",
                         userId, activeRoomInfo.getId(), partyroomId.getId());
                 exit(new PartyroomId(activeRoomInfo.getId()));
@@ -110,11 +99,6 @@ public class PartyroomAccessService {
         Optional<CrewData> existingCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroom.getId(), userId);
         if (existingCrew.isPresent() && !existingCrew.get().isActive()) {
             CrewData crew = existingCrew.get();
-            if(crew.isBanned()) {
-                log.warn("[addOrActivateCrew] PERMANENT_EXPULSION - userId={}, partyroomId={}",
-                        userId, partyroom.getPartyroomId().getId());
-                throw ExceptionCreator.create(PenaltyException.PERMANENT_EXPULSION);
-            }
             log.info("[addOrActivateCrew] Reactivating inactive crew - userId={}, partyroomId={}",
                     userId, partyroom.getPartyroomId().getId());
             crew.activatePresence();
@@ -128,14 +112,7 @@ public class PartyroomAccessService {
     }
 
     private void publishAccessChangedEvent(PartyroomId partyroomId, CrewData crew, UserId userId) {
-        ProfileSettingDto profileSettingDto = userProfileService.getUserProfileSetting(userId);
-        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(),
-                PartyroomAccessMessage.create(
-                        partyroomId,
-                        AccessType.ENTER,
-                        CrewSummaryDto.from(crew, profileSettingDto)
-                )
-        );
+        eventPublisher.publishEvent(new CrewAccessedEvent(partyroomId, crew.getId(), userId, AccessType.ENTER));
     }
 
     @Transactional
@@ -170,31 +147,19 @@ public class PartyroomAccessService {
         CrewId crewId = new CrewId(crew.getId());
         boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), crewId)
                 .map(DjData::isQueued).orElse(false);
+        boolean wasCurrentDj = wasInDjQueue && partyroomAggregateService.isCurrentDj(partyroomId.getId(), crewId);
 
-        boolean wasCurrentDj = false;
-        if (wasInDjQueue) {
-            List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId());
-            wasCurrentDj = queuedDjs.stream()
-                    .anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
-        }
-
-        removeFromDjQueue(partyroomId.getId(), crewId);
+        partyroomAggregateService.removeDjFromQueue(partyroomId.getId(), crewId);
 
         if(wasInDjQueue) {
-            publishDjQueueChangeEvent(partyroom);
+            eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
         }
 
         if(wasCurrentDj) {
             playbackManagementService.skipBySystem(partyroomId);
         }
 
-        CrewSummaryDto crewSummaryDto = new CrewSummaryDto(crew.getId());
-        PartyroomAccessMessage partyroomAccessMessage = new PartyroomAccessMessage(
-                partyroom.getPartyroomId(),
-                MessageTopic.PARTYROOM_ACCESS,
-                AccessType.EXIT,
-                crewSummaryDto);
-        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(), partyroomAccessMessage);
+        eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), crew.getId(), authContext.getUserId(), AccessType.EXIT));
     }
 
     @Transactional
@@ -206,58 +171,25 @@ public class PartyroomAccessService {
         CrewId crewId = new CrewId(crew.getId());
         boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroom.getId(), crewId)
                 .map(DjData::isQueued).orElse(false);
+        boolean wasCurrentDj = partyroom.isPlaybackActivated() && wasInDjQueue
+                && partyroomAggregateService.isCurrentDj(partyroom.getId(), crewId);
 
-        boolean wasCurrentDj = false;
-        if (partyroom.isPlaybackActivated() && wasInDjQueue) {
-            List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
-            wasCurrentDj = queuedDjs.stream()
-                    .anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
-        }
-
-        removeFromDjQueue(partyroom.getId(), crewId);
+        partyroomAggregateService.removeDjFromQueue(partyroom.getId(), crewId);
 
         if(wasInDjQueue) {
-            publishDjQueueChangeEvent(partyroom);
+            eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
         }
 
         if(wasCurrentDj) {
             playbackManagementService.skipBySystem(partyroom.getPartyroomId());
         }
 
-        CrewSummaryDto crewSummaryDto = new CrewSummaryDto(crew.getId());
-        PartyroomAccessMessage partyroomAccessMessage = new PartyroomAccessMessage(
-                partyroom.getPartyroomId(),
-                MessageTopic.PARTYROOM_ACCESS,
-                AccessType.EXIT,
-                crewSummaryDto);
-        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(), partyroomAccessMessage);
-    }
-
-    private void removeFromDjQueue(Long partyroomId, CrewId crewId) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId);
-        AtomicInteger order = new AtomicInteger(1);
-        queuedDjs.forEach(dj -> {
-            if (dj.getCrewId().equals(crewId)) {
-                dj.applyDequeued();
-            } else {
-                dj.updateOrderNumber(order.getAndIncrement());
-            }
-        });
-        djRepository.saveAll(queuedDjs);
-    }
-
-    private void publishDjQueueChangeEvent(PartyroomData partyroom) {
-        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE.topic(),
-                DjQueueChangeMessage.create(
-                        partyroom.getPartyroomId(),
-                        partyroomInfoService.getDjs(partyroom.getId())
-                )
-        );
+        eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), crew.getId(), crew.getUserId(), AccessType.EXIT));
     }
 
     @Transactional(readOnly = true)
     public Map<String, Long> getRedirectUri(String linkDomain) {
-        PartyroomData partyroomData = partyroomRepository.findByLinkDomain(linkDomain)
+        PartyroomData partyroomData = partyroomRepository.findByLinkDomain(LinkDomain.of(linkDomain))
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         return Map.of(
                 "partyroomId", partyroomData.getId()

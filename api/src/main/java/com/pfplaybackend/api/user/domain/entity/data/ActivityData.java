@@ -2,6 +2,8 @@ package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import com.pfplaybackend.api.user.domain.value.Score;
+import com.pfplaybackend.api.user.domain.value.ScoreConverter;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -34,13 +36,14 @@ public class ActivityData extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private ActivityType activityType;
 
+    @Convert(converter = ScoreConverter.class)
     @Column(columnDefinition = "integer unsigned")
-    private Integer score;
+    private Score score;
 
     protected ActivityData() {}
 
     @Builder
-    public ActivityData(Long id, UserId userId, ActivityType activityType, Integer score) {
+    public ActivityData(Long id, UserId userId, ActivityType activityType, Score score) {
         this.id = id;
         this.userId = userId;
         this.activityType = activityType;
@@ -51,11 +54,11 @@ public class ActivityData extends BaseEntity {
         return ActivityData.builder()
                 .userId(userId)
                 .activityType(activityType)
-                .score(score)
+                .score(new Score(score))
                 .build();
     }
 
     public void addScore(int delta) {
-        this.score = this.score + delta;
+        this.score = this.score.add(delta);
     }
 }

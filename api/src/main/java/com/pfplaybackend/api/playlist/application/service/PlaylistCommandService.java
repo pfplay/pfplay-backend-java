@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.playlist.domain.service.PlaylistDomainService;
+import com.pfplaybackend.api.playlist.domain.policy.PlaylistCreationPolicy;
 import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PlaylistCommandService {
 
-    private final PlaylistDomainService playlistDomainService;
     private final PlaylistRepository playlistRepository;
 
     /**
@@ -39,7 +38,7 @@ public class PlaylistCommandService {
         List<PlaylistData> playlistDataList = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST);
 
         // 권한 계층별 '생성 제약' 조건에 대한 위반 여부를 검증한다.
-        playlistDomainService.checkWhetherExceedConstraints(authContext.getAuthorityTier(), playlistDataList.size());
+        new PlaylistCreationPolicy().enforce(authContext.getAuthorityTier(), playlistDataList.size());
 
         // Save
         int nextOrderNumber = playlistDataList.isEmpty() ? 1 : playlistDataList.size();

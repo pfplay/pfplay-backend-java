@@ -152,12 +152,12 @@ public class MemberData extends BaseEntity {
         List<ActivitySummaryDto> activitySummaries = this.activityDataMap.values().stream()
                 .map(a -> ActivitySummaryDto.builder()
                         .activityType(a.getActivityType())
-                        .score(a.getScore())
+                        .score(a.getScore().getValue())
                         .build())
                 .collect(Collectors.toList());
 
         return ProfileSummaryDto.builder()
-                .nickname(this.profileData.getNickname())
+                .nickname(this.profileData.getNicknameValue())
                 .introduction(this.profileData.getIntroduction())
                 .avatarBodyUri(this.profileData.getAvatarBodyUri().getAvatarBodyUri())
                 .avatarFaceUri(this.profileData.getAvatarFaceUri().getAvatarFaceUri())

@@ -1,12 +1,12 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
-import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import com.pfplaybackend.api.party.domain.enums.StageType;
+import com.pfplaybackend.api.party.domain.exception.DjException;
+import com.pfplaybackend.api.party.domain.exception.GradeException;
+import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.domain.value.*;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateDjQueueStatusRequest;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdatePartyroomRequest;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import jakarta.persistence.Index;
@@ -51,9 +51,11 @@ public class PartyroomData extends BaseEntity {
     // 파티룸 소개글
     private String introduction;
     // 링크 도메인
-    private String linkDomain;
+    @Convert(converter = LinkDomainConverter.class)
+    private LinkDomain linkDomain;
     // 재생 길이 제약
-    private int playbackTimeLimit;
+    @Convert(converter = PlaybackTimeLimitConverter.class)
+    private PlaybackTimeLimit playbackTimeLimit;
 
     // 공지사항 내용
     private String noticeContent;
@@ -90,7 +92,7 @@ public class PartyroomData extends BaseEntity {
 
     @Builder
     public PartyroomData(Long id, PartyroomId partyroomId, UserId hostId, StageType stageType,
-                         String title, String introduction, String linkDomain, int playbackTimeLimit,
+                         String title, String introduction, LinkDomain linkDomain, PlaybackTimeLimit playbackTimeLimit,
                          String noticeContent, PlaybackId currentPlaybackId, boolean isPlaybackActivated, boolean isQueueClosed, boolean isTerminated,
                          LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -117,14 +119,15 @@ public class PartyroomData extends BaseEntity {
 
     // ── Factory Method ──
 
-    public static PartyroomData create(CreatePartyroomRequest request, StageType stageType, UserId hostId) {
+    public static PartyroomData create(String title, String introduction, LinkDomain linkDomain,
+                                        PlaybackTimeLimit timeLimit, StageType stageType, UserId hostId) {
         return PartyroomData.builder()
                 .stageType(stageType)
                 .hostId(hostId)
-                .title(request.getTitle())
-                .introduction(request.getIntroduction())
-                .linkDomain(request.getLinkDomain())
-                .playbackTimeLimit(request.getPlaybackTimeLimit())
+                .title(title)
+                .introduction(introduction)
+                .linkDomain(linkDomain)
+                .playbackTimeLimit(timeLimit)
                 .noticeContent("")
                 .isPlaybackActivated(false)
                 .isQueueClosed(false)
@@ -145,17 +148,40 @@ public class PartyroomData extends BaseEntity {
         return this;
     }
 
-    public PartyroomData updateBaseInfo(UpdatePartyroomRequest request) {
-        this.title = request.getTitle();
-        this.introduction = request.getIntroduction();
-        this.linkDomain = request.getLinkDomain();
-        this.playbackTimeLimit = request.getPlaybackTimeLimit();
+    public PartyroomData updateBaseInfo(String title, String introduction, LinkDomain linkDomain, PlaybackTimeLimit timeLimit) {
+        this.title = title;
+        this.introduction = introduction;
+        this.linkDomain = linkDomain;
+        this.playbackTimeLimit = timeLimit;
         return this;
     }
 
-    public void updatedQueueStatus(UpdateDjQueueStatusRequest request) {
-        if (request.getQueueStatus().equals(QueueStatus.CLOSE)) this.isQueueClosed = true;
-        if (request.getQueueStatus().equals(QueueStatus.OPEN)) this.isQueueClosed = false;
+    public void openQueue() {
+        this.isQueueClosed = false;
+    }
+
+    public void closeQueue() {
+        this.isQueueClosed = true;
+    }
+
+    // ── Validation Methods ──
+
+    public void validateHost(UserId userId) {
+        if (!this.hostId.equals(userId)) {
+            throw ExceptionCreator.create(GradeException.GRADE_INSUFFICIENT_FOR_OPERATION);
+        }
+    }
+
+    public void validateNotTerminated() {
+        if (this.isTerminated) {
+            throw ExceptionCreator.create(PartyroomException.ALREADY_TERMINATED);
+        }
+    }
+
+    public void validateQueueOpen() {
+        if (this.isQueueClosed) {
+            throw ExceptionCreator.create(DjException.QUEUE_CLOSED);
+        }
     }
 
     public void terminate() {

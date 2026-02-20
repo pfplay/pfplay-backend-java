@@ -14,8 +14,9 @@ import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.enums.StageType;
-import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.LinkDomain;
+import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
@@ -46,7 +47,6 @@ public class AdminPartyroomService {
 
     private final PartyroomRepository partyroomRepository;
     private final CrewRepository crewRepository;
-    private final PartyroomDomainService partyroomDomainService;
     private final PartyroomAccessService partyroomAccessService;
     private final AdminUserService adminUserService;
     private final PlaybackInfoService playbackInfoService;
@@ -62,8 +62,6 @@ public class AdminPartyroomService {
         String linkDomain = request.getLinkDomain();
         if (linkDomain == null || linkDomain.isEmpty()) {
             linkDomain = generateUniqueLinkDomain();
-        } else {
-            partyroomDomainService.checkIsLinkAddressDuplicated(linkDomain);
         }
 
         CreatePartyroomRequest createRequest = new CreatePartyroomRequest(
@@ -129,7 +127,7 @@ public class AdminPartyroomService {
                     BulkPreviewEnvironmentResponse.PartyroomSummary.builder()
                             .partyroomId(partyroom.getPartyroomId().getId())
                             .title(partyroom.getTitle())
-                            .linkDomain(partyroom.getLinkDomain())
+                            .linkDomain(partyroom.getLinkDomain().getValue())
                             .hostUserId(hostUserId.getUid().toString())
                             .crewCount(virtualMembers.size())
                             .crewUserIds(crewUserIds)
@@ -158,7 +156,11 @@ public class AdminPartyroomService {
     }
 
     private PartyroomData createPartyroom(CreatePartyroomRequest request, StageType stageType, UserId hostId) {
-        PartyroomData partyroom = PartyroomData.create(request, stageType, hostId);
+        PartyroomData partyroom = PartyroomData.create(
+                request.getTitle(), request.getIntroduction(),
+                LinkDomain.of(request.getLinkDomain()),
+                PlaybackTimeLimit.ofMinutes(request.getPlaybackTimeLimit()),
+                stageType, hostId);
         return partyroomRepository.save(partyroom);
     }
 
@@ -187,7 +189,7 @@ public class AdminPartyroomService {
     }
 
     private boolean isLinkDomainDuplicated(String linkDomain) {
-        return partyroomRepository.findByLinkDomain(linkDomain).isPresent();
+        return partyroomRepository.findByLinkDomain(LinkDomain.of(linkDomain)).isPresent();
     }
 
     private UserId parseUserId(String userIdString) {

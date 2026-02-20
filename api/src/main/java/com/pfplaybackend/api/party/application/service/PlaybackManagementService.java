@@ -11,25 +11,23 @@ import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
-import com.pfplaybackend.api.party.domain.enums.MessageTopic;
-import com.pfplaybackend.api.party.domain.service.CrewDomainService;
-import com.pfplaybackend.api.party.domain.service.DjDomainService;
-import com.pfplaybackend.api.party.domain.service.PlaybackDomainService;
-import com.pfplaybackend.api.party.adapter.in.listener.message.DjQueueChangeMessage;
+import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
+import com.pfplaybackend.api.party.domain.event.PlaybackDeactivatedEvent;
+import com.pfplaybackend.api.party.domain.event.PlaybackStartedEvent;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.in.listener.message.PartyroomDeactivationMessage;
 import com.pfplaybackend.api.party.adapter.in.listener.message.PlaybackDurationWaitMessage;
-import com.pfplaybackend.api.party.adapter.in.listener.message.PlaybackStartMessage;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
+import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,20 +39,17 @@ import java.util.concurrent.TimeUnit;
 public class PlaybackManagementService {
 
     private final PlaybackRepository playbackRepository;
-    private final PlaybackDomainService playbackDomainService;
-    private final DjDomainService djDomainService;
     private final PlaybackInfoService playbackInfoService;
     private final UserActivityPort userActivityService;
-    private final RedisMessagePublisher messagePublisher;
+    private final ApplicationEventPublisher eventPublisher;
     private final PartyroomRepository partyroomRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final ExpirationTaskScheduler scheduleService;
-    private final CrewDomainService crewDomainService;
-    private final PartyroomInfoService partyroomInfoService;
+    private final PartyroomAggregateService partyroomAggregateService;
 
     private void scheduleTask(PlaybackData playback) {
-        long seconds = playbackDomainService.convertToSeconds(playback.getDuration());
+        long seconds = playback.getDuration().toSeconds();
         PartyroomId partyroomId = playback.getPartyroomId();
         UserId userId = playback.getUserId();
         PlaybackDurationWaitMessage playbackDurationWaitMessage = new PlaybackDurationWaitMessage(partyroomId, userId);
@@ -75,7 +70,8 @@ public class PlaybackManagementService {
     public void skipByManager(PartyroomId partyroomId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         ActivePartyroomDto activePartyroomDto = partyroomRepository.getActivePartyroomByUserId(authContext.getUserId()).orElseThrow();
-        if(crewDomainService.isBelowManagerGrade(activePartyroomDto.getId(), authContext.getUserId())) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
+        CrewData adjusterCrew = crewRepository.findByPartyroomDataIdAndUserId(activePartyroomDto.getId(), authContext.getUserId()).orElseThrow();
+        if (adjusterCrew.isBelowGrade(GradeType.MODERATOR)) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
         cancelTask(partyroomId);
         tryProceed(partyroomId);
     }
@@ -90,10 +86,10 @@ public class PlaybackManagementService {
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
-        if(djDomainService.isExistDj(partyroomId.getId())) {
+        if(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())) {
             start(partyroom);
         }else{
-            updatePlaybackDeactivation(partyroom);
+            deactivateAndNotify(partyroom);
         }
     }
 
@@ -104,7 +100,7 @@ public class PlaybackManagementService {
     }
 
     private void doStart(PartyroomData partyroom, int remainingAttempts) {
-        rotateDjQueue(partyroom);
+        partyroomAggregateService.rotateDjQueue(partyroom.getId());
 
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
         DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
@@ -112,17 +108,17 @@ public class PlaybackManagementService {
                 .orElseThrow();
         PlaybackData nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj);
 
-        if (exceedsPlaybackTimeLimit(partyroom, nextPlayback)) {
+        if (partyroom.getPlaybackTimeLimit().exceedsDuration(nextPlayback.getDuration())) {
             if (remainingAttempts <= 1) {
-                updatePlaybackDeactivation(partyroom);
+                deactivateAndNotify(partyroom);
                 return;
             }
             PartyroomData reloaded = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                     .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-            if (djDomainService.isExistDj(reloaded.getId())) {
+            if (partyroomAggregateService.hasQueuedDjs(reloaded.getId())) {
                 doStart(reloaded, remainingAttempts - 1);
             } else {
-                updatePlaybackDeactivation(reloaded);
+                deactivateAndNotify(reloaded);
             }
             return;
         }
@@ -134,52 +130,15 @@ public class PlaybackManagementService {
         // Schedule Task to wait for playback time
         scheduleTask(nextPlayback);
         // Propagation Websocket Event
-        publishPlaybackChangedEvent(partyroom.getPartyroomId(), djCrew.getId(), playbackData);
-        publishDjQueueChangeEvent(partyroom);
+        eventPublisher.publishEvent(new PlaybackStartedEvent(
+                partyroom.getPartyroomId(), djCrew.getId(),
+                new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(),
+                        playbackData.getDuration().toDisplayString(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
+        eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
     }
 
-    private boolean exceedsPlaybackTimeLimit(PartyroomData partyroom, PlaybackData playback) {
-        int limitMinutes = partyroom.getPlaybackTimeLimit();
-        if (limitMinutes <= 0) return false;
-        long durationSeconds = playbackDomainService.convertToSeconds(playback.getDuration());
-        return durationSeconds > limitMinutes * 60L;
-    }
-
-    private void publishDjQueueChangeEvent(PartyroomData partyroom) {
-        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE.topic(),
-                DjQueueChangeMessage.create(
-                        partyroom.getPartyroomId(),
-                        partyroomInfoService.getDjs(partyroom.getId())
-                )
-        );
-    }
-
-    private void publishPlaybackChangedEvent(PartyroomId partyroomId, long crewId, PlaybackData playbackData) {
-        messagePublisher.publish(MessageTopic.PLAYBACK_START.topic(),
-                new PlaybackStartMessage(partyroomId, MessageTopic.PLAYBACK_START, crewId,
-                        new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(), playbackData.getDuration(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
-    }
-
-    private void updatePlaybackDeactivation(PartyroomData partyroom) {
-        partyroom.applyDeactivation();
-        partyroomRepository.save(partyroom);
-        // Bulk dequeue all DJs
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
-        queuedDjs.forEach(DjData::applyDequeued);
-        djRepository.saveAll(queuedDjs);
-        messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION.topic(), new PartyroomDeactivationMessage(partyroom.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION));
-    }
-
-    private void rotateDjQueue(PartyroomData partyroom) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
-        int totalElements = queuedDjs.size();
-        queuedDjs.forEach(dj -> {
-            if (dj.getOrderNumber() == 1) {
-                dj.updateOrderNumber(totalElements);
-            } else {
-                dj.updateOrderNumber(dj.getOrderNumber() - 1);
-            }
-        });
-        djRepository.saveAll(queuedDjs);
+    private void deactivateAndNotify(PartyroomData partyroom) {
+        partyroomAggregateService.deactivatePlayback(partyroom);
+        eventPublisher.publishEvent(new PlaybackDeactivatedEvent(partyroom.getPartyroomId()));
     }
 }

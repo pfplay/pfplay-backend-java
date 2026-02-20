@@ -78,7 +78,7 @@ public class GuestData extends BaseEntity {
 
     public ProfileSummaryDto getProfileSummary() {
         return ProfileSummaryDto.builder()
-                .nickname(this.profileData.getNickname())
+                .nickname(this.profileData.getNicknameValue())
                 .introduction(this.profileData.getIntroduction())
                 .avatarBodyUri(this.profileData.getAvatarBodyUri().getAvatarBodyUri())
                 .avatarFaceUri(this.profileData.getAvatarFaceUri().getAvatarFaceUri())

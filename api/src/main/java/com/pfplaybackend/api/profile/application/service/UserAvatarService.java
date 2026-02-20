@@ -18,7 +18,7 @@ import com.pfplaybackend.api.user.domain.exception.UserAvatarException;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
-import com.pfplaybackend.api.user.domain.service.UserDomainService;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +36,6 @@ public class UserAvatarService {
 
     // TODO Call AvatarResourceService In 'Other Sub Domain'
     private final MemberRepository memberRepository;
-    private final UserDomainService userDomainService;
     private final UserAvatarDomainService userAvatarDomainService;
     // Using Peer Service
     private final AvatarResourceService avatarResourceService;
@@ -70,7 +69,7 @@ public class UserAvatarService {
     public List<AvatarBodyDto> findMyAvatarBodies() {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         List<AvatarBodyDto> avatarBodyDtoList = avatarResourceService.findAllAvatarBodies();
-        if (userDomainService.isGuest(authContext)) {
+        if (authContext.getAuthorityTier() == AuthorityTier.GT) {
             return avatarBodyDtoList;
         } else {
             MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
@@ -93,7 +92,7 @@ public class UserAvatarService {
         if (!avatarBodyDto.getObtainableType().equals(ObtainmentType.BASIC)) {
             ActivityType activityType = ActivityType.of(avatarBodyDto.getObtainableType());
             ActivityData activity = member.getActivityDataMap().get(activityType);
-            if (activity.getScore() < avatarBodyDto.getObtainableScore()) {
+            if (!activity.getScore().isAtLeast(avatarBodyDto.getObtainableScore())) {
                 throw ExceptionCreator.create(UserAvatarException.AVATAR_SELECTION_FORBIDDEN);
             }
         }

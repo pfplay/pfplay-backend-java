@@ -97,7 +97,7 @@ public class AdminUserService {
         log.info("Virtual member created with GRABLIST: userId={}, email={}, nickname={}, authorityTier={}",
                 finalData.getUserId().getUid(),
                 virtualEmail,
-                profile.getNickname(),
+                profile.getNicknameValue(),
                 finalData.getAuthorityTier());
 
         return finalData;
@@ -128,7 +128,7 @@ public class AdminUserService {
         // 3. Create new profile with updated avatar
         ProfileData updatedProfile = adminProfileService.createProfileForVirtualMember(
                 userId,
-                member.getProfileData().getNickname(),  // Keep existing nickname
+                member.getProfileData().getNicknameValue(),  // Keep existing nickname
                 avatarBodyUri,
                 avatarFaceUri
         );

@@ -1,20 +1,19 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
-import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
-import com.pfplaybackend.api.party.domain.service.PartyroomDomainService;
+import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
+import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
+import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,23 +24,22 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
+import org.springframework.context.ApplicationEventPublisher;
+
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PartyroomAccessServiceTest {
 
-    @Mock private RedisMessagePublisher messagePublisher;
+    @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private PartyroomRepository partyroomRepository;
     @Mock private CrewRepository crewRepository;
     @Mock private DjRepository djRepository;
-    @Mock private PartyroomDomainService partyroomDomainService;
+    @Mock private PartyroomAggregateService partyroomAggregateService;
     @Mock private PartyroomInfoService partyroomInfoService;
-    @Mock private UserProfileQueryPort userProfileService;
     @Mock private PlaybackManagementService playbackManagementService;
 
     @InjectMocks
@@ -92,16 +90,12 @@ class PartyroomAccessServiceTest {
         ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
         when(activeRoomInfo.getId()).thenReturn(1L);
         when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activeRoomInfo));
-        when(partyroomDomainService.isActiveInAnotherRoom(any(), any())).thenReturn(false);
-
-        ProfileSettingDto profileSettingDto = mock(ProfileSettingDto.class);
-        when(userProfileService.getUserProfileSetting(userId)).thenReturn(profileSettingDto);
 
         // when
         partyroomAccessService.tryEnter(partyroomId);
 
         // then — 재진입 시에도 이벤트가 발행되어야 함
-        verify(messagePublisher, times(1)).publish(any(), any());
+        verify(eventPublisher, times(1)).publishEvent(any(CrewAccessedEvent.class));
     }
 
     @Test
@@ -133,7 +127,6 @@ class PartyroomAccessServiceTest {
         ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
         when(activeRoomInfo.getId()).thenReturn(oldRoomId.getId());
         when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activeRoomInfo));
-        when(partyroomDomainService.isActiveInAnotherRoom(eq(newRoomId), any())).thenReturn(true);
 
         // exit() 호출 시 필요한 mock — 기존 룸 조회
         CrewData oldCrew = CrewData.builder()
@@ -153,19 +146,16 @@ class PartyroomAccessServiceTest {
         when(partyroomRepository.findById(oldRoomId.getId())).thenReturn(Optional.of(oldPartyroomData));
         // exit() mock: crew lookup
         when(crewRepository.findByPartyroomDataIdAndUserId(oldRoomId.getId(), userId)).thenReturn(Optional.of(oldCrew));
-        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(oldRoomId.getId())).thenReturn(Collections.emptyList());
+        when(djRepository.findByPartyroomDataIdAndCrewId(oldRoomId.getId(), new CrewId(5L))).thenReturn(Optional.empty());
 
         // addOrActivateCrew mock for new room: inactive crew found → reactivate
         when(crewRepository.findByPartyroomDataIdAndUserId(newRoomId.getId(), userId)).thenReturn(Optional.of(newRoomCrew));
         when(crewRepository.save(any(CrewData.class))).thenReturn(newRoomCrew);
 
-        ProfileSettingDto profileSettingDto = mock(ProfileSettingDto.class);
-        when(userProfileService.getUserProfileSetting(userId)).thenReturn(profileSettingDto);
-
         // when — 예외 없이 정상 실행되어야 함
         partyroomAccessService.tryEnter(newRoomId);
 
         // then — exit 이벤트 + enter 이벤트 = 최소 2번 publish 호출
-        verify(messagePublisher, atLeast(2)).publish(any(), any());
+        verify(eventPublisher, atLeast(2)).publishEvent(any(Object.class));
     }
 }

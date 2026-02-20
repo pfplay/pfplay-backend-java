@@ -3,6 +3,8 @@ package com.pfplaybackend.api.profile.domain;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.profile.domain.value.Nickname;
+import com.pfplaybackend.api.profile.domain.value.NicknameConverter;
 import com.pfplaybackend.api.profile.domain.vo.Avatar;
 import com.pfplaybackend.api.profile.domain.vo.AvatarBody;
 import com.pfplaybackend.api.profile.domain.vo.AvatarFace;
@@ -35,8 +37,9 @@ public class ProfileData extends BaseEntity {
     })
     private UserId userId;
 
-    @Column(length = 20)
-    private String nickname;
+    @Convert(converter = NicknameConverter.class)
+    @Column(name = "nickname", length = 20)
+    private Nickname nickname;
 
     @Column(length = 50)
     private String introduction;
@@ -64,7 +67,7 @@ public class ProfileData extends BaseEntity {
     protected ProfileData() {}
 
     @Builder
-    public ProfileData(Long id, UserId userId, String nickname, String introduction,
+    public ProfileData(Long id, UserId userId, Nickname nickname, String introduction,
                        AvatarBodyUri avatarBodyUri,
                        AvatarFaceUri avatarFaceUri,
                        AvatarIconUri avatarIconUri,
@@ -107,8 +110,12 @@ public class ProfileData extends BaseEntity {
         }
     }
 
+    public String getNicknameValue() {
+        return nickname == null ? null : nickname.value();
+    }
+
     public void updateBio(String nickname, String introduction) {
-        this.nickname = nickname;
+        this.nickname = new Nickname(nickname);
         this.introduction = introduction;
     }
 

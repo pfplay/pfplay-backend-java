@@ -28,7 +28,7 @@ public class QueryDjQueueResponse {
             map = new HashMap<>();
             map.put("name", playback.getName());
             map.put("thumbnailImage", playback.getThumbnailImage());
-            map.put("duration", playback.getDuration());
+            map.put("duration", playback.getDuration().toDisplayString());
         }
         return new QueryDjQueueResponse(
                 isPlaybackActivated,

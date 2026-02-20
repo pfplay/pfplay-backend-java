@@ -91,7 +91,7 @@ public class AdminUserController {
         return VirtualMemberResponse.builder()
                 .userId(member.getUserId().getUid().toString())
                 .email(member.getEmail())
-                .nickname(member.getProfileData().getNickname())
+                .nickname(member.getProfileData().getNicknameValue())
                 .introduction(member.getProfileData().getIntroduction())
                 .providerType(member.getProviderType())
                 .authorityTier(member.getAuthorityTier())
