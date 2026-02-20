@@ -12,7 +12,7 @@ import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,7 @@ public class PlaybackInfoService {
     private final PartyroomRepository partyroomRepository;
     private final PlaybackRepository playbackRepository;
     private final PlaylistCommandPort playlistCommandPort;
-    private final UserProfileQueryPort userProfileService;
+    private final UserProfileQueryPort userProfileQueryPort;
 
     @Transactional
     public PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj) {
@@ -40,19 +40,19 @@ public class PlaybackInfoService {
         playbackRepository.save(playback);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public PlaybackData getPlaybackById(PlaybackId playbackId) {
         return playbackRepository.findById(playbackId.getId()).orElseThrow();
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<PlaybackHistoryDto> getRecentPlaybackHistory(PartyroomId partyroomId) {
         List<PlaybackData> playbackDataList = partyroomRepository.getRecentPlaybackHistory(partyroomId);
         if(playbackDataList.isEmpty()) {
             return List.of();
         }else {
             List<UserId> userIds =  playbackDataList.stream().map(PlaybackData::getUserId).toList();
-            Map<UserId, ProfileSettingDto> dtoMap = userProfileService.getUsersProfileSetting(userIds);
+            Map<UserId, ProfileSettingDto> dtoMap = userProfileQueryPort.getUsersProfileSetting(userIds);
             return playbackDataList.stream().map(playbackData -> {
                 ProfileSettingDto dto = dtoMap.get(playbackData.getUserId());
                 return new PlaybackHistoryDto(playbackData.getName(), dto.getNickname(),  dto.getAvatarIconUri());

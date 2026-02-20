@@ -40,7 +40,7 @@ public class PlaybackManagementService {
 
     private final PlaybackRepository playbackRepository;
     private final PlaybackInfoService playbackInfoService;
-    private final UserActivityPort userActivityService;
+    private final UserActivityPort userActivityPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomRepository partyroomRepository;
     private final CrewRepository crewRepository;
@@ -63,7 +63,7 @@ public class PlaybackManagementService {
     @Transactional
     public void complete(PartyroomId partyroomId, UserId userId) {
         tryProceed(partyroomId);
-        userActivityService.updateDjPointScore(userId, 1);
+        userActivityPort.updateDjPointScore(userId, 1);
     }
 
     @Transactional

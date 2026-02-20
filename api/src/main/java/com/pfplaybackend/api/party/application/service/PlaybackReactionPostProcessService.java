@@ -26,7 +26,7 @@ public class PlaybackReactionPostProcessService {
     private final PlaybackInfoService playbackInfoService;
     private final ApplicationEventPublisher eventPublisher;
     private final PlaylistCommandPort playlistCommandPort;
-    private final UserActivityPort userActivityService;
+    private final UserActivityPort userActivityPort;
 
     public void postProcess(ReactionPostProcessDto postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
@@ -49,7 +49,7 @@ public class PlaybackReactionPostProcessService {
     }
 
     public void updateDjActivityScore(UserId djUserId, int deltaScore) {
-        userActivityService.updateDjPointScore(djUserId, deltaScore);
+        userActivityPort.updateDjPointScore(djUserId, deltaScore);
     }
 
     public void updatePlaybackAggregation(PlaybackData playback, List<Integer> deltaRecord) {

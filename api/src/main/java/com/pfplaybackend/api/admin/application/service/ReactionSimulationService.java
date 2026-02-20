@@ -33,7 +33,7 @@ public class ReactionSimulationService {
     private final PlaybackReactionDomainService playbackReactionDomainService;
     private final PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
     private final PlaybackReactionPostProcessService playbackReactionPostProcessService;
-    private final UserActivityPort userActivityPeerService;
+    private final UserActivityPort userActivityPort;
 
     /**
      * Simulate a single reaction in a separate transaction
@@ -84,7 +84,7 @@ public class ReactionSimulationService {
 
         // Update DJ activity score
         if (postProcessDto.isDjActivityScoreChanged()) {
-            userActivityPeerService.updateDjPointScore(playback.getUserId(), postProcessDto.getDeltaScore());
+            userActivityPort.updateDjPointScore(playback.getUserId(), postProcessDto.getDeltaScore());
         }
 
         // Update playback aggregation (includes GRAB count)

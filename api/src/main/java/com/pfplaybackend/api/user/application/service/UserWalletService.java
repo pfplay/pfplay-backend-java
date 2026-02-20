@@ -7,7 +7,7 @@ import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.WalletAddress;
 import com.pfplaybackend.api.user.domain.service.WalletDomainService;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

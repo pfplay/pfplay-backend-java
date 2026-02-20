@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class PartyroomInfoServiceGetDjsTest {
 
-    @Mock private UserProfileQueryPort userProfileService;
+    @Mock private UserProfileQueryPort userProfileQueryPort;
     @Mock private CrewRepository crewRepository;
     @Mock private DjRepository djRepository;
     @InjectMocks private PartyroomInfoService partyroomInfoService;
@@ -69,7 +69,7 @@ class PartyroomInfoServiceGetDjsTest {
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
         profileMap.put(user1, mockProfile("nick1", "icon1"));
         profileMap.put(user3, mockProfile("nick3", "icon3"));
-        when(userProfileService.getUsersProfileSetting(anyList())).thenReturn(profileMap);
+        when(userProfileQueryPort.getUsersProfileSetting(anyList())).thenReturn(profileMap);
 
         // when
         List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroomId);
@@ -100,7 +100,7 @@ class PartyroomInfoServiceGetDjsTest {
         profileMap.put(user1, mockProfile("nick1", "icon1"));
         profileMap.put(user2, mockProfile("nick2", "icon2"));
         profileMap.put(user3, mockProfile("nick3", "icon3"));
-        when(userProfileService.getUsersProfileSetting(anyList())).thenReturn(profileMap);
+        when(userProfileQueryPort.getUsersProfileSetting(anyList())).thenReturn(profileMap);
 
         // when
         List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroomId);
@@ -121,7 +121,7 @@ class PartyroomInfoServiceGetDjsTest {
         when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId))
                 .thenReturn(List.of());
 
-        when(userProfileService.getUsersProfileSetting(anyList())).thenReturn(new HashMap<>());
+        when(userProfileQueryPort.getUsersProfileSetting(anyList())).thenReturn(new HashMap<>());
 
         // when
         List<DjWithProfileDto> result = partyroomInfoService.getDjs(partyroomId);

@@ -6,7 +6,7 @@ import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +37,7 @@ public class PartyroomNoticeService {
 //        eventPublisher.publish("notice", "수정된 공지사항 내용");
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public String getNotice(PartyroomId partyroomId) {
         Optional<PartyroomData> optPartyroomData = partyroomRepository.findById(partyroomId.getId());
         if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);

@@ -14,6 +14,7 @@ public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRe
     Optional<TrackData> findByPlaylistDataIdAndLinkId(Long playlistDataId, String linkId);
     TrackData findFirstByLinkId(String linkId);
     Optional<TrackData> findByIdAndPlaylistDataId(Long id, Long playlistDataId);
+    boolean existsByPlaylistDataId(Long playlistDataId);
 
     @Modifying
     @Query("UPDATE TrackData pm SET pm.orderNumber = CASE " +

@@ -26,6 +26,7 @@ public class GrabTrackService {
     @Transactional
     public void grabTrack(UserId userId, String linkId) {
         TrackData targetTrackData = trackRepository.findFirstByLinkId(linkId);
+        if (targetTrackData == null) throw ExceptionCreator.create(TrackException.NOT_FOUND_TRACK);
 
         PlaylistData playlistData = playlistRepository.findByOwnerIdAndType(userId, PlaylistType.GRABLIST);
         // LinkId cannot be duplicated.

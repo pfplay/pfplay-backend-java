@@ -43,7 +43,7 @@ public class CrewPenaltyService {
     private final PartyroomAccessService partyroomAccessService;
     private final CrewPenaltyHistoryRepository crewPenaltyHistoryRepository;
     private final RedisTemplate<String, Object> redisTemplate;
-    private final UserProfileQueryPort userProfileService;
+    private final UserProfileQueryPort userProfileQueryPort;
 
     public List<PenaltyResult> getPenalties(PartyroomId partyroomId) {
         List<CrewPenaltyHistoryData> crewPenaltyHistoryDataList = crewPenaltyHistoryRepository.findAllByPartyroomIdAndReleasedIsFalse(partyroomId);
@@ -54,7 +54,7 @@ public class CrewPenaltyService {
             return crew.getUserId();
         }).toList();
 
-        Map<UserId, ProfileSettingDto> map = userProfileService.getUsersProfileSetting(PunishedUserIds);
+        Map<UserId, ProfileSettingDto> map = userProfileQueryPort.getUsersProfileSetting(PunishedUserIds);
 
         return crewPenaltyHistoryDataList.stream().map(history -> {
             CrewData crew = crewRepository.findById(history.getPunishedCrewId().getId())

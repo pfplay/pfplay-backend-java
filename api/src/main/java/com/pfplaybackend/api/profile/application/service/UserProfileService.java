@@ -16,7 +16,7 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import com.pfplaybackend.api.profile.adapter.out.persistence.UserProfileRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -73,14 +73,14 @@ public class UserProfileService {
     }
 
     // 다수 사용자에 대한 프로필 설정 정보 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public Map<UserId, ProfileSettingDto> getUsersProfileSetting(List<UserId> userIds) {
         return userProfileRepository.findAllByUserIdIn(userIds).stream()
                 .collect(Collectors.toMap(ProfileData::getUserId, this::toProfileSettingDto));
     }
 
     // 특정 사용자에 대한 프로필 설정 정보 조회
-    @Transactional
+    @Transactional(readOnly = true)
     public ProfileSettingDto getUserProfileSetting(UserId userId) {
         ProfileData profileData = userProfileRepository.findByUserId(userId);
         return toProfileSettingDto(profileData);

@@ -41,9 +41,10 @@ public class PartyroomInfoService {
     private final PartyroomRepository partyroomRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
-    private final UserProfileQueryPort userProfileService;
+    private final UserProfileQueryPort userProfileQueryPort;
     private final PlaybackInfoService playbackInfoService;
 
+    @Transactional(readOnly = true)
     public List<PartyroomWithCrewDto> getAllPartyrooms() {
         return partyroomRepository.getCrewDataByPartyroomId().stream().map(partyroomWithCrewDto -> {
             List<CrewDto> filteredCrews = partyroomWithCrewDto.getCrews().stream()
@@ -54,6 +55,7 @@ public class PartyroomInfoService {
         }).toList();
     }
 
+    @Transactional(readOnly = true)
     public Map<UserId, ProfileSettingDto> getPrimariesAvatarSettings(List<PartyroomWithCrewDto> partyrooms) {
         List<UserId> primaryUserIds = partyrooms.stream().collect(Collectors.toMap(
                         PartyroomWithCrewDto::getPartyroomId,
@@ -61,7 +63,7 @@ public class PartyroomInfoService {
                 )).values().stream()
                 .flatMap(List::stream)
                 .map(CrewDto::getUserId).toList();
-        return userProfileService.getUsersProfileSetting(primaryUserIds);
+        return userProfileQueryPort.getUsersProfileSetting(primaryUserIds);
     }
 
     // 초기화를 위한 파티멤버 목록 조회
@@ -69,7 +71,7 @@ public class PartyroomInfoService {
     public List<CrewSetupDto> getCrewsForSetup(PartyroomId partyroomId) {
         List<CrewData> crews = crewRepository.findByPartyroomDataIdAndIsActiveTrue(partyroomId.getId());
         List<UserId> userIds = crews.stream().map(CrewData::getUserId).toList();
-        Map<UserId, ProfileSettingDto> profileSettingMap = userProfileService.getUsersProfileSetting(userIds);
+        Map<UserId, ProfileSettingDto> profileSettingMap = userProfileQueryPort.getUsersProfileSetting(userIds);
 
         return crews.stream().map(crew -> {
             UserId userId = crew.getUserId();
@@ -83,6 +85,7 @@ public class PartyroomInfoService {
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
     }
 
+    @Transactional(readOnly = true)
     public boolean isAlreadyRegistered(Long partyroomId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         return djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId, authContext.getUserId());
@@ -92,7 +95,7 @@ public class PartyroomInfoService {
     public List<DjWithProfileDto> getDjs(Long partyroomId) {
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId);
         List<UserId> userIds = queuedDjs.stream().map(DjData::getUserId).toList();
-        Map<UserId, ProfileSettingDto> profileSettingMap = userProfileService.getUsersProfileSetting(userIds);
+        Map<UserId, ProfileSettingDto> profileSettingMap = userProfileQueryPort.getUsersProfileSetting(userIds);
 
         return queuedDjs.stream().map(dj -> {
             UserId userId = dj.getUserId();
@@ -106,19 +109,23 @@ public class PartyroomInfoService {
         }).toList();
     }
 
+    @Transactional(readOnly = true)
     public Optional<ActivePartyroomDto> getMyActivePartyroom() {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         return partyroomRepository.getActivePartyroomByUserId(authContext.getUserId());
     }
 
+    @Transactional(readOnly = true)
     public Optional<ActivePartyroomDto> getMyActivePartyroom(UserId userId) {
         return partyroomRepository.getActivePartyroomByUserId(userId);
     }
 
+    @Transactional(readOnly = true)
     public Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewId(UserId userId) {
         return partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(userId);
     }
 
+    @Transactional(readOnly = true)
     public QueryPartyroomSummaryResponse getSummaryInfo(PartyroomId partyroomId) {
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
@@ -127,7 +134,7 @@ public class PartyroomInfoService {
             CrewData djCrew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), playback.getUserId())
                     .orElseThrow();
             UserId djUserId = djCrew.getUserId();
-            ProfileSettingDto profileSettingDto = userProfileService.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
+            ProfileSettingDto profileSettingDto = userProfileQueryPort.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
             return QueryPartyroomSummaryResponse.from(partyroom, djCrew, profileSettingDto);
         }else {
             return QueryPartyroomSummaryResponse.from(partyroom, null, null);
@@ -139,6 +146,7 @@ public class PartyroomInfoService {
         return crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId);
     }
 
+    @Transactional(readOnly = true)
     public CrewProfileSummaryResult getProfileSummaryByCrewId(Long crewId) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         ActivePartyroomWithCrewDto activePartyroomDto = getMyActivePartyroomWithCrewId(authContext.getUserId())
@@ -149,7 +157,7 @@ public class PartyroomInfoService {
         UserId targetUserId = crew.getUserId();
         AuthorityTier authorityTier = crew.getAuthorityTier();
 
-        ProfileSummaryDto profileSummaryDto = userProfileService.getOtherProfileSummary(targetUserId, authorityTier);
+        ProfileSummaryDto profileSummaryDto = userProfileQueryPort.getOtherProfileSummary(targetUserId, authorityTier);
         return CrewProfileSummaryResult.from(crewId, profileSummaryDto);
     }
 }

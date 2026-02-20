@@ -25,6 +25,7 @@ public class TrackQueryService {
     private final PlaylistRepository playlistRepository;
     private final TrackRepository trackRepository;
 
+    @Transactional(readOnly = true)
     public Page<PlaylistTrackDto> getTracks(Long playlistId, int pageNo, int pageSize) {
         AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
         Optional<PlaylistData> playlistOptional = playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId());
@@ -36,8 +37,6 @@ public class TrackQueryService {
 
     @Transactional(readOnly = true)
     public boolean isEmptyPlaylist(Long playlistId) {
-        Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.ASC, "orderNumber"));
-        Page<PlaylistTrackDto> page = trackRepository.getTracksWithPagination(playlistId, pageable);
-        return page.getTotalElements() == 0;
+        return !trackRepository.existsByPlaylistDataId(playlistId);
     }
 }

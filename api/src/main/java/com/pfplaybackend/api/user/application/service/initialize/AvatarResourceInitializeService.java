@@ -8,7 +8,7 @@ import com.pfplaybackend.api.user.domain.entity.data.AvatarFaceResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarIconResourceData;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import com.pfplaybackend.api.user.domain.enums.PairType;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
