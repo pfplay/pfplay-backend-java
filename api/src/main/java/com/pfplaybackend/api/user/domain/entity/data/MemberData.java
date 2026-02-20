@@ -1,9 +1,7 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
-import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.profile.domain.ProfileData;
-import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.adapter.in.web.dto.request.AvatarFaceRequest;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
@@ -36,29 +34,14 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @Entity
-public class MemberData extends BaseEntity {
-    @EmbeddedId
-    @AttributeOverrides({
-            @AttributeOverride(name = "uid", column = @Column(name = "user_id")),
-    })
-    private UserId userId;
+@DiscriminatorValue("MEMBER")
+public class MemberData extends UserAccountData {
 
     @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private AuthorityTier authorityTier;
-
-    @Column(nullable = false)
     private ProviderType providerType;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "profile_id")
-    private ProfileData profileData;
-
-    @Column(nullable = false)
-    private boolean isProfileUpdated;
 
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @MapKey(name = "activityType")
@@ -70,15 +53,10 @@ public class MemberData extends BaseEntity {
     @Builder
     public MemberData(UserId userId, AuthorityTier authorityTier, String email, ProviderType providerType, ProfileData profileData, boolean isProfileUpdated, Map<ActivityType, ActivityData> activityDataMap,
                       LocalDateTime createdAt, LocalDateTime updatedAt) {
-        this.userId = userId;
-        this.authorityTier = authorityTier;
-        this.profileData = profileData;
-        this.isProfileUpdated = isProfileUpdated;
+        super(userId, authorityTier, profileData, isProfileUpdated, createdAt, updatedAt);
         this.email = email;
         this.providerType = providerType;
         this.activityDataMap = activityDataMap;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public static MemberData create(String email, ProviderType providerType) {
@@ -99,6 +77,16 @@ public class MemberData extends BaseEntity {
                 .providerType(providerType)
                 .isProfileUpdated(false)
                 .build();
+    }
+
+    @Override
+    public boolean isGuest() {
+        return false;
+    }
+
+    @Override
+    public String getEmail() {
+        return this.email;
     }
 
     public void initializeProfile(ProfileData profileData) {
@@ -148,6 +136,7 @@ public class MemberData extends BaseEntity {
         djActivity.addScore(deltaScore);
     }
 
+    @Override
     public ProfileSummaryDto getProfileSummary() {
         List<ActivitySummaryDto> activitySummaries = this.activityDataMap.values().stream()
                 .map(a -> ActivitySummaryDto.builder()
@@ -156,19 +145,7 @@ public class MemberData extends BaseEntity {
                         .build())
                 .collect(Collectors.toList());
 
-        return ProfileSummaryDto.builder()
-                .nickname(this.profileData.getNicknameValue())
-                .introduction(this.profileData.getIntroduction())
-                .avatarBodyUri(this.profileData.getAvatarBodyUri().getAvatarBodyUri())
-                .avatarFaceUri(this.profileData.getAvatarFaceUri().getAvatarFaceUri())
-                .avatarIconUri(this.profileData.getAvatarIconUri().getAvatarIconUri())
-                .avatarCompositionType(this.profileData.getAvatarCompositionType())
-                .combinePositionX(this.profileData.getCombinePositionX())
-                .combinePositionY(this.profileData.getCombinePositionY())
-                .offsetX(this.profileData.getOffsetX())
-                .offsetY(this.profileData.getOffsetY())
-                .scale(this.profileData.getScale())
-                .walletAddress(this.profileData.getWalletAddress().getWalletAddress())
+        return buildBaseProfileSummary()
                 .activitySummaries(activitySummaries)
                 .build();
     }

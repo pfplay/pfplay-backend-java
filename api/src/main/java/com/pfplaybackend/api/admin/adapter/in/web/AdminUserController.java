@@ -88,6 +88,7 @@ public class AdminUserController {
     }
 
     private VirtualMemberResponse buildResponse(MemberData member) {
+        var avatar = member.getProfileData().getAvatarSetting();
         return VirtualMemberResponse.builder()
                 .userId(member.getUserId().getUid().toString())
                 .email(member.getEmail())
@@ -95,15 +96,15 @@ public class AdminUserController {
                 .introduction(member.getProfileData().getIntroduction())
                 .providerType(member.getProviderType())
                 .authorityTier(member.getAuthorityTier())
-                .avatarBodyUri(member.getProfileData().getAvatarBodyUri().getAvatarBodyUri())
-                .avatarFaceUri(member.getProfileData().getAvatarFaceUri().getAvatarFaceUri())
-                .avatarIconUri(member.getProfileData().getAvatarIconUri().getAvatarIconUri())
-                .avatarCompositionType(member.getProfileData().getAvatarCompositionType())
-                .combinePositionX(member.getProfileData().getCombinePositionX())
-                .combinePositionY(member.getProfileData().getCombinePositionY())
-                .offsetX(member.getProfileData().getOffsetX())
-                .offsetY(member.getProfileData().getOffsetY())
-                .scale(member.getProfileData().getScale())
+                .avatarBodyUri(avatar.getAvatarBodyUri().getAvatarBodyUri())
+                .avatarFaceUri(avatar.getAvatarFaceUri().getAvatarFaceUri())
+                .avatarIconUri(avatar.getAvatarIconUri().getAvatarIconUri())
+                .avatarCompositionType(avatar.getAvatarCompositionType())
+                .combinePositionX(avatar.getCombinePositionX())
+                .combinePositionY(avatar.getCombinePositionY())
+                .offsetX(avatar.getOffsetX())
+                .offsetY(avatar.getOffsetY())
+                .scale(avatar.getScale())
                 .createdAt(member.getCreatedAt())
                 .updatedAt(member.getUpdatedAt())
                 .build();

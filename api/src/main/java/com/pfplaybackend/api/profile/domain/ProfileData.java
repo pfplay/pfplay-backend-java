@@ -3,11 +3,9 @@ package com.pfplaybackend.api.profile.domain;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.profile.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.profile.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.profile.domain.value.AvatarSetting;
+import com.pfplaybackend.api.profile.domain.value.Bio;
 import com.pfplaybackend.api.profile.domain.value.Nickname;
-import com.pfplaybackend.api.profile.domain.value.NicknameConverter;
-import com.pfplaybackend.api.profile.domain.vo.Avatar;
-import com.pfplaybackend.api.profile.domain.vo.AvatarBody;
-import com.pfplaybackend.api.profile.domain.vo.AvatarFace;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
@@ -37,32 +35,14 @@ public class ProfileData extends BaseEntity {
     })
     private UserId userId;
 
-    @Convert(converter = NicknameConverter.class)
-    @Column(name = "nickname", length = 20)
-    private Nickname nickname;
-
-    @Column(length = 50)
-    private String introduction;
+    @Embedded
+    private Bio bio;
 
     @Embedded
     private WalletAddress walletAddress;
 
     @Embedded
-    private AvatarBodyUri avatarBodyUri;
-
-    @Embedded
-    private AvatarFaceUri avatarFaceUri;
-
-    @Embedded
-    private AvatarIconUri avatarIconUri;
-
-    private AvatarCompositionType avatarCompositionType;
-    private FaceSourceType faceSourceType;
-    private int combinePositionX;
-    private int combinePositionY;
-    private double offsetX;
-    private double offsetY;
-    private double scale;
+    private AvatarSetting avatarSetting;
 
     protected ProfileData() {}
 
@@ -78,71 +58,64 @@ public class ProfileData extends BaseEntity {
                        double offsetX, double offsetY, double scale) {
         this.id = id;
         this.userId = userId;
-        this.nickname = nickname;
-        this.introduction = introduction;
-        this.avatarBodyUri = avatarBodyUri;
-        this.avatarFaceUri = avatarFaceUri;
-        this.avatarIconUri = avatarIconUri;
+        this.bio = new Bio(nickname, introduction);
         this.walletAddress = walletAddress;
-        this.avatarCompositionType = avatarCompositionType;
-        this.faceSourceType = faceSourceType;
-        this.combinePositionX = combinePositionX;
-        this.combinePositionY = combinePositionY;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.scale = scale;
+        this.avatarSetting = new AvatarSetting(
+                avatarBodyUri, avatarFaceUri, avatarIconUri,
+                avatarCompositionType, faceSourceType,
+                combinePositionX, combinePositionY,
+                offsetX, offsetY, scale);
     }
 
     @PrePersist
     @PreUpdate
     private void setDefaultValues() {
-        if (this.avatarBodyUri == null) {
-            this.avatarBodyUri = new AvatarBodyUri("");
-        }
-        if (this.avatarFaceUri == null) {
-            this.avatarFaceUri = new AvatarFaceUri("");
-        }
-        if (this.avatarIconUri == null) {
-            this.avatarIconUri = new AvatarIconUri("");
+        if (this.avatarSetting != null) {
+            this.avatarSetting.applyDefaults();
         }
         if (this.walletAddress == null) {
             this.walletAddress = new WalletAddress("");
         }
     }
 
+    // --- Bio delegates ---
+
     public String getNicknameValue() {
-        return nickname == null ? null : nickname.value();
+        return bio == null ? null : bio.getNicknameValue();
+    }
+
+    public String getIntroduction() {
+        return bio == null ? null : bio.getIntroduction();
     }
 
     public void updateBio(String nickname, String introduction) {
-        this.nickname = new Nickname(nickname);
-        this.introduction = introduction;
+        if (this.bio == null) {
+            this.bio = new Bio(new Nickname(nickname), introduction);
+        } else {
+            this.bio.update(nickname, introduction);
+        }
     }
 
+    // --- AvatarSetting delegates ---
+
     public void updateAvatarBody(AvatarBodyUri avatarBodyUri, int combinePositionX, int combinePositionY) {
-        this.avatarBodyUri = avatarBodyUri;
-        this.combinePositionX = combinePositionX;
-        this.combinePositionY = combinePositionY;
+        this.avatarSetting.updateBody(avatarBodyUri, combinePositionX, combinePositionY);
     }
 
     public void updateAvatarFaceSingleBody(AvatarFaceUri avatarFaceUri) {
-        this.avatarCompositionType = AvatarCompositionType.SINGLE_BODY;
-        this.avatarFaceUri = avatarFaceUri;
+        this.avatarSetting.updateFaceSingleBody(avatarFaceUri);
     }
 
     public void updateAvatarFaceWithTransform(AvatarFaceUri avatarFaceUri, FaceSourceType faceSourceType,
                                               double offsetX, double offsetY, double scale) {
-        this.avatarCompositionType = AvatarCompositionType.BODY_WITH_FACE;
-        this.faceSourceType = faceSourceType;
-        this.avatarFaceUri = avatarFaceUri;
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
-        this.scale = scale;
+        this.avatarSetting.updateFaceWithTransform(avatarFaceUri, faceSourceType, offsetX, offsetY, scale);
     }
 
     public void updateAvatarIcon(AvatarIconUri avatarIconUri) {
-        this.avatarIconUri = avatarIconUri;
+        this.avatarSetting.updateIcon(avatarIconUri);
     }
+
+    // --- WalletAddress delegate ---
 
     public void updateWalletAddress(WalletAddress walletAddress) {
         this.walletAddress = walletAddress;

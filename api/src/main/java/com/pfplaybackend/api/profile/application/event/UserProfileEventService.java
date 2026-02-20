@@ -15,18 +15,19 @@ public class UserProfileEventService {
 
     public void publishProfileChangedEvent(MemberData member) {
         ProfileData profile = member.getProfileData();
+        var avatar = profile.getAvatarSetting();
         CrewProfilePreCheckMessage crewProfilePreCheckMessage = new CrewProfilePreCheckMessage(
                 profile.getUserId(),
                 profile.getNicknameValue(),
-                profile.getAvatarFaceUri().getAvatarFaceUri(),
-                profile.getAvatarBodyUri().getAvatarBodyUri(),
-                profile.getAvatarIconUri().getAvatarIconUri(),
-                profile.getAvatarCompositionType(),
-                profile.getCombinePositionX(),
-                profile.getCombinePositionY(),
-                profile.getOffsetX(),
-                profile.getOffsetY(),
-                profile.getScale()
+                avatar.getAvatarFaceUri().getAvatarFaceUri(),
+                avatar.getAvatarBodyUri().getAvatarBodyUri(),
+                avatar.getAvatarIconUri().getAvatarIconUri(),
+                avatar.getAvatarCompositionType(),
+                avatar.getCombinePositionX(),
+                avatar.getCombinePositionY(),
+                avatar.getOffsetX(),
+                avatar.getOffsetY(),
+                avatar.getScale()
         );
         messagePublisher.publish(MessageTopic.CREW_PROFILE_PRE_CHECK.topic(), crewProfilePreCheckMessage);
     }
