@@ -5,6 +5,7 @@ plugins {
 def queryDslVersion = '5.0.0'
 
 dependencies {
+	implementation project(':common')
 	implementation project(':realtime')
 
 	// Core Spring Boot Starters
