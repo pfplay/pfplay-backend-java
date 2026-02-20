@@ -6,6 +6,7 @@ import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
@@ -51,6 +52,7 @@ class PlaybackManagementServiceTest {
     @Mock ApplicationEventPublisher eventPublisher;
     @Mock PartyroomRepository partyroomRepository;
     @Mock PartyroomPlaybackRepository partyroomPlaybackRepository;
+    @Mock CrewRepository crewRepository;
     @Mock DjRepository djRepository;
     @Mock ExpirationTaskScheduler scheduleService;
     @Mock PartyroomAggregateService partyroomAggregateService;

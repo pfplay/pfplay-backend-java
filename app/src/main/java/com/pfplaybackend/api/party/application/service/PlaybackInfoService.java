@@ -32,9 +32,9 @@ public class PlaybackInfoService {
     private final UserProfileQueryPort userProfileQueryPort;
 
     @Transactional
-    public PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj) {
+    public PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj, UserId djUserId) {
         PlaybackTrackDto trackDto = playlistCommandPort.getFirstTrack(dj.getPlaylistId());
-        return PlaybackData.create(partyroomId, dj.getUserId(), trackDto);
+        return PlaybackData.create(partyroomId, djUserId, trackDto);
     }
 
     @Transactional

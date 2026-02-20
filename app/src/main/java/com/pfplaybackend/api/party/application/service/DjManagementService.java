@@ -49,19 +49,21 @@ public class DjManagementService {
         DjQueueData djQueue = djQueueRepository.findById(partyroomId.getId()).orElseThrow();
 
         boolean isPostActivationProcessingRequired = !playbackState.isActivated();
-        boolean isAlreadyRegistered = djRepository.existsByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId());
-        boolean isEmptyPlaylist = playlistQueryPort.isEmptyPlaylist(playlistId.getId());
-        new DjEnqueueSpecification().validate(djQueue, isAlreadyRegistered, isEmptyPlaylist);
 
         // Find crew
         CrewData crew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
+        CrewId crewId = new CrewId(crew.getId());
+
+        boolean isAlreadyRegistered = djRepository.existsByPartyroomDataIdAndCrewId(partyroomId.getId(), crewId);
+        boolean isEmptyPlaylist = playlistQueryPort.isEmptyPlaylist(playlistId.getId());
+        new DjEnqueueSpecification().validate(djQueue, isAlreadyRegistered, isEmptyPlaylist);
 
         // Calculate next order number
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId.getId());
         int nextOrder = queuedDjs.size() + 1;
 
         // Create and save DJ
-        DjData dj = DjData.create(partyroom, playlistId, authContext.getUserId(), new CrewId(crew.getId()), nextOrder);
+        DjData dj = DjData.create(partyroom, playlistId, crewId, nextOrder);
         djRepository.save(dj);
 
         playbackState.activate(null, null);

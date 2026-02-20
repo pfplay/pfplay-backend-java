@@ -2,6 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
@@ -33,14 +34,17 @@ class PartyroomInfoServiceGetDjsTest {
     @Mock private DjRepository djRepository;
     @InjectMocks private PartyroomInfoService partyroomInfoService;
 
-    private DjData createDj(long crewId, int orderNumber, UserId userId) {
+    private DjData createDj(long crewId, int orderNumber) {
         return DjData.builder()
                 .id(crewId * 100)
-                .userId(userId)
                 .crewId(new CrewId(crewId))
                 .playlistId(new PlaylistId(1L))
                 .orderNumber(orderNumber)
                 .build();
+    }
+
+    private CrewData createCrew(long crewId, UserId userId) {
+        return CrewData.builder().id(crewId).userId(userId).build();
     }
 
     private ProfileSettingDto mockProfile(String nickname, String iconUri) {
@@ -57,13 +61,14 @@ class PartyroomInfoServiceGetDjsTest {
         UserId user1 = new UserId();
         UserId user3 = new UserId();
 
-        DjData queuedDj1 = createDj(1L, 1, user1);
-        DjData queuedDj2 = createDj(3L, 2, user3);
+        DjData queuedDj1 = createDj(1L, 1);
+        DjData queuedDj2 = createDj(3L, 2);
 
         Long partyroomId = 1L;
-        // Only queued DJs are returned by the repository
         when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId))
                 .thenReturn(List.of(queuedDj1, queuedDj2));
+        when(crewRepository.findAllById(List.of(1L, 3L)))
+                .thenReturn(List.of(createCrew(1L, user1), createCrew(3L, user3)));
 
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
         profileMap.put(user1, mockProfile("nick1", "icon1"));
@@ -86,14 +91,15 @@ class PartyroomInfoServiceGetDjsTest {
         UserId user2 = new UserId();
         UserId user3 = new UserId();
 
-        DjData dj1 = createDj(1L, 1, user1);
-        DjData dj2 = createDj(2L, 2, user2);
-        DjData dj3 = createDj(3L, 3, user3);
+        DjData dj1 = createDj(1L, 1);
+        DjData dj2 = createDj(2L, 2);
+        DjData dj3 = createDj(3L, 3);
 
         Long partyroomId = 1L;
-        // Repository returns in order
         when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId))
                 .thenReturn(List.of(dj1, dj2, dj3));
+        when(crewRepository.findAllById(List.of(1L, 2L, 3L)))
+                .thenReturn(List.of(createCrew(1L, user1), createCrew(2L, user2), createCrew(3L, user3)));
 
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
         profileMap.put(user1, mockProfile("nick1", "icon1"));
@@ -116,9 +122,9 @@ class PartyroomInfoServiceGetDjsTest {
     void getDjs_shouldReturnEmptyList_whenAllDjsDequeued() {
         // given
         Long partyroomId = 1L;
-        // Repository returns empty for all dequeued
         when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId))
                 .thenReturn(List.of());
+        when(crewRepository.findAllById(List.of())).thenReturn(List.of());
 
         when(userProfileQueryPort.getUsersProfileSetting(anyList())).thenReturn(new HashMap<>());
 

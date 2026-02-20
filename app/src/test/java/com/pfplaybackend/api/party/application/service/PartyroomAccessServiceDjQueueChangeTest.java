@@ -92,7 +92,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
         when(djRepository.findByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.of(
-                DjData.builder().id(100L).userId(userId).crewId(new CrewId(1L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
+                DjData.builder().id(100L).crewId(new CrewId(1L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
         ));
         when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
 
@@ -160,7 +160,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
         playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
         when(djRepository.findByPartyroomDataIdAndCrewId(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.of(
-                DjData.builder().id(100L).userId(targetUserId).crewId(new CrewId(2L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
+                DjData.builder().id(100L).crewId(new CrewId(2L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
         ));
         when(partyroomPlaybackRepository.findById(partyroomData.getId())).thenReturn(Optional.of(playbackState));
 

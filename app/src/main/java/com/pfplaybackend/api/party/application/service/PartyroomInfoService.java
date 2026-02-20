@@ -17,6 +17,7 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
+import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
@@ -76,17 +77,26 @@ public class PartyroomInfoService {
     @Transactional(readOnly = true)
     public boolean isAlreadyRegistered(Long partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        return djRepository.existsByPartyroomDataIdAndUserId(partyroomId, authContext.getUserId());
+        Optional<CrewData> crew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId, authContext.getUserId());
+        if (crew.isEmpty()) return false;
+        return djRepository.existsByPartyroomDataIdAndCrewId(partyroomId, new CrewId(crew.get().getId()));
     }
 
     @Transactional(readOnly = true)
     public List<DjWithProfileDto> getDjs(Long partyroomId) {
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId);
-        List<UserId> userIds = queuedDjs.stream().map(DjData::getUserId).toList();
+        // Resolve userIds via crew lookup
+        List<Long> crewIds = queuedDjs.stream().map(dj -> dj.getCrewId().getId()).toList();
+        List<CrewData> crews = crewRepository.findAllById(crewIds);
+        Map<Long, UserId> crewIdToUserId = crews.stream()
+                .collect(Collectors.toMap(CrewData::getId, CrewData::getUserId));
+        List<UserId> userIds = queuedDjs.stream()
+                .map(dj -> crewIdToUserId.get(dj.getCrewId().getId()))
+                .toList();
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileQueryPort.getUsersProfileSetting(userIds);
 
         return queuedDjs.stream().map(dj -> {
-            UserId userId = dj.getUserId();
+            UserId userId = crewIdToUserId.get(dj.getCrewId().getId());
             ProfileSettingDto profileSettingDto = profileSettingMap.get(userId);
             return new DjWithProfileDto(
                     dj.getCrewId().getId(),

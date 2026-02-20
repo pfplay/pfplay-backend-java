@@ -95,9 +95,9 @@ class DjManagementServiceDjQueueChangeTest {
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(partyroomPlaybackRepository.findById(partyroomId.getId())).thenReturn(Optional.of(playbackState));
         when(djQueueRepository.findById(partyroomId.getId())).thenReturn(Optional.of(djQueue));
-        when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
-        when(djRepository.existsByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(false);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
+        when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
+        when(djRepository.existsByPartyroomDataIdAndCrewId(partyroomId.getId(), new CrewId(1L))).thenReturn(false);
         when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
         when(partyroomPlaybackRepository.save(any(PartyroomPlaybackData.class))).thenReturn(playbackState);
 
@@ -186,7 +186,6 @@ class DjManagementServiceDjQueueChangeTest {
 
         DjData targetDj = DjData.builder()
                 .id(100L)
-                .userId(targetUserId)
                 .crewId(new CrewId(2L))
                 .playlistId(new PlaylistId(10L))
                 .orderNumber(2)

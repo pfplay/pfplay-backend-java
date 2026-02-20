@@ -20,6 +20,7 @@ import com.pfplaybackend.api.party.domain.event.PlaybackStartedEvent;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
@@ -48,6 +49,7 @@ public class PlaybackManagementService {
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomPlaybackRepository partyroomPlaybackRepository;
+    private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final ExpirationTaskScheduler scheduleService;
     private final PartyroomAggregateService partyroomAggregateService;
@@ -108,8 +110,8 @@ public class PlaybackManagementService {
 
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroom.getId());
         DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
-        CrewData djCrew = partyroomInfoService.getCrewOrThrow(partyroom.getId(), nextDj.getUserId());
-        PlaybackData nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj);
+        CrewData djCrew = crewRepository.findById(nextDj.getCrewId().getId()).orElseThrow();
+        PlaybackData nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj, djCrew.getUserId());
 
         if (partyroom.getPlaybackTimeLimit().exceedsDuration(nextPlayback.getDuration())) {
             if (remainingAttempts <= 1) {

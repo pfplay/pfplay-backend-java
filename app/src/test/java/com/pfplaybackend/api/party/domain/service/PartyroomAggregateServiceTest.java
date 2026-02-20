@@ -7,7 +7,6 @@ import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,7 +36,6 @@ class PartyroomAggregateServiceTest {
         return DjData.builder()
                 .id(id)
                 .crewId(crewId)
-                .userId(new UserId())
                 .playlistId(new PlaylistId(1L))
                 .orderNumber(orderNumber)
                 .build();

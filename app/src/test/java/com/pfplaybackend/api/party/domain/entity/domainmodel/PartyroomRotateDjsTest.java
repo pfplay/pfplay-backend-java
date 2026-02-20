@@ -3,7 +3,6 @@ package com.pfplaybackend.api.party.domain.entity.domainmodel;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +22,6 @@ class PartyroomRotateDjsTest {
     private DjData createDj(long crewId, int orderNumber) {
         return DjData.builder()
                 .id(crewId * 100)
-                .userId(new UserId())
                 .crewId(new CrewId(crewId))
                 .playlistId(new PlaylistId(1L))
                 .orderNumber(orderNumber)

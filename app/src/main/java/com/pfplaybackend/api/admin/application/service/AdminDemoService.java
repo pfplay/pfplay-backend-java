@@ -322,9 +322,10 @@ public class AdminDemoService {
         // Find crew
         CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(loadedPartyroom.getId(), userId)
                 .orElseThrow();
+        CrewId crewId = new CrewId(crew.getId());
 
         // Check if already registered
-        if (djRepository.existsByPartyroomDataIdAndUserId(loadedPartyroom.getId(), userId)) {
+        if (djRepository.existsByPartyroomDataIdAndCrewId(loadedPartyroom.getId(), crewId)) {
             log.warn("DJ already registered for user {}, skipping", userId.getUid());
             return;
         }
@@ -334,7 +335,7 @@ public class AdminDemoService {
         int nextOrder = queuedDjs.size() + 1;
 
         // Create and save DJ
-        DjData dj = DjData.create(loadedPartyroom, new PlaylistId(playlist.getId()), userId, new CrewId(crew.getId()), nextOrder);
+        DjData dj = DjData.create(loadedPartyroom, new PlaylistId(playlist.getId()), crewId, nextOrder);
         djRepository.save(dj);
 
         playbackState.activate(null, null);

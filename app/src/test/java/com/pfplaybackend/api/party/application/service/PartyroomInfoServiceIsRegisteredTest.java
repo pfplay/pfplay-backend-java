@@ -4,6 +4,8 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
+import com.pfplaybackend.api.party.domain.entity.data.CrewData;
+import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -47,7 +51,10 @@ class PartyroomInfoServiceIsRegisteredTest {
     void isAlreadyRegistered_shouldReturnTrue_whenUserIsRegistered() {
         // given
         Long partyroomId = 1L;
-        when(djRepository.existsByPartyroomDataIdAndUserId(partyroomId, myUserId))
+        CrewData crew = CrewData.builder().id(5L).userId(myUserId).build();
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId, myUserId))
+                .thenReturn(Optional.of(crew));
+        when(djRepository.existsByPartyroomDataIdAndCrewId(partyroomId, new CrewId(5L)))
                 .thenReturn(true);
 
         // when
@@ -62,8 +69,26 @@ class PartyroomInfoServiceIsRegisteredTest {
     void isAlreadyRegistered_shouldReturnFalse_whenUserIsNotRegistered() {
         // given
         Long partyroomId = 1L;
-        when(djRepository.existsByPartyroomDataIdAndUserId(partyroomId, myUserId))
+        CrewData crew = CrewData.builder().id(5L).userId(myUserId).build();
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId, myUserId))
+                .thenReturn(Optional.of(crew));
+        when(djRepository.existsByPartyroomDataIdAndCrewId(partyroomId, new CrewId(5L)))
                 .thenReturn(false);
+
+        // when
+        boolean result = partyroomInfoService.isAlreadyRegistered(partyroomId);
+
+        // then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    @DisplayName("크루가 없으면 false 반환")
+    void isAlreadyRegistered_shouldReturnFalse_whenCrewNotFound() {
+        // given
+        Long partyroomId = 1L;
+        when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId, myUserId))
+                .thenReturn(Optional.empty());
 
         // when
         boolean result = partyroomInfoService.isAlreadyRegistered(partyroomId);
