@@ -2,12 +2,12 @@ package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.adapter.in.web.payload.request.AvatarFaceRequest;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.*;
@@ -111,13 +111,10 @@ public class MemberData extends UserAccountData {
         this.profileData.updateAvatarFaceSingleBody(avatarFaceUri);
     }
 
-    public void updateAvatarFace(AvatarFaceUri avatarFaceUri, AvatarFaceRequest avatarFaceRequest) {
+    public void updateAvatarFace(AvatarFaceUri avatarFaceUri, FaceSourceType sourceType,
+                                 double offsetX, double offsetY, double scale) {
         this.profileData.updateAvatarFaceWithTransform(
-                avatarFaceUri,
-                avatarFaceRequest.getSourceType(),
-                avatarFaceRequest.getTransform().getOffsetX(),
-                avatarFaceRequest.getTransform().getOffsetY(),
-                avatarFaceRequest.getTransform().getScale());
+                avatarFaceUri, sourceType, offsetX, offsetY, scale);
     }
 
     public void updateAvatarIcon(AvatarIconUri avatarIconUri) {

@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
+import com.pfplaybackend.api.party.domain.value.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
@@ -29,7 +29,7 @@ public class PlaybackReactionPostProcessService {
     private final PlaylistCommandPort playlistCommandPort;
     private final UserActivityPort userActivityPort;
 
-    public void postProcess(ReactionPostProcessDto postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
+    public void postProcess(ReactionPostProcessResult postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
         if(postProcessDto.isGrabStatusChanged()) {

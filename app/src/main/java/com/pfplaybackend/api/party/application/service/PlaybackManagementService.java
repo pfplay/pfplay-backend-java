@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
-import com.pfplaybackend.api.party.application.dto.playback.PlaybackDto;
+import com.pfplaybackend.api.party.domain.value.PlaybackSnapshot;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.application.service.task.ExpirationTaskScheduler;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
@@ -129,10 +129,10 @@ public class PlaybackManagementService {
         // Schedule Task to wait for playback time
         scheduleTask(nextPlayback);
         // Propagation Websocket Event
-        eventPublisher.publishEvent(new PlaybackStartedEvent(
-                partyroom.getPartyroomId(), djCrew.getId(),
-                PlaybackDto.withEndTime(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(),
-                        playbackData.getDuration().toDisplayString(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
+        PlaybackSnapshot snapshot = new PlaybackSnapshot(
+                playbackData.getId(), playbackData.getLinkId(), playbackData.getName(),
+                playbackData.getDuration().toDisplayString(), playbackData.getThumbnailImage(), playbackData.getEndTime());
+        eventPublisher.publishEvent(new PlaybackStartedEvent(partyroom.getPartyroomId(), djCrew.getId(), snapshot));
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
     }
 

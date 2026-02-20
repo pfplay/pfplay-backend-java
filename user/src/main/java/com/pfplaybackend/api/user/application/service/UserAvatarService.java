@@ -109,9 +109,13 @@ public class UserAvatarService {
             member.updateAvatarIcon(avatarIconUri);
         }else {
             avatarFaceUri = new AvatarFaceUri(request.getFace().getUri());
-            avatarIconUri = userAvatarDomainService.findAvatarIconByFaceSourceType(request);
+            avatarIconUri = userAvatarDomainService.findAvatarIconByFaceSourceType(
+                    avatarFaceUri, request.getFace().getSourceType());
 
-            member.updateAvatarFace(avatarFaceUri, request.getFace());
+            member.updateAvatarFace(avatarFaceUri, request.getFace().getSourceType(),
+                    request.getFace().getTransform().getOffsetX(),
+                    request.getFace().getTransform().getOffsetY(),
+                    request.getFace().getTransform().getScale());
             member.updateAvatarIcon(avatarIconUri);
         }
 

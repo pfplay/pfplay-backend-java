@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.admin.adapter.in.web.dto.response.SimulateReactionsResponse;
-import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
+import com.pfplaybackend.api.party.domain.value.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackReactionPostProcessService;
@@ -74,7 +74,7 @@ public class ReactionSimulationService {
         playbackReactionHistoryRepository.save(historyData.applyReactionState(targetState));
 
         // 5. Determine post-processing
-        ReactionPostProcessDto postProcessDto = playbackReactionDomainService
+        ReactionPostProcessResult postProcessDto = playbackReactionDomainService
                 .determinePostProcessing(existingState, targetState);
 
         // 6. Execute post-processing manually (avoid ThreadLocalContext dependency)

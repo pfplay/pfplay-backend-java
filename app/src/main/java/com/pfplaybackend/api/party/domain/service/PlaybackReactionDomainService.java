@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.domain.service;
 
-import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
+import com.pfplaybackend.api.party.domain.value.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
@@ -21,8 +21,8 @@ public class PlaybackReactionDomainService {
         return ReactionStateResolver.getCombinedReactionState(reactionState, reactionType);
     }
 
-    public ReactionPostProcessDto determinePostProcessing(ReactionState existingState, ReactionState targetState) {
-        ReactionPostProcessDto reactionPostProcessDto = new ReactionPostProcessDto();
+    public ReactionPostProcessResult determinePostProcessing(ReactionState existingState, ReactionState targetState) {
+        ReactionPostProcessResult reactionPostProcessDto = new ReactionPostProcessResult();
 
         ResolvedReaction existingResolved = ReactionStateResolver.resolve(existingState);
         ResolvedReaction targetResolved = ReactionStateResolver.resolve(targetState);

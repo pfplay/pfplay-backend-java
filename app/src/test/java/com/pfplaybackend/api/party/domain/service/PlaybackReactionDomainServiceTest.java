@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.party.domain.service;
 
-import com.pfplaybackend.api.party.application.dto.playback.ReactionPostProcessDto;
+import com.pfplaybackend.api.party.domain.value.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.party.domain.enums.MotionType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
@@ -78,7 +78,7 @@ class PlaybackReactionDomainServiceTest {
             ReactionState liked = new ReactionState(true, false, false);
 
             // when
-            ReactionPostProcessDto result = service.determinePostProcessing(liked, liked);
+            ReactionPostProcessResult result = service.determinePostProcessing(liked, liked);
 
             // then
             assertThat(result.isMotionChanged()).isFalse();
@@ -95,7 +95,7 @@ class PlaybackReactionDomainServiceTest {
             ReactionState liked = new ReactionState(true, false, false);
 
             // when
-            ReactionPostProcessDto result = service.determinePostProcessing(base, liked);
+            ReactionPostProcessResult result = service.determinePostProcessing(base, liked);
 
             // then
             assertThat(result.isMotionChanged()).isTrue();
@@ -114,7 +114,7 @@ class PlaybackReactionDomainServiceTest {
             ReactionState likedGrabbed = new ReactionState(true, false, true);
 
             // when
-            ReactionPostProcessDto result = service.determinePostProcessing(liked, likedGrabbed);
+            ReactionPostProcessResult result = service.determinePostProcessing(liked, likedGrabbed);
 
             // then
             assertThat(result.isMotionChanged()).isTrue();
@@ -133,7 +133,7 @@ class PlaybackReactionDomainServiceTest {
             ReactionState disliked = new ReactionState(false, true, false);
 
             // when
-            ReactionPostProcessDto result = service.determinePostProcessing(liked, disliked);
+            ReactionPostProcessResult result = service.determinePostProcessing(liked, disliked);
 
             // then
             assertThat(result.isMotionChanged()).isTrue();
@@ -152,7 +152,7 @@ class PlaybackReactionDomainServiceTest {
             ReactionState dislikedGrabbed = new ReactionState(false, true, true);
 
             // when
-            ReactionPostProcessDto result = service.determinePostProcessing(likedGrabbed, dislikedGrabbed);
+            ReactionPostProcessResult result = service.determinePostProcessing(likedGrabbed, dislikedGrabbed);
 
             // then
             assertThat(result.isGrabStatusChanged()).isFalse();

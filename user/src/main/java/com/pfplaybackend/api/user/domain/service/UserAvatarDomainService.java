@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.user.domain.service;
 
 import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.user.adapter.in.web.payload.request.SetAvatarRequest;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
 import com.pfplaybackend.api.user.application.service.AvatarResourceService;
@@ -49,13 +48,12 @@ public class UserAvatarDomainService {
         return new AvatarIconUri(avatarIconDto.resourceUri());
     }
 
-    public AvatarIconUri findAvatarIconByFaceSourceType(SetAvatarRequest request) {
-        AvatarFaceUri avatarFaceUri = new AvatarFaceUri(request.getFace().getUri());
-        if(request.getFace().getSourceType().equals(FaceSourceType.INTERNAL_IMAGE)) {
-            AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByFaceUri(avatarFaceUri);
+    public AvatarIconUri findAvatarIconByFaceSourceType(AvatarFaceUri faceUri, FaceSourceType sourceType) {
+        if(sourceType.equals(FaceSourceType.INTERNAL_IMAGE)) {
+            AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByFaceUri(faceUri);
             return new AvatarIconUri(avatarIconDto.resourceUri());
         }else {
-            return new AvatarIconUri(avatarFaceUri.getAvatarFaceUri());
+            return new AvatarIconUri(faceUri.getAvatarFaceUri());
         }
     }
 }

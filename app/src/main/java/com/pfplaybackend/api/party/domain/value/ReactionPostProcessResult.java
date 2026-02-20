@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.party.application.dto.playback;
+package com.pfplaybackend.api.party.domain.value;
 
 import com.pfplaybackend.api.party.domain.enums.MotionType;
 import lombok.*;
@@ -9,8 +9,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class ReactionPostProcessDto {
+public class ReactionPostProcessResult {
     private boolean isAggregationChanged;
     private boolean isMotionChanged;
     private boolean isDjActivityScoreChanged;

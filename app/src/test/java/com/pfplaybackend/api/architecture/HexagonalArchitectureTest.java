@@ -47,14 +47,10 @@ class HexagonalArchitectureTest {
         }
 
         @Test
-        @DisplayName("domain 패키지는 application 패키지에 의존하지 않는다 (이벤트/서비스 DTO 참조 예외)")
+        @DisplayName("domain 패키지는 application 패키지에 의존하지 않는다")
         void domainShouldNotDependOnApplication() {
-            // TODO: PlaybackStartedEvent가 PlaybackDto를, PlaybackReactionDomainService가 ReactionPostProcessDto를 참조 중
-            //       향후 도메인 전용 타입으로 교체하여 해소 예정
             ArchRule rule = noClasses()
                     .that().resideInAPackage("..party.domain..")
-                    .and().doNotHaveSimpleName("PlaybackStartedEvent")
-                    .and().doNotHaveSimpleName("PlaybackReactionDomainService")
                     .should().dependOnClassesThat()
                     .resideInAPackage("..party.application..");
 
@@ -102,13 +98,10 @@ class HexagonalArchitectureTest {
     class AuthDomainLayerRules {
 
         @Test
-        @DisplayName("auth domain 패키지는 adapter 패키지에 의존하지 않는다 (OAuth2Redirection 예외)")
+        @DisplayName("auth domain 패키지는 adapter 패키지에 의존하지 않는다")
         void domainShouldNotDependOnAdapter() {
-            // TODO: OAuth2Redirection이 OAuth2ProviderConfig$Environment를 참조 중
-            //       향후 도메인 전용 타입으로 교체하여 해소 예정
             ArchRule rule = noClasses()
                     .that().resideInAPackage("..auth.domain..")
-                    .and().doNotHaveSimpleName("OAuth2Redirection")
                     .should().dependOnClassesThat()
                     .resideInAPackage("..auth.adapter..");
 
