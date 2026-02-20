@@ -21,25 +21,28 @@ public class PartyroomAggregateService {
      * DJ큐에서 제거 + 순서 재배치 (atomic operation)
      */
     public void removeDjFromQueue(Long partyroomId, CrewId crewId) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId);
-        queuedDjs.stream()
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId);
+        List<DjData> toDelete = queuedDjs.stream()
                 .filter(dj -> dj.getCrewId().equals(crewId))
-                .forEach(DjData::applyDequeued);
+                .toList();
+        List<DjData> remaining = queuedDjs.stream()
+                .filter(dj -> !dj.getCrewId().equals(crewId))
+                .toList();
+
+        djRepository.deleteAll(toDelete);
 
         int order = 1;
-        for (DjData dj : queuedDjs) {
-            if (!dj.getCrewId().equals(crewId)) {
-                dj.updateOrderNumber(order++);
-            }
+        for (DjData dj : remaining) {
+            dj.updateOrderNumber(order++);
         }
-        djRepository.saveAll(queuedDjs);
+        djRepository.saveAll(remaining);
     }
 
     /**
      * DJ큐 로테이션 (1번→마지막, 나머지 -1)
      */
     public void rotateDjQueue(Long partyroomId) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId);
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId);
         int totalElements = queuedDjs.size();
         queuedDjs.forEach(dj -> {
             if (dj.getOrderNumber() == 1) {
@@ -52,21 +55,20 @@ public class PartyroomAggregateService {
     }
 
     /**
-     * 재생 비활성화 + 전체 DJ 일괄 dequeue
+     * 재생 비활성화 + 전체 DJ 일괄 삭제
      */
     public void deactivatePlayback(PartyroomData partyroom) {
         partyroom.applyDeactivation();
         partyroomRepository.save(partyroom);
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
-        queuedDjs.forEach(DjData::applyDequeued);
-        djRepository.saveAll(queuedDjs);
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroom.getId());
+        djRepository.deleteAll(queuedDjs);
     }
 
     /**
      * 현재 DJ 여부 판별 (큐에서 1번 순서인지)
      */
     public boolean isCurrentDj(Long partyroomId, CrewId crewId) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId);
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId);
         return queuedDjs.stream()
                 .anyMatch(dj -> dj.getCrewId().equals(crewId) && dj.getOrderNumber() == 1);
     }
@@ -75,6 +77,6 @@ public class PartyroomAggregateService {
      * DJ큐에 활성 DJ가 존재하는지 확인
      */
     public boolean hasQueuedDjs(Long partyroomId) {
-        return djRepository.existsByPartyroomDataIdAndIsQueuedTrue(partyroomId);
+        return djRepository.existsByPartyroomDataId(partyroomId);
     }
 }

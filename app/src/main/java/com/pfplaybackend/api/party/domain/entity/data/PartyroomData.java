@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 @Table(
         name = "PARTYROOM",
         indexes = {
-                @Index(name = "paytyroom_host_id_IDX", columnList = "host_id")
+                @Index(name = "partyroom_host_id_IDX", columnList = "host_id")
         }
 )
 @Entity

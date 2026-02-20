@@ -104,7 +104,7 @@ class PlaybackManagementServiceTest {
     @DisplayName("skipByManager — MODERATOR 이상 등급이면 스킵이 실행된다")
     void skipByManager_moderator_succeeds() {
         // given
-        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), true, false, new PlaybackId(1L));
+        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), true, false, new PlaybackId(1L), 1L);
         CrewData adjuster = CrewData.builder()
                 .id(1L).userId(userId).gradeType(GradeType.MODERATOR).build();
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
@@ -126,7 +126,7 @@ class PlaybackManagementServiceTest {
     @DisplayName("skipByManager — MODERATOR 미만 등급이면 예외가 발생한다")
     void skipByManager_belowModerator_throws() {
         // given
-        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), true, false, new PlaybackId(1L));
+        ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), true, false, new PlaybackId(1L), 1L);
         CrewData adjuster = CrewData.builder()
                 .id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
 

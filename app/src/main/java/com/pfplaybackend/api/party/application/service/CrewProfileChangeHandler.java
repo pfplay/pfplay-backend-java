@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfileMessage;
@@ -22,13 +22,13 @@ public class CrewProfileChangeHandler {
     private final RedisMessagePublisher messagePublisher;
     private final PartyroomInfoService partyroomInfoService;
 
-    private void publishProfileChangedEvent(ActivePartyroomWithCrewDto dto, CrewProfilePreCheckMessage message) {
+    private void publishProfileChangedEvent(ActivePartyroomDto dto, CrewProfilePreCheckMessage message) {
         messagePublisher.publish(MessageTopic.CREW_PROFILE.topic(),
                 CrewProfileMessage.from(new PartyroomId(dto.id()), dto.crewId(), message));
     }
 
     public void preCheck(CrewProfilePreCheckMessage message) {
-        Optional<ActivePartyroomWithCrewDto> optional = partyroomInfoService.getMyActivePartyroomWithCrewId(message.userId());
-        optional.ifPresent(activePartyroomWithCrewDto -> publishProfileChangedEvent(activePartyroomWithCrewDto, message));
+        Optional<ActivePartyroomDto> optional = partyroomInfoService.getMyActivePartyroom(message.userId());
+        optional.ifPresent(activePartyroomDto -> publishProfileChangedEvent(activePartyroomDto, message));
     }
 }

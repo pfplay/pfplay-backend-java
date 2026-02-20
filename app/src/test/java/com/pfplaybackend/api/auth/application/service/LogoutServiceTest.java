@@ -2,7 +2,7 @@ package com.pfplaybackend.api.auth.application.service;
 
 import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -45,9 +45,9 @@ class LogoutServiceTest {
         UserId userId = new UserId();
         setAuthentication(userId);
 
-        ActivePartyroomWithCrewDto activePartyroom = mock(ActivePartyroomWithCrewDto.class);
+        ActivePartyroomDto activePartyroom = mock(ActivePartyroomDto.class);
         when(activePartyroom.id()).thenReturn(1L);
-        when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activePartyroom));
+        when(partyroomInfoService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activePartyroom));
 
         // when
         logoutService.exitActivePartyroomIfPresent();
@@ -63,7 +63,7 @@ class LogoutServiceTest {
         UserId userId = new UserId();
         setAuthentication(userId);
 
-        when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.empty());
+        when(partyroomInfoService.getMyActivePartyroom(userId)).thenReturn(Optional.empty());
 
         // when
         logoutService.exitActivePartyroomIfPresent();
@@ -81,7 +81,7 @@ class LogoutServiceTest {
         logoutService.exitActivePartyroomIfPresent();
 
         // then
-        verify(partyroomInfoService, never()).getMyActivePartyroomWithCrewId(any());
+        verify(partyroomInfoService, never()).getMyActivePartyroom(any());
         verify(partyroomAccessService, never()).exit(any());
     }
 

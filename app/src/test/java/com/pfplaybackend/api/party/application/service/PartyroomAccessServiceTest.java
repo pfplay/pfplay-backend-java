@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
@@ -87,9 +87,9 @@ class PartyroomAccessServiceTest {
         when(crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
 
         // 같은 룸에 이미 active
-        ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
+        ActivePartyroomDto activeRoomInfo = mock(ActivePartyroomDto.class);
         when(activeRoomInfo.id()).thenReturn(1L);
-        when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activeRoomInfo));
+        when(partyroomInfoService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeRoomInfo));
 
         // when
         partyroomAccessService.tryEnter(partyroomId);
@@ -124,9 +124,9 @@ class PartyroomAccessServiceTest {
         when(crewRepository.countByPartyroomDataIdAndIsActiveTrue(newRoomId.getId())).thenReturn(5L);
 
         // 다른 룸에 이미 active
-        ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
+        ActivePartyroomDto activeRoomInfo = mock(ActivePartyroomDto.class);
         when(activeRoomInfo.id()).thenReturn(oldRoomId.getId());
-        when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activeRoomInfo));
+        when(partyroomInfoService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeRoomInfo));
 
         // exit() 호출 시 필요한 mock — 기존 룸 조회
         CrewData oldCrew = CrewData.builder()

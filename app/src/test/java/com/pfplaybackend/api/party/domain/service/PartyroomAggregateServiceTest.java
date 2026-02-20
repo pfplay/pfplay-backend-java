@@ -39,7 +39,6 @@ class PartyroomAggregateServiceTest {
                 .userId(new UserId())
                 .playlistId(new PlaylistId(1L))
                 .orderNumber(orderNumber)
-                .isQueued(true)
                 .build();
     }
 
@@ -48,7 +47,7 @@ class PartyroomAggregateServiceTest {
     class RemoveDjFromQueue {
 
         @Test
-        @DisplayName("대상 DJ를 dequeue하고 나머지 순서를 재배치한다")
+        @DisplayName("대상 DJ를 삭제하고 나머지 순서를 재배치한다")
         void removesTargetAndReorders() {
             // given
             CrewId targetCrewId = new CrewId(2L);
@@ -57,28 +56,29 @@ class PartyroomAggregateServiceTest {
             DjData dj3 = createDj(3L, new CrewId(3L), 3);
             List<DjData> djs = new ArrayList<>(List.of(dj1, dj2, dj3));
 
-            when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(10L)).thenReturn(djs);
+            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(djs);
 
             // when
             service.removeDjFromQueue(10L, targetCrewId);
 
             // then
-            assertThat(dj2.isQueued()).isFalse();
+            verify(djRepository).deleteAll(List.of(dj2));
             assertThat(dj1.getOrderNumber()).isEqualTo(1);
             assertThat(dj3.getOrderNumber()).isEqualTo(2);
-            verify(djRepository).saveAll(djs);
+            verify(djRepository).saveAll(List.of(dj1, dj3));
         }
 
         @Test
         @DisplayName("큐에 DJ가 없으면 아무 일도 하지 않는다")
         void emptyQueueDoesNothing() {
             // given
-            when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(10L)).thenReturn(Collections.emptyList());
+            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(Collections.emptyList());
 
             // when
             service.removeDjFromQueue(10L, new CrewId(1L));
 
             // then
+            verify(djRepository).deleteAll(Collections.emptyList());
             verify(djRepository).saveAll(Collections.emptyList());
         }
     }
@@ -96,15 +96,15 @@ class PartyroomAggregateServiceTest {
             DjData dj3 = createDj(3L, new CrewId(3L), 3);
             List<DjData> djs = new ArrayList<>(List.of(dj1, dj2, dj3));
 
-            when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(10L)).thenReturn(djs);
+            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(djs);
 
             // when
             service.rotateDjQueue(10L);
 
             // then
-            assertThat(dj1.getOrderNumber()).isEqualTo(3); // 1→마지막
-            assertThat(dj2.getOrderNumber()).isEqualTo(1); // 2→1
-            assertThat(dj3.getOrderNumber()).isEqualTo(2); // 3→2
+            assertThat(dj1.getOrderNumber()).isEqualTo(3); // 1->last
+            assertThat(dj2.getOrderNumber()).isEqualTo(1); // 2->1
+            assertThat(dj3.getOrderNumber()).isEqualTo(2); // 3->2
             verify(djRepository).saveAll(djs);
         }
     }
@@ -119,7 +119,7 @@ class PartyroomAggregateServiceTest {
             // given
             CrewId crewId = new CrewId(1L);
             DjData dj = createDj(1L, crewId, 1);
-            when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(10L)).thenReturn(List.of(dj));
+            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(List.of(dj));
 
             // when / then
             assertThat(service.isCurrentDj(10L, crewId)).isTrue();
@@ -132,7 +132,7 @@ class PartyroomAggregateServiceTest {
             CrewId crewId = new CrewId(2L);
             DjData dj1 = createDj(1L, new CrewId(1L), 1);
             DjData dj2 = createDj(2L, crewId, 2);
-            when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(10L)).thenReturn(List.of(dj1, dj2));
+            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(List.of(dj1, dj2));
 
             // when / then
             assertThat(service.isCurrentDj(10L, crewId)).isFalse();
@@ -142,7 +142,7 @@ class PartyroomAggregateServiceTest {
         @DisplayName("빈 큐에서는 현재 DJ가 없다")
         void emptyQueueHasNoCurrentDj() {
             // given
-            when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(10L)).thenReturn(Collections.emptyList());
+            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(Collections.emptyList());
 
             // when / then
             assertThat(service.isCurrentDj(10L, new CrewId(1L))).isFalse();
@@ -154,8 +154,8 @@ class PartyroomAggregateServiceTest {
     class DeactivatePlayback {
 
         @Test
-        @DisplayName("파티룸을 비활성화하고 모든 DJ를 dequeue한다")
-        void deactivatesAndDequeuseAll() {
+        @DisplayName("파티룸을 비활성화하고 모든 DJ를 삭제한다")
+        void deactivatesAndDeletesAll() {
             // given
             PartyroomData partyroom = PartyroomData.builder()
                     .id(10L)
@@ -167,17 +167,15 @@ class PartyroomAggregateServiceTest {
             DjData dj2 = createDj(2L, new CrewId(2L), 2);
             List<DjData> djs = new ArrayList<>(List.of(dj1, dj2));
 
-            when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(10L)).thenReturn(djs);
+            when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(10L)).thenReturn(djs);
 
             // when
             service.deactivatePlayback(partyroom);
 
             // then
             assertThat(partyroom.isPlaybackActivated()).isFalse();
-            assertThat(dj1.isQueued()).isFalse();
-            assertThat(dj2.isQueued()).isFalse();
             verify(partyroomRepository).save(partyroom);
-            verify(djRepository).saveAll(djs);
+            verify(djRepository).deleteAll(djs);
         }
     }
 
@@ -189,7 +187,7 @@ class PartyroomAggregateServiceTest {
         @DisplayName("큐에 DJ가 있으면 true를 반환한다")
         void returnsTrueWhenDjsExist() {
             // given
-            when(djRepository.existsByPartyroomDataIdAndIsQueuedTrue(10L)).thenReturn(true);
+            when(djRepository.existsByPartyroomDataId(10L)).thenReturn(true);
 
             // when / then
             assertThat(service.hasQueuedDjs(10L)).isTrue();
@@ -199,7 +197,7 @@ class PartyroomAggregateServiceTest {
         @DisplayName("큐에 DJ가 없으면 false를 반환한다")
         void returnsFalseWhenNoDjs() {
             // given
-            when(djRepository.existsByPartyroomDataIdAndIsQueuedTrue(10L)).thenReturn(false);
+            when(djRepository.existsByPartyroomDataId(10L)).thenReturn(false);
 
             // when / then
             assertThat(service.hasQueuedDjs(10L)).isFalse();

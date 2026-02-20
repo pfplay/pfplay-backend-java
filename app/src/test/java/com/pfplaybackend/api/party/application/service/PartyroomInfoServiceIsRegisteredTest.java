@@ -47,7 +47,7 @@ class PartyroomInfoServiceIsRegisteredTest {
     void isAlreadyRegistered_shouldReturnTrue_whenUserIsRegistered() {
         // given
         Long partyroomId = 1L;
-        when(djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId, myUserId))
+        when(djRepository.existsByPartyroomDataIdAndUserId(partyroomId, myUserId))
                 .thenReturn(true);
 
         // when
@@ -62,7 +62,7 @@ class PartyroomInfoServiceIsRegisteredTest {
     void isAlreadyRegistered_shouldReturnFalse_whenUserIsNotRegistered() {
         // given
         Long partyroomId = 1L;
-        when(djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId, myUserId))
+        when(djRepository.existsByPartyroomDataIdAndUserId(partyroomId, myUserId))
                 .thenReturn(false);
 
         // when

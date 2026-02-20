@@ -24,7 +24,7 @@ public class PlaybackData extends BaseEntity {
 
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "partroom_id")),
+            @AttributeOverride(name = "id", column = @Column(name = "partyroom_id")),
     })
     private PartyroomId partyroomId;
 

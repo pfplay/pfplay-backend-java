@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.application.service.cache;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -54,7 +54,7 @@ public class PartyroomSessionCacheManager implements SessionCachePort {
     }
 
     private Optional<PartyroomSessionDto> createSessionData(String sessionId, UserId userId) {
-        Optional<ActivePartyroomWithCrewDto> optional = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
+        Optional<ActivePartyroomDto> optional = partyroomInfoService.getMyActivePartyroom(userId);
         if (optional.isPresent()) {
             PartyroomId partyroomId = new PartyroomId(optional.get().id());
             long crewId = optional.get().crewId();

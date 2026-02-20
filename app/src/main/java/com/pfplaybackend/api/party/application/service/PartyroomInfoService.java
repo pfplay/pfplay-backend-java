@@ -5,7 +5,6 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
 import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
@@ -74,12 +73,12 @@ public class PartyroomInfoService {
     @Transactional(readOnly = true)
     public boolean isAlreadyRegistered(Long partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        return djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId, authContext.getUserId());
+        return djRepository.existsByPartyroomDataIdAndUserId(partyroomId, authContext.getUserId());
     }
 
     @Transactional(readOnly = true)
     public List<DjWithProfileDto> getDjs(Long partyroomId) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId);
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId);
         List<UserId> userIds = queuedDjs.stream().map(DjData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileQueryPort.getUsersProfileSetting(userIds);
 
@@ -104,11 +103,6 @@ public class PartyroomInfoService {
     @Transactional(readOnly = true)
     public Optional<ActivePartyroomDto> getMyActivePartyroom(UserId userId) {
         return partyroomRepository.getActivePartyroomByUserId(userId);
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewId(UserId userId) {
-        return partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(userId);
     }
 
     @Transactional(readOnly = true)
@@ -139,15 +133,15 @@ public class PartyroomInfoService {
     }
 
     @Transactional(readOnly = true)
-    public ActivePartyroomWithCrewDto getMyActivePartyroomWithCrewOrThrow(UserId userId) {
-        return getMyActivePartyroomWithCrewId(userId)
+    public ActivePartyroomDto getMyActivePartyroomOrThrow(UserId userId) {
+        return getMyActivePartyroom(userId)
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
     }
 
     @Transactional(readOnly = true)
     public CrewProfileSummaryResult getProfileSummaryByCrewId(Long crewId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        ActivePartyroomWithCrewDto activePartyroomDto = getMyActivePartyroomWithCrewId(authContext.getUserId())
+        ActivePartyroomDto activePartyroomDto = getMyActivePartyroom(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
         CrewData crew = crewRepository.findById(crewId)

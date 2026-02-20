@@ -11,5 +11,4 @@ public interface CrewRepository extends JpaRepository<CrewData, Long> {
     List<CrewData> findByPartyroomDataIdAndIsActiveTrue(Long partyroomId);
     Optional<CrewData> findByPartyroomDataIdAndUserId(Long partyroomId, UserId userId);
     long countByPartyroomDataIdAndIsActiveTrue(Long partyroomId);
-    List<CrewData> findByPartyroomDataId(Long partyroomId);
 }

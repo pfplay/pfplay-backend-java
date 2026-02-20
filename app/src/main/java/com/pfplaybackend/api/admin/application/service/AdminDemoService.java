@@ -315,13 +315,13 @@ public class AdminDemoService {
                 .orElseThrow();
 
         // Check if already registered
-        if (djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(loadedPartyroom.getId(), userId)) {
+        if (djRepository.existsByPartyroomDataIdAndUserId(loadedPartyroom.getId(), userId)) {
             log.warn("DJ already registered for user {}, skipping", userId.getUid());
             return;
         }
 
         // Calculate next order number
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(loadedPartyroom.getId());
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(loadedPartyroom.getId());
         int nextOrder = queuedDjs.size() + 1;
 
         // Create and save DJ
@@ -430,7 +430,7 @@ public class AdminDemoService {
                 .filter(p -> !p.isTerminated())
                 .map(p -> {
                     int crewCount = (int) crewRepository.countByPartyroomDataIdAndIsActiveTrue(p.getId());
-                    int djCount = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(p.getId()).size();
+                    int djCount = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(p.getId()).size();
                     return AdminPartyroomListResponse.PartyroomItem.builder()
                             .partyroomId(p.getId())
                             .stageType(p.getStageType().name())

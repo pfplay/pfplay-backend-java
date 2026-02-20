@@ -41,7 +41,7 @@ public class DjManagementService {
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
         boolean isPostActivationProcessingRequired = !partyroom.isPlaybackActivated();
-        boolean isAlreadyRegistered = djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId.getId(), authContext.getUserId());
+        boolean isAlreadyRegistered = djRepository.existsByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId());
         boolean isEmptyPlaylist = playlistQueryPort.isEmptyPlaylist(playlistId.getId());
         new DjEnqueueSpecification().validate(partyroom, isAlreadyRegistered, isEmptyPlaylist);
 
@@ -49,7 +49,7 @@ public class DjManagementService {
         CrewData crew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
 
         // Calculate next order number
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId());
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId.getId());
         int nextOrder = queuedDjs.size() + 1;
 
         // Create and save DJ

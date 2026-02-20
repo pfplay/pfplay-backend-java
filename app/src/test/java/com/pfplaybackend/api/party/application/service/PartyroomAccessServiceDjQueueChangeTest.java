@@ -83,7 +83,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
                 .crewId(new CrewId(1L))
                 .playlistId(new PlaylistId(10L))
                 .orderNumber(2)
-                .isQueued(true)
+
                 .build();
 
         PartyroomData partyroomData = PartyroomData.builder()
@@ -156,7 +156,7 @@ class PartyroomAccessServiceDjQueueChangeTest {
                 .crewId(new CrewId(2L))
                 .playlistId(new PlaylistId(10L))
                 .orderNumber(2)
-                .isQueued(true)
+
                 .build();
 
         PartyroomData partyroomData = PartyroomData.builder()

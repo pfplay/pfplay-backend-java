@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.auth.application.service;
 
 import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -29,7 +29,7 @@ public class LogoutService {
         }
 
         UserId userId = token.getUserId();
-        Optional<ActivePartyroomWithCrewDto> activePartyroom = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
+        Optional<ActivePartyroomDto> activePartyroom = partyroomInfoService.getMyActivePartyroom(userId);
 
         if (activePartyroom.isPresent()) {
             PartyroomId partyroomId = new PartyroomId(activePartyroom.get().id());

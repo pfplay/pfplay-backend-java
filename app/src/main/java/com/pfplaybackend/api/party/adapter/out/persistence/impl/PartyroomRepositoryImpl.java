@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.adapter.out.persistence.impl;
 
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackDto;
@@ -37,28 +36,6 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         qPartyroomData.id,
                         qPartyroomData.isPlaybackActivated,
                         qPartyroomData.isQueueClosed,
-                        qPartyroomData.currentPlaybackId
-                ))
-                .from(qCrewData)
-                .join(qCrewData.partyroomData, qPartyroomData)
-                .where(qCrewData.userId.eq(userId)
-                        .and(qCrewData.isActive.eq(true)))
-                .fetchOne();
-
-        return Optional.ofNullable(activePartyroomDto);
-    }
-
-    @Override
-    public Optional<ActivePartyroomWithCrewDto> getMyActivePartyroomWithCrewIdByUserId(UserId userId) {
-        QPartyroomData qPartyroomData = QPartyroomData.partyroomData;
-        QCrewData qCrewData = QCrewData.crewData;
-
-        ActivePartyroomWithCrewDto activePartyroomWithCrewDto = queryFactory
-                .select(Projections.constructor(
-                        ActivePartyroomWithCrewDto.class,
-                        qPartyroomData.id,
-                        qPartyroomData.isPlaybackActivated,
-                        qPartyroomData.isQueueClosed,
                         qPartyroomData.currentPlaybackId,
                         qCrewData.id.as("crewId")
                 ))
@@ -68,7 +45,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         .and(qCrewData.isActive.eq(true)))
                 .fetchOne();
 
-        return Optional.ofNullable(activePartyroomWithCrewDto);
+        return Optional.ofNullable(activePartyroomDto);
     }
 
     @Override

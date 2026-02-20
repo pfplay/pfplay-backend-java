@@ -9,10 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DjRepository extends JpaRepository<DjData, Long> {
-    List<DjData> findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(Long partyroomId);
+    List<DjData> findByPartyroomDataIdOrderByOrderNumberAsc(Long partyroomId);
     Optional<DjData> findByPartyroomDataIdAndCrewId(Long partyroomId, CrewId crewId);
     Optional<DjData> findByPartyroomDataIdAndUserId(Long partyroomId, UserId userId);
-    List<DjData> findByPartyroomDataId(Long partyroomId);
-    boolean existsByPartyroomDataIdAndIsQueuedTrue(Long partyroomId);
-    boolean existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(Long partyroomId, UserId userId);
+    boolean existsByPartyroomDataId(Long partyroomId);
+    boolean existsByPartyroomDataIdAndUserId(Long partyroomId, UserId userId);
 }

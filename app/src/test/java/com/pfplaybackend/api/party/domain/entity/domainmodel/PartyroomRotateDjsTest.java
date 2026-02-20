@@ -27,7 +27,7 @@ class PartyroomRotateDjsTest {
                 .crewId(new CrewId(crewId))
                 .playlistId(new PlaylistId(1L))
                 .orderNumber(orderNumber)
-                .isQueued(true)
+
                 .build();
     }
 

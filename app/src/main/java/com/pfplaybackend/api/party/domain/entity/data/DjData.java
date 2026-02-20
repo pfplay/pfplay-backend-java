@@ -52,22 +52,18 @@ public class DjData extends BaseEntity {
 
     private int orderNumber;
 
-    // Dj 대기열에서 삭제되었을 경우, 레코드 무효화
-    private boolean isQueued;
-
     // 데이터 엔티티 생성자
     public DjData() {
     }
 
     @Builder
-    public DjData(Long id, CrewId crewId, UserId userId, PlaylistId playlistId, int orderNumber, boolean isQueued,
+    public DjData(Long id, CrewId crewId, UserId userId, PlaylistId playlistId, int orderNumber,
                   LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.crewId = crewId;
         this.userId = userId;
         this.playlistId = playlistId;
         this.orderNumber = orderNumber;
-        this.isQueued = isQueued;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -85,7 +81,6 @@ public class DjData extends BaseEntity {
                 .userId(userId)
                 .crewId(crewId)
                 .orderNumber(orderNumber)
-                .isQueued(true)
                 .build();
         dj.assignPartyroomData(partyroomData);
         return dj;
@@ -93,10 +88,6 @@ public class DjData extends BaseEntity {
 
     public void updateOrderNumber(int orderNumber) {
         this.orderNumber = orderNumber;
-    }
-
-    public void applyDequeued() {
-        this.isQueued = false;
     }
 
     @Override

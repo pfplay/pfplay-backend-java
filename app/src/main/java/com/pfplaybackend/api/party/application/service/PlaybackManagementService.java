@@ -91,7 +91,7 @@ public class PlaybackManagementService {
     }
 
     public void start(PartyroomData partyroom) {
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroom.getId());
         int maxAttempts = queuedDjs.size();
         doStart(partyroom, maxAttempts);
     }
@@ -99,7 +99,7 @@ public class PlaybackManagementService {
     private void doStart(PartyroomData partyroom, int remainingAttempts) {
         partyroomAggregateService.rotateDjQueue(partyroom.getId());
 
-        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroom.getId());
+        List<DjData> queuedDjs = djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroom.getId());
         DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
         CrewData djCrew = partyroomInfoService.getCrewOrThrow(partyroom.getId(), nextDj.getUserId());
         PlaybackData nextPlayback = playbackInfoService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj);
@@ -127,7 +127,7 @@ public class PlaybackManagementService {
         // Propagation Websocket Event
         eventPublisher.publishEvent(new PlaybackStartedEvent(
                 partyroom.getPartyroomId(), djCrew.getId(),
-                new PlaybackDto(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(),
+                PlaybackDto.withEndTime(playbackData.getId(), playbackData.getLinkId(), playbackData.getName(),
                         playbackData.getDuration().toDisplayString(), playbackData.getThumbnailImage(), playbackData.getEndTime())));
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
     }

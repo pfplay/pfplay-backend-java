@@ -8,17 +8,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * DJ 큐 제거/순서 재배정 로직 테스트
- * Phase 2에서 PartyroomData → 서비스 레벨로 이동된 로직을 단위 테스트
+ * Phase 2에서 PartyroomData -> 서비스 레벨로 이동된 로직을 단위 테스트
  */
 class PartyroomDjQueueTest {
 
@@ -29,24 +27,22 @@ class PartyroomDjQueueTest {
                 .crewId(new CrewId(crewId))
                 .playlistId(new PlaylistId(1L))
                 .orderNumber(orderNumber)
-                .isQueued(true)
                 .build();
     }
 
     /**
-     * Service-level DJ queue removal logic (extracted from PartyroomData)
+     * Service-level DJ queue removal logic (hard-delete version)
+     * Returns the remaining DJs after removing the target.
      */
-    private void removeFromDjQueue(List<DjData> queuedDjs, CrewId crewId) {
-        AtomicInteger orderNumber = new AtomicInteger(1);
-        queuedDjs.stream()
-                .sorted(Comparator.comparingInt(DjData::getOrderNumber))
-                .forEach(dj -> {
-                    if (dj.getCrewId().equals(crewId)) {
-                        dj.applyDequeued();
-                    } else {
-                        dj.updateOrderNumber(orderNumber.getAndIncrement());
-                    }
-                });
+    private List<DjData> removeFromDjQueue(List<DjData> queuedDjs, CrewId crewId) {
+        List<DjData> remaining = queuedDjs.stream()
+                .filter(dj -> !dj.getCrewId().equals(crewId))
+                .toList();
+        int order = 1;
+        for (DjData dj : remaining) {
+            dj.updateOrderNumber(order++);
+        }
+        return remaining;
     }
 
     @Test
@@ -60,16 +56,15 @@ class PartyroomDjQueueTest {
         List<DjData> djList = new ArrayList<>(List.of(dj1, dj2, dj3));
 
         // when
-        removeFromDjQueue(djList, new CrewId(2L));
+        List<DjData> remaining = removeFromDjQueue(djList, new CrewId(2L));
 
         // then
-        Map<Long, Integer> orderMap = djList.stream()
-                .filter(DjData::isQueued)
+        Map<Long, Integer> orderMap = remaining.stream()
                 .collect(Collectors.toMap(dj -> dj.getCrewId().getId(), DjData::getOrderNumber));
 
         assertThat(orderMap).hasSize(2);
         assertThat(orderMap.get(1L)).isEqualTo(1);
-        assertThat(orderMap.get(3L)).isEqualTo(2); // 3번이 2번으로 당겨져야 함
+        assertThat(orderMap.get(3L)).isEqualTo(2);
     }
 
     @Test
@@ -83,11 +78,10 @@ class PartyroomDjQueueTest {
         List<DjData> djList = new ArrayList<>(List.of(dj1, dj2, dj3));
 
         // when
-        removeFromDjQueue(djList, new CrewId(1L));
+        List<DjData> remaining = removeFromDjQueue(djList, new CrewId(1L));
 
         // then
-        Map<Long, Integer> orderMap = djList.stream()
-                .filter(DjData::isQueued)
+        Map<Long, Integer> orderMap = remaining.stream()
                 .collect(Collectors.toMap(dj -> dj.getCrewId().getId(), DjData::getOrderNumber));
 
         assertThat(orderMap).hasSize(2);

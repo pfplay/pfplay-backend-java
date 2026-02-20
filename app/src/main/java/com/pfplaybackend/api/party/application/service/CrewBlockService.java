@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.result.BlockedCrewResult;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewBlockHistoryData;
@@ -37,7 +37,7 @@ public class CrewBlockService {
 
     public List<BlockedCrewResult> getBlocks() {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        ActivePartyroomWithCrewDto dto = partyroomInfoService.getMyActivePartyroomWithCrewOrThrow(authContext.getUserId());
+        ActivePartyroomDto dto = partyroomInfoService.getMyActivePartyroomOrThrow(authContext.getUserId());
 
         List<CrewBlockHistoryData> historyDataList = blockHistoryRepository.findAllByBlockerCrewIdAndUnblockedIsFalse(new CrewId(dto.crewId()));
         Map<UserId, ProfileSettingDto> map = userProfileService.getUsersProfileSetting(historyDataList.stream().map(CrewBlockHistoryData::getBlockedUserId).toList());
@@ -48,7 +48,7 @@ public class CrewBlockService {
     @Transactional
     public void addBlock(AddBlockRequest request) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        ActivePartyroomWithCrewDto dto = partyroomInfoService.getMyActivePartyroomWithCrewOrThrow(authContext.getUserId());
+        ActivePartyroomDto dto = partyroomInfoService.getMyActivePartyroomOrThrow(authContext.getUserId());
 
         CrewId blockerCrewId = new CrewId(dto.crewId());
         CrewId blockedCrewId = new CrewId(request.getCrewId());
@@ -72,7 +72,7 @@ public class CrewBlockService {
     @Transactional
     public void removeBlock(Long blockId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        ActivePartyroomWithCrewDto dto = partyroomInfoService.getMyActivePartyroomWithCrewOrThrow(authContext.getUserId());
+        ActivePartyroomDto dto = partyroomInfoService.getMyActivePartyroomOrThrow(authContext.getUserId());
 
         CrewId blockerCrewId = new CrewId(dto.crewId());
         CrewBlockHistoryData historyData  = blockHistoryRepository.findByIdAndBlockerCrewIdAndUnblockedIsFalse(blockId, blockerCrewId)

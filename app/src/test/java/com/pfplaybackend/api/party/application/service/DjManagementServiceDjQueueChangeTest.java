@@ -86,9 +86,9 @@ class DjManagementServiceDjQueueChangeTest {
 
         when(partyroomInfoService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
-        when(djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId.getId(), userId)).thenReturn(false);
+        when(djRepository.existsByPartyroomDataIdAndUserId(partyroomId.getId(), userId)).thenReturn(false);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
-        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
+        when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId.getId())).thenReturn(Collections.emptyList());
         when(partyroomRepository.save(any(PartyroomData.class))).thenReturn(partyroomData);
 
         // when
@@ -116,7 +116,7 @@ class DjManagementServiceDjQueueChangeTest {
                 .crewId(new CrewId(1L))
                 .playlistId(new PlaylistId(10L))
                 .orderNumber(2)
-                .isQueued(true)
+
                 .build();
 
         PartyroomData partyroomData = PartyroomData.builder()
@@ -157,7 +157,7 @@ class DjManagementServiceDjQueueChangeTest {
                 .crewId(new CrewId(1L))
                 .playlistId(new PlaylistId(10L))
                 .orderNumber(1)
-                .isQueued(true)
+
                 .build();
 
         PartyroomData partyroomData = PartyroomData.builder()
@@ -194,7 +194,7 @@ class DjManagementServiceDjQueueChangeTest {
                 .crewId(new CrewId(2L))
                 .playlistId(new PlaylistId(10L))
                 .orderNumber(2)
-                .isQueued(true)
+
                 .build();
 
         PartyroomData partyroomData = PartyroomData.builder()

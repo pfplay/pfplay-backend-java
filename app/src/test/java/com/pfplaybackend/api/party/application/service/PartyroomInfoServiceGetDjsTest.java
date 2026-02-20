@@ -33,14 +33,13 @@ class PartyroomInfoServiceGetDjsTest {
     @Mock private DjRepository djRepository;
     @InjectMocks private PartyroomInfoService partyroomInfoService;
 
-    private DjData createDj(long crewId, int orderNumber, boolean isQueued, UserId userId) {
+    private DjData createDj(long crewId, int orderNumber, UserId userId) {
         return DjData.builder()
                 .id(crewId * 100)
                 .userId(userId)
                 .crewId(new CrewId(crewId))
                 .playlistId(new PlaylistId(1L))
                 .orderNumber(orderNumber)
-                .isQueued(isQueued)
                 .build();
     }
 
@@ -58,12 +57,12 @@ class PartyroomInfoServiceGetDjsTest {
         UserId user1 = new UserId();
         UserId user3 = new UserId();
 
-        DjData queuedDj1 = createDj(1L, 1, true, user1);
-        DjData queuedDj2 = createDj(3L, 2, true, user3);
+        DjData queuedDj1 = createDj(1L, 1, user1);
+        DjData queuedDj2 = createDj(3L, 2, user3);
 
         Long partyroomId = 1L;
         // Only queued DJs are returned by the repository
-        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId))
+        when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId))
                 .thenReturn(List.of(queuedDj1, queuedDj2));
 
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
@@ -87,13 +86,13 @@ class PartyroomInfoServiceGetDjsTest {
         UserId user2 = new UserId();
         UserId user3 = new UserId();
 
-        DjData dj1 = createDj(1L, 1, true, user1);
-        DjData dj2 = createDj(2L, 2, true, user2);
-        DjData dj3 = createDj(3L, 3, true, user3);
+        DjData dj1 = createDj(1L, 1, user1);
+        DjData dj2 = createDj(2L, 2, user2);
+        DjData dj3 = createDj(3L, 3, user3);
 
         Long partyroomId = 1L;
         // Repository returns in order
-        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId))
+        when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId))
                 .thenReturn(List.of(dj1, dj2, dj3));
 
         Map<UserId, ProfileSettingDto> profileMap = new HashMap<>();
@@ -118,7 +117,7 @@ class PartyroomInfoServiceGetDjsTest {
         // given
         Long partyroomId = 1L;
         // Repository returns empty for all dequeued
-        when(djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId))
+        when(djRepository.findByPartyroomDataIdOrderByOrderNumberAsc(partyroomId))
                 .thenReturn(List.of());
 
         when(userProfileQueryPort.getUsersProfileSetting(anyList())).thenReturn(new HashMap<>());

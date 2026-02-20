@@ -8,10 +8,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class PlaybackDtoTest {
 
     @Test
-    @DisplayName("6인자 생성자로 생성 시 반응 수가 0으로 초기화되어야 한다")
-    void sixArgConstructor_shouldInitializeReactionCountsToZero() {
+    @DisplayName("withEndTime 팩토리로 생성 시 반응 수가 0으로 초기화되어야 한다")
+    void withEndTime_shouldInitializeReactionCountsToZero() {
         // when
-        PlaybackDto dto = new PlaybackDto(1L, "linkId", "name", "3:45", "thumb.jpg", 123456789L);
+        PlaybackDto dto = PlaybackDto.withEndTime(1L, "linkId", "name", "3:45", "thumb.jpg", 123456789L);
 
         // then
         assertThat(dto.getLikeCount()).isZero();

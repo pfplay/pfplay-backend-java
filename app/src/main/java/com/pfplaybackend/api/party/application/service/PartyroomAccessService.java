@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -63,14 +63,14 @@ public class PartyroomAccessService {
         new PartyroomEntrySpecification().validate(partyroom, activeCrewCount, existingCrew);
 
         // Validate Crew Condition
-        Optional<ActivePartyroomWithCrewDto> optActiveRoomInfo = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
+        Optional<ActivePartyroomDto> optActiveRoomInfo = partyroomInfoService.getMyActivePartyroom(userId);
         log.info("[tryEnter] Active room check - userId={}, hasActiveRoom={}, activeRoomId={}",
                 userId,
                 optActiveRoomInfo.isPresent(),
-                optActiveRoomInfo.map(ActivePartyroomWithCrewDto::id).orElse(null));
+                optActiveRoomInfo.map(ActivePartyroomDto::id).orElse(null));
 
         if (optActiveRoomInfo.isPresent()) {
-            ActivePartyroomWithCrewDto activeRoomInfo = optActiveRoomInfo.get();
+            ActivePartyroomDto activeRoomInfo = optActiveRoomInfo.get();
             if(!partyroomId.equals(new PartyroomId(activeRoomInfo.id()))) {
                 log.info("[tryEnter] Auto-exit from another room - userId={}, exitingRoomId={}, enteringRoomId={}",
                         userId, activeRoomInfo.id(), partyroomId.getId());
@@ -152,7 +152,7 @@ public class PartyroomAccessService {
 
     private void handleDjQueueOnLeave(PartyroomData partyroom, CrewId crewId) {
         boolean wasInDjQueue = djRepository.findByPartyroomDataIdAndCrewId(partyroom.getId(), crewId)
-                .map(DjData::isQueued).orElse(false);
+                .isPresent();
         boolean wasCurrentDj = partyroom.isPlaybackActivated() && wasInDjQueue
                 && partyroomAggregateService.isCurrentDj(partyroom.getId(), crewId);
 
