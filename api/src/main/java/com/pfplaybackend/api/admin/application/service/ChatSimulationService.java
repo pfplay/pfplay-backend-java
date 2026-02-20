@@ -239,18 +239,11 @@ public class ChatSimulationService {
     }
 
     private void sendChatMessage(Long partyroomId, Long crewId, String content) {
-        Map<String, Object> crew = new HashMap<>();
-        crew.put("crewId", crewId);
-
-        Map<String, Object> message = new HashMap<>();
-        message.put("messageId", System.currentTimeMillis() + ":" + crewId);
-        message.put("content", content);
-
         OutgoingGroupChatMessage chatMessage = new OutgoingGroupChatMessage(
                 new PartyroomId(partyroomId),
                 MessageTopic.CHAT,
-                crew,
-                message
+                new OutgoingGroupChatMessage.CrewInfo(crewId),
+                new OutgoingGroupChatMessage.ChatContent(System.currentTimeMillis() + ":" + crewId, content)
         );
 
         messagePublisher.publish(MessageTopic.CHAT.topic(), chatMessage);

@@ -55,7 +55,7 @@ public class PlaybackInfoService {
             Map<UserId, ProfileSettingDto> dtoMap = userProfileQueryPort.getUsersProfileSetting(userIds);
             return playbackDataList.stream().map(playbackData -> {
                 ProfileSettingDto dto = dtoMap.get(playbackData.getUserId());
-                return new PlaybackHistoryDto(playbackData.getName(), dto.getNickname(),  dto.getAvatarIconUri());
+                return new PlaybackHistoryDto(playbackData.getName(), dto.nickname(),  dto.avatarIconUri());
             }).toList();
         }
     }

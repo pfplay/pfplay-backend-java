@@ -27,19 +27,19 @@ public class MyProfileSummaryResponse {
 
     public static MyProfileSummaryResponse from(ProfileSummaryDto profileSummaryDto) {
         return MyProfileSummaryResponse.builder()
-                .nickname(profileSummaryDto.getNickname())
-                .introduction(profileSummaryDto.getIntroduction())
-                .avatarBodyUri(profileSummaryDto.getAvatarBodyUri())
-                .avatarCompositionType(profileSummaryDto.getAvatarCompositionType())
-                .combinePositionX(profileSummaryDto.getCombinePositionX())
-                .combinePositionY(profileSummaryDto.getCombinePositionY())
-                .offsetX(profileSummaryDto.getOffsetX())
-                .offsetY(profileSummaryDto.getOffsetY())
-                .scale(profileSummaryDto.getScale())
-                .avatarFaceUri(profileSummaryDto.getAvatarFaceUri())
-                .avatarIconUri(profileSummaryDto.getAvatarIconUri())
-                .walletAddress(profileSummaryDto.getWalletAddress())
-                .activitySummaries(profileSummaryDto.getActivitySummaries())
+                .nickname(profileSummaryDto.nickname())
+                .introduction(profileSummaryDto.introduction())
+                .avatarBodyUri(profileSummaryDto.avatarBodyUri())
+                .avatarCompositionType(profileSummaryDto.avatarCompositionType())
+                .combinePositionX(profileSummaryDto.combinePositionX())
+                .combinePositionY(profileSummaryDto.combinePositionY())
+                .offsetX(profileSummaryDto.offsetX())
+                .offsetY(profileSummaryDto.offsetY())
+                .scale(profileSummaryDto.scale())
+                .avatarFaceUri(profileSummaryDto.avatarFaceUri())
+                .avatarIconUri(profileSummaryDto.avatarIconUri())
+                .walletAddress(profileSummaryDto.walletAddress())
+                .activitySummaries(profileSummaryDto.activitySummaries())
                 .build();
     }
 }

@@ -1,17 +1,11 @@
 package com.pfplaybackend.api.party.application.dto.playback;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.util.Map;
 
-@Data
-@AllArgsConstructor
-public class ReactionDto {
-    private Map<String, Boolean> history;
-    private AggregationDto aggregation;
-    // private Map<String, List<Long>> motion;
-
+public record ReactionDto(
+        Map<String, Boolean> history,
+        AggregationDto aggregation
+) {
     public static ReactionDto from(Map<String, Boolean> history, AggregationDto aggregation) {
         return new ReactionDto(history, aggregation);
     }

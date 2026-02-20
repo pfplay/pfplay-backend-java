@@ -1,16 +1,10 @@
 package com.pfplaybackend.api.party.application.dto.playback;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class PlaybackTrackDto {
-    private String linkId;
-    private String name;
-    private String thumbnailImage;
-    private String duration;
-    private int orderNumber;
+public record PlaybackTrackDto(
+        String linkId,
+        String name,
+        String thumbnailImage,
+        String duration,
+        int orderNumber
+) {
 }

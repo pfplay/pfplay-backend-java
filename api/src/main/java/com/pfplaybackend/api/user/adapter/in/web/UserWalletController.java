@@ -37,16 +37,13 @@ public class UserWalletController {
     @PutMapping("/me/profile/wallet")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<?> updateMyWallet(@RequestBody UpdateMyWalletRequest request, HttpServletResponse response) {
-        MemberData member = userWalletService.updateMyWalletAddress(UpdateWalletCommand.builder()
-                .walletAddress(request.getWalletAddress())
-                .build()
-        );
-        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder()
-                .uid(member.getUserId().getUid().toString())
-                .email(member.getEmail())
-                .accessLevel(AccessLevel.ROLE_MEMBER)
-                .authorityTier(member.getAuthorityTier())
-                .build()));
+        MemberData member = userWalletService.updateMyWalletAddress(new UpdateWalletCommand(request.getWalletAddress()));
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(new TokenClaimsRequest(
+                member.getUserId().getUid().toString(),
+                member.getEmail(),
+                AccessLevel.ROLE_MEMBER,
+                member.getAuthorityTier()
+        )));
 
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));

@@ -4,40 +4,30 @@ import com.pfplaybackend.api.party.domain.enums.PenaltyType;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-public class CrewPenaltyMessage implements Serializable {
-    private PartyroomId partyroomId;
-    private MessageTopic eventType;
-    private PenaltyType penaltyType;
-    private String detail;
-    private Map<String, Object> punisher;
-    private Map<String, Object> punished;
+public record CrewPenaltyMessage(
+        PartyroomId partyroomId,
+        MessageTopic eventType,
+        PenaltyType penaltyType,
+        String detail,
+        PunisherInfo punisher,
+        PunishedInfo punished
+) implements Serializable, GroupBroadcastMessage {
+
+    public record PunisherInfo(long crewId) {}
+    public record PunishedInfo(long crewId) {}
 
     public static CrewPenaltyMessage from(PartyroomId partyroomId,
                                         CrewId punisherCrewId, CrewId punishedCrewId, String detail, PenaltyType penaltyType) {
-        Map<String, Object> punisher = new HashMap<>();
-        punisher.put("crewId", punisherCrewId.getId());
-
-        Map<String, Object> punished = new HashMap<>();
-        punished.put("crewId", punishedCrewId.getId());
-
         return new CrewPenaltyMessage(
                 partyroomId,
                 MessageTopic.CREW_PENALTY,
                 penaltyType,
                 detail,
-                punisher,
-                punished
+                new PunisherInfo(punisherCrewId.getId()),
+                new PunishedInfo(punishedCrewId.getId())
         );
     }
 }

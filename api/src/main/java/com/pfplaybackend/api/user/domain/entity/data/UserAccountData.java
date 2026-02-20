@@ -54,26 +54,28 @@ public abstract class UserAccountData extends BaseEntity {
 
     public abstract boolean isGuest();
 
-    protected ProfileSummaryDto.ProfileSummaryDtoBuilder buildBaseProfileSummary() {
+    protected ProfileSummaryDto buildProfileSummary(java.util.List<com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto> activitySummaries) {
         var bio = this.profileData.getBio();
         var avatar = this.profileData.getAvatarSetting();
-        return ProfileSummaryDto.builder()
-                .nickname(bio != null ? bio.getNicknameValue() : null)
-                .introduction(bio != null ? bio.getIntroduction() : null)
-                .avatarBodyUri(avatar.getAvatarBodyUri().getAvatarBodyUri())
-                .avatarFaceUri(avatar.getAvatarFaceUri().getAvatarFaceUri())
-                .avatarIconUri(avatar.getAvatarIconUri().getAvatarIconUri())
-                .avatarCompositionType(avatar.getAvatarCompositionType())
-                .combinePositionX(avatar.getCombinePositionX())
-                .combinePositionY(avatar.getCombinePositionY())
-                .offsetX(avatar.getOffsetX())
-                .offsetY(avatar.getOffsetY())
-                .scale(avatar.getScale())
-                .walletAddress(this.profileData.getWalletAddress().getWalletAddress());
+        return new ProfileSummaryDto(
+                bio != null ? bio.getNicknameValue() : null,
+                bio != null ? bio.getIntroduction() : null,
+                avatar.getAvatarBodyUri().getAvatarBodyUri(),
+                avatar.getAvatarCompositionType(),
+                avatar.getCombinePositionX(),
+                avatar.getCombinePositionY(),
+                avatar.getOffsetX(),
+                avatar.getOffsetY(),
+                avatar.getScale(),
+                avatar.getAvatarFaceUri().getAvatarFaceUri(),
+                avatar.getAvatarIconUri().getAvatarIconUri(),
+                this.profileData.getWalletAddress().getWalletAddress(),
+                activitySummaries
+        );
     }
 
     public ProfileSummaryDto getProfileSummary() {
-        return buildBaseProfileSummary().build();
+        return buildProfileSummary(java.util.List.of());
     }
 
     public String getEmail() {

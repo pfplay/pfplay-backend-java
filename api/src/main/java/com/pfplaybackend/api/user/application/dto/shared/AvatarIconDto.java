@@ -1,13 +1,3 @@
 package com.pfplaybackend.api.user.application.dto.shared;
 
-import lombok.Builder;
-import lombok.Data;
-
-@Data
-@Builder
-public class AvatarIconDto {
-    private final long id;
-    private final String name;
-    private final String resourceUri;
-    private final boolean isAvailable;
-}
+public record AvatarIconDto(long id, String name, String resourceUri, boolean isAvailable) {}

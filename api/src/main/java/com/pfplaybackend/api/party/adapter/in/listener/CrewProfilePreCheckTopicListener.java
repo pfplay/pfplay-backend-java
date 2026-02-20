@@ -22,7 +22,7 @@ public class CrewProfilePreCheckTopicListener implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             CrewProfilePreCheckMessage deserialized = objectMapper.readValue(new String(message.getBody()), CrewProfilePreCheckMessage.class);
-            String suffixId = deserialized.getUserId().getUid().toString();
+            String suffixId = deserialized.userId().getUid().toString();
             distributedLockExecutor.performTaskWithLock(suffixId, () -> {
                 crewProfileService.preCheck(deserialized);
                 return null;

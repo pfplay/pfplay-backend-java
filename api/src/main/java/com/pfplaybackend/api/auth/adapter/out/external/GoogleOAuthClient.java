@@ -76,18 +76,18 @@ public class GoogleOAuthClient {
                 )
                 .bodyToMono(GoogleUserInfo.class)
                 .map(this::mapToUserProfile)
-                .doOnSuccess(profile -> log.debug("Successfully fetched Google user profile: {}", profile.getEmail()))
+                .doOnSuccess(profile -> log.debug("Successfully fetched Google user profile: {}", profile.email()))
                 .doOnError(error -> log.error("Error fetching Google user profile", error))
                 .block();
     }
 
     private OAuthUserProfile mapToUserProfile(GoogleUserInfo googleUser) {
-        return OAuthUserProfile.builder()
-                .id(googleUser.getId())
-                .email(googleUser.getEmail())
-                .name(googleUser.getName())
-                .picture(googleUser.getPicture())
-                .build();
+        return new OAuthUserProfile(
+                googleUser.getId(),
+                googleUser.getEmail(),
+                googleUser.getName(),
+                googleUser.getPicture()
+        );
     }
 
     @Data

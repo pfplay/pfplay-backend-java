@@ -46,20 +46,20 @@ public class AuthService {
             // 2. Get user profile from OAuth provider
             var userProfile = oAuthClientService.getUserProfile(
                     provider,
-                    tokenResponse.getAccessToken()
+                    tokenResponse.accessToken()
             );
 
             // 3. Get or Create Member
             ProviderType providerType = ProviderType.valueOf(provider.name());
-            MemberData member = memberSignService.getMemberOrCreate(userProfile.getEmail(), providerType);
+            MemberData member = memberSignService.getMemberOrCreate(userProfile.email(), providerType);
 
             // 4. Generate JWT tokens
-            String accessToken = jwtService.generateAccessToken(TokenClaimsRequest.builder()
-                    .uid(member.getUserId().getUid().toString())
-                    .email(member.getEmail())
-                    .accessLevel(AccessLevel.ROLE_MEMBER)
-                    .authorityTier(member.getAuthorityTier())
-                    .build());
+            String accessToken = jwtService.generateAccessToken(new TokenClaimsRequest(
+                    member.getUserId().getUid().toString(),
+                    member.getEmail(),
+                    AccessLevel.ROLE_MEMBER,
+                    member.getAuthorityTier()
+            ));
 
             // 5. Build response
             return AuthResponse.builder()

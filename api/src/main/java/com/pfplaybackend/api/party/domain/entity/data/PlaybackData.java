@@ -76,14 +76,14 @@ public class PlaybackData extends BaseEntity {
     // ── Factory Method ──
 
     public static PlaybackData create(PartyroomId partyroomId, UserId userId, PlaybackTrackDto trackDto) {
-        Duration dur = Duration.fromString(trackDto.getDuration());
+        Duration dur = Duration.fromString(trackDto.duration());
         return PlaybackData.builder()
                 .partyroomId(partyroomId)
                 .userId(userId)
-                .name(trackDto.getName())
+                .name(trackDto.name())
                 .duration(dur)
-                .linkId(trackDto.getLinkId())
-                .thumbnailImage(trackDto.getThumbnailImage())
+                .linkId(trackDto.linkId())
+                .thumbnailImage(trackDto.thumbnailImage())
                 .grabCount(0)
                 .likeCount(0)
                 .dislikeCount(0)

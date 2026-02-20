@@ -72,14 +72,14 @@ public class PartyroomAccessService {
         log.info("[tryEnter] Active room check - userId={}, hasActiveRoom={}, activeRoomId={}",
                 userId,
                 optActiveRoomInfo.isPresent(),
-                optActiveRoomInfo.map(ActivePartyroomWithCrewDto::getId).orElse(null));
+                optActiveRoomInfo.map(ActivePartyroomWithCrewDto::id).orElse(null));
 
         if (optActiveRoomInfo.isPresent()) {
             ActivePartyroomWithCrewDto activeRoomInfo = optActiveRoomInfo.get();
-            if(!partyroomId.equals(new PartyroomId(activeRoomInfo.getId()))) {
+            if(!partyroomId.equals(new PartyroomId(activeRoomInfo.id()))) {
                 log.info("[tryEnter] Auto-exit from another room - userId={}, exitingRoomId={}, enteringRoomId={}",
-                        userId, activeRoomInfo.getId(), partyroomId.getId());
-                exit(new PartyroomId(activeRoomInfo.getId()));
+                        userId, activeRoomInfo.id(), partyroomId.getId());
+                exit(new PartyroomId(activeRoomInfo.id()));
             } else {
                 log.info("[tryEnter] Same room re-entry - userId={}, partyroomId={}", userId, partyroomId.getId());
                 CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), userId)

@@ -41,7 +41,7 @@ public class PartyroomChatService {
         if (object instanceof Map) {
             try {
                 PartyroomSessionDto sessionDto = objectMapper.convertValue(object, PartyroomSessionDto.class);
-                if(isPossibleChat(sessionDto.getCrewId())) {
+                if(isPossibleChat(sessionDto.crewId())) {
                     OutgoingGroupChatMessage outgoingGroupChatMessage = OutgoingGroupChatMessage.from(sessionDto, incomingGroupChatMessage.getContent());
                     messagePublisher.publish(MessageTopic.CHAT.topic(), outgoingGroupChatMessage);
                 }

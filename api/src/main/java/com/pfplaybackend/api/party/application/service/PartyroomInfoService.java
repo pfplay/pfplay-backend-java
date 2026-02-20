@@ -47,8 +47,8 @@ public class PartyroomInfoService {
     @Transactional(readOnly = true)
     public List<PartyroomWithCrewDto> getAllPartyrooms() {
         return partyroomRepository.getCrewDataByPartyroomId().stream().map(partyroomWithCrewDto -> {
-            List<CrewDto> filteredCrews = partyroomWithCrewDto.getCrews().stream()
-                                .filter(crewDto -> crewDto.getGradeType().isEqualOrHigherThan(GradeType.MODERATOR))
+            List<CrewDto> filteredCrews = partyroomWithCrewDto.crews().stream()
+                                .filter(crewDto -> crewDto.gradeType().isEqualOrHigherThan(GradeType.MODERATOR))
                                 .limit(3)
                                 .toList();
             return PartyroomWithCrewDto.from(partyroomWithCrewDto, filteredCrews);
@@ -58,11 +58,11 @@ public class PartyroomInfoService {
     @Transactional(readOnly = true)
     public Map<UserId, ProfileSettingDto> getPrimariesAvatarSettings(List<PartyroomWithCrewDto> partyrooms) {
         List<UserId> primaryUserIds = partyrooms.stream().collect(Collectors.toMap(
-                        PartyroomWithCrewDto::getPartyroomId,
-                        partyroomWithCrewDto -> partyroomWithCrewDto.getCrews().stream().toList()
+                        PartyroomWithCrewDto::partyroomId,
+                        partyroomWithCrewDto -> partyroomWithCrewDto.crews().stream().toList()
                 )).values().stream()
                 .flatMap(List::stream)
-                .map(CrewDto::getUserId).toList();
+                .map(CrewDto::userId).toList();
         return userProfileQueryPort.getUsersProfileSetting(primaryUserIds);
     }
 
@@ -103,8 +103,8 @@ public class PartyroomInfoService {
             return new DjWithProfileDto(
                     dj.getCrewId().getId(),
                     dj.getOrderNumber(),
-                    profileSettingDto.getNickname(),
-                    profileSettingDto.getAvatarIconUri()
+                    profileSettingDto.nickname(),
+                    profileSettingDto.avatarIconUri()
             );
         }).toList();
     }

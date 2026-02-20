@@ -1,17 +1,5 @@
 package com.pfplaybackend.api.party.application.dto.partyroom;
 
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Getter
-@AllArgsConstructor
-@NoArgsConstructor
-public class ActivePartyroomWithCrewDto {
-    private Long id;
-    private boolean isPlaybackActivated;
-    private boolean isQueueClosed;
-    private PlaybackId currentPlaybackId;
-    private Long crewId;
-}
+public record ActivePartyroomWithCrewDto(Long id, boolean isPlaybackActivated, boolean isQueueClosed, PlaybackId currentPlaybackId, Long crewId) {}

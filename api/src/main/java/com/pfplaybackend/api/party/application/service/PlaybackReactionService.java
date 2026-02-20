@@ -41,7 +41,7 @@ public class PlaybackReactionService {
         }
 
         ActivePartyroomDto myActivePartyroom = partyroomInfoService.getMyActivePartyroom().orElseThrow();
-        PlaybackId playbackId = myActivePartyroom.getCurrentPlaybackId();
+        PlaybackId playbackId = myActivePartyroom.currentPlaybackId();
         PlaybackReactionHistoryData historyData = getValidReactionHistoryData(authContext, playbackId);
         ReactionState existingState = getExistingState(historyData);
         ReactionState targetState = getTargetState(existingState, reactionType);

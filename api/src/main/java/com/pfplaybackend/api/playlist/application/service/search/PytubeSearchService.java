@@ -48,15 +48,15 @@ public class PytubeSearchService implements YoutubeSearchService {
                 uri, HttpMethod.GET, entity, SearchResultDto.class);
 
         SearchResultDto result = response.getBody();
-        if (result != null && result.getData() != null) {
-            result = SearchResultDto.builder()
-                    .message(result.getMessage())
-                    .data(result.getData().stream()
-                            .filter(music -> music.getRunning_time() != null
-                                    && !music.getRunning_time().isBlank()
-                                    && !music.getRunning_time().equals("0"))
-                            .toList())
-                    .build();
+        if (result != null && result.data() != null) {
+            result = new SearchResultDto(
+                    result.message(),
+                    result.data().stream()
+                            .filter(music -> music.running_time() != null
+                                    && !music.running_time().isBlank()
+                                    && !music.running_time().equals("0"))
+                            .toList()
+            );
         }
         return result;
     }

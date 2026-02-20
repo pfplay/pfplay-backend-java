@@ -17,11 +17,11 @@ public class SearchMusicResponse {
 
     public static SearchMusicResponse from(SearchResultDto searchMusicResultDto) {
         return SearchMusicResponse.builder()
-                .musicList(searchMusicResultDto.getData().stream().map(it -> MusicData.builder()
-                        .videoId(it.getVideo_id())
-                        .videoTitle(it.getVideo_title())
-                        .runningTime(it.getRunning_time())
-                        .thumbnailUrl(it.getThumbnail_url())
+                .musicList(searchMusicResultDto.data().stream().map(it -> MusicData.builder()
+                        .videoId(it.video_id())
+                        .videoTitle(it.video_title())
+                        .runningTime(it.running_time())
+                        .thumbnailUrl(it.thumbnail_url())
                         .build()).toList())
                 .build();
     }

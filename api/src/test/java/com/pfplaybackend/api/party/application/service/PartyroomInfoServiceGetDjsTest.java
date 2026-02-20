@@ -46,8 +46,8 @@ class PartyroomInfoServiceGetDjsTest {
 
     private ProfileSettingDto mockProfile(String nickname, String iconUri) {
         ProfileSettingDto dto = mock(ProfileSettingDto.class);
-        when(dto.getNickname()).thenReturn(nickname);
-        when(dto.getAvatarIconUri()).thenReturn(iconUri);
+        when(dto.nickname()).thenReturn(nickname);
+        when(dto.avatarIconUri()).thenReturn(iconUri);
         return dto;
     }
 
@@ -76,7 +76,7 @@ class PartyroomInfoServiceGetDjsTest {
 
         // then
         assertThat(result).hasSize(2);
-        assertThat(result).noneMatch(dto -> dto.getCrewId() == 2L);
+        assertThat(result).noneMatch(dto -> dto.crewId() == 2L);
     }
 
     @Test
@@ -107,9 +107,9 @@ class PartyroomInfoServiceGetDjsTest {
 
         // then
         assertThat(result).hasSize(3);
-        assertThat(result.get(0).getOrderNumber()).isEqualTo(1);
-        assertThat(result.get(1).getOrderNumber()).isEqualTo(2);
-        assertThat(result.get(2).getOrderNumber()).isEqualTo(3);
+        assertThat(result.get(0).orderNumber()).isEqualTo(1);
+        assertThat(result.get(1).orderNumber()).isEqualTo(2);
+        assertThat(result.get(2).orderNumber()).isEqualTo(3);
     }
 
     @Test

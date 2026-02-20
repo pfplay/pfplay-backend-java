@@ -17,13 +17,13 @@ public class QueryTrackListResponse {
     public static QueryTrackListResponse from(Page<PlaylistTrackDto> page) {
         return QueryTrackListResponse.builder()
                 .content(page.getContent())
-                .pagination(PaginationDto.builder()
-                        .pageNumber(page.getNumber())
-                        .pageSize(page.getSize())
-                        .totalPages(page.getTotalPages())
-                        .totalElements(page.getTotalElements())
-                        .hasNext(page.hasNext())
-                        .build())
+                .pagination(new PaginationDto(
+                        page.getNumber(),
+                        page.getSize(),
+                        page.getTotalPages(),
+                        page.getTotalElements(),
+                        page.hasNext()
+                ))
                 .build();
     }
 }

@@ -31,12 +31,12 @@ public class AvatarResourceService {
 
     public List<AvatarFaceDto> findAllAvatarFaces() {
         return avatarFaceResourceRepository.findAll().stream().map(avatarResourceData ->
-                AvatarFaceDto.builder()
-                        .id(avatarResourceData.getId())
-                        .name(avatarResourceData.getName())
-                        .resourceUri(avatarResourceData.getResourceUri())
-                        .isAvailable(true)
-                        .build()).toList();
+                new AvatarFaceDto(
+                        avatarResourceData.getId(),
+                        avatarResourceData.getName(),
+                        avatarResourceData.getResourceUri(),
+                        true
+                )).toList();
     }
 
     public List<AvatarBodyDto> findAllAvatarBodies() {
@@ -56,11 +56,12 @@ public class AvatarResourceService {
         String avatarFaceName = avatarFaceResourceData.getName();
         String iconName = "ava_icon_" + avatarFaceName.split("_", 2)[1];
         AvatarIconResourceData avatarIconResourceData = avatarIconResourceRepository.findByNameAndPairType(iconName, PairType.FACE);
-        return AvatarIconDto.builder()
-                .id(avatarIconResourceData.getId())
-                .name(avatarIconResourceData.getName())
-                .resourceUri(avatarIconResourceData.getResourceUri())
-                .build();
+        return new AvatarIconDto(
+                avatarIconResourceData.getId(),
+                avatarIconResourceData.getName(),
+                avatarIconResourceData.getResourceUri(),
+                true
+        );
     }
 
     public AvatarIconDto findPairAvatarIconByBodyUri(AvatarBodyUri uri) {
@@ -68,11 +69,12 @@ public class AvatarResourceService {
         String avatarBodyName = avatarBodyResourceData.getName();
         String iconName = "ava_icon_" + avatarBodyName.split("_", 2)[1];
         AvatarIconResourceData avatarIconResourceData = avatarIconResourceRepository.findByNameAndPairType(iconName, PairType.BODY);
-        return AvatarIconDto.builder()
-                .id(avatarIconResourceData.getId())
-                .name(avatarIconResourceData.getName())
-                .resourceUri(avatarIconResourceData.getResourceUri())
-                .build();
+        return new AvatarIconDto(
+                avatarIconResourceData.getId(),
+                avatarIconResourceData.getName(),
+                avatarIconResourceData.getResourceUri(),
+                true
+        );
     }
 
     public boolean isBasicFaceUri(AvatarFaceUri avatarFaceUri) {

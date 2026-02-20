@@ -21,16 +21,16 @@ public class OtherProfileSummaryResponse {
     private List<ActivitySummaryDto> activitySummaries;
 
     public static OtherProfileSummaryResponse from(ProfileSummaryDto profileSummaryDto) {
-        List<ActivitySummaryDto> activitySummaries = Optional.ofNullable(profileSummaryDto.getActivitySummaries())
+        List<ActivitySummaryDto> activitySummaries = Optional.ofNullable(profileSummaryDto.activitySummaries())
                 .map(list -> list.stream()
-                        .filter(a -> a.getActivityType().equals(ActivityType.DJ_PNT))
+                        .filter(a -> a.activityType().equals(ActivityType.DJ_PNT))
                         .toList())
                 .orElse(List.of());
         return OtherProfileSummaryResponse.builder()
-                .nickname(profileSummaryDto.getNickname())
-                .introduction(profileSummaryDto.getIntroduction())
-                .avatarBodyUri(profileSummaryDto.getAvatarBodyUri())
-                .avatarFaceUri(profileSummaryDto.getAvatarFaceUri())
+                .nickname(profileSummaryDto.nickname())
+                .introduction(profileSummaryDto.introduction())
+                .avatarBodyUri(profileSummaryDto.avatarBodyUri())
+                .avatarFaceUri(profileSummaryDto.avatarFaceUri())
                 .activitySummaries(activitySummaries)
                 .build();
     }

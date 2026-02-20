@@ -37,11 +37,11 @@ public class DisplayInfoService {
         if(optActivePartyroom.isEmpty()) throw ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM);
 
         ActivePartyroomDto activePartyroom = optActivePartyroom.get();
-        PartyroomId partyroomId = new PartyroomId(activePartyroom.getId());
+        PartyroomId partyroomId = new PartyroomId(activePartyroom.id());
         boolean isPlaybackActivated = activePartyroom.isPlaybackActivated();
 
         if(isPlaybackActivated) {
-            PlaybackData playback = playbackInfoService.getPlaybackById(activePartyroom.getCurrentPlaybackId());
+            PlaybackData playback = playbackInfoService.getPlaybackById(activePartyroom.currentPlaybackId());
             CrewData djInfo = getCurrentDjInfo(partyroomId, playback);
             CurrentDjDto currentDjDto = new CurrentDjDto(djInfo.getId());
             //

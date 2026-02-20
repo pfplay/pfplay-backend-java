@@ -1,21 +1,18 @@
 package com.pfplaybackend.api.party.adapter.in.web.dto;
 
 import com.pfplaybackend.api.party.domain.enums.StageType;
-import lombok.Builder;
-import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
 
-@Builder
-@Data
-public class PartyroomElement {
-    private long partyroomId;
-    private StageType stageType;
-    private String title;
-    private String introduction;
-    boolean isPlaybackActivated;
-    private long crewCount;
-    private Map<String, Object> playback;
-    private List<Map<String, Object>> primaryIcons;
+public record PartyroomElement(
+        long partyroomId,
+        StageType stageType,
+        String title,
+        String introduction,
+        boolean isPlaybackActivated,
+        long crewCount,
+        Map<String, Object> playback,
+        List<Map<String, Object>> primaryIcons
+) {
 }

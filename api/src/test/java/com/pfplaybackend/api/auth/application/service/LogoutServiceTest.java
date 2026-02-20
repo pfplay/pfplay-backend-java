@@ -46,7 +46,7 @@ class LogoutServiceTest {
         setAuthentication(userId);
 
         ActivePartyroomWithCrewDto activePartyroom = mock(ActivePartyroomWithCrewDto.class);
-        when(activePartyroom.getId()).thenReturn(1L);
+        when(activePartyroom.id()).thenReturn(1L);
         when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activePartyroom));
 
         // when

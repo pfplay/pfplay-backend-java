@@ -4,47 +4,28 @@ import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CrewSummaryDto {
-    // Crew
-    private long crewId;
-    private GradeType gradeType;
-    // Profile
-    private String nickname;
-    private AvatarCompositionType avatarCompositionType;
-    private String avatarBodyUri;
-    private String avatarFaceUri;
-    private String avatarIconUri;
-    private int combinePositionX;
-    private int combinePositionY;
-    private double offsetX;
-    private double offsetY;
-    private double scale;
-
-    public CrewSummaryDto(long crewId) {
-        this.crewId = crewId;
+public record CrewSummaryDto(
+        long crewId,
+        GradeType gradeType,
+        String nickname,
+        AvatarCompositionType avatarCompositionType,
+        String avatarBodyUri,
+        String avatarFaceUri,
+        String avatarIconUri,
+        int combinePositionX,
+        int combinePositionY,
+        double offsetX,
+        double offsetY,
+        double scale
+) {
+    public static CrewSummaryDto exitOnly(long crewId) {
+        return new CrewSummaryDto(crewId, null, null, null, null, null, null, 0, 0, 0, 0, 0);
     }
 
-    public static CrewSummaryDto from(CrewData crew, ProfileSettingDto profileSettingDto) {
-        return new CrewSummaryDto(
-                crew.getId(),
-                crew.getGradeType(),
-                profileSettingDto.getNickname(),
-                profileSettingDto.getAvatarCompositionType(),
-                profileSettingDto.getAvatarBodyUri(),
-                profileSettingDto.getAvatarFaceUri(),
-                profileSettingDto.getAvatarIconUri(),
-                profileSettingDto.getCombinePositionX(),
-                profileSettingDto.getCombinePositionY(),
-                profileSettingDto.getOffsetX(),
-                profileSettingDto.getOffsetY(),
-                profileSettingDto.getScale()
-        );
+    public static CrewSummaryDto from(CrewData crew, ProfileSettingDto p) {
+        return new CrewSummaryDto(crew.getId(), crew.getGradeType(),
+                p.nickname(), p.avatarCompositionType(), p.avatarBodyUri(), p.avatarFaceUri(), p.avatarIconUri(),
+                p.combinePositionX(), p.combinePositionY(), p.offsetX(), p.offsetY(), p.scale());
     }
 }

@@ -24,10 +24,10 @@ public class PlaybackDurationWaitTopicListener implements MessageListener {
             String taskId = expiredKey.split(":")[2];
             String argsKey = "WAIT:ARGS:" + taskId;
             PlaybackDurationWaitMessage deserialized = objectMapper.convertValue(redisTemplate.opsForValue().get(argsKey), PlaybackDurationWaitMessage.class);
-            String suffixId = deserialized.getUserId().getUid().toString();
+            String suffixId = deserialized.userId().getUid().toString();
             distributedLockExecutor.performTaskWithLock(suffixId, () -> {
                 redisTemplate.delete(argsKey);
-                playbackManagementService.complete(deserialized.getPartyroomId(), deserialized.getUserId());
+                playbackManagementService.complete(deserialized.partyroomId(), deserialized.userId());
                 return null;
             });
         }

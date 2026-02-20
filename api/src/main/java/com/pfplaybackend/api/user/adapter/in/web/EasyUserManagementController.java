@@ -29,12 +29,12 @@ public class EasyUserManagementController {
     public ResponseEntity<?> createAssociateMember(HttpServletResponse response) {
         UserId userId = new UserId();
         MemberData member = temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com");
-        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder()
-                .uid(member.getUserId().getUid().toString())
-                .email(member.getEmail())
-                .accessLevel(AccessLevel.ROLE_MEMBER)
-                .authorityTier(member.getAuthorityTier())
-                .build()));
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(new TokenClaimsRequest(
+                member.getUserId().getUid().toString(),
+                member.getEmail(),
+                AccessLevel.ROLE_MEMBER,
+                member.getAuthorityTier()
+        )));
 
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));
@@ -45,12 +45,12 @@ public class EasyUserManagementController {
         UserId userId = new UserId();
         MemberData member = temporaryUserInitializeService.upgradeMember(
                 temporaryUserInitializeService.addAssociateMember(userId, userId.getUid().toString().substring(0,12) + "@gmail.com"));
-        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder()
-                .uid(member.getUserId().getUid().toString())
-                .email(member.getEmail())
-                .accessLevel(AccessLevel.ROLE_MEMBER)
-                .authorityTier(member.getAuthorityTier())
-                .build()));
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(new TokenClaimsRequest(
+                member.getUserId().getUid().toString(),
+                member.getEmail(),
+                AccessLevel.ROLE_MEMBER,
+                member.getAuthorityTier()
+        )));
 
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));

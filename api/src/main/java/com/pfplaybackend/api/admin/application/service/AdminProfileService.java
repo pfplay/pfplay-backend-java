@@ -98,7 +98,7 @@ public class AdminProfileService {
         } else {
             // BODY_WITH_FACE with INTERNAL_IMAGE: Use face-paired icon
             iconUri = new AvatarIconUri(
-                    avatarResourceService.findPairAvatarIconByFaceUri(finalFaceUri).getResourceUri()
+                    avatarResourceService.findPairAvatarIconByFaceUri(finalFaceUri).resourceUri()
             );
         }
 

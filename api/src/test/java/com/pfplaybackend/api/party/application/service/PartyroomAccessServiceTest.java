@@ -88,7 +88,7 @@ class PartyroomAccessServiceTest {
 
         // 같은 룸에 이미 active
         ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
-        when(activeRoomInfo.getId()).thenReturn(1L);
+        when(activeRoomInfo.id()).thenReturn(1L);
         when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activeRoomInfo));
 
         // when
@@ -125,7 +125,7 @@ class PartyroomAccessServiceTest {
 
         // 다른 룸에 이미 active
         ActivePartyroomWithCrewDto activeRoomInfo = mock(ActivePartyroomWithCrewDto.class);
-        when(activeRoomInfo.getId()).thenReturn(oldRoomId.getId());
+        when(activeRoomInfo.id()).thenReturn(oldRoomId.getId());
         when(partyroomInfoService.getMyActivePartyroomWithCrewId(userId)).thenReturn(Optional.of(activeRoomInfo));
 
         // exit() 호출 시 필요한 mock — 기존 룸 조회

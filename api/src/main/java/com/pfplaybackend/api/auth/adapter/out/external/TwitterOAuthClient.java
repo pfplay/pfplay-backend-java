@@ -82,7 +82,7 @@ public class TwitterOAuthClient {
                 )
                 .bodyToMono(TwitterUserResponse.class)
                 .map(this::mapToUserProfile)
-                .doOnSuccess(profile -> log.debug("Successfully fetched Twitter user profile: {}", profile.getEmail()))
+                .doOnSuccess(profile -> log.debug("Successfully fetched Twitter user profile: {}", profile.email()))
                 .doOnError(error -> log.error("Error fetching Twitter user profile", error))
                 .onErrorMap(WebClientResponseException.class, ex -> {
                     log.error("WebClient error - Status: {}, Body: {}", ex.getStatusCode(), ex.getResponseBodyAsString());
@@ -104,12 +104,12 @@ public class TwitterOAuthClient {
         log.debug("Twitter user mapping - ID: {}, Username: {}, Email-like: {}",
                 user.getId(), user.getUsername(), emailLikeUsername);
 
-        return OAuthUserProfile.builder()
-                .id(user.getId())
-                .email(emailLikeUsername)  // username을 이메일 대용으로 사용
-                .name(user.getName() != null ? user.getName() : user.getUsername())
-                .picture(user.getProfileImageUrl())
-                .build();
+        return new OAuthUserProfile(
+                user.getId(),
+                emailLikeUsername,  // username을 이메일 대용으로 사용
+                user.getName() != null ? user.getName() : user.getUsername(),
+                user.getProfileImageUrl()
+        );
     }
 
     /**

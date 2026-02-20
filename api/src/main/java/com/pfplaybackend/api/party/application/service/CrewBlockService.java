@@ -41,7 +41,7 @@ public class CrewBlockService {
         ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
-        List<CrewBlockHistoryData> historyDataList = blockHistoryRepository.findAllByBlockerCrewIdAndUnblockedIsFalse(new CrewId(dto.getCrewId()));
+        List<CrewBlockHistoryData> historyDataList = blockHistoryRepository.findAllByBlockerCrewIdAndUnblockedIsFalse(new CrewId(dto.crewId()));
         Map<UserId, ProfileSettingDto> map = userProfileService.getUsersProfileSetting(historyDataList.stream().map(CrewBlockHistoryData::getBlockedUserId).toList());
 
         return historyDataList.stream().map(historyData -> BlockedCrewResult.from(historyData.getId(), historyData.getBlockedCrewId(), map.get(historyData.getBlockedUserId()))).toList();
@@ -53,7 +53,7 @@ public class CrewBlockService {
         ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
-        CrewId blockerCrewId = new CrewId(dto.getCrewId());
+        CrewId blockerCrewId = new CrewId(dto.crewId());
         CrewId blockedCrewId = new CrewId(request.getCrewId());
         Optional<CrewBlockHistoryData> historyDataOptional = blockHistoryRepository.findByBlockerCrewIdAndBlockedCrewIdAndUnblockedIsFalse(blockerCrewId, blockedCrewId);
         if(historyDataOptional.isPresent()) throw ExceptionCreator.create(BlockException.ALREADY_BLOCKED_CREW);
@@ -78,7 +78,7 @@ public class CrewBlockService {
         ActivePartyroomWithCrewDto dto = partyroomRepository.getMyActivePartyroomWithCrewIdByUserId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 
-        CrewId blockerCrewId = new CrewId(dto.getCrewId());
+        CrewId blockerCrewId = new CrewId(dto.crewId());
         CrewBlockHistoryData historyData  = blockHistoryRepository.findByIdAndBlockerCrewIdAndUnblockedIsFalse(blockId, blockerCrewId)
                 .orElseThrow(() -> ExceptionCreator.create(BlockException.BLOCK_HISTORY_NOT_FOUND));
 

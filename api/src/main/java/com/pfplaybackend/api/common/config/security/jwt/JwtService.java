@@ -50,10 +50,10 @@ public class JwtService {
 
     private Map<String, Object> buildClaims(TokenClaimsRequest claims) {
         Map<String, Object> tokenClaims = new HashMap<>();
-        tokenClaims.put(TokenClaim.UID.getValue(), claims.getUid());
-        tokenClaims.put(TokenClaim.EMAIL.getValue(), claims.getEmail());
-        tokenClaims.put(TokenClaim.ACCESS_LEVEL.getValue(), claims.getAccessLevel().toString());
-        tokenClaims.put(TokenClaim.AUTHORITY_TIER.getValue(), claims.getAuthorityTier().toString());
+        tokenClaims.put(TokenClaim.UID.getValue(), claims.uid());
+        tokenClaims.put(TokenClaim.EMAIL.getValue(), claims.email());
+        tokenClaims.put(TokenClaim.ACCESS_LEVEL.getValue(), claims.accessLevel().toString());
+        tokenClaims.put(TokenClaim.AUTHORITY_TIER.getValue(), claims.authorityTier().toString());
         tokenClaims.put("type", "access");
         return tokenClaims;
     }

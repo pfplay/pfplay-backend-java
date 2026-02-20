@@ -26,10 +26,6 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
 
-	// MapStruct
-	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
-	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
-
 	// OAuth2 + JWT
 	implementation 'com.auth0:java-jwt:4.4.0'
 	implementation 'org.passay:passay:1.6.4'

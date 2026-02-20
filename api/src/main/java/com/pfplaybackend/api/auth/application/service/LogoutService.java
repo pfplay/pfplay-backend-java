@@ -32,7 +32,7 @@ public class LogoutService {
         Optional<ActivePartyroomWithCrewDto> activePartyroom = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
 
         if (activePartyroom.isPresent()) {
-            PartyroomId partyroomId = new PartyroomId(activePartyroom.get().getId());
+            PartyroomId partyroomId = new PartyroomId(activePartyroom.get().id());
             log.info("User {} exiting active partyroom {} on logout", userId, partyroomId);
             partyroomAccessService.exit(partyroomId);
         }

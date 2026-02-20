@@ -29,12 +29,12 @@ public class GuestSignController {
             HttpServletResponse response
     ) {
         GuestData guest = guestSignService.getGuestOrCreate();
-        cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessToken(TokenClaimsRequest.builder()
-                .uid(guest.getUserId().getUid().toString())
-                .email("N/A")
-                .accessLevel(AccessLevel.ROLE_GUEST)
-                .authorityTier(AuthorityTier.GT)
-                .build()));
+        cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessToken(new TokenClaimsRequest(
+                guest.getUserId().getUid().toString(),
+                "N/A",
+                AccessLevel.ROLE_GUEST,
+                AuthorityTier.GT
+        )));
 
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.success("OK"));

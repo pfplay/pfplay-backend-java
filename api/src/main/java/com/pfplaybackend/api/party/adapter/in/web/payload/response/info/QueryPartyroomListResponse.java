@@ -21,25 +21,25 @@ public class QueryPartyroomListResponse {
             Map<String, Object> playback = null;
             if(partyroomWithCrewDto.isPlaybackActivated()) {
                 playback = new HashMap<>();
-                playback.put("name", partyroomWithCrewDto.getPlaybackDto().getName());
-                playback.put("thumbnailImage", partyroomWithCrewDto.getPlaybackDto().getThumbnailImage());
+                playback.put("name", partyroomWithCrewDto.playbackDto().getName());
+                playback.put("thumbnailImage", partyroomWithCrewDto.playbackDto().getThumbnailImage());
             }
-            List<Map<String, Object>> primaryIcons = partyroomWithCrewDto.getCrews().stream().map(crewDto -> profileSettings.get(crewDto.getUserId()))
+            List<Map<String, Object>> primaryIcons = partyroomWithCrewDto.crews().stream().map(crewDto -> profileSettings.get(crewDto.userId()))
                     .map(profileSettingDto -> {
                         Map<String, Object> primaryAvatar = new HashMap<>();
-                        primaryAvatar.put("avatarIconUri", profileSettingDto.getAvatarIconUri());
+                        primaryAvatar.put("avatarIconUri", profileSettingDto.avatarIconUri());
                         return primaryAvatar;
                     }).toList();
-            return PartyroomElement.builder()
-                    .partyroomId(partyroomWithCrewDto.getPartyroomId())
-                    .stageType(partyroomWithCrewDto.getStageType())
-                    .title(partyroomWithCrewDto.getTitle())
-                    .introduction(partyroomWithCrewDto.getIntroduction())
-                    .crewCount(partyroomWithCrewDto.getCrewCount())
-                    .isPlaybackActivated(partyroomWithCrewDto.isPlaybackActivated())
-                    .playback(playback)
-                    .primaryIcons(primaryIcons)
-                    .build();
+            return new PartyroomElement(
+                    partyroomWithCrewDto.partyroomId(),
+                    partyroomWithCrewDto.stageType(),
+                    partyroomWithCrewDto.title(),
+                    partyroomWithCrewDto.introduction(),
+                    partyroomWithCrewDto.isPlaybackActivated(),
+                    partyroomWithCrewDto.crewCount(),
+                    playback,
+                    primaryIcons
+            );
         }).toList();
     }
 }

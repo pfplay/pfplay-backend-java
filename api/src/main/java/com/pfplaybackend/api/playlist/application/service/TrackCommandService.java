@@ -47,9 +47,9 @@ public class TrackCommandService {
         if (optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 최대 보유 한계치 초과 검사
         PlaylistSummary playlistSummary = playlistQueryService.getPlaylist(playlistId);
-        if (playlistSummary.getMusicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
+        if (playlistSummary.musicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
 
-        long nextMusicOrderNumber = playlistSummary.getMusicCount() == 0 ? 1 : playlistSummary.getMusicCount() + 1;
+        long nextMusicOrderNumber = playlistSummary.musicCount() == 0 ? 1 : playlistSummary.musicCount() + 1;
 
         TrackData trackData = TrackData.builder()
                 .playlistData(playlistData)
@@ -80,7 +80,7 @@ public class TrackCommandService {
         PlaylistSummary playlistSummary = playlistQueryService.getPlaylist(playlistId);
         if (prevOrderNumber < 1 || nextOrderNumber < 1
                 || Objects.equals(prevOrderNumber, nextOrderNumber)
-                || playlistSummary.getMusicCount() < nextOrderNumber)
+                || playlistSummary.musicCount() < nextOrderNumber)
             throw ExceptionCreator.create(TrackException.INVALID_TRACK_ORDER);
 
         if (prevOrderNumber < nextOrderNumber) {
@@ -114,11 +114,11 @@ public class TrackCommandService {
         if (duplicate.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 타겟 트랙 개수 15개 제한 검사
         PlaylistSummary targetSummary = playlistQueryService.getPlaylist(request.getTargetPlaylistId());
-        if (targetSummary.getMusicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
+        if (targetSummary.musicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
         // 소스 orderNumber 재정렬
         trackRepository.shiftUpOrderByDelete(sourcePlaylistId, trackData.getOrderNumber());
         // 트랙을 타겟 플레이리스트로 이동
-        int nextOrderNumber = (int) (targetSummary.getMusicCount() + 1);
+        int nextOrderNumber = (int) (targetSummary.musicCount() + 1);
         trackData.setPlaylistData(targetPlaylistData);
         trackData.setOrderNumber(nextOrderNumber);
         trackRepository.save(trackData);
@@ -147,11 +147,11 @@ public class TrackCommandService {
         rotateTrackOrder(playlistId, page.getTotalElements());
         PlaylistTrackDto dto = page.getContent().get(0);
         return new PlaybackTrackDto(
-                dto.getLinkId(),
-                dto.getName(),
-                dto.getThumbnailImage(),
-                dto.getDuration(),
-                dto.getOrderNumber()
+                dto.linkId(),
+                dto.name(),
+                dto.thumbnailImage(),
+                dto.duration(),
+                dto.orderNumber()
         );
     }
 

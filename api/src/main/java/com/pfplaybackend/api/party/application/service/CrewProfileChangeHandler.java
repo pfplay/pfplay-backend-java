@@ -24,11 +24,11 @@ public class CrewProfileChangeHandler {
 
     private void publishProfileChangedEvent(ActivePartyroomWithCrewDto dto, CrewProfilePreCheckMessage message) {
         messagePublisher.publish(MessageTopic.CREW_PROFILE.topic(),
-                CrewProfileMessage.from(new PartyroomId(dto.getId()), dto.getCrewId(), message));
+                CrewProfileMessage.from(new PartyroomId(dto.id()), dto.crewId(), message));
     }
 
     public void preCheck(CrewProfilePreCheckMessage message) {
-        Optional<ActivePartyroomWithCrewDto> optional = partyroomInfoService.getMyActivePartyroomWithCrewId(message.getUserId());
+        Optional<ActivePartyroomWithCrewDto> optional = partyroomInfoService.getMyActivePartyroomWithCrewId(message.userId());
         optional.ifPresent(activePartyroomWithCrewDto -> publishProfileChangedEvent(activePartyroomWithCrewDto, message));
     }
 }

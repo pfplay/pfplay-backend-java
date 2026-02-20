@@ -98,7 +98,7 @@ public class MemberData extends UserAccountData {
     }
 
     public void updateProfileBio(UpdateBioCommand command) {
-        this.profileData.updateBio(command.getNickName(), command.getIntroduction());
+        this.profileData.updateBio(command.nickName(), command.introduction());
         this.isProfileUpdated = true;
     }
 
@@ -139,14 +139,9 @@ public class MemberData extends UserAccountData {
     @Override
     public ProfileSummaryDto getProfileSummary() {
         List<ActivitySummaryDto> activitySummaries = this.activityDataMap.values().stream()
-                .map(a -> ActivitySummaryDto.builder()
-                        .activityType(a.getActivityType())
-                        .score(a.getScore().getValue())
-                        .build())
+                .map(a -> new ActivitySummaryDto(a.getActivityType(), a.getScore().getValue()))
                 .collect(Collectors.toList());
 
-        return buildBaseProfileSummary()
-                .activitySummaries(activitySummaries)
-                .build();
+        return buildProfileSummary(activitySummaries);
     }
 }

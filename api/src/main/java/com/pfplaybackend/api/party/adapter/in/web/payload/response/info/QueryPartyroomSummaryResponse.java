@@ -24,7 +24,7 @@ public class QueryPartyroomSummaryResponse {
         if(crew != null) {
             return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
                     partyroom.getLinkDomain().getValue(), partyroom.getPlaybackTimeLimit().getMinutes(),
-                    new CurrentDjWithProfileDto(crew.getId(), profileSettingDto.getNickname(), profileSettingDto.getAvatarIconUri()));
+                    new CurrentDjWithProfileDto(crew.getId(), profileSettingDto.nickname(), profileSettingDto.avatarIconUri()));
         } else {
             return new QueryPartyroomSummaryResponse(partyroom.getTitle(), partyroom.getIntroduction(),
                     partyroom.getLinkDomain().getValue(), partyroom.getPlaybackTimeLimit().getMinutes(), null);

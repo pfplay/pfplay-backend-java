@@ -56,8 +56,8 @@ public class PartyroomSessionCacheManager implements SessionCachePort {
     private Optional<PartyroomSessionDto> createSessionData(String sessionId, UserId userId) {
         Optional<ActivePartyroomWithCrewDto> optional = partyroomInfoService.getMyActivePartyroomWithCrewId(userId);
         if (optional.isPresent()) {
-            PartyroomId partyroomId = new PartyroomId(optional.get().getId());
-            long crewId = optional.get().getCrewId();
+            PartyroomId partyroomId = new PartyroomId(optional.get().id());
+            long crewId = optional.get().crewId();
             return Optional.of(new PartyroomSessionDto(sessionId, userId, partyroomId, crewId));
         }
         return Optional.empty();

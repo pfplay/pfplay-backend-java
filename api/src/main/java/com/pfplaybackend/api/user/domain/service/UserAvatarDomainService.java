@@ -46,14 +46,14 @@ public class UserAvatarDomainService {
 
     public AvatarIconUri findAvatarIconPairWithSingleBody(AvatarBodyDto avatarBodyDto) {
         AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByBodyUri(new AvatarBodyUri(avatarBodyDto.getResourceUri()));
-        return new AvatarIconUri(avatarIconDto.getResourceUri());
+        return new AvatarIconUri(avatarIconDto.resourceUri());
     }
 
     public AvatarIconUri findAvatarIconByFaceSourceType(SetAvatarRequest request) {
         AvatarFaceUri avatarFaceUri = new AvatarFaceUri(request.getFace().getUri());
         if(request.getFace().getSourceType().equals(FaceSourceType.INTERNAL_IMAGE)) {
             AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByFaceUri(avatarFaceUri);
-            return new AvatarIconUri(avatarIconDto.getResourceUri());
+            return new AvatarIconUri(avatarIconDto.resourceUri());
         }else {
             return new AvatarIconUri(avatarFaceUri.getAvatarFaceUri());
         }

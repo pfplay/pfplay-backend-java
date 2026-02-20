@@ -34,7 +34,7 @@ public class DomainEventRedisRelay {
             ProfileSettingDto profile = userProfileService.getUserProfileSetting(event.getUserId());
             crewSummary = CrewSummaryDto.from(crew, profile);
         } else {
-            crewSummary = new CrewSummaryDto(event.getCrewId());
+            crewSummary = CrewSummaryDto.exitOnly(event.getCrewId());
         }
         messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(),
                 PartyroomAccessMessage.create(event.getPartyroomId(), event.getAccessType(), crewSummary));
