@@ -12,7 +12,6 @@ import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.UserAccountData;
-import com.pfplaybackend.api.user.domain.service.GuestDomainService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
@@ -23,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,14 +31,13 @@ public class UserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final GuestRepository guestRepository;
     private final MemberRepository memberRepository;
-    private final GuestDomainService guestDomainService;
     private final UserAvatarService userAvatarService;
 
     public ProfileData createProfileDataForGuest(UserId userId) {
         AvatarBodyResourceData avatarBodyResource = userAvatarService.getDefaultAvatarBodyResourceData();
         return ProfileData.builder()
                 .userId(userId)
-                .nickname(new Nickname(guestDomainService.generateRandomNickname()))
+                .nickname(new Nickname(generateGuestNickname()))
                 .avatarCompositionType(AvatarCompositionType.BODY_WITH_FACE)
                 .faceSourceType(FaceSourceType.INTERNAL_IMAGE)
                 .avatarBodyUri(userAvatarService.getDefaultAvatarBodyUri())
@@ -85,6 +84,10 @@ public class UserProfileService {
     public ProfileSettingDto getUserProfileSetting(UserId userId) {
         ProfileData profileData = userProfileRepository.findByUserId(userId);
         return toProfileSettingDto(profileData);
+    }
+
+    private String generateGuestNickname() {
+        return "Guest_" + UUID.randomUUID().toString().replace("-", "").substring(0, 6);
     }
 
     private ProfileSettingDto toProfileSettingDto(ProfileData profileData) {
