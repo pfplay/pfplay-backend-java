@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.user.adapter.out.external;
+package com.pfplaybackend.api.bootstrap.adapter;
 
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;

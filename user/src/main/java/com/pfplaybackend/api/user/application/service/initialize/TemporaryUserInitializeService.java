@@ -2,7 +2,7 @@ package com.pfplaybackend.api.user.application.service.initialize;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
-import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
+import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
@@ -29,7 +29,7 @@ public class TemporaryUserInitializeService {
     private final MemberRepository memberRepository;
     private final UserProfileService userProfileService;
     private final UserActivityService userActivityService;
-    private final PlaylistCommandService playlistCommandService;
+    private final PlaylistSetupPort playlistSetupPort;
     private final JwtService jwtService;
 
     private static final long GUEST_FIXED_ID = 1000000000000001L;
@@ -64,7 +64,7 @@ public class TemporaryUserInitializeService {
         member.initializeActivityMap(activityMap);
 
         MemberData memberData = memberRepository.save(member);
-        playlistCommandService.createDefaultPlaylist(member.getUserId());
+        playlistSetupPort.createDefaultPlaylist(member.getUserId());
         // System.out.println("AM JWT: " + jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder().uid(member.getUserId().getUid().toString()).email(member.getEmail()).accessLevel(AccessLevel.ROLE_MEMBER).authorityTier(member.getAuthorityTier()).build()));
         return memberData;
     }

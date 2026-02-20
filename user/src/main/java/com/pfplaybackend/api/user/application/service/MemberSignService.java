@@ -1,8 +1,7 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.auth.domain.value.OAuth2Redirection;
-import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2ProviderConfig;
+import com.pfplaybackend.api.user.application.port.out.OAuth2RedirectPort;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
@@ -21,15 +20,14 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class MemberSignService {
-    private final OAuth2ProviderConfig oauth2ProviderConfig;
+    private final OAuth2RedirectPort oauth2RedirectPort;
     private final MemberRepository memberRepository;
     private final UserProfileService userProfileService;
     private final UserActivityService userActivityService;
     private final PlaylistSetupPort playlistSetupPort;
 
     public String getOAuth2RedirectUri(SignMemberRequest request, String redirectLocation) {
-        OAuth2Redirection oauth2Redirection = OAuth2Redirection.create(oauth2ProviderConfig.getProviders(), request.getOauth2Provider(), redirectLocation);
-        return oauth2Redirection.getUrl();
+        return oauth2RedirectPort.getRedirectUri(request.getOauth2Provider(), redirectLocation);
     }
 
     @Transactional

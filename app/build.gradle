@@ -6,6 +6,7 @@ def queryDslVersion = '5.0.0'
 
 dependencies {
 	implementation project(':common')
+	implementation project(':user')
 	implementation project(':playlist')
 	implementation project(':realtime')
 
@@ -30,7 +31,6 @@ dependencies {
 
 	// OAuth2 + JWT
 	implementation 'com.auth0:java-jwt:4.4.0'
-	implementation 'org.passay:passay:1.6.4'
 
 	// QueryDSL
 	implementation "com.querydsl:querydsl-core:${queryDslVersion}"

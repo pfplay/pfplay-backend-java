@@ -29,7 +29,7 @@ public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRe
             "WHERE pm.playlistData.id = :playlistId " +
             "AND pm.orderNumber > :deleteOrderNumber "
     )
-    void shiftUpOrderByDelete(@Param("playlistId") Long playlistId, Integer deleteOrderNumber);
+    void shiftUpOrderByDelete(@Param("playlistId") Long playlistId, @Param("deleteOrderNumber") Integer deleteOrderNumber);
 
     @Modifying
     @Query("UPDATE TrackData pm " +

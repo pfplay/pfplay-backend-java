@@ -1,7 +1,16 @@
 # Gradle 모듈 재구조화 계획
 
-> 현재 2개 모듈(api, realtime)을 4개 모듈(common, realtime, playlist, app)로 재구성하고,
-> profile/avatarresource 패키지를 user로 병합하는 계획.
+> **Status: COMPLETED** — 4개 Phase 모두 완료 (2026-02-20)
+>
+> 2개 모듈(api, realtime)을 4개 모듈(common, realtime, playlist, app)로 재구성하고,
+> profile/avatarresource 패키지를 user로 병합.
+>
+> | Phase | 내용 | Commit |
+> |-------|------|--------|
+> | A | common 모듈 승격 | `3816ff2` |
+> | B | playlist 모듈 분리 | `d0d543c` |
+> | C | api → app 개명 | `ad643af` |
+> | D | profile+avatarresource → user 병합 | `222b495` |
 
 ---
 
