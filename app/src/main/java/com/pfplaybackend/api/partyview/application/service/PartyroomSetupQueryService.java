@@ -28,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -62,11 +61,9 @@ public class PartyroomSetupQueryService {
     }
 
     private DisplayDto getDisplayInfo() {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        Optional<ActivePartyroomDto> optActivePartyroom = partyroomRepository.getActivePartyroomByUserId(authContext.getUserId());
-        if (optActivePartyroom.isEmpty()) throw ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM);
-
-        ActivePartyroomDto activePartyroom = optActivePartyroom.get();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
+        ActivePartyroomDto activePartyroom = partyroomRepository.getActivePartyroomByUserId(authContext.getUserId())
+                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
         PartyroomId partyroomId = new PartyroomId(activePartyroom.id());
         boolean isPlaybackActivated = activePartyroom.isPlaybackActivated();
 
@@ -91,17 +88,14 @@ public class PartyroomSetupQueryService {
     }
 
     private static Map<String, Boolean> getHistory(Optional<PlaybackReactionHistoryData> optional) {
-        Map<String, Boolean> history = new HashMap<>();
-        if (optional.isPresent()) {
-            PlaybackReactionHistoryData playbackReactionHistoryData = optional.get();
-            history.put("isLiked", playbackReactionHistoryData.isLiked());
-            history.put("isDislike", playbackReactionHistoryData.isDisliked());
-            history.put("isGrabbed", playbackReactionHistoryData.isGrabbed());
-        } else {
-            history.put("isLiked", false);
-            history.put("isDislike", false);
-            history.put("isGrabbed", false);
-        }
-        return history;
+        return optional.map(data -> Map.of(
+                "isLiked", data.isLiked(),
+                "isDislike", data.isDisliked(),
+                "isGrabbed", data.isGrabbed()
+        )).orElseGet(() -> Map.of(
+                "isLiked", false,
+                "isDislike", false,
+                "isGrabbed", false
+        ));
     }
 }

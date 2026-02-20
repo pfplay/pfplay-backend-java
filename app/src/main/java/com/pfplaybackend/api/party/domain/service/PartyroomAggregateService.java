@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -23,14 +22,16 @@ public class PartyroomAggregateService {
      */
     public void removeDjFromQueue(Long partyroomId, CrewId crewId) {
         List<DjData> queuedDjs = djRepository.findByPartyroomDataIdAndIsQueuedTrueOrderByOrderNumberAsc(partyroomId);
-        AtomicInteger order = new AtomicInteger(1);
-        queuedDjs.forEach(dj -> {
-            if (dj.getCrewId().equals(crewId)) {
-                dj.applyDequeued();
-            } else {
-                dj.updateOrderNumber(order.getAndIncrement());
+        queuedDjs.stream()
+                .filter(dj -> dj.getCrewId().equals(crewId))
+                .forEach(DjData::applyDequeued);
+
+        int order = 1;
+        for (DjData dj : queuedDjs) {
+            if (!dj.getCrewId().equals(crewId)) {
+                dj.updateOrderNumber(order++);
             }
-        });
+        }
         djRepository.saveAll(queuedDjs);
     }
 

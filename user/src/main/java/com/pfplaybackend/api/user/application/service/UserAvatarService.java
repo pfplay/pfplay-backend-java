@@ -67,7 +67,7 @@ public class UserAvatarService {
 
     @Transactional(readOnly = true)
     public List<AvatarBodyDto> findMyAvatarBodies() {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         List<AvatarBodyDto> avatarBodyDtoList = avatarResourceService.findAllAvatarBodies();
         if (authContext.getAuthorityTier() == AuthorityTier.GT) {
             return avatarBodyDtoList;
@@ -84,7 +84,7 @@ public class UserAvatarService {
 
     @Transactional
     public void setUserAvatar(com.pfplaybackend.api.user.adapter.in.web.payload.request.SetAvatarRequest request) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
 
         // 0. 리소스 접근 권한 유효성 검증

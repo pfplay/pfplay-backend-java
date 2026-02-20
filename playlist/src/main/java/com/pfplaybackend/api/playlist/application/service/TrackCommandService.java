@@ -38,7 +38,7 @@ public class TrackCommandService {
 
     @Transactional
     public void addTrackInPlaylist(Long playlistId, AddTrackRequest request) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         // 플레이리스트 접근 권한 검사
         PlaylistData playlistData = playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
@@ -65,7 +65,7 @@ public class TrackCommandService {
 
     @Transactional
     public void updateTrackOrderInPlaylist(Long playlistId, Long trackId, UpdateTrackOrderRequest request) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         // 플레이리스트 접근 권한 검사
         playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
@@ -98,7 +98,7 @@ public class TrackCommandService {
 
     @Transactional
     public void moveTrackToPlaylist(Long sourcePlaylistId, Long trackId, MoveTrackRequest request) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserId ownerId = authContext.getUserId();
         // 소스 플레이리스트 소유권 검증
         playlistRepository.findByIdAndOwnerId(sourcePlaylistId, ownerId)
@@ -126,7 +126,7 @@ public class TrackCommandService {
 
     @Transactional
     public void deleteTrackInPlaylist(Long playlistId, Long trackId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         // 플레이리스트 접근 권한 검사
         playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));

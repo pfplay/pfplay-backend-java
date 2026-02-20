@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,9 +38,8 @@ public class PartyroomNoticeService {
 
     @Transactional(readOnly = true)
     public String getNotice(PartyroomId partyroomId) {
-        Optional<PartyroomData> optPartyroomData = partyroomRepository.findById(partyroomId.getId());
-        if(optPartyroomData.isEmpty()) throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
-        PartyroomData partyroomData = optPartyroomData.get();
+        PartyroomData partyroomData = partyroomRepository.findById(partyroomId.getId())
+                .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         return partyroomData.getNoticeContent();
     }
 }

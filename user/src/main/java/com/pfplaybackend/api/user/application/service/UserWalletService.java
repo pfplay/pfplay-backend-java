@@ -20,7 +20,7 @@ public class UserWalletService {
 
     @Transactional
     public MemberData updateMyWalletAddress(UpdateWalletCommand updateWalletCommand) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
         // TODO 2. 지갑 주소 서명 검증 실패 시 예외 발생!
         member.updateWalletAddress(new WalletAddress(updateWalletCommand.walletAddress()));

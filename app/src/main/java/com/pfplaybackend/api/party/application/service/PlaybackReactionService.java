@@ -35,7 +35,7 @@ public class PlaybackReactionService {
 
     @Transactional
     public Map<String, Boolean> reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         if(AuthorityTier.GT.equals(authContext.getAuthorityTier()) && reactionType.equals(ReactionType.GRAB)) {
             throw ExceptionCreator.create(ReactionException.INVALID_REACTION);
         }
@@ -58,21 +58,14 @@ public class PlaybackReactionService {
     }
 
     private PlaybackReactionHistoryData getValidReactionHistoryData(AuthContext authContext, PlaybackId playbackId) {
-        Optional<PlaybackReactionHistoryData> optional = findPrevHistoryData(playbackId, authContext.getUserId());
-        if(optional.isPresent()) {
-            return optional.orElseThrow();
-        }else {
-            return new PlaybackReactionHistoryData(authContext.getUserId(), playbackId);
-        }
+        return findPrevHistoryData(playbackId, authContext.getUserId())
+                .orElseGet(() -> new PlaybackReactionHistoryData(authContext.getUserId(), playbackId));
     }
 
     private ReactionState getExistingState(PlaybackReactionHistoryData historyData) {
-        Optional<Long> optional = Optional.ofNullable(historyData.getId());
-        if(optional.isPresent()) {
-            return playbackReactionDomainService.getReactionStateByHistory(historyData);
-        }else {
-            return ReactionState.createBaseState();
-        }
+        return historyData.getId() != null
+                ? playbackReactionDomainService.getReactionStateByHistory(historyData)
+                : ReactionState.createBaseState();
     }
 
     private ReactionState getTargetState(ReactionState existingState, ReactionType reactionType) {

@@ -29,7 +29,7 @@ public class PlaybackReactionPostProcessService {
     private final UserActivityPort userActivityPort;
 
     public void postProcess(ReactionPostProcessDto postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
         if(postProcessDto.isGrabStatusChanged()) {
             grabTrack(authContext.getUserId(), playback);

@@ -55,7 +55,7 @@ public class UserProfileService {
     }
 
     public ProfileSummaryDto getMyProfileSummary() {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         return findUserWithProfile(authContext.getUserId(), authContext.getAuthorityTier())
                 .getProfileSummary();
     }

@@ -73,7 +73,7 @@ public class PartyroomInfoService {
 
     @Transactional(readOnly = true)
     public boolean isAlreadyRegistered(Long partyroomId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         return djRepository.existsByPartyroomDataIdAndUserIdAndIsQueuedTrue(partyroomId, authContext.getUserId());
     }
 
@@ -97,7 +97,7 @@ public class PartyroomInfoService {
 
     @Transactional(readOnly = true)
     public Optional<ActivePartyroomDto> getMyActivePartyroom() {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         return partyroomRepository.getActivePartyroomByUserId(authContext.getUserId());
     }
 
@@ -134,7 +134,7 @@ public class PartyroomInfoService {
 
     @Transactional(readOnly = true)
     public CrewProfileSummaryResult getProfileSummaryByCrewId(Long crewId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         ActivePartyroomWithCrewDto activePartyroomDto = getMyActivePartyroomWithCrewId(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
 

@@ -33,7 +33,7 @@ public class PlaylistCommandService {
 
     @Transactional
     public PlaylistData createPlaylist(String playlistName) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserId userId = authContext.getUserId();
         List<PlaylistData> playlistDataList = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(userId, PlaylistType.PLAYLIST);
 
@@ -48,7 +48,7 @@ public class PlaylistCommandService {
 
     @Transactional
     public PlaylistData renamePlaylist(Long playlistId, String name) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserId userId = authContext.getUserId();
 
         PlaylistData playlistData = playlistRepository.findByIdAndOwnerIdAndType(playlistId, userId, PlaylistType.PLAYLIST)
@@ -61,7 +61,7 @@ public class PlaylistCommandService {
 
     @Transactional
     public void deletePlaylist(List<Long> playlistIds) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserId userId = authContext.getUserId();
         List<PlaylistData> playlistDataList = playlistRepository.findAllByOwnerId(userId);
 

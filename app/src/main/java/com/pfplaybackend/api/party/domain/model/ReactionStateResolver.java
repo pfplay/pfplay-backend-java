@@ -76,16 +76,11 @@ public class ReactionStateResolver {
     }
 
     public static ReactionState getCombinedReactionState(ReactionState reactionState, ReactionType reactionType) {
-        if(reactionType.equals(ReactionType.LIKE)) {
-            return likeCombinationTable.get(reactionState);
-        }
-        if(reactionType.equals(ReactionType.DISLIKE)) {
-            return dislikeCombinationTable.get(reactionState);
-        }
-        if(reactionType.equals(ReactionType.GRAB)) {
-            return grabCombinationTable.get(reactionState);
-        }
-        throw new IllegalArgumentException("Unsupported ReactionType: " + reactionType);
+        return switch (reactionType) {
+            case LIKE -> likeCombinationTable.get(reactionState);
+            case DISLIKE -> dislikeCombinationTable.get(reactionState);
+            case GRAB -> grabCombinationTable.get(reactionState);
+        };
     }
 
     public static ResolvedReaction resolve(ReactionState reactionState) {

@@ -21,13 +21,13 @@ public class PlaylistQueryService {
 
     @Transactional(readOnly = true)
     public List<PlaylistSummary> getPlaylists() {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         return playlistRepository.findAllByUserId(authContext.getUserId());
     }
 
     @Transactional(readOnly = true)
     public PlaylistSummary getPlaylist(Long playlistId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         return playlistRepository.findByIdAndUserId(playlistId, authContext.getUserId());
     }
 }

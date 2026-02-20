@@ -44,7 +44,7 @@ public class PartyroomManagementService {
 
     @Transactional
     public PartyroomData createGeneralPartyRoom(CreatePartyroomRequest request) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         new PartyroomCreationPolicy().enforce(authContext.getAuthorityTier());
         Optional<PartyroomData> optionalActive = partyroomRepository.findActiveHostRoom(authContext.getUserId());
         if(optionalActive.isPresent()) throw ExceptionCreator.create(PartyroomException.ALREADY_HOST);
@@ -68,7 +68,7 @@ public class PartyroomManagementService {
 
     @Transactional
     public void updatePartyroom(PartyroomId partyroomId, UpdatePartyroomRequest request) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.validateHost(authContext.getUserId());
@@ -80,7 +80,7 @@ public class PartyroomManagementService {
 
     @Transactional
     public void deletePartyRoom(PartyroomId partyroomId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         if (authContext.getAuthorityTier() != AuthorityTier.FM) {
             throw ExceptionCreator.create(PartyroomException.RESTRICTED_AUTHORITY);
         }
@@ -104,7 +104,7 @@ public class PartyroomManagementService {
 
     @Transactional
     public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         if (request.getQueueStatus().equals(QueueStatus.CLOSE)) partyroom.closeQueue();

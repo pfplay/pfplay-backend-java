@@ -32,6 +32,8 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,26 +50,27 @@ public class CrewPenaltyService {
     public List<PenaltyResult> getPenalties(PartyroomId partyroomId) {
         List<CrewPenaltyHistoryData> crewPenaltyHistoryDataList = crewPenaltyHistoryRepository.findAllByPartyroomIdAndReleasedIsFalse(partyroomId);
 
-        List<UserId> PunishedUserIds = crewPenaltyHistoryDataList.stream().map(history -> {
-            CrewData crew = crewRepository.findById(history.getPunishedCrewId().getId())
-                    .orElseThrow();
-            return crew.getUserId();
-        }).toList();
+        List<Long> crewIds = crewPenaltyHistoryDataList.stream()
+                .map(history -> history.getPunishedCrewId().getId())
+                .distinct()
+                .toList();
+        Map<Long, CrewData> crewMap = crewRepository.findAllById(crewIds).stream()
+                .collect(Collectors.toMap(CrewData::getId, Function.identity()));
 
-        Map<UserId, ProfileSettingDto> map = userProfileQueryPort.getUsersProfileSetting(PunishedUserIds);
+        List<UserId> punishedUserIds = crewPenaltyHistoryDataList.stream()
+                .map(history -> crewMap.get(history.getPunishedCrewId().getId()).getUserId())
+                .toList();
+        Map<UserId, ProfileSettingDto> profileMap = userProfileQueryPort.getUsersProfileSetting(punishedUserIds);
 
         return crewPenaltyHistoryDataList.stream().map(history -> {
-            CrewData crew = crewRepository.findById(history.getPunishedCrewId().getId())
-                    .orElseThrow();
-            UserId userId = crew.getUserId();
-            ProfileSettingDto profileSettingDto = map.get(userId);
-            return PenaltyResult.from(history, profileSettingDto);
+            CrewData crew = crewMap.get(history.getPunishedCrewId().getId());
+            return PenaltyResult.from(history, profileMap.get(crew.getUserId()));
         }).toList();
     }
 
     @Transactional
     public void addPenalty(PartyroomId partyroomId, PunishPenaltyRequest request) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
@@ -86,9 +89,12 @@ public class CrewPenaltyService {
 
         // 페널티 부과
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId()).orElseThrow();
-        if(penaltyType.equals(PenaltyType.CHAT_BAN_30_SECONDS)) recordInShortTime(punishedCrewId.getId());
-        if(penaltyType.equals(PenaltyType.ONE_TIME_EXPULSION)) partyroomAccessService.expel(partyroom, punishedCrew, false);
-        if(penaltyType.equals(PenaltyType.PERMANENT_EXPULSION)) partyroomAccessService.expel(partyroom, punishedCrew, true);
+        switch (penaltyType) {
+            case CHAT_MESSAGE_REMOVAL -> {} // 이벤트로만 처리
+            case CHAT_BAN_30_SECONDS -> recordInShortTime(punishedCrewId.getId());
+            case ONE_TIME_EXPULSION -> partyroomAccessService.expel(partyroom, punishedCrew, false);
+            case PERMANENT_EXPULSION -> partyroomAccessService.expel(partyroom, punishedCrew, true);
+        }
 
         eventPublisher.publishEvent(new CrewPenalizedEvent(
                 partyroomId, new CrewId(punisherCrew.getId()), punishedCrewId, request.getDetail(), request.getPenaltyType()));
@@ -113,7 +119,7 @@ public class CrewPenaltyService {
     }
 
     public void releaseCrewPenalty(PartyroomId partyroomId, Long penaltyId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
@@ -131,9 +137,7 @@ public class CrewPenaltyService {
         crewRepository.save(crew);
 
         // 2. Update history
-        historyData.setReleased(true);
-        historyData.setReleasedByCrewId(new CrewId(releaserCrewForValidation.getId()));
-        historyData.setReleaseDate(LocalDateTime.now());
+        historyData.release(new CrewId(releaserCrewForValidation.getId()));
         crewPenaltyHistoryRepository.save(historyData);
     }
 

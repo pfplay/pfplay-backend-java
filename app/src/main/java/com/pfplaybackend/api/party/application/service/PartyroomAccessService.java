@@ -47,7 +47,7 @@ public class PartyroomAccessService {
 
     @Transactional
     public CrewData tryEnter(PartyroomId partyroomId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserId userId = authContext.getUserId();
         AuthorityTier authorityTier = authContext.getAuthorityTier();
         log.info("[tryEnter] START - userId={}, targetPartyroomId={}, authorityTier={}",
@@ -123,7 +123,7 @@ public class PartyroomAccessService {
 
     @Transactional
     public void exit(PartyroomId partyroomId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         log.info("[exit] START - userId={}, partyroomId={}", authContext.getUserId(), partyroomId.getId());
 
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())

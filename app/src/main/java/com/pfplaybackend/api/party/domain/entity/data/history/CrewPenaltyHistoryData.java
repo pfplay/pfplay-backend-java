@@ -70,4 +70,10 @@ public class CrewPenaltyHistoryData extends BaseEntity {
     private CrewId releasedByCrewId;
 
     public CrewPenaltyHistoryData() {}
+
+    public void release(CrewId releaserCrewId) {
+        this.released = true;
+        this.releasedByCrewId = releaserCrewId;
+        this.releaseDate = LocalDateTime.now();
+    }
 }

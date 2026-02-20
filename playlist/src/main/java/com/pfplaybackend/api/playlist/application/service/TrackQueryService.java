@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +26,9 @@ public class TrackQueryService {
 
     @Transactional(readOnly = true)
     public Page<PlaylistTrackDto> getTracks(Long playlistId, int pageNo, int pageSize) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
-        Optional<PlaylistData> playlistOptional = playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId());
-        if(playlistOptional.isEmpty()) throw ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST);
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
+        playlistRepository.findByIdAndOwnerId(playlistId, authContext.getUserId())
+                .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.ASC, "orderNumber"));
         return trackRepository.getTracksWithPagination(playlistId, pageable);

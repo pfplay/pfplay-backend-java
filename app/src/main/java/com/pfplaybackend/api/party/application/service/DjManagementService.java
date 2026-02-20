@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +40,7 @@ public class DjManagementService {
 
     @Transactional
     public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
@@ -74,13 +73,12 @@ public class DjManagementService {
 
     @Transactional
     public void dequeueDj(PartyroomId partyroomId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
-        Optional<CrewData> crewOptional = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId());
-        if(crewOptional.isEmpty()) throw ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM);
-        CrewData crew = crewOptional.get();
+        CrewData crew = crewRepository.findByPartyroomDataIdAndUserId(partyroomId.getId(), authContext.getUserId())
+                .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
         CrewId crewId = new CrewId(crew.getId());
 
         boolean wasCurrentDj = partyroom.isPlaybackActivated() && partyroomAggregateService.isCurrentDj(partyroomId.getId(), crewId);
@@ -94,7 +92,7 @@ public class DjManagementService {
 
     @Transactional
     public void dequeueDj(PartyroomId partyroomId, DjId djId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomRepository.findById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 

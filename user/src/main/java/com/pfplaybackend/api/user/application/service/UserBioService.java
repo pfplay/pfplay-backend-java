@@ -19,7 +19,7 @@ public class UserBioService {
 
     @Transactional
     public void updateMyBio(UpdateBioCommand updateBioCommand) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         MemberData memberData = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
         memberData.updateProfileBio(updateBioCommand);
         memberRepository.save(memberData);

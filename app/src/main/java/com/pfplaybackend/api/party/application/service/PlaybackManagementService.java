@@ -68,7 +68,7 @@ public class PlaybackManagementService {
 
     @Transactional
     public void skipByManager(PartyroomId partyroomId) {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         ActivePartyroomDto activePartyroomDto = partyroomRepository.getActivePartyroomByUserId(authContext.getUserId()).orElseThrow();
         CrewData adjusterCrew = crewRepository.findByPartyroomDataIdAndUserId(activePartyroomDto.id(), authContext.getUserId()).orElseThrow();
         if (adjusterCrew.isBelowGrade(GradeType.MODERATOR)) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);

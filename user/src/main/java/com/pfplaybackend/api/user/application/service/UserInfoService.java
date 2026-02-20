@@ -18,7 +18,7 @@ public class UserInfoService {
 
     @Transactional(readOnly = true)
     public MyInfoResponse getMyInfo() {
-        AuthContext authContext = (AuthContext) ThreadLocalContext.getContext();
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserAccountData user = userAccountRepository.findByUserId(authContext.getUserId())
                 .orElseThrow(() -> new UnauthorizedException("USER_NOT_FOUND", "User not found"));
         return MyInfoResponse.from(user);
