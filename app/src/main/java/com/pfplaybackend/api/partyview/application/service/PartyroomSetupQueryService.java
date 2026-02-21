@@ -8,6 +8,9 @@ import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackDto;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
+import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
+import com.pfplaybackend.api.party.application.service.PlaybackQueryService;
+import com.pfplaybackend.api.party.application.service.PlaybackReactionQueryService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
@@ -16,16 +19,11 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackReactionHistoryRepository;
-import com.pfplaybackend.api.partyview.adapter.in.web.payload.response.QueryPartyroomSetupResponse;
 import com.pfplaybackend.api.partyview.application.dto.CrewSetupDto;
 import com.pfplaybackend.api.partyview.application.dto.CurrentDjDto;
 import com.pfplaybackend.api.partyview.application.dto.DisplayDto;
 import com.pfplaybackend.api.partyview.application.dto.ReactionDto;
+import com.pfplaybackend.api.partyview.application.dto.result.PartyroomSetupResult;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -39,22 +37,20 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PartyroomSetupQueryService {
 
-    private final PartyroomRepository partyroomRepository;
-    private final CrewRepository crewRepository;
-    private final PlaybackRepository playbackRepository;
-    private final PlaybackAggregationRepository playbackAggregationRepository;
-    private final PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
+    private final PartyroomQueryService partyroomQueryService;
+    private final PlaybackQueryService playbackQueryService;
+    private final PlaybackReactionQueryService playbackReactionQueryService;
     private final UserProfileQueryPort userProfileQueryPort;
 
     @Transactional(readOnly = true)
-    public QueryPartyroomSetupResponse getSetupInfo(PartyroomId partyroomId) {
+    public PartyroomSetupResult getSetupInfo(PartyroomId partyroomId) {
         List<CrewSetupDto> crews = getCrewsForSetup(partyroomId);
         DisplayDto display = getDisplayInfo();
-        return QueryPartyroomSetupResponse.from(crews, display);
+        return new PartyroomSetupResult(crews, display);
     }
 
     private List<CrewSetupDto> getCrewsForSetup(PartyroomId partyroomId) {
-        List<CrewData> crews = crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId());
+        List<CrewData> crews = partyroomQueryService.getActiveCrews(partyroomId);
         List<UserId> userIds = crews.stream().map(CrewData::getUserId).toList();
         Map<UserId, ProfileSettingDto> profileSettingMap = userProfileQueryPort.getUsersProfileSetting(userIds);
 
@@ -66,18 +62,18 @@ public class PartyroomSetupQueryService {
 
     private DisplayDto getDisplayInfo() {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        ActivePartyroomDto activePartyroom = partyroomRepository.getActivePartyroomByUserId(authContext.getUserId())
+        ActivePartyroomDto activePartyroom = partyroomQueryService.getMyActivePartyroom(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
         boolean isPlaybackActivated = activePartyroom.isPlaybackActivated();
 
         if (isPlaybackActivated) {
-            PlaybackData playback = playbackRepository.findById(activePartyroom.currentPlaybackId().getId()).orElseThrow();
+            PlaybackData playback = playbackQueryService.getPlaybackById(activePartyroom.currentPlaybackId());
             CrewId currentDjCrewId = activePartyroom.currentDjCrewId();
             CurrentDjDto currentDjDto = new CurrentDjDto(currentDjCrewId.getId());
 
-            Optional<PlaybackReactionHistoryData> optional = playbackReactionHistoryRepository.findByPlaybackIdAndUserId(
+            Optional<PlaybackReactionHistoryData> optional = playbackReactionQueryService.findPrevHistoryData(
                     new PlaybackId(playback.getId()), authContext.getUserId());
-            PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playback.getId()).orElseThrow();
+            PlaybackAggregationData aggregation = playbackQueryService.getPlaybackAggregationById(playback.getId());
             AggregationDto aggregationDto = new AggregationDto(aggregation.getLikeCount(), aggregation.getDislikeCount(), aggregation.getGrabCount());
             ReactionDto reactionDto = ReactionDto.from(getHistory(optional), aggregationDto);
             PlaybackDto playbackDto = PlaybackDto.withEndTime(playback.getId(), playback.getLinkId(), playback.getName(), playback.getDuration().toDisplayString(), playback.getThumbnailImage(), playback.getEndTime());

@@ -17,6 +17,7 @@ class HexagonalArchitectureTest {
     static JavaClasses partyClasses;
     static JavaClasses authClasses;
     static JavaClasses adminClasses;
+    static JavaClasses partyviewClasses;
 
     @BeforeAll
     static void setUp() {
@@ -29,6 +30,9 @@ class HexagonalArchitectureTest {
         adminClasses = new ClassFileImporter()
                 .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                 .importPackages("com.pfplaybackend.api.admin");
+        partyviewClasses = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .importPackages("com.pfplaybackend.api.partyview");
     }
 
     @Nested
@@ -123,6 +127,33 @@ class HexagonalArchitectureTest {
                     .resideInAPackage("..admin.adapter.in..");
 
             rule.check(adminClasses);
+        }
+    }
+
+    @Nested
+    @DisplayName("Partyview 도메인 레이어 규칙")
+    class PartyviewDomainLayerRules {
+
+        @Test
+        @DisplayName("partyview application 패키지는 partyview adapter.in 패키지에 의존하지 않는다")
+        void applicationShouldNotDependOnInboundAdapter() {
+            ArchRule rule = noClasses()
+                    .that().resideInAPackage("..partyview.application..")
+                    .should().dependOnClassesThat()
+                    .resideInAPackage("..partyview.adapter.in..");
+
+            rule.check(partyviewClasses);
+        }
+
+        @Test
+        @DisplayName("partyview application 패키지는 party adapter.out.persistence 패키지에 의존하지 않는다")
+        void applicationShouldNotDependOnPartyPersistence() {
+            ArchRule rule = noClasses()
+                    .that().resideInAPackage("..partyview.application..")
+                    .should().dependOnClassesThat()
+                    .resideInAPackage("..party.adapter.out.persistence..");
+
+            rule.check(partyviewClasses);
         }
     }
 }

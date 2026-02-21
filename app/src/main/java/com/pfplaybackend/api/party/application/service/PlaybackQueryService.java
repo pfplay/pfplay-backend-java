@@ -51,6 +51,11 @@ public class PlaybackQueryService {
     }
 
     @Transactional(readOnly = true)
+    public PlaybackAggregationData getPlaybackAggregationById(Long playbackId) {
+        return playbackAggregationRepository.findById(playbackId).orElseThrow();
+    }
+
+    @Transactional(readOnly = true)
     public List<PlaybackHistoryDto> getRecentPlaybackHistory(PartyroomId partyroomId) {
         List<PlaybackData> playbackDataList = partyroomQueryPort.getRecentPlaybackHistory(partyroomId);
         if(playbackDataList.isEmpty()) {

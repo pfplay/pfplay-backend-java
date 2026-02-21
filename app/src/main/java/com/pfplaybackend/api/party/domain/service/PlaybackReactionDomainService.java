@@ -2,6 +2,7 @@ package com.pfplaybackend.api.party.domain.service;
 
 import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
+import com.pfplaybackend.api.party.domain.enums.MotionType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
 import com.pfplaybackend.api.party.domain.model.ReactionStateResolver;
@@ -22,37 +23,27 @@ public class PlaybackReactionDomainService {
     }
 
     public ReactionPostProcessResult determinePostProcessing(ReactionState existingState, ReactionState targetState) {
-        ReactionPostProcessResult reactionPostProcessDto = new ReactionPostProcessResult();
-
         ResolvedReaction existingResolved = ReactionStateResolver.resolve(existingState);
         ResolvedReaction targetResolved = ReactionStateResolver.resolve(targetState);
 
         boolean isDifferentMotionType = diffMotionType(existingResolved, targetResolved);
         boolean isDifferentDjActivityScore = diffDjActivityScore(existingResolved, targetResolved);
-        boolean isDifferentAggregation =  diffAggregation(existingState, targetState);
+        boolean isDifferentAggregation = diffAggregation(existingState, targetState);
         boolean isDifferentGrabStatus = diffGrabStatus(existingState, targetState);
 
-        reactionPostProcessDto.setMotionChanged(isDifferentMotionType);
-        reactionPostProcessDto.setDjActivityScoreChanged(isDifferentDjActivityScore);
-        reactionPostProcessDto.setAggregationChanged(isDifferentAggregation);
-        reactionPostProcessDto.setGrabStatusChanged(isDifferentGrabStatus);
+        MotionType determinedMotionType = isDifferentMotionType ? targetResolved.getMotionType() : null;
+        int deltaScore = isDifferentDjActivityScore ? targetResolved.getScore() - existingResolved.getScore() : 0;
+        List<Integer> deltaRecord = isDifferentAggregation
+                ? List.of(
+                    convertBooleanToInt(targetState.isLiked()) - convertBooleanToInt(existingState.isLiked()),
+                    convertBooleanToInt(targetState.isDisliked()) - convertBooleanToInt(existingState.isDisliked()),
+                    convertBooleanToInt(targetState.isGrabbed()) - convertBooleanToInt(existingState.isGrabbed()))
+                : null;
 
-        if(isDifferentMotionType) {
-            reactionPostProcessDto.setDeterminedMotionType(targetResolved.getMotionType());
-        }
-
-        if(isDifferentDjActivityScore) {
-            int deltaDjScore = targetResolved.getScore() - existingResolved.getScore();
-            reactionPostProcessDto.setDeltaScore(deltaDjScore);
-        }
-
-        if(isDifferentAggregation) {
-            int likeCountDelta = convertBooleanToInt(targetState.isLiked()) - convertBooleanToInt(existingState.isLiked());
-            int dislikeCountDelta = convertBooleanToInt(targetState.isDisliked()) - convertBooleanToInt(existingState.isDisliked());
-            int grabCountDelta = convertBooleanToInt(targetState.isGrabbed()) - convertBooleanToInt(existingState.isGrabbed());
-            reactionPostProcessDto.setDeltaRecord(List.of(likeCountDelta, dislikeCountDelta, grabCountDelta));
-        }
-        return reactionPostProcessDto;
+        return new ReactionPostProcessResult(
+                isDifferentAggregation, isDifferentMotionType,
+                isDifferentDjActivityScore, isDifferentGrabStatus,
+                deltaRecord, deltaScore, determinedMotionType);
     }
 
     private boolean diffAggregation(ReactionState existingState, ReactionState targetState) {

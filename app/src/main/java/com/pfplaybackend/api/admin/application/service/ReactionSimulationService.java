@@ -85,12 +85,12 @@ public class ReactionSimulationService {
 
         // Update DJ activity score
         if (postProcessDto.isDjActivityScoreChanged()) {
-            userActivityPort.updateDjPointScore(playback.getUserId(), postProcessDto.getDeltaScore());
+            userActivityPort.updateDjPointScore(playback.getUserId(), postProcessDto.deltaScore());
         }
 
         // Update playback aggregation (includes GRAB count)
         if (postProcessDto.isAggregationChanged()) {
-            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(playback.getId(), postProcessDto.getDeltaRecord());
+            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(playback.getId(), postProcessDto.deltaRecord());
             playbackReactionPostProcessCommandService.publishAggregationChangedEvent(partyroomId, aggregation);
         }
 
@@ -98,7 +98,7 @@ public class ReactionSimulationService {
         playbackReactionPostProcessCommandService.publishMotionChangedEvent(
                 partyroomId,
                 reactionType,
-                postProcessDto.getDeterminedMotionType(),
+                postProcessDto.determinedMotionType(),
                 crewId
         );
 

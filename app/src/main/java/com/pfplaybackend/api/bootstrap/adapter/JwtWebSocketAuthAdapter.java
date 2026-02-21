@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.common.adapter.realtime;
+package com.pfplaybackend.api.bootstrap.adapter;
 
 import com.pfplaybackend.api.common.config.security.jwt.JwtCookieValidator;
 import com.pfplaybackend.realtime.port.WebSocketAuthPort;

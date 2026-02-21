@@ -68,6 +68,11 @@ public class PartyroomQueryService {
     }
 
     @Transactional(readOnly = true)
+    public List<CrewData> getActiveCrews(PartyroomId partyroomId) {
+        return aggregatePort.findActiveCrews(partyroomId.getId());
+    }
+
+    @Transactional(readOnly = true)
     public PartyroomData getPartyroomById(PartyroomId partyroomId) {
         return aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));

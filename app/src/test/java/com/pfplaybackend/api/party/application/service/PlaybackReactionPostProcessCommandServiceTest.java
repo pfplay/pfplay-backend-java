@@ -61,11 +61,8 @@ class PlaybackReactionPostProcessCommandServiceTest {
     @DisplayName("grab 상태 변경 시 grabTrack이 호출된다")
     void postProcess_grabStatusChanged_callsGrabTrack() {
         // given
-        ReactionPostProcessResult dto = new ReactionPostProcessResult();
-        dto.setGrabStatusChanged(true);
-        dto.setDjActivityScoreChanged(false);
-        dto.setAggregationChanged(false);
-        dto.setDeterminedMotionType(MotionType.NONE);
+        ReactionPostProcessResult dto = new ReactionPostProcessResult(
+                false, false, false, true, null, 0, MotionType.NONE);
 
         PlaybackData playback = mock(PlaybackData.class);
         lenient().when(playback.getUserId()).thenReturn(new UserId(2L));
@@ -84,12 +81,8 @@ class PlaybackReactionPostProcessCommandServiceTest {
     @DisplayName("DJ 활동 점수 변경 시 점수가 업데이트된다")
     void postProcess_djActivityScoreChanged_updatesScore() {
         // given
-        ReactionPostProcessResult dto = new ReactionPostProcessResult();
-        dto.setGrabStatusChanged(false);
-        dto.setDjActivityScoreChanged(true);
-        dto.setAggregationChanged(false);
-        dto.setDeltaScore(5);
-        dto.setDeterminedMotionType(MotionType.NONE);
+        ReactionPostProcessResult dto = new ReactionPostProcessResult(
+                false, false, true, false, null, 5, MotionType.NONE);
 
         PlaybackData playback = mock(PlaybackData.class);
         when(playback.getUserId()).thenReturn(new UserId(2L));
@@ -106,12 +99,8 @@ class PlaybackReactionPostProcessCommandServiceTest {
     @DisplayName("집계 변경 시 PlaybackAggregation이 업데이트되고 이벤트가 발행된다")
     void postProcess_aggregationChanged_updatesAndPublishes() {
         // given
-        ReactionPostProcessResult dto = new ReactionPostProcessResult();
-        dto.setGrabStatusChanged(false);
-        dto.setDjActivityScoreChanged(false);
-        dto.setAggregationChanged(true);
-        dto.setDeltaRecord(List.of(1, 0, 0));
-        dto.setDeterminedMotionType(MotionType.NONE);
+        ReactionPostProcessResult dto = new ReactionPostProcessResult(
+                true, false, false, false, List.of(1, 0, 0), 0, MotionType.NONE);
 
         PlaybackData playback = mock(PlaybackData.class);
         lenient().when(playback.getUserId()).thenReturn(new UserId(2L));
@@ -138,11 +127,8 @@ class PlaybackReactionPostProcessCommandServiceTest {
     @DisplayName("아무 상태도 변경되지 않으면 motion 이벤트만 발행된다")
     void postProcess_noChanges_onlyMotionEvent() {
         // given
-        ReactionPostProcessResult dto = new ReactionPostProcessResult();
-        dto.setGrabStatusChanged(false);
-        dto.setDjActivityScoreChanged(false);
-        dto.setAggregationChanged(false);
-        dto.setDeterminedMotionType(MotionType.NONE);
+        ReactionPostProcessResult dto = new ReactionPostProcessResult(
+                false, false, false, false, null, 0, MotionType.NONE);
 
         PlaybackData playback = mock(PlaybackData.class);
         lenient().when(playback.getUserId()).thenReturn(new UserId(2L));

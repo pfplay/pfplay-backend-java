@@ -36,13 +36,13 @@ public class PlaybackReactionPostProcessCommandService {
             grabTrack(authContext.getUserId(), playback);
         }
         if(postProcessDto.isDjActivityScoreChanged()) {
-            updateDjActivityScore(playback.getUserId(), postProcessDto.getDeltaScore());
+            updateDjActivityScore(playback.getUserId(), postProcessDto.deltaScore());
         }
         if(postProcessDto.isAggregationChanged()) {
-            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(playback.getId(), postProcessDto.getDeltaRecord());
+            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(playback.getId(), postProcessDto.deltaRecord());
             publishAggregationChangedEvent(partyroomId, aggregation);
         }
-        publishMotionChangedEvent(partyroomId, reactionType, postProcessDto.getDeterminedMotionType(), crewId);
+        publishMotionChangedEvent(partyroomId, reactionType, postProcessDto.determinedMotionType(), crewId);
     }
 
     public void publishMotionChangedEvent(PartyroomId partyroomId, ReactionType reactionType, MotionType motionType, CrewId crewId) {

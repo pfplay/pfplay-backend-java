@@ -7,13 +7,11 @@ import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackReactionHistoryRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
+import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
+import com.pfplaybackend.api.party.application.service.PlaybackQueryService;
+import com.pfplaybackend.api.party.application.service.PlaybackReactionQueryService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
@@ -21,7 +19,7 @@ import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.partyview.adapter.in.web.payload.response.QueryPartyroomSetupResponse;
+import com.pfplaybackend.api.partyview.application.dto.result.PartyroomSetupResult;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,11 +42,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PartyroomSetupQueryServiceTest {
 
-    @Mock PartyroomRepository partyroomRepository;
-    @Mock CrewRepository crewRepository;
-    @Mock PlaybackRepository playbackRepository;
-    @Mock PlaybackAggregationRepository playbackAggregationRepository;
-    @Mock PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
+    @Mock PartyroomQueryService partyroomQueryService;
+    @Mock PlaybackQueryService playbackQueryService;
+    @Mock PlaybackReactionQueryService playbackReactionQueryService;
     @Mock UserProfileQueryPort userProfileQueryPort;
 
     @InjectMocks PartyroomSetupQueryService partyroomSetupQueryService;
@@ -94,28 +90,27 @@ class PartyroomSetupQueryServiceTest {
         PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(playbackId.getId());
         aggregation.updateAggregation(5, 1, 2);
 
-        when(crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId()))
-                .thenReturn(List.of(crew1, djCrew));
+        when(partyroomQueryService.getActiveCrews(partyroomId)).thenReturn(List.of(crew1, djCrew));
         when(userProfileQueryPort.getUsersProfileSetting(any()))
                 .thenReturn(Map.of(
                         userId, createProfileSetting("User1"),
                         djUserId, createProfileSetting("DJ")
                 ));
-        when(partyroomRepository.getActivePartyroomByUserId(userId)).thenReturn(Optional.of(activeDto));
-        when(playbackRepository.findById(playbackId.getId())).thenReturn(Optional.of(playback));
-        when(playbackAggregationRepository.findById(playbackId.getId())).thenReturn(Optional.of(aggregation));
-        when(playbackReactionHistoryRepository.findByPlaybackIdAndUserId(any(), any()))
+        when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
+        when(playbackQueryService.getPlaybackById(playbackId)).thenReturn(playback);
+        when(playbackQueryService.getPlaybackAggregationById(playbackId.getId())).thenReturn(aggregation);
+        when(playbackReactionQueryService.findPrevHistoryData(any(), any()))
                 .thenReturn(Optional.empty());
 
         // when
-        QueryPartyroomSetupResponse response = partyroomSetupQueryService.getSetupInfo(partyroomId);
+        PartyroomSetupResult result = partyroomSetupQueryService.getSetupInfo(partyroomId);
 
         // then
-        assertThat(response.getDisplay().isPlaybackActivated()).isTrue();
-        assertThat(response.getDisplay().playback()).isNotNull();
-        assertThat(response.getDisplay().playback().getName()).isEqualTo("Song");
-        assertThat(response.getDisplay().currentDj()).isNotNull();
-        assertThat(response.getCrews()).hasSize(2);
+        assertThat(result.display().isPlaybackActivated()).isTrue();
+        assertThat(result.display().playback()).isNotNull();
+        assertThat(result.display().playback().getName()).isEqualTo("Song");
+        assertThat(result.display().currentDj()).isNotNull();
+        assertThat(result.crews()).hasSize(2);
     }
 
     @Test
@@ -125,20 +120,19 @@ class PartyroomSetupQueryServiceTest {
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, false, null, null);
         CrewData crew = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
 
-        when(crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId()))
-                .thenReturn(List.of(crew));
+        when(partyroomQueryService.getActiveCrews(partyroomId)).thenReturn(List.of(crew));
         when(userProfileQueryPort.getUsersProfileSetting(any()))
                 .thenReturn(Map.of(userId, createProfileSetting("User1")));
-        when(partyroomRepository.getActivePartyroomByUserId(userId)).thenReturn(Optional.of(activeDto));
+        when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
 
         // when
-        QueryPartyroomSetupResponse response = partyroomSetupQueryService.getSetupInfo(partyroomId);
+        PartyroomSetupResult result = partyroomSetupQueryService.getSetupInfo(partyroomId);
 
         // then
-        assertThat(response.getDisplay().isPlaybackActivated()).isFalse();
-        assertThat(response.getDisplay().playback()).isNull();
-        assertThat(response.getDisplay().reaction()).isNull();
-        assertThat(response.getDisplay().currentDj()).isNull();
+        assertThat(result.display().isPlaybackActivated()).isFalse();
+        assertThat(result.display().playback()).isNull();
+        assertThat(result.display().reaction()).isNull();
+        assertThat(result.display().currentDj()).isNull();
     }
 
     @Test
@@ -151,33 +145,31 @@ class PartyroomSetupQueryServiceTest {
         CrewData crew1 = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.HOST).build();
         CrewData crew2 = CrewData.builder().id(2L).userId(user2).gradeType(GradeType.CLUBBER).build();
 
-        when(crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId()))
-                .thenReturn(List.of(crew1, crew2));
+        when(partyroomQueryService.getActiveCrews(partyroomId)).thenReturn(List.of(crew1, crew2));
         when(userProfileQueryPort.getUsersProfileSetting(any()))
                 .thenReturn(Map.of(
                         userId, createProfileSetting("Host"),
                         user2, createProfileSetting("Clubber")
                 ));
-        when(partyroomRepository.getActivePartyroomByUserId(userId)).thenReturn(Optional.of(activeDto));
+        when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
 
         // when
-        QueryPartyroomSetupResponse response = partyroomSetupQueryService.getSetupInfo(partyroomId);
+        PartyroomSetupResult result = partyroomSetupQueryService.getSetupInfo(partyroomId);
 
         // then
-        assertThat(response.getCrews()).hasSize(2);
-        assertThat(response.getCrews().get(0).nickname()).isEqualTo("Host");
-        assertThat(response.getCrews().get(1).nickname()).isEqualTo("Clubber");
+        assertThat(result.crews()).hasSize(2);
+        assertThat(result.crews().get(0).nickname()).isEqualTo("Host");
+        assertThat(result.crews().get(1).nickname()).isEqualTo("Clubber");
     }
 
     @Test
     @DisplayName("getSetupInfo — 활성 파티룸이 없으면 예외가 발생한다")
     void getSetupInfo_noActiveRoom_throws() {
         // given
-        when(crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId.getId()))
-                .thenReturn(List.of());
+        when(partyroomQueryService.getActiveCrews(partyroomId)).thenReturn(List.of());
         when(userProfileQueryPort.getUsersProfileSetting(any()))
                 .thenReturn(Map.of());
-        when(partyroomRepository.getActivePartyroomByUserId(userId)).thenReturn(Optional.empty());
+        when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> partyroomSetupQueryService.getSetupInfo(partyroomId))

@@ -99,11 +99,11 @@ class PlaybackReactionDomainServiceTest {
 
             // then
             assertThat(result.isMotionChanged()).isTrue();
-            assertThat(result.getDeterminedMotionType()).isEqualTo(MotionType.DANCE_TYPE_1);
+            assertThat(result.determinedMotionType()).isEqualTo(MotionType.DANCE_TYPE_1);
             assertThat(result.isDjActivityScoreChanged()).isTrue();
-            assertThat(result.getDeltaScore()).isEqualTo(1);
+            assertThat(result.deltaScore()).isEqualTo(1);
             assertThat(result.isAggregationChanged()).isTrue();
-            assertThat(result.getDeltaRecord()).isEqualTo(List.of(1, 0, 0));
+            assertThat(result.deltaRecord()).isEqualTo(List.of(1, 0, 0));
         }
 
         @Test
@@ -118,11 +118,11 @@ class PlaybackReactionDomainServiceTest {
 
             // then
             assertThat(result.isMotionChanged()).isTrue();
-            assertThat(result.getDeterminedMotionType()).isEqualTo(MotionType.DANCE_TYPE_2);
+            assertThat(result.determinedMotionType()).isEqualTo(MotionType.DANCE_TYPE_2);
             assertThat(result.isDjActivityScoreChanged()).isTrue();
-            assertThat(result.getDeltaScore()).isEqualTo(2);
+            assertThat(result.deltaScore()).isEqualTo(2);
             assertThat(result.isGrabStatusChanged()).isTrue();
-            assertThat(result.getDeltaRecord()).isEqualTo(List.of(0, 0, 1));
+            assertThat(result.deltaRecord()).isEqualTo(List.of(0, 0, 1));
         }
 
         @Test
@@ -137,11 +137,11 @@ class PlaybackReactionDomainServiceTest {
 
             // then
             assertThat(result.isMotionChanged()).isTrue();
-            assertThat(result.getDeterminedMotionType()).isEqualTo(MotionType.NONE);
+            assertThat(result.determinedMotionType()).isEqualTo(MotionType.NONE);
             assertThat(result.isDjActivityScoreChanged()).isTrue();
-            assertThat(result.getDeltaScore()).isEqualTo(-1);
+            assertThat(result.deltaScore()).isEqualTo(-1);
             assertThat(result.isAggregationChanged()).isTrue();
-            assertThat(result.getDeltaRecord()).isEqualTo(List.of(-1, 1, 0));
+            assertThat(result.deltaRecord()).isEqualTo(List.of(-1, 1, 0));
         }
 
         @Test

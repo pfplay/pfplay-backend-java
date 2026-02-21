@@ -1,8 +1,6 @@
 def queryDslVersion = '5.0.0'
 
 dependencies {
-	implementation project(':realtime')
-
 	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'

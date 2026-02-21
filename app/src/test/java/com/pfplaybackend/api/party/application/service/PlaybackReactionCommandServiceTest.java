@@ -79,7 +79,7 @@ class PlaybackReactionCommandServiceTest {
         when(playbackReactionDomainService.getTargetReactionState(baseState, ReactionType.LIKE))
                 .thenReturn(targetState);
 
-        ReactionPostProcessResult postProcessResult = new ReactionPostProcessResult();
+        ReactionPostProcessResult postProcessResult = new ReactionPostProcessResult(false, false, false, false, null, 0, null);
         when(playbackReactionDomainService.determinePostProcessing(baseState, targetState))
                 .thenReturn(postProcessResult);
         when(playbackReactionHistoryRepository.save(any())).thenReturn(historyData);
@@ -134,7 +134,7 @@ class PlaybackReactionCommandServiceTest {
         when(playbackReactionDomainService.getTargetReactionState(existingState, ReactionType.LIKE))
                 .thenReturn(targetState);
 
-        ReactionPostProcessResult postProcessResult = new ReactionPostProcessResult();
+        ReactionPostProcessResult postProcessResult = new ReactionPostProcessResult(false, false, false, false, null, 0, null);
         when(playbackReactionDomainService.determinePostProcessing(existingState, targetState))
                 .thenReturn(postProcessResult);
         when(playbackReactionHistoryRepository.save(any())).thenReturn(historyData);

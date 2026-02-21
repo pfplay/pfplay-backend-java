@@ -22,6 +22,7 @@ public interface PartyroomAggregatePort {
     Optional<CrewData> findCrewById(Long crewId);
     List<CrewData> findCrewsByIds(Iterable<Long> crewIds);
     CrewData saveCrew(CrewData crew);
+    List<CrewData> findActiveCrews(Long partyroomId);
     long countActiveCrews(Long partyroomId);
 
     // ===== DJ: DjData =====

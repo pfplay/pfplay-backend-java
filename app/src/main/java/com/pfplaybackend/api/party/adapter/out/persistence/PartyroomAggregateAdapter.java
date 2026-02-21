@@ -75,6 +75,11 @@ public class PartyroomAggregateAdapter implements PartyroomAggregatePort, Partyr
     }
 
     @Override
+    public List<CrewData> findActiveCrews(Long partyroomId) {
+        return crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId);
+    }
+
+    @Override
     public long countActiveCrews(Long partyroomId) {
         return crewRepository.countByPartyroomIdAndIsActiveTrue(partyroomId);
     }

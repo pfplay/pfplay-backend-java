@@ -3,6 +3,7 @@ package com.pfplaybackend.api.partyview.adapter.in.web;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.partyview.adapter.in.web.payload.response.QueryPartyroomSetupResponse;
+import com.pfplaybackend.api.partyview.application.dto.result.PartyroomSetupResult;
 import com.pfplaybackend.api.partyview.application.service.PartyroomSetupQueryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,8 @@ public class PartyroomSetupController {
 
     @GetMapping("/{partyroomId}/setup")
     public ResponseEntity<ApiCommonResponse<QueryPartyroomSetupResponse>> getSetupInfo(@PathVariable Long partyroomId) {
+        PartyroomSetupResult result = partyroomSetupQueryService.getSetupInfo(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(
-                ApiCommonResponse.success(partyroomSetupQueryService.getSetupInfo(new PartyroomId(partyroomId))));
+                ApiCommonResponse.success(QueryPartyroomSetupResponse.from(result.crews(), result.display())));
     }
 }
