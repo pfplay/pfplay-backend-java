@@ -1,12 +1,12 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence.custom;
 
-import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
 
 import java.util.List;
 
 public interface PlaylistRepositoryCustom {
-    List<PlaylistSummary> findAllByUserId(UserId userId);
-    PlaylistSummary findByIdAndUserId(Long playlistId, UserId userId);
+    List<PlaylistSummaryDto> findAllByUserId(UserId userId);
+    PlaylistSummaryDto findByIdAndUserId(Long playlistId, UserId userId);
     Long deleteByListIds(List<Long> listIds);
 }

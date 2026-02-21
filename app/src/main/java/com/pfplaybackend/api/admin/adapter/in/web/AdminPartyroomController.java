@@ -5,10 +5,10 @@ import com.pfplaybackend.api.admin.application.dto.command.AdminCreatePartyroomC
 import com.pfplaybackend.api.admin.application.dto.command.BulkPreviewCommand;
 import com.pfplaybackend.api.admin.application.dto.result.AdminPartyroomResult;
 import com.pfplaybackend.api.admin.application.dto.result.BulkPreviewResult;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.request.AdminCreatePartyroomRequest;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.request.BulkPreviewEnvironmentRequest;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.AdminPartyroomResponse;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.BulkPreviewEnvironmentResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.request.AdminCreatePartyroomRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.request.CreateBulkPreviewEnvironmentRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.CreateAdminPartyroomResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.CreateBulkPreviewEnvironmentResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class AdminPartyroomController {
     @Operation(summary = "Create partyroom with designated host")
     @PostMapping
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<AdminPartyroomResponse> createPartyroom(
+    public ResponseEntity<CreateAdminPartyroomResponse> createPartyroom(
             @Valid @RequestBody AdminCreatePartyroomRequest request) {
 
         log.info("Admin creating partyroom: hostUserId={}, title={}",
@@ -45,7 +45,7 @@ public class AdminPartyroomController {
 
         AdminPartyroomResult result = adminPartyroomService.createPartyroomWithHost(command);
 
-        AdminPartyroomResponse response = AdminPartyroomResponse.builder()
+        CreateAdminPartyroomResponse response = CreateAdminPartyroomResponse.builder()
                 .partyroomId(result.partyroomId())
                 .hostUserId(result.hostUserId())
                 .title(result.title())
@@ -63,8 +63,8 @@ public class AdminPartyroomController {
     @Operation(summary = "Create bulk preview environment")
     @PostMapping("/bulk-preview")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<BulkPreviewEnvironmentResponse> createBulkPreviewEnvironment(
-            @Valid @RequestBody BulkPreviewEnvironmentRequest request) {
+    public ResponseEntity<CreateBulkPreviewEnvironmentResponse> createBulkPreviewEnvironment(
+            @Valid @RequestBody CreateBulkPreviewEnvironmentRequest request) {
 
         log.info("Admin creating bulk preview environment: {} partyrooms with {} users each",
                 request.getPartyroomCount(), request.getUsersPerRoom());
@@ -75,12 +75,12 @@ public class AdminPartyroomController {
 
         BulkPreviewResult result = adminPartyroomService.createBulkPreviewEnvironment(command);
 
-        BulkPreviewEnvironmentResponse response = BulkPreviewEnvironmentResponse.builder()
+        CreateBulkPreviewEnvironmentResponse response = CreateBulkPreviewEnvironmentResponse.builder()
                 .totalPartyrooms(result.totalPartyrooms())
                 .totalVirtualMembers(result.totalVirtualMembers())
                 .executionTimeMs(result.executionTimeMs())
                 .partyrooms(result.partyrooms().stream()
-                        .map(s -> BulkPreviewEnvironmentResponse.PartyroomSummary.builder()
+                        .map(s -> CreateBulkPreviewEnvironmentResponse.PartyroomSummary.builder()
                                 .partyroomId(s.partyroomId())
                                 .title(s.title())
                                 .linkDomain(s.linkDomain())

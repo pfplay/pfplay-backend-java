@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.adapter.in.listener;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
-import com.pfplaybackend.api.party.application.dto.PlaybackDurationWaitPayload;
+import com.pfplaybackend.api.party.application.dto.playback.PlaybackDurationWaitDto;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -23,7 +23,7 @@ public class PlaybackDurationWaitTopicListener implements MessageListener {
         if(expiredKey.startsWith("TASK:WAIT")) {
             String taskId = expiredKey.split(":")[2];
             String argsKey = "WAIT:ARGS:" + taskId;
-            PlaybackDurationWaitPayload deserialized = objectMapper.convertValue(redisTemplate.opsForValue().get(argsKey), PlaybackDurationWaitPayload.class);
+            PlaybackDurationWaitDto deserialized = objectMapper.convertValue(redisTemplate.opsForValue().get(argsKey), PlaybackDurationWaitDto.class);
             String suffixId = deserialized.userId().getUid().toString();
             distributedLockExecutor.performTaskWithLock(suffixId, () -> {
                 redisTemplate.delete(argsKey);

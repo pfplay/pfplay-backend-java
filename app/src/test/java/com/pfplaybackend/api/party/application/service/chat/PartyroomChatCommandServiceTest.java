@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
-import com.pfplaybackend.api.party.application.dto.chat.ChatMessagePayload;
+import com.pfplaybackend.api.party.application.dto.chat.ChatMessageDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.realtime.port.SessionCachePort;
@@ -56,7 +56,7 @@ class PartyroomChatCommandServiceTest {
         partyroomChatCommandService.sendMessage(sessionId, "Hello!");
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.CHAT.topic()), any(ChatMessagePayload.class));
+        verify(messagePublisher).publish(eq(MessageTopic.CHAT.topic()), any(ChatMessageDto.class));
     }
 
     @Test

@@ -2,8 +2,8 @@ package com.pfplaybackend.api.auth.application.service;
 
 import com.pfplaybackend.api.auth.adapter.out.external.GoogleOAuthClient;
 import com.pfplaybackend.api.auth.adapter.out.external.TwitterOAuthClient;
-import com.pfplaybackend.api.auth.application.dto.OAuthTokenResponse;
-import com.pfplaybackend.api.auth.application.dto.OAuthUserProfile;
+import com.pfplaybackend.api.auth.application.dto.oauth.OAuthTokenDto;
+import com.pfplaybackend.api.auth.application.dto.oauth.OAuthUserProfileDto;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class OAuthClientService {
     private final GoogleOAuthClient googleOAuthClient;
     private final TwitterOAuthClient twitterOAuthClient;
 
-    public OAuthTokenResponse exchangeCodeForToken(OAuthProvider provider, String code, String codeVerifier) {
+    public OAuthTokenDto exchangeCodeForToken(OAuthProvider provider, String code, String codeVerifier) {
         log.debug("Exchanging code for token with provider: {}", provider);
 
         return switch (provider) {
@@ -26,7 +26,7 @@ public class OAuthClientService {
         };
     }
 
-    public OAuthUserProfile getUserProfile(OAuthProvider provider, String accessToken) {
+    public OAuthUserProfileDto getUserProfile(OAuthProvider provider, String accessToken) {
         log.debug("Fetching user profile from provider: {}", provider);
 
         return switch (provider) {

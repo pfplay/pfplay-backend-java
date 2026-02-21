@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
 import com.pfplaybackend.api.user.application.validation.AvatarRequestValidator;
-import com.pfplaybackend.api.user.adapter.in.web.payload.request.SetAvatarRequest;
+import com.pfplaybackend.api.user.adapter.in.web.payload.request.UpdateAvatarRequest;
 import com.pfplaybackend.api.user.application.dto.command.SetAvatarCommand;
 import com.pfplaybackend.api.user.application.service.UserAvatarCommandService;
 import com.pfplaybackend.api.common.ApiCommonResponse;
@@ -23,14 +23,14 @@ public class UserAvatarCommandController {
 
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @PutMapping("/me/profile/avatar")
-    public ResponseEntity<ApiCommonResponse<Void>> setMyAvatar(@Valid @RequestBody SetAvatarRequest request) {
+    public ResponseEntity<ApiCommonResponse<Void>> setMyAvatar(@Valid @RequestBody UpdateAvatarRequest request) {
         SetAvatarCommand command = toCommand(request);
         avatarRequestValidator.validate(command);
         userAvatarCommandService.setUserAvatar(command);
         return ResponseEntity.ok().body(ApiCommonResponse.ok());
     }
 
-    private SetAvatarCommand toCommand(SetAvatarRequest request) {
+    private SetAvatarCommand toCommand(UpdateAvatarRequest request) {
         SetAvatarCommand.AvatarFaceSpec faceSpec = null;
         if (request.getFace() != null) {
             faceSpec = new SetAvatarCommand.AvatarFaceSpec(

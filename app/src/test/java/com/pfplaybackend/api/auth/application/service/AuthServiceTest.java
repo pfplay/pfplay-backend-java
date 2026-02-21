@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.auth.application.service;
 
-import com.pfplaybackend.api.auth.application.dto.OAuthTokenResponse;
-import com.pfplaybackend.api.auth.application.dto.OAuthUserProfile;
+import com.pfplaybackend.api.auth.application.dto.oauth.OAuthTokenDto;
+import com.pfplaybackend.api.auth.application.dto.oauth.OAuthUserProfileDto;
 import com.pfplaybackend.api.auth.application.dto.command.OAuthLoginCommand;
 import com.pfplaybackend.api.auth.application.dto.result.AuthResult;
 import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
@@ -41,11 +41,11 @@ class AuthServiceTest {
         // given
         OAuthLoginCommand command = new OAuthLoginCommand("google", "auth-code", "verifier");
 
-        OAuthTokenResponse tokenResponse = new OAuthTokenResponse("access-token", "Bearer", 3600, null, "email");
+        OAuthTokenDto tokenResponse = new OAuthTokenDto("access-token", "Bearer", 3600, null, "email");
         when(oAuthClientService.exchangeCodeForToken(OAuthProvider.GOOGLE, "auth-code", "verifier"))
                 .thenReturn(tokenResponse);
 
-        OAuthUserProfile userProfile = new OAuthUserProfile("google-id", "test@gmail.com", "Test User", null);
+        OAuthUserProfileDto userProfile = new OAuthUserProfileDto("google-id", "test@gmail.com", "Test User", null);
         when(oAuthClientService.getUserProfile(OAuthProvider.GOOGLE, "access-token"))
                 .thenReturn(userProfile);
 

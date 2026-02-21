@@ -1,0 +1,35 @@
+package com.pfplaybackend.api.user.adapter.in.web.payload.response;
+
+import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
+import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import lombok.Builder;
+import lombok.Data;
+
+import java.util.List;
+import java.util.Optional;
+
+@Data
+@Builder
+public class QueryOtherProfileSummaryResponse {
+    private String nickname;
+    private String introduction;
+    private String avatarBodyUri;
+    private String avatarFaceUri;
+    private List<ActivitySummaryDto> activitySummaries;
+
+    public static QueryOtherProfileSummaryResponse from(ProfileSummaryDto profileSummaryDto) {
+        List<ActivitySummaryDto> activitySummaries = Optional.ofNullable(profileSummaryDto.activitySummaries())
+                .map(list -> list.stream()
+                        .filter(a -> a.activityType().equals(ActivityType.DJ_PNT))
+                        .toList())
+                .orElse(List.of());
+        return QueryOtherProfileSummaryResponse.builder()
+                .nickname(profileSummaryDto.nickname())
+                .introduction(profileSummaryDto.introduction())
+                .avatarBodyUri(profileSummaryDto.avatarBodyUri())
+                .avatarFaceUri(profileSummaryDto.avatarFaceUri())
+                .activitySummaries(activitySummaries)
+                .build();
+    }
+}

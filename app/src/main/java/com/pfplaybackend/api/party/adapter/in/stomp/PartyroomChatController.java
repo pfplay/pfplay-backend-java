@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.application.service.chat.PartyroomChatCommandService;
 
 import com.pfplaybackend.api.party.adapter.in.web.api.PartyroomChatApi;
-import com.pfplaybackend.api.party.adapter.in.web.dto.IncomingGroupChatMessage;
+import com.pfplaybackend.api.party.adapter.in.stomp.message.IncomingGroupChatMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

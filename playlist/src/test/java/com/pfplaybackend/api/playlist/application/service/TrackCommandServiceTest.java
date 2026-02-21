@@ -6,7 +6,7 @@ import com.pfplaybackend.api.common.exception.http.BadRequestException;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
 import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
@@ -77,7 +77,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByPlaylistAndLink(playlistId, "linkId1")).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(playlistId))
-                .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 3L));
+                .thenReturn(new PlaylistSummaryDto(playlistId, "test", 0, PlaylistType.PLAYLIST, 3L));
 
         // when
         trackCommandService.addTrackInPlaylist(playlistId, command);
@@ -134,7 +134,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByPlaylistAndLink(playlistId, "linkId1")).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(playlistId))
-                .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 15L));
+                .thenReturn(new PlaylistSummaryDto(playlistId, "test", 0, PlaylistType.PLAYLIST, 15L));
 
         // when & then
         assertThatThrownBy(() -> trackCommandService.addTrackInPlaylist(playlistId, command))
@@ -209,7 +209,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findTrackByIdAndPlaylist(trackId, sourcePlaylistId)).thenReturn(Optional.of(trackData));
         when(aggregatePort.findTrackByPlaylistAndLink(targetPlaylistId, "linkId1")).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(targetPlaylistId))
-                .thenReturn(new PlaylistSummary(targetPlaylistId, "target", 1, PlaylistType.PLAYLIST, 5L));
+                .thenReturn(new PlaylistSummaryDto(targetPlaylistId, "target", 1, PlaylistType.PLAYLIST, 5L));
 
         // when
         trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, command);
@@ -312,7 +312,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findTrackByIdAndPlaylist(trackId, sourcePlaylistId)).thenReturn(Optional.of(trackData));
         when(aggregatePort.findTrackByPlaylistAndLink(targetPlaylistId, "linkId1")).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(targetPlaylistId))
-                .thenReturn(new PlaylistSummary(targetPlaylistId, "target", 1, PlaylistType.PLAYLIST, 15L));
+                .thenReturn(new PlaylistSummaryDto(targetPlaylistId, "target", 1, PlaylistType.PLAYLIST, 15L));
 
         // when & then
         assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, command))
@@ -338,7 +338,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)).thenReturn(Optional.of(trackData));
         when(playlistQueryService.getPlaylist(playlistId))
-                .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
+                .thenReturn(new PlaylistSummaryDto(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 
         // when
         trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command);
@@ -365,7 +365,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)).thenReturn(Optional.of(trackData));
         when(playlistQueryService.getPlaylist(playlistId))
-                .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
+                .thenReturn(new PlaylistSummaryDto(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 
         // when
         trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command);
@@ -393,7 +393,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)).thenReturn(Optional.of(trackData));
         when(playlistQueryService.getPlaylist(playlistId))
-                .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
+                .thenReturn(new PlaylistSummaryDto(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 
         // when & then
         assertThatThrownBy(() -> trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command))

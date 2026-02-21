@@ -8,13 +8,13 @@ import com.pfplaybackend.api.admin.application.dto.result.AdminPartyroomListResu
 import com.pfplaybackend.api.admin.application.dto.result.DemoEnvironmentResult;
 import com.pfplaybackend.api.admin.application.dto.result.DemoStatusResult;
 import com.pfplaybackend.api.admin.application.dto.result.SimulateReactionsResult;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.request.InitializeDemoEnvironmentRequest;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.request.SimulateReactionsRequest;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.request.StartChatSimulationRequest;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.AdminPartyroomListResponse;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentResponse;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentStatusResponse;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.SimulateReactionsResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.request.InitializeDemoEnvironmentRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.request.SimulateReactionsRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.request.StartChatSimulationRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.QueryAdminPartyroomListResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.InitializeDemoEnvironmentResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.QueryDemoEnvironmentStatusResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.SimulateReactionsResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -42,9 +42,9 @@ public class AdminDemoController {
 
     @Operation(summary = "Check demo environment status")
     @GetMapping("/status")
-    public ResponseEntity<DemoEnvironmentStatusResponse> getDemoEnvironmentStatus() {
+    public ResponseEntity<QueryDemoEnvironmentStatusResponse> getDemoEnvironmentStatus() {
         DemoStatusResult result = adminDemoService.getDemoEnvironmentStatus();
-        return ResponseEntity.ok(DemoEnvironmentStatusResponse.builder()
+        return ResponseEntity.ok(QueryDemoEnvironmentStatusResponse.builder()
                 .initialized(result.initialized())
                 .virtualMemberCount(result.virtualMemberCount())
                 .generalRoomCount(result.generalRoomCount())
@@ -54,11 +54,11 @@ public class AdminDemoController {
     @Operation(summary = "Get all active partyrooms")
     @GetMapping("/partyrooms")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<AdminPartyroomListResponse> getPartyrooms() {
+    public ResponseEntity<QueryAdminPartyroomListResponse> getPartyrooms() {
         AdminPartyroomListResult result = adminDemoService.getPartyrooms();
-        AdminPartyroomListResponse response = AdminPartyroomListResponse.builder()
+        QueryAdminPartyroomListResponse response = QueryAdminPartyroomListResponse.builder()
                 .partyrooms(result.partyrooms().stream()
-                        .map(item -> AdminPartyroomListResponse.PartyroomItem.builder()
+                        .map(item -> QueryAdminPartyroomListResponse.PartyroomItem.builder()
                                 .partyroomId(item.partyroomId())
                                 .stageType(item.stageType())
                                 .title(item.title())
@@ -75,7 +75,7 @@ public class AdminDemoController {
     @Operation(summary = "Initialize complete demo environment")
     @PostMapping("/init")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<DemoEnvironmentResponse> initializeDemoEnvironment(
+    public ResponseEntity<InitializeDemoEnvironmentResponse> initializeDemoEnvironment(
             @Valid @RequestBody InitializeDemoEnvironmentRequest request) {
 
         log.warn("!!! INITIALIZING FULL DEMO ENVIRONMENT !!!");
@@ -90,7 +90,7 @@ public class AdminDemoController {
                 result.totalMembers(), result.totalPartyrooms(),
                 result.totalDjsRegistered(), result.executionTimeMs());
 
-        DemoEnvironmentResponse response = DemoEnvironmentResponse.builder()
+        InitializeDemoEnvironmentResponse response = InitializeDemoEnvironmentResponse.builder()
                 .totalMembers(result.totalMembers())
                 .specialMembers(result.specialMembers())
                 .totalPartyrooms(result.totalPartyrooms())
@@ -170,8 +170,8 @@ public class AdminDemoController {
         return ResponseEntity.ok(response);
     }
 
-    private DemoEnvironmentResponse.PartyroomDetail toPartyroomDetail(DemoEnvironmentResult.PartyroomDetail detail) {
-        return DemoEnvironmentResponse.PartyroomDetail.builder()
+    private InitializeDemoEnvironmentResponse.PartyroomDetail toPartyroomDetail(DemoEnvironmentResult.PartyroomDetail detail) {
+        return InitializeDemoEnvironmentResponse.PartyroomDetail.builder()
                 .partyroomId(detail.partyroomId())
                 .stageType(detail.stageType())
                 .title(detail.title())

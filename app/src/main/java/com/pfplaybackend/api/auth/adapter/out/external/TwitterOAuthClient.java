@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.auth.adapter.out.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pfplaybackend.api.auth.application.dto.OAuthTokenResponse;
-import com.pfplaybackend.api.auth.application.dto.OAuthUserProfile;
+import com.pfplaybackend.api.auth.application.dto.oauth.OAuthTokenDto;
+import com.pfplaybackend.api.auth.application.dto.oauth.OAuthUserProfileDto;
 import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
 import com.pfplaybackend.api.common.exception.OAuthException;
 import lombok.Data;
@@ -33,7 +33,7 @@ public class TwitterOAuthClient {
         this.twitterConfig = oAuth2Properties.getProviders().get("twitter");
     }
 
-    public OAuthTokenResponse exchangeCodeForToken(String code, String codeVerifier) {
+    public OAuthTokenDto exchangeCodeForToken(String code, String codeVerifier) {
         log.debug("Exchanging Twitter authorization code for token");
 
         String credentials = twitterConfig.getClientId() + ":" + twitterConfig.getClientSecret();
@@ -59,13 +59,13 @@ public class TwitterOAuthClient {
                                 })
                                 .switchIfEmpty(Mono.error(new OAuthException("Failed to exchange code for token")))
                 )
-                .bodyToMono(OAuthTokenResponse.class)
+                .bodyToMono(OAuthTokenDto.class)
                 .doOnSuccess(response -> log.debug("Successfully obtained Twitter access token"))
                 .doOnError(error -> log.error("Error exchanging Twitter code for token", error))
                 .block();
     }
 
-    public OAuthUserProfile getUserProfile(String accessToken) {
+    public OAuthUserProfileDto getUserProfile(String accessToken) {
         log.debug("Fetching Twitter user profile");
 
         return webClient.get()
@@ -92,10 +92,10 @@ public class TwitterOAuthClient {
     }
 
     /**
-     * Twitter 사용자 정보를 OAuthUserProfile로 변환
+     * Twitter 사용자 정보를 OAuthUserProfileDto로 변환
      * username을 이메일 대용으로 사용
      */
-    private OAuthUserProfile mapToUserProfile(TwitterUserResponse response) {
+    private OAuthUserProfileDto mapToUserProfile(TwitterUserResponse response) {
         TwitterUserInfo user = response.getData();
 
         // username을 이메일 형식으로 변환
@@ -104,7 +104,7 @@ public class TwitterOAuthClient {
         log.debug("Twitter user mapping - ID: {}, Username: {}, Email-like: {}",
                 user.getId(), user.getUsername(), emailLikeUsername);
 
-        return new OAuthUserProfile(
+        return new OAuthUserProfileDto(
                 user.getId(),
                 emailLikeUsername,  // username을 이메일 대용으로 사용
                 user.getName() != null ? user.getName() : user.getUsername(),

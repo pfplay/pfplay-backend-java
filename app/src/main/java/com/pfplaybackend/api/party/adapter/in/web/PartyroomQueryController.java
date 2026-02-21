@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.party.adapter.in.web.dto.PartyroomElement;
+import com.pfplaybackend.api.party.adapter.in.web.payload.response.info.QueryPartyroomListResponse.PartyroomElement;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.dto.result.DjQueueInfoResult;
 import com.pfplaybackend.api.party.application.dto.result.PartyroomSummaryResult;

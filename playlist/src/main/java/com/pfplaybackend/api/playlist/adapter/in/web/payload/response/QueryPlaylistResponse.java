@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.adapter.in.web.payload.response;
 
-import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -12,5 +12,5 @@ import java.util.List;
 @Schema
 @Builder
 public class QueryPlaylistResponse {
-    private final List<PlaylistSummary> playlists;
+    private final List<PlaylistSummaryDto> playlists;
 }

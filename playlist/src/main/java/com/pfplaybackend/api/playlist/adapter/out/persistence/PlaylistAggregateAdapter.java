@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence;
 
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
 import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
@@ -117,12 +117,12 @@ public class PlaylistAggregateAdapter implements PlaylistAggregatePort, Playlist
     // ===== Query Port (DTO-returning methods) =====
 
     @Override
-    public List<PlaylistSummary> findAllByUserId(UserId userId) {
+    public List<PlaylistSummaryDto> findAllByUserId(UserId userId) {
         return playlistRepository.findAllByUserId(userId);
     }
 
     @Override
-    public PlaylistSummary findByIdAndUserId(Long playlistId, UserId userId) {
+    public PlaylistSummaryDto findByIdAndUserId(Long playlistId, UserId userId) {
         return playlistRepository.findByIdAndUserId(playlistId, userId);
     }
 

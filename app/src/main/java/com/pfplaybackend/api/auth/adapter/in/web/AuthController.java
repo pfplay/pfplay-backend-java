@@ -3,10 +3,10 @@ package com.pfplaybackend.api.auth.adapter.in.web;
 import com.pfplaybackend.api.auth.application.service.AuthService;
 import com.pfplaybackend.api.auth.application.service.LogoutService;
 import com.pfplaybackend.api.auth.application.service.OAuthUrlService;
-import com.pfplaybackend.api.auth.adapter.in.web.dto.response.AuthResponse;
-import com.pfplaybackend.api.auth.adapter.in.web.dto.request.OAuthLoginRequest;
-import com.pfplaybackend.api.auth.adapter.in.web.dto.request.OAuthUrlRequest;
-import com.pfplaybackend.api.auth.adapter.in.web.dto.response.OAuthUrlResponse;
+import com.pfplaybackend.api.auth.adapter.in.web.payload.response.LoginOAuthResponse;
+import com.pfplaybackend.api.auth.adapter.in.web.payload.request.LoginOAuthRequest;
+import com.pfplaybackend.api.auth.adapter.in.web.payload.request.GenerateOAuthUrlRequest;
+import com.pfplaybackend.api.auth.adapter.in.web.payload.response.GenerateOAuthUrlResponse;
 import com.pfplaybackend.api.auth.application.dto.command.OAuthLoginCommand;
 import com.pfplaybackend.api.auth.application.dto.result.AuthResult;
 import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
@@ -37,14 +37,14 @@ public class AuthController {
      * OAuth 인증 URL 생성
      */
     @PostMapping("/oauth/url")
-    public ResponseEntity<OAuthUrlResponse> generateOAuthUrl(@Valid @RequestBody OAuthUrlRequest request) {
+    public ResponseEntity<GenerateOAuthUrlResponse> generateOAuthUrl(@Valid @RequestBody GenerateOAuthUrlRequest request) {
         log.info("Generating OAuth URL for provider: {}", request.getProvider());
 
         try {
             OAuthProvider provider = OAuthProvider.fromString(request.getProvider());
             OAuthUrlResult result = oAuthUrlService.generateAuthUrl(provider, request.getCodeVerifier());
 
-            return ResponseEntity.ok(OAuthUrlResponse.builder()
+            return ResponseEntity.ok(GenerateOAuthUrlResponse.builder()
                     .authUrl(result.authUrl())
                     .state(result.state())
                     .provider(result.provider())
@@ -54,14 +54,14 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             log.error("Invalid provider: {}", request.getProvider());
             return ResponseEntity.badRequest()
-                    .body(OAuthUrlResponse.builder()
+                    .body(GenerateOAuthUrlResponse.builder()
                             .success(false)
                             .message("Invalid OAuth provider: " + request.getProvider())
                             .build());
         } catch (Exception e) {
             log.error("Failed to generate OAuth URL: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(OAuthUrlResponse.builder()
+                    .body(GenerateOAuthUrlResponse.builder()
                             .success(false)
                             .message("Failed to generate OAuth URL")
                             .build());
@@ -72,8 +72,8 @@ public class AuthController {
      * OAuth 콜백 처리 (쿠키 방식만 지원)
      */
     @PostMapping("/oauth/callback")
-    public ResponseEntity<AuthResponse> oauthCallback(
-            @Valid @RequestBody OAuthLoginRequest request,
+    public ResponseEntity<LoginOAuthResponse> oauthCallback(
+            @Valid @RequestBody LoginOAuthRequest request,
             HttpServletResponse response) {
 
         try {
@@ -87,7 +87,7 @@ public class AuthController {
                 if (!stateValid) {
                     log.warn("Invalid state parameter for OAuth callback");
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(AuthResponse.builder()
+                            .body(LoginOAuthResponse.builder()
                                     .success(false)
                                     .message("Invalid or expired state parameter")
                                     .build());
@@ -102,7 +102,7 @@ public class AuthController {
             cookieUtil.addAccessTokenCookie(response, authResult.accessToken());
 
             // 쿠키 전용 응답 반환 (토큰 정보 제거)
-            return ResponseEntity.ok(AuthResponse.builder()
+            return ResponseEntity.ok(LoginOAuthResponse.builder()
                     .tokenType(authResult.tokenType())
                     .expiresIn(authResult.expiresIn())
                     .issuedAt(authResult.issuedAt())
@@ -113,14 +113,14 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             log.error("Invalid provider in OAuth callback: {}", e.getMessage());
             return ResponseEntity.badRequest()
-                    .body(AuthResponse.builder()
+                    .body(LoginOAuthResponse.builder()
                             .success(false)
                             .message("Invalid OAuth provider")
                             .build());
         } catch (Exception e) {
             log.error("OAuth callback failed: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(AuthResponse.builder()
+                    .body(LoginOAuthResponse.builder()
                             .success(false)
                             .message("Authentication failed")
                             .build());

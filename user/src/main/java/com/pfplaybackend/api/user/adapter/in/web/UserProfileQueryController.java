@@ -3,7 +3,7 @@ package com.pfplaybackend.api.user.adapter.in.web;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.application.service.UserProfileQueryService;
-import com.pfplaybackend.api.user.adapter.in.web.payload.response.MyProfileSummaryResponse;
+import com.pfplaybackend.api.user.adapter.in.web.payload.response.QueryMyProfileSummaryResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +23,8 @@ public class UserProfileQueryController {
      */
     @GetMapping("/me/profile/summary")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
-    public ResponseEntity<ApiCommonResponse<MyProfileSummaryResponse>> getMyProfileSummary() {
+    public ResponseEntity<ApiCommonResponse<QueryMyProfileSummaryResponse>> getMyProfileSummary() {
         ProfileSummaryDto profileSummaryDto = userProfileQueryService.getMyProfileSummary();
-        return ResponseEntity.ok().body(ApiCommonResponse.success(MyProfileSummaryResponse.from(profileSummaryDto)));
+        return ResponseEntity.ok().body(ApiCommonResponse.success(QueryMyProfileSummaryResponse.from(profileSummaryDto)));
     }
 }

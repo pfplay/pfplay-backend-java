@@ -3,7 +3,7 @@ package com.pfplaybackend.api.playlist.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
 import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import org.junit.jupiter.api.AfterEach;
@@ -46,14 +46,14 @@ class PlaylistQueryServiceTest {
     @DisplayName("getPlaylists — 사용자의 전체 플레이리스트 목록을 반환한다")
     void getPlaylists_success() {
         // given
-        List<PlaylistSummary> expected = List.of(
-                new PlaylistSummary(1L, "My Playlist", 1, PlaylistType.PLAYLIST, 5L),
-                new PlaylistSummary(2L, "Grab", 0, PlaylistType.GRABLIST, 3L)
+        List<PlaylistSummaryDto> expected = List.of(
+                new PlaylistSummaryDto(1L, "My Playlist", 1, PlaylistType.PLAYLIST, 5L),
+                new PlaylistSummaryDto(2L, "Grab", 0, PlaylistType.GRABLIST, 3L)
         );
         when(queryPort.findAllByUserId(userId)).thenReturn(expected);
 
         // when
-        List<PlaylistSummary> result = playlistQueryService.getPlaylists();
+        List<PlaylistSummaryDto> result = playlistQueryService.getPlaylists();
 
         // then
         assertThat(result).hasSize(2);
@@ -68,7 +68,7 @@ class PlaylistQueryServiceTest {
         when(queryPort.findAllByUserId(userId)).thenReturn(Collections.emptyList());
 
         // when
-        List<PlaylistSummary> result = playlistQueryService.getPlaylists();
+        List<PlaylistSummaryDto> result = playlistQueryService.getPlaylists();
 
         // then
         assertThat(result).isEmpty();
@@ -79,11 +79,11 @@ class PlaylistQueryServiceTest {
     void getPlaylist_success() {
         // given
         Long playlistId = 1L;
-        PlaylistSummary expected = new PlaylistSummary(playlistId, "My Playlist", 0, PlaylistType.PLAYLIST, 10L);
+        PlaylistSummaryDto expected = new PlaylistSummaryDto(playlistId, "My Playlist", 0, PlaylistType.PLAYLIST, 10L);
         when(queryPort.findByIdAndUserId(playlistId, userId)).thenReturn(expected);
 
         // when
-        PlaylistSummary result = playlistQueryService.getPlaylist(playlistId);
+        PlaylistSummaryDto result = playlistQueryService.getPlaylist(playlistId);
 
         // then
         assertThat(result).isEqualTo(expected);

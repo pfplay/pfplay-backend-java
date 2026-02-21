@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web.payload.response.info;
 
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
-import com.pfplaybackend.api.party.adapter.in.web.dto.PartyroomElement;
+import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.Builder;
@@ -16,6 +16,18 @@ import java.util.Map;
 @Getter
 @Data
 public class QueryPartyroomListResponse {
+
+    public record PartyroomElement(
+            long partyroomId,
+            StageType stageType,
+            String title,
+            String introduction,
+            boolean isPlaybackActivated,
+            long crewCount,
+            Map<String, Object> playback,
+            List<Map<String, Object>> primaryIcons
+    ) {}
+
     public static List<PartyroomElement> from(List<PartyroomWithCrewDto> partyrooms, Map<UserId, ProfileSettingDto> profileSettings) {
         return partyrooms.stream().map(partyroomWithCrewDto -> {
             Map<String, Object> playback = null;

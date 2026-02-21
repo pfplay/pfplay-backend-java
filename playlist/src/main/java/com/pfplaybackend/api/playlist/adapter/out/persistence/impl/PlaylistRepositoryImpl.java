@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence.impl;
 
-import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
 import com.pfplaybackend.api.playlist.domain.entity.data.QPlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.QTrackData;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.custom.PlaylistRepositoryCustom;
@@ -17,11 +17,11 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<PlaylistSummary> findAllByUserId(UserId ownerId) {
+    public List<PlaylistSummaryDto> findAllByUserId(UserId ownerId) {
         QPlaylistData qPlaylistData = QPlaylistData.playlistData;
         QTrackData qTrackData = QTrackData.trackData;
         return queryFactory
-                .select(Projections.constructor(PlaylistSummary.class,
+                .select(Projections.constructor(PlaylistSummaryDto.class,
                                 qPlaylistData.id,
                                 qPlaylistData.name,
                                 qPlaylistData.orderNumber,
@@ -38,11 +38,11 @@ public class PlaylistRepositoryImpl implements PlaylistRepositoryCustom {
     }
 
     @Override
-    public PlaylistSummary findByIdAndUserId(Long playlistId, UserId ownerId) {
+    public PlaylistSummaryDto findByIdAndUserId(Long playlistId, UserId ownerId) {
         QPlaylistData qPlaylistData = QPlaylistData.playlistData;
         QTrackData qTrackData = QTrackData.trackData;
         return queryFactory
-                .select(Projections.constructor(PlaylistSummary.class,
+                .select(Projections.constructor(PlaylistSummaryDto.class,
                                 qPlaylistData.id,
                                 qPlaylistData.name,
                                 qPlaylistData.orderNumber,

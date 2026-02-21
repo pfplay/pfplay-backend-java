@@ -2,7 +2,7 @@ package com.pfplaybackend.api.user.application.event;
 
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.user.application.dto.ProfileChangedEvent;
+import com.pfplaybackend.api.user.application.dto.event.ProfileChangedEvent;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import lombok.RequiredArgsConstructor;

@@ -5,7 +5,7 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
-import com.pfplaybackend.api.playlist.application.dto.PlaylistSummary;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
@@ -46,7 +46,7 @@ public class TrackCommandService {
         Optional<TrackData> optional = aggregatePort.findTrackByPlaylistAndLink(playlistData.getId(), command.linkId());
         if (optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 최대 보유 한계치 초과 검사
-        PlaylistSummary playlistSummary = playlistQueryService.getPlaylist(playlistId);
+        PlaylistSummaryDto playlistSummary = playlistQueryService.getPlaylist(playlistId);
         if (playlistSummary.musicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
 
         long nextMusicOrderNumber = playlistSummary.musicCount() == 0 ? 1 : playlistSummary.musicCount() + 1;
@@ -77,7 +77,7 @@ public class TrackCommandService {
         Integer prevOrderNumber = trackData.getOrderNumber();
         Integer nextOrderNumber = command.nextOrderNumber();
         // 이동할 순서 값에 대한 유효성 검증
-        PlaylistSummary playlistSummary = playlistQueryService.getPlaylist(playlistId);
+        PlaylistSummaryDto playlistSummary = playlistQueryService.getPlaylist(playlistId);
         if (prevOrderNumber < 1 || nextOrderNumber < 1
                 || Objects.equals(prevOrderNumber, nextOrderNumber)
                 || playlistSummary.musicCount() < nextOrderNumber)
@@ -113,7 +113,7 @@ public class TrackCommandService {
         Optional<TrackData> duplicate = aggregatePort.findTrackByPlaylistAndLink(targetPlaylistData.getId(), trackData.getLinkId());
         if (duplicate.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 타겟 트랙 개수 15개 제한 검사
-        PlaylistSummary targetSummary = playlistQueryService.getPlaylist(command.targetPlaylistId());
+        PlaylistSummaryDto targetSummary = playlistQueryService.getPlaylist(command.targetPlaylistId());
         if (targetSummary.musicCount() >= 15) throw ExceptionCreator.create(TrackException.EXCEEDED_TRACK_LIMIT);
         // 소스 orderNumber 재정렬
         aggregatePort.shiftUpTrackOrderByDelete(sourcePlaylistId, trackData.getOrderNumber());

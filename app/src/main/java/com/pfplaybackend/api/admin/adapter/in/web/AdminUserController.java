@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.admin.adapter.in.web;
 
 import com.pfplaybackend.api.admin.application.service.AdminUserService;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.request.VirtualMemberAvatarUpdateRequest;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.request.VirtualMemberCreateRequest;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.VirtualMemberResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.request.UpdateVirtualMemberAvatarRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.request.CreateVirtualMemberRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.QueryVirtualMemberResponse;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
@@ -28,8 +28,8 @@ public class AdminUserController {
 
     @PostMapping("/virtual")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<VirtualMemberResponse> createVirtualMember(
-            @Valid @RequestBody(required = false) VirtualMemberCreateRequest request) {
+    public ResponseEntity<QueryVirtualMemberResponse> createVirtualMember(
+            @Valid @RequestBody(required = false) CreateVirtualMemberRequest request) {
 
         String nickname = request != null ? request.getNickname() : null;
         AvatarBodyUri avatarBodyUri = request != null && request.getAvatarBodyUri() != null
@@ -40,26 +40,26 @@ public class AdminUserController {
                 : null;
 
         MemberData member = adminUserService.createVirtualMember(nickname, avatarBodyUri, avatarFaceUri);
-        VirtualMemberResponse response = buildResponse(member);
+        QueryVirtualMemberResponse response = buildResponse(member);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/virtual/{userId}")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<VirtualMemberResponse> getVirtualMember(@PathVariable String userId) {
+    public ResponseEntity<QueryVirtualMemberResponse> getVirtualMember(@PathVariable String userId) {
         UserId userIdObj = UserId.fromString(userId);
         MemberData member = adminUserService.getVirtualMember(userIdObj);
-        VirtualMemberResponse response = buildResponse(member);
+        QueryVirtualMemberResponse response = buildResponse(member);
 
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/virtual/{userId}/avatar")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<VirtualMemberResponse> updateVirtualMemberAvatar(
+    public ResponseEntity<QueryVirtualMemberResponse> updateVirtualMemberAvatar(
             @PathVariable String userId,
-            @Valid @RequestBody VirtualMemberAvatarUpdateRequest request) {
+            @Valid @RequestBody UpdateVirtualMemberAvatarRequest request) {
 
         UserId userIdObj = UserId.fromString(userId);
         AvatarBodyUri avatarBodyUri = new AvatarBodyUri(request.getAvatarBodyUri());
@@ -73,7 +73,7 @@ public class AdminUserController {
                 avatarFaceUri
         );
 
-        VirtualMemberResponse response = buildResponse(updatedMember);
+        QueryVirtualMemberResponse response = buildResponse(updatedMember);
 
         return ResponseEntity.ok(response);
     }
@@ -87,9 +87,9 @@ public class AdminUserController {
         return ResponseEntity.noContent().build();
     }
 
-    private VirtualMemberResponse buildResponse(MemberData member) {
+    private QueryVirtualMemberResponse buildResponse(MemberData member) {
         var avatar = member.getProfileData().getAvatarSetting();
-        return VirtualMemberResponse.builder()
+        return QueryVirtualMemberResponse.builder()
                 .userId(member.getUserId().getUid().toString())
                 .email(member.getEmail())
                 .nickname(member.getProfileData().getNicknameValue())

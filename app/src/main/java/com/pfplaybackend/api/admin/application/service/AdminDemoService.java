@@ -1,5 +1,8 @@
 package com.pfplaybackend.api.admin.application.service;
 
+import com.pfplaybackend.api.admin.application.port.out.AdminAvatarResourcePort;
+import com.pfplaybackend.api.admin.application.port.out.AdminMemberPort;
+import com.pfplaybackend.api.admin.application.port.out.AdminPlaylistPort;
 import com.pfplaybackend.api.admin.domain.DemoTrackConstants;
 import com.pfplaybackend.api.admin.application.dto.command.InitializeDemoCommand;
 import com.pfplaybackend.api.admin.application.dto.result.AdminPartyroomListResult;
@@ -8,8 +11,6 @@ import com.pfplaybackend.api.admin.application.dto.result.DemoStatusResult;
 import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.admin.application.util.NicknameGenerator;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.user.adapter.out.persistence.AvatarBodyResourceRepository;
-import com.pfplaybackend.api.user.adapter.out.persistence.AvatarFaceResourceRepository;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
@@ -34,11 +35,8 @@ import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarFaceResourceData;
-import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
@@ -67,17 +65,15 @@ import java.util.Random;
 public class AdminDemoService {
 
     private final AdminUserService adminUserService;
-    private final MemberRepository memberRepository;
+    private final AdminMemberPort adminMemberPort;
+    private final AdminAvatarResourcePort adminAvatarResourcePort;
+    private final AdminPlaylistPort adminPlaylistPort;
     private final PartyroomRepository partyroomRepository;
     private final PartyroomPlaybackRepository partyroomPlaybackRepository;
     private final DjQueueRepository djQueueRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
     private final PartyroomAccessCommandService partyroomAccessCommandService;
-    private final PlaylistRepository playlistRepository;
-    private final TrackRepository trackRepository;
-    private final AvatarBodyResourceRepository avatarBodyResourceRepository;
-    private final AvatarFaceResourceRepository avatarFaceResourceRepository;
     private final PlaybackCommandService playbackCommandService;
 
     private static final int TOTAL_MEMBERS = 400;
@@ -99,8 +95,8 @@ public class AdminDemoService {
         PartyroomData mainStage = findMainStage();
 
         // Get available avatar resources
-        List<AvatarBodyResourceData> avatarBodies = avatarBodyResourceRepository.findAll();
-        List<AvatarFaceResourceData> avatarFaces = avatarFaceResourceRepository.findAll();
+        List<AvatarBodyResourceData> avatarBodies = adminAvatarResourcePort.findAllAvatarBodyResources();
+        List<AvatarFaceResourceData> avatarFaces = adminAvatarResourcePort.findAllAvatarFaceResources();
 
         if (avatarBodies.isEmpty() || avatarFaces.isEmpty()) {
             throw ExceptionCreator.create(AdminException.AVATAR_RESOURCES_NOT_INITIALIZED);
@@ -188,7 +184,7 @@ public class AdminDemoService {
 
     private void createPlaylistAndTrack(UserId userId) {
         PlaylistData playlist = PlaylistData.create(1, "DJ Playlist", PlaylistType.PLAYLIST, userId);
-        PlaylistData savedPlaylist = playlistRepository.save(playlist);
+        PlaylistData savedPlaylist = adminPlaylistPort.savePlaylist(playlist);
 
         DemoTrackConstants.TrackInfo track = DemoTrackConstants.getRandomTrack();
         TrackData trackData = TrackData.builder()
@@ -200,7 +196,7 @@ public class AdminDemoService {
                 .orderNumber(1)
                 .build();
 
-        trackRepository.save(trackData);
+        adminPlaylistPort.saveTrack(trackData);
     }
 
     private List<PartyroomData> createGeneralRooms(
@@ -295,8 +291,8 @@ public class AdminDemoService {
     }
 
     private void registerDjInRoom(PartyroomData partyroom, UserId userId) {
-        Optional<PlaylistData> playlistOpt = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(
-                userId, PlaylistType.PLAYLIST).stream().findFirst();
+        List<PlaylistData> playlists = adminPlaylistPort.findPlaylistsByOwnerAndType(userId, PlaylistType.PLAYLIST);
+        Optional<PlaylistData> playlistOpt = playlists.stream().findFirst();
 
         if (playlistOpt.isEmpty()) {
             log.warn("No playlist found for user {}, skipping DJ registration", userId.getUid());
@@ -397,9 +393,8 @@ public class AdminDemoService {
     }
 
     private Long findPlaylistId(UserId userId) {
-        Optional<PlaylistData> playlistOpt = playlistRepository.findByOwnerIdAndTypeOrderByOrderNumberDesc(
-                userId, PlaylistType.PLAYLIST).stream().findFirst();
-        return playlistOpt.map(PlaylistData::getId).orElse(null);
+        List<PlaylistData> playlists = adminPlaylistPort.findPlaylistsByOwnerAndType(userId, PlaylistType.PLAYLIST);
+        return playlists.stream().findFirst().map(PlaylistData::getId).orElse(null);
     }
 
     private AvatarFaceUri generateRandomNftFaceUri() {
@@ -412,7 +407,7 @@ public class AdminDemoService {
 
     @Transactional(readOnly = true)
     public DemoStatusResult getDemoEnvironmentStatus() {
-        long virtualMemberCount = memberRepository.countByProviderType(ProviderType.ADMIN);
+        long virtualMemberCount = adminMemberPort.countMembersByProviderType(ProviderType.ADMIN);
         long generalRoomCount = partyroomRepository.findAll().stream()
                 .filter(p -> !p.isTerminated() && p.getStageType() == StageType.GENERAL)
                 .count();

@@ -2,8 +2,8 @@ package com.pfplaybackend.api.playlist.adapter.in.web.search;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.playlist.application.service.search.MusicSearchService;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.SearchMusicListRequest;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.response.SearchMusicResponse;
+import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MusicSearchRequest;
+import com.pfplaybackend.api.playlist.adapter.in.web.payload.response.QueryMusicSearchResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +25,8 @@ public class MusicSearchController {
 
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<ApiCommonResponse<SearchMusicResponse>> getSearchList(@ModelAttribute @Valid SearchMusicListRequest request) {
-        SearchMusicResponse searchMusicResponse = SearchMusicResponse.from(musicSearchService.getSearchList(request.getQ()));
+    public ResponseEntity<ApiCommonResponse<QueryMusicSearchResponse>> getSearchList(@ModelAttribute @Valid MusicSearchRequest request) {
+        QueryMusicSearchResponse searchMusicResponse = QueryMusicSearchResponse.from(musicSearchService.getSearchList(request.getQ()));
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiCommonResponse.success(searchMusicResponse));

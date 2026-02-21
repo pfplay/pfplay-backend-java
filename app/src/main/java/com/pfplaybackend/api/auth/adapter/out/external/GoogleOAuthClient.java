@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.auth.adapter.out.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pfplaybackend.api.auth.application.dto.OAuthTokenResponse;
-import com.pfplaybackend.api.auth.application.dto.OAuthUserProfile;
+import com.pfplaybackend.api.auth.application.dto.oauth.OAuthTokenDto;
+import com.pfplaybackend.api.auth.application.dto.oauth.OAuthUserProfileDto;
 import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
 import com.pfplaybackend.api.common.exception.OAuthException;
 import lombok.Data;
@@ -29,7 +29,7 @@ public class GoogleOAuthClient {
         this.googleConfig = oAuth2Properties.getProviders().get("google");
     }
 
-    public OAuthTokenResponse exchangeCodeForToken(String code, String codeVerifier) {
+    public OAuthTokenDto exchangeCodeForToken(String code, String codeVerifier) {
         log.debug("Exchanging Google OAuth code for token");
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
@@ -53,13 +53,13 @@ public class GoogleOAuthClient {
                                 })
                                 .switchIfEmpty(Mono.error(new OAuthException("Failed to exchange code for token")))
                 )
-                .bodyToMono(OAuthTokenResponse.class)
+                .bodyToMono(OAuthTokenDto.class)
                 .doOnSuccess(response -> log.debug("Successfully obtained Google access token"))
                 .doOnError(error -> log.error("Error exchanging Google code for token", error))
                 .block();
     }
 
-    public OAuthUserProfile getUserProfile(String accessToken) {
+    public OAuthUserProfileDto getUserProfile(String accessToken) {
         log.debug("Fetching Google user profile");
 
         return webClient.get()
@@ -81,8 +81,8 @@ public class GoogleOAuthClient {
                 .block();
     }
 
-    private OAuthUserProfile mapToUserProfile(GoogleUserInfo googleUser) {
-        return new OAuthUserProfile(
+    private OAuthUserProfileDto mapToUserProfile(GoogleUserInfo googleUser) {
+        return new OAuthUserProfileDto(
                 googleUser.getId(),
                 googleUser.getEmail(),
                 googleUser.getName(),

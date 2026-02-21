@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.admin.application.service;
 
+import com.pfplaybackend.api.admin.application.port.out.AdminMemberPort;
+import com.pfplaybackend.api.admin.application.port.out.AdminPlaylistPort;
 import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
-import com.pfplaybackend.api.user.application.service.UserActivityCommandService;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
@@ -13,7 +13,6 @@ import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.WalletAddress;
-import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,10 +29,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AdminUserService {
 
-    private final MemberRepository memberRepository;
-    private final UserActivityCommandService userActivityCommandService;
+    private final AdminMemberPort adminMemberPort;
     private final AdminProfileService adminProfileService;
-    private final PlaylistCommandService playlistCommandService;
+    private final AdminPlaylistPort adminPlaylistPort;
 
     /**
      * Create virtual member with auto-generated profile and FM authority
@@ -75,24 +73,24 @@ public class AdminUserService {
         );
 
         // 4. Initialize activity map (all activities start at 0)
-        Map<ActivityType, ActivityData> activityMap = userActivityCommandService.createUserActivities(member.getUserId());
+        Map<ActivityType, ActivityData> activityMap = adminMemberPort.createUserActivities(member.getUserId());
 
         // 5. Update member with profile and activities
         member.initializeProfile(profile);
         member.initializeActivityMap(activityMap);
 
         // 6. Save member (currently AM)
-        MemberData savedMember = memberRepository.save(member);
+        MemberData savedMember = adminMemberPort.saveMember(member);
 
         // 7. Create default GRABLIST playlist for virtual member
-        playlistCommandService.createDefaultPlaylist(savedMember.getUserId());
+        adminPlaylistPort.createDefaultPlaylist(savedMember.getUserId());
 
         // 8. Upgrade to FM by setting wallet address
         // This automatically upgrades authority tier to FM
         savedMember.updateWalletAddress(new WalletAddress(""));
 
         // 9. Save upgraded member (now FM)
-        MemberData finalData = memberRepository.save(savedMember);
+        MemberData finalData = adminMemberPort.saveMember(savedMember);
 
         log.info("Virtual member created with GRABLIST: userId={}, email={}, nickname={}, authorityTier={}",
                 finalData.getUserId().getUid(),
@@ -137,7 +135,7 @@ public class AdminUserService {
         member.initializeProfile(updatedProfile);
 
         // 5. Save and return
-        MemberData savedData = memberRepository.save(member);
+        MemberData savedData = adminMemberPort.saveMember(member);
 
         log.info("Virtual member avatar updated: userId={}", userId.getUid());
 
@@ -161,7 +159,7 @@ public class AdminUserService {
         }
 
         // 3. Delete
-        memberRepository.deleteById(userId.getUid());
+        adminMemberPort.deleteMemberById(userId.getUid());
 
         log.info("Virtual member deleted: userId={}", userId.getUid());
     }
@@ -190,7 +188,7 @@ public class AdminUserService {
      * @return MemberData entity
      */
     private MemberData findMemberByUserId(UserId userId) {
-        return memberRepository.findById(userId.getUid())
+        return adminMemberPort.findMemberById(userId.getUid())
                 .orElseThrow(() -> ExceptionCreator.create(AdminException.MEMBER_NOT_FOUND));
     }
 
@@ -205,7 +203,7 @@ public class AdminUserService {
         String email = "virtual_" + uuid + "@pfplay.system";
 
         // Check if email already exists (should be extremely rare)
-        if (memberRepository.findByEmail(email).isPresent()) {
+        if (adminMemberPort.findMemberByEmail(email).isPresent()) {
             // Recursive call to generate another email
             return generateVirtualEmail();
         }
