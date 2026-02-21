@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.architecture;
 
+import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 @DisplayName("헥사고널 아키텍처 규칙 검증")
@@ -18,6 +20,7 @@ class HexagonalArchitectureTest {
     static JavaClasses authClasses;
     static JavaClasses adminClasses;
     static JavaClasses partyviewClasses;
+    static JavaClasses allClasses;
 
     @BeforeAll
     static void setUp() {
@@ -33,6 +36,9 @@ class HexagonalArchitectureTest {
         partyviewClasses = new ClassFileImporter()
                 .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                 .importPackages("com.pfplaybackend.api.partyview");
+        allClasses = new ClassFileImporter()
+                .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+                .importPackages("com.pfplaybackend.api");
     }
 
     @Nested
@@ -165,6 +171,21 @@ class HexagonalArchitectureTest {
                     .resideInAPackage("..party.adapter.out.persistence..");
 
             rule.check(partyviewClasses);
+        }
+    }
+
+    @Nested
+    @DisplayName("Aggregate Root 마커 규칙")
+    class AggregateRootRules {
+
+        @Test
+        @DisplayName("@AggregateRoot 어노테이션은 domain.entity.data 패키지의 클래스에만 적용된다")
+        void aggregateRootShouldResideInDomainEntityDataPackage() {
+            ArchRule rule = classes()
+                    .that().areAnnotatedWith(AggregateRoot.class)
+                    .should().resideInAPackage("..domain.entity.data..");
+
+            rule.check(allClasses);
         }
     }
 }

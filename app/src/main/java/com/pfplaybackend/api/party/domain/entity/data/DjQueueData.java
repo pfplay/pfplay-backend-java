@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.domain.exception.DjException;
@@ -9,6 +10,7 @@ import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+@AggregateRoot
 @Getter
 @DynamicInsert
 @DynamicUpdate

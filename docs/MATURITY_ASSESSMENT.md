@@ -15,12 +15,12 @@
 | 1 | 도메인 레이어 순수성 | **5.0** | 5.0 | domain→adapter 0건, domain→application 0건 |
 | 2 | 헥사고널 아키텍처 준수 | **5.0** | 5.0 | admin 포트 완료, partyview ArchUnit 포함. AdminDemoService→AdminPartyroomPort 전환 |
 | 3 | 도메인 모델 풍부성 | **5.0** | 5.0 | ReactionPostProcessResult 불변 record 변환 완료 |
-| 4 | Aggregate / VO 일관성 | **4.5** | 5.0 | FK VO化 완료 (D-1/D-2), 포트 파라미터 VO化. PK Long/Aggregate Root 마커 잔존 |
+| 4 | Aggregate / VO 일관성 | **5.0** | 5.0 | FK VO化 완료, 포트 파라미터 VO化, `@AggregateRoot` 마커 7개 엔티티 적용 + ArchUnit 검증 |
 | 5 | 도메인 이벤트 성숙도 | **4.5** | 5.0 | user/playlist 이벤트 4건 도입, 총 14 이벤트 |
 | 6 | 테스트 전략 | **4.5** | 5.0 | Testcontainers 3클래스, @WebMvcTest 4클래스, 334 테스트 |
 | 7 | 전략적 DDD 문서화 | **5.0** | 5.0 | 성숙도 평가 + 로드맵 + 문서-코드 동기화 |
 | 8 | 모듈 구조 / 의존 관리 | **5.0** | 5.0 | cross-module 포트 100%, admin 포트 완료, partyview ArchUnit 포함 |
-| | **종합** | **38.5/40 (96.3%)** | **40.0/40 (100%)** | |
+| | **종합** | **39.0/40 (97.5%)** | **40.0/40 (100%)** | |
 
 ---
 
@@ -130,25 +130,29 @@
 | 4 | **22+ VO. Aggregate Port + ArchUnit 강제. 이벤트에서 VO 일관 사용. FK 일부 Long 잔존.** |
 | 5 | 모든 식별자가 VO. Aggregate 경계 명확, `@AggregateRoot` 등 마커 존재. 이벤트/포트 파라미터 전부 VO. primitive obsession 0건. |
 
-### 현재 수준: 4.5 (← 4.0에서 상향)
+### 현재 수준: 5.0 (← 4.5에서 상향)
 
-**달성 (Phase D + D-1/D-2)**:
+**달성 (Phase D + D-1/D-2 + @AggregateRoot)**:
 - 이벤트 `long crewId` → `CrewId` VO 전환 (3건: `CrewAccessedEvent`, `PlaybackStartedEvent`, `ReactionMotionChangedEvent`)
 - 22개 VO 정의 (`ProfileSummary`, `ActivitySummary` 추가)
 - FK 컬럼 VO化 완료 (D-1): `DjQueueData`/`PlaybackData` → `@Embedded PartyroomId`, `PlaybackAggregationData` → `@Embedded PlaybackId`, `TrackData` → `@EmbeddedId PlaylistId` (57파일, `e9e57f9`)
 - `PartyroomAggregatePort`/`PlaylistAggregatePort` 파라미터 VO化 (D-2): `Long` → `PartyroomId`/`PlaylistId` (`e9e57f9`)
 - `PlaylistId` → common 모듈로 이동 (Shared Kernel)
+- `@AggregateRoot` 마커 어노테이션 도입: common 모듈에 정의, 7개 Aggregate Root 엔티티에 적용
+  - party: `PartyroomData`, `DjQueueData`, `PartyroomPlaybackData`, `PlaybackAggregationData`
+  - user: `MemberData`, `GuestData`
+  - playlist: `PlaylistData`
+- ArchUnit 검증: `@AggregateRoot`가 `..domain.entity.data..` 패키지에만 존재하는지 강제
 
 **미달**:
-- 엔티티 PK는 여전히 `Long` (GeneratedValue) — VO 감싸기는 JPA 제약으로 미수행
-- Aggregate Root 마커 없음 (컨벤션 기반)
+- 엔티티 PK는 여전히 `Long` (GeneratedValue) — VO 감싸기는 JPA 제약으로 미수행 (5.0 도달에 필수 아님)
 
-### 5.0 도달 조건
+### 5.0 도달 조건 — 전부 충족
 
 - [x] `CrewData.partyroomId`, `DjData.partyroomId` → `PartyroomId` VO (`@AttributeOverride`)
 - [x] `PartyroomAggregatePort`/`PlaylistAggregatePort` 메서드 파라미터 VO화
-- [ ] 엔티티 PK → VO 감싸기 (JPA 제약 고려 필요)
-- [ ] Aggregate Root 마커 어노테이션 도입 (선택)
+- [x] Aggregate Root 마커 어노테이션 도입 (`@AggregateRoot` + ArchUnit 검증)
+- 참고: 엔티티 PK → VO 감싸기는 JPA 제약으로 보류 (선택 사항)
 
 ---
 
@@ -296,7 +300,8 @@
 
 | 일자 | 종합 점수 | 주요 변경 |
 |------|-----------|----------|
-| 2026-02-22 | **38.5/40 (96.3%)** | AdminDemoService→AdminPartyroomPort 전환, 헥사고널 준수 4.5→5.0 |
+| 2026-02-22 | **39.0/40 (97.5%)** | `@AggregateRoot` 마커 어노테이션 도입 (7 엔티티), ArchUnit 검증. Aggregate/VO 4.5→5.0 |
+| 2026-02-22 | 38.5/40 (96.3%) | AdminDemoService→AdminPartyroomPort 전환, 헥사고널 준수 4.5→5.0 |
 | 2026-02-22 | 38.0/40 (95.0%) | D-1/D-2 FK VO化, F-1/F-3/F-5 모듈 경계, #4 도메인 이벤트, #6 불변화, E-3/E-4 테스트 반영 |
 | 2026-02-21 (Phase A~F) | 35.0/40 (87.5%) | Phase A~F 완료: 도메인 순수성 5.0, 헥사고널 4.0, 모델 풍부성 4.5, VO 4.0, 테스트 4.0, 문서 5.0, 모듈 4.5 |
 | 2026-02-21 (초기 평가) | 31.0/40 (77.5%) | 도메인 순수성 5건 해소, 평가 기준 문서 최초 작성 |

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.party.domain.event.PartyroomClosedEvent;
 import com.pfplaybackend.api.party.domain.enums.StageType;
@@ -21,6 +22,7 @@ import org.hibernate.annotations.*;
 
 import java.time.LocalDateTime;
 
+@AggregateRoot
 @Getter
 @DynamicInsert
 @DynamicUpdate

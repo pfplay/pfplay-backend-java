@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 
+@AggregateRoot
 @DynamicUpdate
 @DynamicInsert
 @Table(name = "GUEST")

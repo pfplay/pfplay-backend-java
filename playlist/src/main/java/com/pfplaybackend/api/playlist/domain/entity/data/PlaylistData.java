@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.playlist.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.Comment;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
+@AggregateRoot
 @Getter
 @DynamicInsert
 @DynamicUpdate

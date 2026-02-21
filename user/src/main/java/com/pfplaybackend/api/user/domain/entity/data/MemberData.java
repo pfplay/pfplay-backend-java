@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@AggregateRoot
 @DynamicUpdate
 @DynamicInsert
 @Table(
