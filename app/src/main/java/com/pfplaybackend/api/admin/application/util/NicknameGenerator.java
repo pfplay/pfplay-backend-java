@@ -2,15 +2,13 @@ package com.pfplaybackend.api.admin.application.util;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Generates realistic English nicknames by combining two words
  * Pattern: Adjective + Noun (e.g., "HappyRabbit", "ShinyStars", "QuietOcean")
  */
 public class NicknameGenerator {
-
-    private static final Random RANDOM = new Random();
 
     // Adjectives - positive, fun, and diverse descriptive words (max 7 chars)
     private static final List<String> ADJECTIVES = Arrays.asList(
@@ -45,8 +43,8 @@ public class NicknameGenerator {
      * @return Generated nickname in PascalCase
      */
     public static String generate() {
-        String adjective = ADJECTIVES.get(RANDOM.nextInt(ADJECTIVES.size()));
-        String noun = NOUNS.get(RANDOM.nextInt(NOUNS.size()));
+        String adjective = ADJECTIVES.get(ThreadLocalRandom.current().nextInt(ADJECTIVES.size()));
+        String noun = NOUNS.get(ThreadLocalRandom.current().nextInt(NOUNS.size()));
         return adjective + noun;
     }
 

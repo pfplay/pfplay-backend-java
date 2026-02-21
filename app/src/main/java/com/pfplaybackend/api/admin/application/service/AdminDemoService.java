@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Admin service for initializing complete demo environment
@@ -73,8 +73,6 @@ public class AdminDemoService {
     private static final int MAIN_STAGE_CREW = 40;
     private static final int GENERAL_ROOM_CREW = 30;
     private static final int GENERAL_ROOMS_COUNT = 12;
-
-    private final Random random = new Random();
 
     @Transactional
     public DemoEnvironmentResult initializeDemoEnvironment(InitializeDemoCommand command) {
@@ -134,7 +132,7 @@ public class AdminDemoService {
         for (int i = 0; i < TOTAL_MEMBERS; i++) {
             String nickname = NicknameGenerator.generateUnique(i + 1);
 
-            AvatarBodyResourceData randomBody = avatarBodies.get(random.nextInt(avatarBodies.size()));
+            AvatarBodyResourceData randomBody = avatarBodies.get(ThreadLocalRandom.current().nextInt(avatarBodies.size()));
             AvatarBodyUri avatarBody = new AvatarBodyUri(randomBody.getResourceUri());
 
             AvatarFaceUri avatarFace;
@@ -390,7 +388,7 @@ public class AdminDemoService {
     }
 
     private AvatarFaceUri generateRandomNftFaceUri() {
-        int faceNumber = random.nextInt(30) + 1;
+        int faceNumber = ThreadLocalRandom.current().nextInt(30) + 1;
         String faceFileName = String.format("ava_nft_tmp_%03d.png", faceNumber);
         String faceUri = "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/" +
                 "ava_nft_tmp%2F" + faceFileName + "?alt=media";

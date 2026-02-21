@@ -5,14 +5,12 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Demo track constants for initialization
  */
 public class DemoTrackConstants {
-
-    private static final Random RANDOM = new Random();
 
     @Getter
     @AllArgsConstructor
@@ -43,7 +41,7 @@ public class DemoTrackConstants {
      * Get random track from the demo tracks list
      */
     public static TrackInfo getRandomTrack() {
-        return DEMO_TRACKS.get(RANDOM.nextInt(DEMO_TRACKS.size()));
+        return DEMO_TRACKS.get(ThreadLocalRandom.current().nextInt(DEMO_TRACKS.size()));
     }
 
     /**
