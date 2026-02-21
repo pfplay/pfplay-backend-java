@@ -7,16 +7,19 @@ import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.crew.CrewDto;
 import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
+import com.pfplaybackend.api.party.application.dto.result.DjQueueInfoResult;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
 import com.pfplaybackend.api.party.application.port.out.PartyroomQueryPort;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
+import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -149,6 +152,22 @@ public class PartyroomInfoService {
     public ActivePartyroomDto getMyActivePartyroomOrThrow(UserId userId) {
         return getMyActivePartyroom(userId)
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
+    }
+
+    @Transactional(readOnly = true)
+    public DjQueueInfoResult getDjQueueInfo(PartyroomId partyroomId) {
+        PartyroomData partyroom = getPartyroomById(partyroomId);
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getId());
+        DjQueueData djQueue = aggregatePort.findDjQueueState(partyroom.getId());
+        boolean isPlaybackActivated = playbackState.isActivated();
+        QueueStatus queueStatus = djQueue.isClosed() ? QueueStatus.CLOSE : QueueStatus.OPEN;
+        boolean isRegistered = isAlreadyRegistered(partyroom.getId());
+        PlaybackData playback = null;
+        if (isPlaybackActivated) {
+            playback = playbackInfoService.getPlaybackById(playbackState.getCurrentPlaybackId());
+        }
+        List<DjWithProfileDto> djWithProfiles = getDjs(partyroom.getId());
+        return new DjQueueInfoResult(isPlaybackActivated, queueStatus, isRegistered, playback, djWithProfiles);
     }
 
     @Transactional(readOnly = true)
