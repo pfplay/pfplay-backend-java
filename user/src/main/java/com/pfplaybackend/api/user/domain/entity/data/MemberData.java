@@ -2,12 +2,10 @@ package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
-import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
-import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.user.domain.value.ActivitySummary;
+import com.pfplaybackend.api.user.domain.value.ProfileSummary;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.*;
@@ -95,16 +93,13 @@ public class MemberData extends UserAccountData {
         this.activityDataMap = activityDataMap;
     }
 
-    public void updateProfileBio(UpdateBioCommand command) {
-        this.profileData.updateBio(command.nickName(), command.introduction());
+    public void updateProfileBio(String nickName, String introduction) {
+        this.profileData.updateBio(nickName, introduction);
         this.isProfileUpdated = true;
     }
 
-    public void updateAvatarBody(AvatarBodyDto avatarBodyDto) {
-        this.profileData.updateAvatarBody(
-                new AvatarBodyUri(avatarBodyDto.getResourceUri()),
-                avatarBodyDto.getCombinePositionX(),
-                avatarBodyDto.getCombinePositionY());
+    public void updateAvatarBody(AvatarBodyUri bodyUri, int combinePositionX, int combinePositionY) {
+        this.profileData.updateAvatarBody(bodyUri, combinePositionX, combinePositionY);
     }
 
     public void updateAvatarFace(AvatarFaceUri avatarFaceUri) {
@@ -132,9 +127,9 @@ public class MemberData extends UserAccountData {
     }
 
     @Override
-    public ProfileSummaryDto getProfileSummary() {
-        List<ActivitySummaryDto> activitySummaries = this.activityDataMap.values().stream()
-                .map(a -> new ActivitySummaryDto(a.getActivityType(), a.getScore().getValue()))
+    public ProfileSummary getProfileSummary() {
+        List<ActivitySummary> activitySummaries = this.activityDataMap.values().stream()
+                .map(a -> new ActivitySummary(a.getActivityType(), a.getScore().getValue()))
                 .collect(Collectors.toList());
 
         return buildProfileSummary(activitySummaries);

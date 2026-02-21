@@ -1,16 +1,15 @@
 package com.pfplaybackend.api.user.application.service.initialize;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
+import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
-import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.*;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
@@ -30,7 +29,7 @@ public class AdminUserInitializeService {
     private final UserProfileService userProfileService;
     private final UserActivityService userActivityService;
     private final AvatarResourceService avatarResourceService;
-    private final UserAvatarDomainService userAvatarDomainService;
+    private final UserAvatarService userAvatarService;
 
     @Transactional
     public UserId addAdminUser() {
@@ -52,7 +51,7 @@ public class AdminUserInitializeService {
 
     private void upgradeMember(MemberData member) {
         // 1. Profile Update
-        member.updateProfileBio(new UpdateBioCommand("운영자", ""));
+        member.updateProfileBio("운영자", "");
         memberRepository.save(member);
         // 2. Wallet Update
         member.updateWalletAddress(new WalletAddress(""));
@@ -62,10 +61,12 @@ public class AdminUserInitializeService {
     private MemberData updateAvatarBody(MemberData member, AvatarBodyUri avatarBodyUri) {
         AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(avatarBodyUri);
         AvatarFaceUri avatarFaceUri = new AvatarFaceUri();
-        AvatarIconUri avatarIconUri = userAvatarDomainService.findAvatarIconPairWithSingleBody(avatarBodyDto);
+        AvatarIconUri avatarIconUri = userAvatarService.findAvatarIconPairWithSingleBody(avatarBodyDto);
 
-        // TODO Check if the score is actually configurable in Domain Service
-        member.updateAvatarBody(avatarBodyDto);
+        member.updateAvatarBody(
+                new AvatarBodyUri(avatarBodyDto.getResourceUri()),
+                avatarBodyDto.getCombinePositionX(),
+                avatarBodyDto.getCombinePositionY());
         member.updateAvatarFace(avatarFaceUri);
         member.updateAvatarIcon(avatarIconUri);
         return memberRepository.save(member);

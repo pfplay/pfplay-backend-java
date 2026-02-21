@@ -56,7 +56,7 @@ class UserBioServiceTest {
         userBioService.updateMyBio(command);
 
         // then
-        verify(member).updateProfileBio(command);
+        verify(member).updateProfileBio(command.nickName(), command.introduction());
         verify(memberRepository).save(member);
         verify(userProfileEventService).publishProfileChangedEvent(member);
     }

@@ -1,31 +1,19 @@
 package com.pfplaybackend.api.user.domain.service;
 
-import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
-import com.pfplaybackend.api.user.application.service.AvatarResourceService;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
-import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
-import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 public class UserAvatarDomainService {
-    private final AvatarResourceService avatarResourceService;
 
-    public boolean isAvailableBody(AvatarBodyDto avatarBodyDto, Map<ActivityType, ActivityData> activityMap) {
-        ObtainmentType obtainmentType = avatarBodyDto.getObtainableType();
-        if(obtainmentType.equals(ObtainmentType.BASIC)) return true;
-        // Comparison of Scores
-        ActivityType activityType = convertToActivityType(avatarBodyDto.getObtainableType());
-        return activityMap.get(activityType).getScore().isAtLeast(avatarBodyDto.getObtainableScore());
+    public boolean isAvailableBody(ObtainmentType obtainmentType, int obtainableScore, Map<ActivityType, ActivityData> activityMap) {
+        if (obtainmentType.equals(ObtainmentType.BASIC)) return true;
+        ActivityType activityType = convertToActivityType(obtainmentType);
+        return activityMap.get(activityType).getScore().isAtLeast(obtainableScore);
     }
 
     private ActivityType convertToActivityType(ObtainmentType obtainmentType) {
@@ -40,20 +28,6 @@ public class UserAvatarDomainService {
                 return ActivityType.ROOM_ACT;
             }
             default -> throw new IllegalArgumentException("Unsupported ObtainmentType: " + obtainmentType);
-        }
-    }
-
-    public AvatarIconUri findAvatarIconPairWithSingleBody(AvatarBodyDto avatarBodyDto) {
-        AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByBodyUri(new AvatarBodyUri(avatarBodyDto.getResourceUri()));
-        return new AvatarIconUri(avatarIconDto.resourceUri());
-    }
-
-    public AvatarIconUri findAvatarIconByFaceSourceType(AvatarFaceUri faceUri, FaceSourceType sourceType) {
-        if(sourceType.equals(FaceSourceType.INTERNAL_IMAGE)) {
-            AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByFaceUri(faceUri);
-            return new AvatarIconUri(avatarIconDto.resourceUri());
-        }else {
-            return new AvatarIconUri(faceUri.getAvatarFaceUri());
         }
     }
 }

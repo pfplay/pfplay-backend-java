@@ -3,7 +3,6 @@ package com.pfplaybackend.api.user.application.service.initialize;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
-import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.service.UserActivityService;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
@@ -71,7 +70,7 @@ public class TemporaryUserInitializeService {
 
     public MemberData upgradeMember(MemberData member) {
         // 1. Profile Update
-        member.updateProfileBio(new UpdateBioCommand("nickname", "introduction"));
+        member.updateProfileBio("nickname", "introduction");
         memberRepository.save(member);
         // 2. Wallet Update
         member.updateWalletAddress(new WalletAddress("wallet-address"));

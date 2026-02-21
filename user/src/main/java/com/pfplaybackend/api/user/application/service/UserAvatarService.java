@@ -14,6 +14,7 @@ import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import com.pfplaybackend.api.user.domain.exception.UserAvatarException;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
@@ -35,12 +36,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserAvatarService {
 
-    // TODO Call AvatarResourceService In 'Other Sub Domain'
     private final MemberRepository memberRepository;
     private final UserAvatarDomainService userAvatarDomainService;
-    // Using Peer Service
     private final AvatarResourceService avatarResourceService;
-    // Event
     private final UserProfileEventService userProfileEventService;
 
     public AvatarBodyResourceData getDefaultAvatarBodyResourceData() {
@@ -77,7 +75,8 @@ public class UserAvatarService {
             Map<ActivityType, ActivityData> activityMap = member.getActivityDataMap();
             return avatarBodyDtoList.stream()
                     .map(avatarBodyDto -> avatarBodyDto.toBuilder()
-                            .isAvailable(userAvatarDomainService.isAvailableBody(avatarBodyDto, activityMap))
+                            .isAvailable(userAvatarDomainService.isAvailableBody(
+                                    avatarBodyDto.getObtainableType(), avatarBodyDto.getObtainableScore(), activityMap))
                             .build()
                     ).toList();
         }
@@ -100,18 +99,20 @@ public class UserAvatarService {
 
         AvatarFaceUri avatarFaceUri;
         AvatarIconUri avatarIconUri;
-        member.updateAvatarBody(avatarBodyDto);
+        member.updateAvatarBody(
+                new AvatarBodyUri(avatarBodyDto.getResourceUri()),
+                avatarBodyDto.getCombinePositionX(),
+                avatarBodyDto.getCombinePositionY());
 
         if(command.avatarCompositionType().equals(AvatarCompositionType.SINGLE_BODY)) {
             avatarFaceUri = new AvatarFaceUri();
-            avatarIconUri = userAvatarDomainService.findAvatarIconPairWithSingleBody(avatarBodyDto);
+            avatarIconUri = findAvatarIconPairWithSingleBody(avatarBodyDto);
 
             member.updateAvatarFace(avatarFaceUri);
             member.updateAvatarIcon(avatarIconUri);
         }else {
             avatarFaceUri = new AvatarFaceUri(command.face().uri());
-            avatarIconUri = userAvatarDomainService.findAvatarIconByFaceSourceType(
-                    avatarFaceUri, command.face().sourceType());
+            avatarIconUri = findAvatarIconByFaceSourceType(avatarFaceUri, command.face().sourceType());
 
             member.updateAvatarFace(avatarFaceUri, command.face().sourceType(),
                     command.face().transform().offsetX(),
@@ -122,5 +123,19 @@ public class UserAvatarService {
 
         memberRepository.save(member);
         userProfileEventService.publishProfileChangedEvent(member);
+    }
+
+    public AvatarIconUri findAvatarIconPairWithSingleBody(AvatarBodyDto avatarBodyDto) {
+        AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByBodyUri(new AvatarBodyUri(avatarBodyDto.getResourceUri()));
+        return new AvatarIconUri(avatarIconDto.resourceUri());
+    }
+
+    public AvatarIconUri findAvatarIconByFaceSourceType(AvatarFaceUri faceUri, FaceSourceType sourceType) {
+        if (sourceType.equals(FaceSourceType.INTERNAL_IMAGE)) {
+            AvatarIconDto avatarIconDto = avatarResourceService.findPairAvatarIconByFaceUri(faceUri);
+            return new AvatarIconUri(avatarIconDto.resourceUri());
+        } else {
+            return new AvatarIconUri(faceUri.getAvatarFaceUri());
+        }
     }
 }

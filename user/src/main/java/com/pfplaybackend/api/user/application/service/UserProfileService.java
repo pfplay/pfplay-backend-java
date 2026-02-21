@@ -8,8 +8,10 @@ import com.pfplaybackend.api.user.domain.value.Nickname;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
+import com.pfplaybackend.api.user.domain.value.ProfileSummary;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.UserAccountData;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -56,13 +58,15 @@ public class UserProfileService {
 
     public ProfileSummaryDto getMyProfileSummary() {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
-        return findUserWithProfile(authContext.getUserId(), authContext.getAuthorityTier())
+        ProfileSummary summary = findUserWithProfile(authContext.getUserId(), authContext.getAuthorityTier())
                 .getProfileSummary();
+        return toProfileSummaryDto(summary);
     }
 
     public ProfileSummaryDto getOtherProfileSummary(UserId otherUserId, AuthorityTier authorityTier) {
-        return findUserWithProfile(otherUserId, authorityTier)
+        ProfileSummary summary = findUserWithProfile(otherUserId, authorityTier)
                 .getProfileSummary();
+        return toProfileSummaryDto(summary);
     }
 
     public AuthorityTier getAuthorityTier(UserId userId) {
@@ -92,6 +96,28 @@ public class UserProfileService {
     public ProfileSettingDto getUserProfileSetting(UserId userId) {
         ProfileData profileData = userProfileRepository.findByUserId(userId);
         return toProfileSettingDto(profileData);
+    }
+
+    private ProfileSummaryDto toProfileSummaryDto(ProfileSummary summary) {
+        return new ProfileSummaryDto(
+                summary.nickname(),
+                summary.introduction(),
+                summary.avatarBodyUri(),
+                summary.avatarCompositionType(),
+                summary.combinePositionX(),
+                summary.combinePositionY(),
+                summary.offsetX(),
+                summary.offsetY(),
+                summary.scale(),
+                summary.avatarFaceUri(),
+                summary.avatarIconUri(),
+                summary.walletAddress(),
+                summary.activitySummaries() != null
+                        ? summary.activitySummaries().stream()
+                            .map(a -> new ActivitySummaryDto(a.activityType(), a.score()))
+                            .toList()
+                        : List.of()
+        );
     }
 
     private String generateGuestNickname() {

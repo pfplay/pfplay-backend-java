@@ -34,15 +34,10 @@ class UserArchitectureTest {
     }
 
     @Test
-    @DisplayName("domain 패키지는 application 패키지에 의존하지 않는다 (MemberData, UserAccountData, UserAvatarDomainService 예외)")
+    @DisplayName("domain 패키지는 application 패키지에 의존하지 않는다")
     void domainShouldNotDependOnApplication() {
-        // TODO: MemberData, UserAccountData가 application DTO를, UserAvatarDomainService가 AvatarResourceService를 참조 중
-        //       향후 도메인 전용 타입/포트로 교체하여 해소 예정
         ArchRule rule = noClasses()
                 .that().resideInAPackage("..user.domain..")
-                .and().doNotHaveSimpleName("MemberData")
-                .and().doNotHaveSimpleName("UserAccountData")
-                .and().doNotHaveSimpleName("UserAvatarDomainService")
                 .should().dependOnClassesThat()
                 .resideInAPackage("..user.application..");
 

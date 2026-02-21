@@ -21,7 +21,7 @@ public class UserBioService {
     public void updateMyBio(UpdateBioCommand updateBioCommand) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         MemberData memberData = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
-        memberData.updateProfileBio(updateBioCommand);
+        memberData.updateProfileBio(updateBioCommand.nickName(), updateBioCommand.introduction());
         memberRepository.save(memberData);
         userProfileEventService.publishProfileChangedEvent(memberData);
     }

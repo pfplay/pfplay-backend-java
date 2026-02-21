@@ -4,7 +4,8 @@ import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
+import com.pfplaybackend.api.user.domain.value.ActivitySummary;
+import com.pfplaybackend.api.user.domain.value.ProfileSummary;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
@@ -52,10 +53,10 @@ public abstract class UserAccountData extends BaseEntity {
 
     public abstract boolean isGuest();
 
-    protected ProfileSummaryDto buildProfileSummary(java.util.List<com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto> activitySummaries) {
+    protected ProfileSummary buildProfileSummary(java.util.List<ActivitySummary> activitySummaries) {
         var bio = this.profileData.getBio();
         var avatar = this.profileData.getAvatarSetting();
-        return new ProfileSummaryDto(
+        return new ProfileSummary(
                 bio != null ? bio.getNicknameValue() : null,
                 bio != null ? bio.getIntroduction() : null,
                 avatar.getAvatarBodyUri().getAvatarBodyUri(),
@@ -72,7 +73,7 @@ public abstract class UserAccountData extends BaseEntity {
         );
     }
 
-    public ProfileSummaryDto getProfileSummary() {
+    public ProfileSummary getProfileSummary() {
         return buildProfileSummary(java.util.List.of());
     }
 

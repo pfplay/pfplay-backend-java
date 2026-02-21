@@ -6,7 +6,7 @@ import com.pfplaybackend.api.user.domain.value.Nickname;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.domain.service.UserAvatarDomainService;
+import com.pfplaybackend.api.user.application.service.UserAvatarService;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class AdminProfileService {
 
     private final AvatarResourceService avatarResourceService;
-    private final UserAvatarDomainService userAvatarDomainService;
+    private final UserAvatarService userAvatarService;
 
     /**
      * Create profile for virtual member with auto-generated nickname and default avatar
@@ -91,7 +91,7 @@ public class AdminProfileService {
         AvatarIconUri iconUri;
         if (compositionType == AvatarCompositionType.SINGLE_BODY) {
             // SINGLE_BODY: Use body-paired icon
-            iconUri = userAvatarDomainService.findAvatarIconPairWithSingleBody(avatarBodyDto);
+            iconUri = userAvatarService.findAvatarIconPairWithSingleBody(avatarBodyDto);
         } else if (faceSourceType == FaceSourceType.NFT_URI) {
             // BODY_WITH_FACE with NFT: NFT face URI becomes icon URI
             iconUri = new AvatarIconUri(finalFaceUri.getAvatarFaceUri());

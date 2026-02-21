@@ -3,7 +3,6 @@ package com.pfplaybackend.api.user.domain.entity.data;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.value.*;
 import org.junit.jupiter.api.DisplayName;
@@ -57,7 +56,7 @@ class MemberDataTest {
         member.initializeProfile(profile);
 
         // when
-        member.updateProfileBio(new UpdateBioCommand("NewNick", "Hello!"));
+        member.updateProfileBio("NewNick", "Hello!");
 
         // then
         assertThat(member.isProfileUpdated()).isTrue();
