@@ -42,7 +42,7 @@ public class CrewPenaltyCommandService {
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
 
         CrewId punishedCrewId = new CrewId(command.crewId());
-        CrewData punisherCrew = partyroomQueryService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
+        CrewData punisherCrew = partyroomQueryService.getCrewOrThrow(partyroomId, authContext.getUserId());
         CrewData punishedCrew = aggregatePort.findCrewById(punishedCrewId.getId())
                 .orElseThrow();
         GradeType punishedGradeType = punishedCrew.getGradeType();
@@ -87,7 +87,7 @@ public class CrewPenaltyCommandService {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         partyroomQueryService.getPartyroomById(partyroomId);
 
-        CrewData releaserCrewForValidation = partyroomQueryService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
+        CrewData releaserCrewForValidation = partyroomQueryService.getCrewOrThrow(partyroomId, authContext.getUserId());
         if (releaserCrewForValidation.isBelowGrade(GradeType.MODERATOR)) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
 
         CrewPenaltyHistoryData historyData = crewPenaltyHistoryRepository.findByIdAndPartyroomIdAndReleasedIsFalse(penaltyId, partyroomId)

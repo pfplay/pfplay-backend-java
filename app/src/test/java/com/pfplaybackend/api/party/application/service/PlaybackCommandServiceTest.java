@@ -72,7 +72,7 @@ class PlaybackCommandServiceTest {
         // given — tryProceed에서 DJ가 없으면 deactivate
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())).thenReturn(false);
+        when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(false);
 
         // when
         playbackCommandService.complete(partyroomId, userId);
@@ -87,13 +87,13 @@ class PlaybackCommandServiceTest {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())).thenReturn(false);
+        when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(false);
 
         // when
         playbackCommandService.complete(partyroomId, userId);
 
         // then
-        verify(partyroomAggregateService).deactivatePlayback(partyroomId.getId());
+        verify(partyroomAggregateService).deactivatePlayback(partyroomId);
     }
 
     @Test
@@ -106,16 +106,16 @@ class PlaybackCommandServiceTest {
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
 
         when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
-        when(partyroomQueryService.getCrewOrThrow(activeDto.id(), userId)).thenReturn(adjuster);
+        when(partyroomQueryService.getCrewOrThrow(new PartyroomId(activeDto.id()), userId)).thenReturn(adjuster);
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())).thenReturn(false);
+        when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(false);
 
         // when
         playbackCommandService.skipByManager(partyroomId);
 
         // then
         verify(scheduleService).deleteKey(String.valueOf(partyroomId.getId()));
-        verify(partyroomAggregateService).deactivatePlayback(partyroomId.getId());
+        verify(partyroomAggregateService).deactivatePlayback(partyroomId);
     }
 
     @Test
@@ -127,7 +127,7 @@ class PlaybackCommandServiceTest {
                 .id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
 
         when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
-        when(partyroomQueryService.getCrewOrThrow(activeDto.id(), userId)).thenReturn(adjuster);
+        when(partyroomQueryService.getCrewOrThrow(new PartyroomId(activeDto.id()), userId)).thenReturn(adjuster);
 
         // when & then
         assertThatThrownBy(() -> playbackCommandService.skipByManager(partyroomId))

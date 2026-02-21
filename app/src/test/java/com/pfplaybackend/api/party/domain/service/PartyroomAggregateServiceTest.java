@@ -4,6 +4,7 @@ import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import org.junit.jupiter.api.DisplayName;
@@ -52,10 +53,10 @@ class PartyroomAggregateServiceTest {
             DjData dj3 = createDj(3L, new CrewId(3L), 3);
             List<DjData> djs = new ArrayList<>(List.of(dj1, dj2, dj3));
 
-            when(aggregatePort.findDjsOrdered(10L)).thenReturn(djs);
+            when(aggregatePort.findDjsOrdered(new PartyroomId(10L))).thenReturn(djs);
 
             // when
-            service.removeDjFromQueue(10L, targetCrewId);
+            service.removeDjFromQueue(new PartyroomId(10L), targetCrewId);
 
             // then
             verify(aggregatePort).removeDjs(List.of(dj2));
@@ -68,10 +69,10 @@ class PartyroomAggregateServiceTest {
         @DisplayName("큐에 DJ가 없으면 아무 일도 하지 않는다")
         void emptyQueueDoesNothing() {
             // given
-            when(aggregatePort.findDjsOrdered(10L)).thenReturn(Collections.emptyList());
+            when(aggregatePort.findDjsOrdered(new PartyroomId(10L))).thenReturn(Collections.emptyList());
 
             // when
-            service.removeDjFromQueue(10L, new CrewId(1L));
+            service.removeDjFromQueue(new PartyroomId(10L), new CrewId(1L));
 
             // then
             verify(aggregatePort).removeDjs(Collections.emptyList());
@@ -92,10 +93,10 @@ class PartyroomAggregateServiceTest {
             DjData dj3 = createDj(3L, new CrewId(3L), 3);
             List<DjData> djs = new ArrayList<>(List.of(dj1, dj2, dj3));
 
-            when(aggregatePort.findDjsOrdered(10L)).thenReturn(djs);
+            when(aggregatePort.findDjsOrdered(new PartyroomId(10L))).thenReturn(djs);
 
             // when
-            service.rotateDjQueue(10L);
+            service.rotateDjQueue(new PartyroomId(10L));
 
             // then
             assertThat(dj1.getOrderNumber()).isEqualTo(3); // 1->last
@@ -121,10 +122,10 @@ class PartyroomAggregateServiceTest {
             List<DjData> djs = new ArrayList<>(List.of(dj1, dj2));
 
             when(aggregatePort.findPlaybackState(10L)).thenReturn(playbackState);
-            when(aggregatePort.findDjsOrdered(10L)).thenReturn(djs);
+            when(aggregatePort.findDjsOrdered(new PartyroomId(10L))).thenReturn(djs);
 
             // when
-            service.deactivatePlayback(10L);
+            service.deactivatePlayback(new PartyroomId(10L));
 
             // then
             assertThat(playbackState.isActivated()).isFalse();
@@ -141,20 +142,20 @@ class PartyroomAggregateServiceTest {
         @DisplayName("큐에 DJ가 있으면 true를 반환한다")
         void returnsTrueWhenDjsExist() {
             // given
-            when(aggregatePort.hasDjs(10L)).thenReturn(true);
+            when(aggregatePort.hasDjs(new PartyroomId(10L))).thenReturn(true);
 
             // when / then
-            assertThat(service.hasQueuedDjs(10L)).isTrue();
+            assertThat(service.hasQueuedDjs(new PartyroomId(10L))).isTrue();
         }
 
         @Test
         @DisplayName("큐에 DJ가 없으면 false를 반환한다")
         void returnsFalseWhenNoDjs() {
             // given
-            when(aggregatePort.hasDjs(10L)).thenReturn(false);
+            when(aggregatePort.hasDjs(new PartyroomId(10L))).thenReturn(false);
 
             // when / then
-            assertThat(service.hasQueuedDjs(10L)).isFalse();
+            assertThat(service.hasQueuedDjs(new PartyroomId(10L))).isFalse();
         }
     }
 }

@@ -70,7 +70,7 @@ public class PlaybackCommandService {
     public void skipByManager(PartyroomId partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         ActivePartyroomDto activePartyroomDto = partyroomQueryService.getMyActivePartyroom(authContext.getUserId()).orElseThrow();
-        CrewData adjusterCrew = partyroomQueryService.getCrewOrThrow(activePartyroomDto.id(), authContext.getUserId());
+        CrewData adjusterCrew = partyroomQueryService.getCrewOrThrow(new PartyroomId(activePartyroomDto.id()), authContext.getUserId());
         if (adjusterCrew.isBelowGrade(GradeType.MODERATOR)) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
         cancelTask(partyroomId);
         tryProceed(partyroomId);
@@ -85,7 +85,7 @@ public class PlaybackCommandService {
     private void tryProceed(PartyroomId partyroomId) {
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
 
-        if(partyroomAggregateService.hasQueuedDjs(partyroomId.getId())) {
+        if(partyroomAggregateService.hasQueuedDjs(partyroomId)) {
             start(partyroom);
         }else{
             deactivateAndNotify(partyroom);
@@ -93,15 +93,15 @@ public class PlaybackCommandService {
     }
 
     public void start(PartyroomData partyroom) {
-        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getId());
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getPartyroomId());
         int maxAttempts = queuedDjs.size();
         doStart(partyroom, maxAttempts);
     }
 
     private void doStart(PartyroomData partyroom, int remainingAttempts) {
-        partyroomAggregateService.rotateDjQueue(partyroom.getId());
+        partyroomAggregateService.rotateDjQueue(partyroom.getPartyroomId());
 
-        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getId());
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getPartyroomId());
         DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
         CrewData djCrew = aggregatePort.findCrewById(nextDj.getCrewId().getId()).orElseThrow();
         PlaybackData nextPlayback = playbackQueryService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj, djCrew.getUserId());
@@ -112,7 +112,7 @@ public class PlaybackCommandService {
                 return;
             }
             PartyroomData reloaded = partyroomQueryService.getPartyroomById(partyroom.getPartyroomId());
-            if (partyroomAggregateService.hasQueuedDjs(reloaded.getId())) {
+            if (partyroomAggregateService.hasQueuedDjs(reloaded.getPartyroomId())) {
                 doStart(reloaded, remainingAttempts - 1);
             } else {
                 deactivateAndNotify(reloaded);
@@ -137,7 +137,7 @@ public class PlaybackCommandService {
     }
 
     private void deactivateAndNotify(PartyroomData partyroom) {
-        partyroomAggregateService.deactivatePlayback(partyroom.getId())
+        partyroomAggregateService.deactivatePlayback(partyroom.getPartyroomId())
                 .forEach(eventPublisher::publishEvent);
     }
 }

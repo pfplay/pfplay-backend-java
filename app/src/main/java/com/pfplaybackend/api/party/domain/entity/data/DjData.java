@@ -2,6 +2,7 @@ package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -27,8 +28,11 @@ public class DjData extends BaseEntity {
     @Column(name = "dj_id")
     private Long id;
 
-    @Column(name = "partyroom_id", nullable = false)
-    private Long partyroomId;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "partyroom_id", nullable = false)),
+    })
+    private PartyroomId partyroomId;
 
     @Embedded
     @AttributeOverrides({
@@ -49,7 +53,7 @@ public class DjData extends BaseEntity {
     }
 
     @Builder
-    public DjData(Long id, Long partyroomId, CrewId crewId, PlaylistId playlistId, int orderNumber,
+    public DjData(Long id, PartyroomId partyroomId, CrewId crewId, PlaylistId playlistId, int orderNumber,
                   LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.partyroomId = partyroomId;
@@ -62,7 +66,7 @@ public class DjData extends BaseEntity {
 
     // ── Business Methods ──
 
-    public static DjData create(Long partyroomId, PlaylistId playlistId, CrewId crewId, int orderNumber) {
+    public static DjData create(PartyroomId partyroomId, PlaylistId playlistId, CrewId crewId, int orderNumber) {
         return DjData.builder()
                 .partyroomId(partyroomId)
                 .playlistId(playlistId)

@@ -159,7 +159,7 @@ public class ChatSimulationService {
             return;
         }
 
-        List<CrewData> crewList = crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId);
+        List<CrewData> crewList = crewRepository.findByPartyroomIdAndIsActiveTrue(new PartyroomId(partyroomId));
         if (crewList.isEmpty()) {
             throw ExceptionCreator.create(AdminException.NO_CREW_MEMBERS);
         }

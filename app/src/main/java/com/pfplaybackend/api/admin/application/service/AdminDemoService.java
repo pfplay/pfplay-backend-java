@@ -24,6 +24,7 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
@@ -265,7 +266,7 @@ public class AdminDemoService {
         PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
-        CrewData crew = CrewData.create(loadedPartyroom.getId(), userId, GradeType.LISTENER);
+        CrewData crew = CrewData.create(loadedPartyroom.getPartyroomId(), userId, GradeType.LISTENER);
         crewRepository.save(crew);
     }
 
@@ -308,22 +309,22 @@ public class AdminDemoService {
         boolean isPostActivationProcessingRequired = !playbackState.isActivated();
 
         // Find crew
-        CrewData crew = crewRepository.findByPartyroomIdAndUserId(loadedPartyroom.getId(), userId)
+        CrewData crew = crewRepository.findByPartyroomIdAndUserId(loadedPartyroom.getPartyroomId(), userId)
                 .orElseThrow();
         CrewId crewId = new CrewId(crew.getId());
 
         // Check if already registered
-        if (djRepository.existsByPartyroomIdAndCrewId(loadedPartyroom.getId(), crewId)) {
+        if (djRepository.existsByPartyroomIdAndCrewId(loadedPartyroom.getPartyroomId(), crewId)) {
             log.warn("DJ already registered for user {}, skipping", userId.getUid());
             return;
         }
 
         // Calculate next order number
-        List<DjData> queuedDjs = djRepository.findByPartyroomIdOrderByOrderNumberAsc(loadedPartyroom.getId());
+        List<DjData> queuedDjs = djRepository.findByPartyroomIdOrderByOrderNumberAsc(loadedPartyroom.getPartyroomId());
         int nextOrder = queuedDjs.size() + 1;
 
         // Create and save DJ
-        DjData dj = DjData.create(loadedPartyroom.getId(), new PlaylistId(playlist.getId()), crewId, nextOrder);
+        DjData dj = DjData.create(loadedPartyroom.getPartyroomId(), new PlaylistId(playlist.getId()), crewId, nextOrder);
         djRepository.save(dj);
 
         playbackState.activate(null, null);
@@ -422,8 +423,8 @@ public class AdminDemoService {
         List<AdminPartyroomListResult.PartyroomItem> items = partyroomRepository.findAll().stream()
                 .filter(p -> !p.isTerminated())
                 .map(p -> {
-                    int crewCount = (int) crewRepository.countByPartyroomIdAndIsActiveTrue(p.getId());
-                    int djCount = djRepository.findByPartyroomIdOrderByOrderNumberAsc(p.getId()).size();
+                    int crewCount = (int) crewRepository.countByPartyroomIdAndIsActiveTrue(p.getPartyroomId());
+                    int djCount = djRepository.findByPartyroomIdOrderByOrderNumberAsc(p.getPartyroomId()).size();
                     boolean isPlaybackActivated = partyroomPlaybackRepository.findById(p.getId())
                             .map(PartyroomPlaybackData::isActivated).orElse(false);
                     return new AdminPartyroomListResult.PartyroomItem(

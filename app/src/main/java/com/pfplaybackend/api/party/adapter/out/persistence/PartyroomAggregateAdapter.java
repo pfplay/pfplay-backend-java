@@ -55,7 +55,7 @@ public class PartyroomAggregateAdapter implements PartyroomAggregatePort, Partyr
     // ===== Crew: CrewData =====
 
     @Override
-    public Optional<CrewData> findCrew(Long partyroomId, UserId userId) {
+    public Optional<CrewData> findCrew(PartyroomId partyroomId, UserId userId) {
         return crewRepository.findByPartyroomIdAndUserId(partyroomId, userId);
     }
 
@@ -75,19 +75,19 @@ public class PartyroomAggregateAdapter implements PartyroomAggregatePort, Partyr
     }
 
     @Override
-    public List<CrewData> findActiveCrews(Long partyroomId) {
+    public List<CrewData> findActiveCrews(PartyroomId partyroomId) {
         return crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId);
     }
 
     @Override
-    public long countActiveCrews(Long partyroomId) {
+    public long countActiveCrews(PartyroomId partyroomId) {
         return crewRepository.countByPartyroomIdAndIsActiveTrue(partyroomId);
     }
 
     // ===== DJ: DjData =====
 
     @Override
-    public List<DjData> findDjsOrdered(Long partyroomId) {
+    public List<DjData> findDjsOrdered(PartyroomId partyroomId) {
         return djRepository.findByPartyroomIdOrderByOrderNumberAsc(partyroomId);
     }
 
@@ -97,17 +97,17 @@ public class PartyroomAggregateAdapter implements PartyroomAggregatePort, Partyr
     }
 
     @Override
-    public Optional<DjData> findDj(Long partyroomId, CrewId crewId) {
+    public Optional<DjData> findDj(PartyroomId partyroomId, CrewId crewId) {
         return djRepository.findByPartyroomIdAndCrewId(partyroomId, crewId);
     }
 
     @Override
-    public boolean hasDjs(Long partyroomId) {
+    public boolean hasDjs(PartyroomId partyroomId) {
         return djRepository.existsByPartyroomId(partyroomId);
     }
 
     @Override
-    public boolean isDjRegistered(Long partyroomId, CrewId crewId) {
+    public boolean isDjRegistered(PartyroomId partyroomId, CrewId crewId) {
         return djRepository.existsByPartyroomIdAndCrewId(partyroomId, crewId);
     }
 

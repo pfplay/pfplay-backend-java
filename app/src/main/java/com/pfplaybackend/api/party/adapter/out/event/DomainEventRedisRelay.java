@@ -45,7 +45,7 @@ public class DomainEventRedisRelay {
         messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE.topic(),
                 DjQueueChangeMessage.create(
                         event.getPartyroomId(),
-                        partyroomQueryService.getDjs(event.getPartyroomId().getId())
+                        partyroomQueryService.getDjs(event.getPartyroomId())
                 ));
     }
 

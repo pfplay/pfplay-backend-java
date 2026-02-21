@@ -5,6 +5,7 @@ import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +49,7 @@ class PartyroomQueryServiceIsRegisteredTest {
     @DisplayName("DJ 대기열에 등록되어 있으면 true 반환")
     void isAlreadyRegistered_shouldReturnTrue_whenUserIsRegistered() {
         // given
-        Long partyroomId = 1L;
+        PartyroomId partyroomId = new PartyroomId(1L);
         CrewData crew = CrewData.builder().id(5L).userId(myUserId).build();
         when(aggregatePort.findCrew(partyroomId, myUserId))
                 .thenReturn(Optional.of(crew));
@@ -66,7 +67,7 @@ class PartyroomQueryServiceIsRegisteredTest {
     @DisplayName("DJ 대기열에 등록되어 있지 않으면 false 반환")
     void isAlreadyRegistered_shouldReturnFalse_whenUserIsNotRegistered() {
         // given
-        Long partyroomId = 1L;
+        PartyroomId partyroomId = new PartyroomId(1L);
         CrewData crew = CrewData.builder().id(5L).userId(myUserId).build();
         when(aggregatePort.findCrew(partyroomId, myUserId))
                 .thenReturn(Optional.of(crew));
@@ -84,7 +85,7 @@ class PartyroomQueryServiceIsRegisteredTest {
     @DisplayName("크루가 없으면 false 반환")
     void isAlreadyRegistered_shouldReturnFalse_whenCrewNotFound() {
         // given
-        Long partyroomId = 1L;
+        PartyroomId partyroomId = new PartyroomId(1L);
         when(aggregatePort.findCrew(partyroomId, myUserId))
                 .thenReturn(Optional.empty());
 

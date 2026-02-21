@@ -45,19 +45,19 @@ public class DjCommandService {
         boolean isPostActivationProcessingRequired = !playbackState.isActivated();
 
         // Find crew
-        CrewData crew = partyroomQueryService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
+        CrewData crew = partyroomQueryService.getCrewOrThrow(partyroomId, authContext.getUserId());
         CrewId crewId = new CrewId(crew.getId());
 
-        boolean isAlreadyRegistered = aggregatePort.isDjRegistered(partyroomId.getId(), crewId);
+        boolean isAlreadyRegistered = aggregatePort.isDjRegistered(partyroomId, crewId);
         boolean isEmptyPlaylist = playlistQueryPort.isEmptyPlaylist(playlistId.getId());
         new DjEnqueueSpecification().validate(djQueue, isAlreadyRegistered, isEmptyPlaylist);
 
         // Calculate next order number
-        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId.getId());
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         int nextOrder = queuedDjs.size() + 1;
 
         // Create and save DJ
-        DjData dj = DjData.create(partyroom.getId(), playlistId, crewId, nextOrder);
+        DjData dj = DjData.create(partyroom.getPartyroomId(), playlistId, crewId, nextOrder);
         aggregatePort.saveDj(dj);
 
         playbackState.activate(null, null);
@@ -76,11 +76,11 @@ public class DjCommandService {
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
         PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
 
-        CrewData crew = partyroomQueryService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
+        CrewData crew = partyroomQueryService.getCrewOrThrow(partyroomId, authContext.getUserId());
         CrewId crewId = new CrewId(crew.getId());
 
         boolean wasCurrentDj = playbackState.isActivated() && playbackState.isCurrentDj(crewId);
-        partyroomAggregateService.removeDjFromQueue(partyroomId.getId(), crewId);
+        partyroomAggregateService.removeDjFromQueue(partyroomId, crewId);
 
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
         if (wasCurrentDj) {
@@ -95,7 +95,7 @@ public class DjCommandService {
         PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
 
         // 관리자 등급 체크
-        CrewData adjusterCrew = partyroomQueryService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
+        CrewData adjusterCrew = partyroomQueryService.getCrewOrThrow(partyroomId, authContext.getUserId());
         if (adjusterCrew.isBelowGrade(GradeType.MODERATOR))
             throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
 
@@ -104,7 +104,7 @@ public class DjCommandService {
                 .orElseThrow(() -> ExceptionCreator.create(DjException.NOT_FOUND_DJ));
 
         boolean wasCurrentDj = playbackState.isActivated() && playbackState.isCurrentDj(targetDj.getCrewId());
-        partyroomAggregateService.removeDjFromQueue(partyroomId.getId(), targetDj.getCrewId());
+        partyroomAggregateService.removeDjFromQueue(partyroomId, targetDj.getCrewId());
 
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
         if (wasCurrentDj) {

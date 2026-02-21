@@ -46,8 +46,8 @@ public class PartyroomAccessCommandService {
 
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
 
-        long activeCrewCount = aggregatePort.countActiveCrews(partyroomId.getId());
-        Optional<CrewData> existingCrew = aggregatePort.findCrew(partyroomId.getId(), userId);
+        long activeCrewCount = aggregatePort.countActiveCrews(partyroomId);
+        Optional<CrewData> existingCrew = aggregatePort.findCrew(partyroomId, userId);
         log.debug("[tryEnter] Partyroom found - partyroomId={}, isTerminated={}, crewCount={}",
                 partyroomId.getId(), partyroom.isTerminated(), activeCrewCount);
 
@@ -68,7 +68,7 @@ public class PartyroomAccessCommandService {
                 exit(new PartyroomId(activeRoomInfo.id()));
             } else {
                 log.info("[tryEnter] Same room re-entry - userId={}, partyroomId={}", userId, partyroomId.getId());
-                CrewData crew = aggregatePort.findCrew(partyroomId.getId(), userId)
+                CrewData crew = aggregatePort.findCrew(partyroomId, userId)
                         .orElseThrow();
                 publishAccessChangedEvent(partyroom.getPartyroomId(), crew, userId);
                 return crew;
@@ -82,7 +82,7 @@ public class PartyroomAccessCommandService {
     }
 
     private CrewData addOrActivateCrew(PartyroomData partyroom, UserId userId) {
-        Optional<CrewData> existingCrew = aggregatePort.findCrew(partyroom.getId(), userId);
+        Optional<CrewData> existingCrew = aggregatePort.findCrew(partyroom.getPartyroomId(), userId);
         if (existingCrew.isPresent() && !existingCrew.get().isActive()) {
             CrewData crew = existingCrew.get();
             log.info("[addOrActivateCrew] Reactivating inactive crew - userId={}, partyroomId={}",
@@ -92,7 +92,7 @@ public class PartyroomAccessCommandService {
         } else {
             log.info("[addOrActivateCrew] Adding new crew - userId={}, partyroomId={}, gradeType=LISTENER",
                     userId, partyroom.getPartyroomId().getId());
-            CrewData crew = CrewData.create(partyroom.getId(), userId, GradeType.LISTENER);
+            CrewData crew = CrewData.create(partyroom.getPartyroomId(), userId, GradeType.LISTENER);
             return aggregatePort.saveCrew(crew);
         }
     }
@@ -103,7 +103,7 @@ public class PartyroomAccessCommandService {
 
     @Transactional
     public void enterByHost(UserId hostId, PartyroomData partyroom) {
-        CrewData crew = CrewData.create(partyroom.getId(), hostId, GradeType.HOST);
+        CrewData crew = CrewData.create(partyroom.getPartyroomId(), hostId, GradeType.HOST);
         aggregatePort.saveCrew(crew);
     }
 
@@ -114,7 +114,7 @@ public class PartyroomAccessCommandService {
 
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
 
-        Optional<CrewData> optionalCrew = aggregatePort.findCrew(partyroomId.getId(), authContext.getUserId());
+        Optional<CrewData> optionalCrew = aggregatePort.findCrew(partyroomId, authContext.getUserId());
         if(optionalCrew.isEmpty()) {
             log.warn("[exit] INVALID_ACTIVE_ROOM - userId={} has no active crew in partyroomId={}",
                     authContext.getUserId(), partyroomId.getId());
@@ -142,13 +142,13 @@ public class PartyroomAccessCommandService {
     }
 
     private void handleDjQueueOnLeave(PartyroomData partyroom, CrewId crewId) {
-        boolean wasInDjQueue = aggregatePort.findDj(partyroom.getId(), crewId)
+        boolean wasInDjQueue = aggregatePort.findDj(partyroom.getPartyroomId(), crewId)
                 .isPresent();
         PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getId());
         boolean wasCurrentDj = playbackState.isActivated() && wasInDjQueue
                 && playbackState.isCurrentDj(crewId);
 
-        partyroomAggregateService.removeDjFromQueue(partyroom.getId(), crewId);
+        partyroomAggregateService.removeDjFromQueue(partyroom.getPartyroomId(), crewId);
 
         if (wasInDjQueue) {
             eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));

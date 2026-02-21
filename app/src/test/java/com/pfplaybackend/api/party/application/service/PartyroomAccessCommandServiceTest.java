@@ -77,8 +77,8 @@ class PartyroomAccessCommandServiceTest {
                 .build();
 
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(aggregatePort.countActiveCrews(partyroomId.getId())).thenReturn(10L);
-        when(aggregatePort.findCrew(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
+        when(aggregatePort.countActiveCrews(partyroomId)).thenReturn(10L);
+        when(aggregatePort.findCrew(partyroomId, userId)).thenReturn(Optional.of(crew));
 
         // 같은 룸에 이미 active
         ActivePartyroomDto activeRoomInfo = mock(ActivePartyroomDto.class);
@@ -114,7 +114,7 @@ class PartyroomAccessCommandServiceTest {
                 .build();
 
         when(partyroomQueryService.getPartyroomById(newRoomId)).thenReturn(newPartyroomData);
-        when(aggregatePort.countActiveCrews(newRoomId.getId())).thenReturn(5L);
+        when(aggregatePort.countActiveCrews(newRoomId)).thenReturn(5L);
 
         // 다른 룸에 이미 active
         ActivePartyroomDto activeRoomInfo = mock(ActivePartyroomDto.class);
@@ -139,12 +139,12 @@ class PartyroomAccessCommandServiceTest {
 
         when(partyroomQueryService.getPartyroomById(oldRoomId)).thenReturn(oldPartyroomData);
         // exit() mock: crew lookup
-        when(aggregatePort.findCrew(oldRoomId.getId(), userId)).thenReturn(Optional.of(oldCrew));
-        when(aggregatePort.findDj(oldRoomId.getId(), new CrewId(5L))).thenReturn(Optional.empty());
+        when(aggregatePort.findCrew(oldRoomId, userId)).thenReturn(Optional.of(oldCrew));
+        when(aggregatePort.findDj(oldRoomId, new CrewId(5L))).thenReturn(Optional.empty());
         when(aggregatePort.findPlaybackState(oldRoomId.getId())).thenReturn(oldPlaybackState);
 
         // addOrActivateCrew mock for new room: inactive crew found → reactivate
-        when(aggregatePort.findCrew(newRoomId.getId(), userId)).thenReturn(Optional.of(newRoomCrew));
+        when(aggregatePort.findCrew(newRoomId, userId)).thenReturn(Optional.of(newRoomCrew));
         when(aggregatePort.saveCrew(any(CrewData.class))).thenReturn(newRoomCrew);
 
         // when — 예외 없이 정상 실행되어야 함

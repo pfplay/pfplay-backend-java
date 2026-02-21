@@ -83,8 +83,8 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
         playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(aggregatePort.findCrew(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
-        when(aggregatePort.findDj(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.of(
+        when(aggregatePort.findCrew(partyroomId, userId)).thenReturn(Optional.of(crew));
+        when(aggregatePort.findDj(partyroomId, new CrewId(1L))).thenReturn(Optional.of(
                 DjData.builder().id(100L).crewId(new CrewId(1L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
         ));
         when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
@@ -93,7 +93,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
         partyroomAccessCommandService.exit(partyroomId);
 
         // then
-        verify(partyroomAggregateService).removeDjFromQueue(partyroomId.getId(), new CrewId(1L));
+        verify(partyroomAggregateService).removeDjFromQueue(partyroomId, new CrewId(1L));
         verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
         verify(eventPublisher).publishEvent(any(CrewAccessedEvent.class));
     }
@@ -117,8 +117,8 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
 
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
-        when(aggregatePort.findCrew(partyroomId.getId(), userId)).thenReturn(Optional.of(crew));
-        when(aggregatePort.findDj(partyroomId.getId(), new CrewId(1L))).thenReturn(Optional.empty());
+        when(aggregatePort.findCrew(partyroomId, userId)).thenReturn(Optional.of(crew));
+        when(aggregatePort.findDj(partyroomId, new CrewId(1L))).thenReturn(Optional.empty());
         when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
 
         // when
@@ -150,7 +150,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
         playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
-        when(aggregatePort.findDj(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.of(
+        when(aggregatePort.findDj(partyroomId, new CrewId(2L))).thenReturn(Optional.of(
                 DjData.builder().id(100L).crewId(new CrewId(2L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
         ));
         when(aggregatePort.findPlaybackState(partyroomData.getId())).thenReturn(playbackState);
@@ -159,7 +159,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
         partyroomAccessCommandService.expel(partyroomData, targetCrew, false);
 
         // then
-        verify(partyroomAggregateService).removeDjFromQueue(partyroomData.getId(), new CrewId(2L));
+        verify(partyroomAggregateService).removeDjFromQueue(partyroomId, new CrewId(2L));
         verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
         verify(eventPublisher).publishEvent(any(CrewAccessedEvent.class));
     }
@@ -184,7 +184,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
 
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
 
-        when(aggregatePort.findDj(partyroomData.getId(), new CrewId(2L))).thenReturn(Optional.empty());
+        when(aggregatePort.findDj(partyroomId, new CrewId(2L))).thenReturn(Optional.empty());
         when(aggregatePort.findPlaybackState(partyroomData.getId())).thenReturn(playbackState);
 
         // when

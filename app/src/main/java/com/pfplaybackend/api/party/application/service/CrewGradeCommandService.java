@@ -38,7 +38,7 @@ public class CrewGradeCommandService {
         AuthorityTier authorityTier = userProfileQueryPort.getAuthorityTier(adjustedCrew.getUserId());
         GradeType prevGradeType = adjustedCrew.getGradeType();
         GradeType targetGradeType = command.gradeType();
-        CrewData adjusterCrew = partyroomQueryService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
+        CrewData adjusterCrew = partyroomQueryService.getCrewOrThrow(partyroomId, authContext.getUserId());
 
         new GradeAdjustmentSpecification().validate(adjusterCrew, adjustedCrew, targetGradeType, authorityTier);
 

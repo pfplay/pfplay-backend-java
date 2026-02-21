@@ -88,10 +88,10 @@ class DjCommandServiceDjQueueChangeTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
         when(aggregatePort.findDjQueueState(partyroomId.getId())).thenReturn(djQueue);
-        when(partyroomQueryService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(crew);
         when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
-        when(aggregatePort.isDjRegistered(partyroomId.getId(), new CrewId(1L))).thenReturn(false);
-        when(aggregatePort.findDjsOrdered(partyroomId.getId())).thenReturn(Collections.emptyList());
+        when(aggregatePort.isDjRegistered(partyroomId, new CrewId(1L))).thenReturn(false);
+        when(aggregatePort.findDjsOrdered(partyroomId)).thenReturn(Collections.emptyList());
 
         // when
         djCommandService.enqueueDj(partyroomId, playlistId);
@@ -121,13 +121,13 @@ class DjCommandServiceDjQueueChangeTest {
 
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
-        when(partyroomQueryService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(crew);
 
         // when
         djCommandService.dequeueDj(partyroomId);
 
         // then
-        verify(partyroomAggregateService).removeDjFromQueue(partyroomId.getId(), new CrewId(1L));
+        verify(partyroomAggregateService).removeDjFromQueue(partyroomId, new CrewId(1L));
         verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
         // 대기 DJ(currentDj가 아님)이므로 skipBySystem은 호출되지 않아야 한다
         verify(playbackCommandService, never()).skipBySystem(any());
@@ -154,13 +154,13 @@ class DjCommandServiceDjQueueChangeTest {
 
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
-        when(partyroomQueryService.getCrewOrThrow(partyroomId.getId(), userId)).thenReturn(crew);
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(crew);
 
         // when
         djCommandService.dequeueDj(partyroomId);
 
         // then
-        verify(partyroomAggregateService).removeDjFromQueue(partyroomId.getId(), new CrewId(1L));
+        verify(partyroomAggregateService).removeDjFromQueue(partyroomId, new CrewId(1L));
         verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
         verify(playbackCommandService).skipBySystem(partyroomId);
     }
@@ -198,7 +198,7 @@ class DjCommandServiceDjQueueChangeTest {
 
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
-        when(partyroomQueryService.getCrewOrThrow(partyroomId.getId(), adminUserId)).thenReturn(adjusterCrew);
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, adminUserId)).thenReturn(adjusterCrew);
         when(aggregatePort.findDjById(djId.getId())).thenReturn(Optional.of(targetDj));
 
         // when

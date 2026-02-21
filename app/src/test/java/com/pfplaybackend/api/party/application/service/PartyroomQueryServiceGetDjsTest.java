@@ -6,6 +6,7 @@ import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaylistId;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -62,7 +63,7 @@ class PartyroomQueryServiceGetDjsTest {
         DjData queuedDj1 = createDj(1L, 1);
         DjData queuedDj2 = createDj(3L, 2);
 
-        Long partyroomId = 1L;
+        PartyroomId partyroomId = new PartyroomId(1L);
         when(aggregatePort.findDjsOrdered(partyroomId))
                 .thenReturn(List.of(queuedDj1, queuedDj2));
         when(aggregatePort.findCrewsByIds(List.of(1L, 3L)))
@@ -93,7 +94,7 @@ class PartyroomQueryServiceGetDjsTest {
         DjData dj2 = createDj(2L, 2);
         DjData dj3 = createDj(3L, 3);
 
-        Long partyroomId = 1L;
+        PartyroomId partyroomId = new PartyroomId(1L);
         when(aggregatePort.findDjsOrdered(partyroomId))
                 .thenReturn(List.of(dj1, dj2, dj3));
         when(aggregatePort.findCrewsByIds(List.of(1L, 2L, 3L)))
@@ -119,7 +120,7 @@ class PartyroomQueryServiceGetDjsTest {
     @DisplayName("getDjs - 모든 DJ가 dequeued이면 빈 리스트를 반환해야 한다")
     void getDjs_shouldReturnEmptyList_whenAllDjsDequeued() {
         // given
-        Long partyroomId = 1L;
+        PartyroomId partyroomId = new PartyroomId(1L);
         when(aggregatePort.findDjsOrdered(partyroomId))
                 .thenReturn(List.of());
         when(aggregatePort.findCrewsByIds(List.of())).thenReturn(List.of());

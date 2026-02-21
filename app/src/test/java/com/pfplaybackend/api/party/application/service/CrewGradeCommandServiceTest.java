@@ -76,7 +76,7 @@ class CrewGradeCommandServiceTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(aggregatePort.findCrewById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
         when(userProfileQueryPort.getAuthorityTier(adjustedUserId)).thenReturn(AuthorityTier.FM);
-        when(partyroomQueryService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, adjusterUserId)).thenReturn(adjusterCrew);
         when(aggregatePort.saveCrew(any())).thenReturn(adjustedCrew);
 
         AdjustGradeCommand command = createCommand(GradeType.MODERATOR);
@@ -116,7 +116,7 @@ class CrewGradeCommandServiceTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(aggregatePort.findCrewById(adjustedCrewId.getId())).thenReturn(Optional.of(adjustedCrew));
         when(userProfileQueryPort.getAuthorityTier(adjustedUserId)).thenReturn(AuthorityTier.FM);
-        when(partyroomQueryService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, adjusterUserId)).thenReturn(adjusterCrew);
 
         AdjustGradeCommand command = createCommand(GradeType.MODERATOR);
 

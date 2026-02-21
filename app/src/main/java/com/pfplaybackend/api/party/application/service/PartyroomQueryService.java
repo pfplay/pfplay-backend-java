@@ -69,7 +69,7 @@ public class PartyroomQueryService {
 
     @Transactional(readOnly = true)
     public List<CrewData> getActiveCrews(PartyroomId partyroomId) {
-        return aggregatePort.findActiveCrews(partyroomId.getId());
+        return aggregatePort.findActiveCrews(partyroomId);
     }
 
     @Transactional(readOnly = true)
@@ -79,7 +79,7 @@ public class PartyroomQueryService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isAlreadyRegistered(Long partyroomId) {
+    public boolean isAlreadyRegistered(PartyroomId partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         Optional<CrewData> crew = aggregatePort.findCrew(partyroomId, authContext.getUserId());
         if (crew.isEmpty()) return false;
@@ -87,7 +87,7 @@ public class PartyroomQueryService {
     }
 
     @Transactional(readOnly = true)
-    public List<DjWithProfileDto> getDjs(Long partyroomId) {
+    public List<DjWithProfileDto> getDjs(PartyroomId partyroomId) {
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         // Resolve userIds via crew lookup
         List<Long> crewIds = queuedDjs.stream().map(dj -> dj.getCrewId().getId()).toList();
@@ -129,7 +129,7 @@ public class PartyroomQueryService {
         PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
         if(playbackState.isActivated()) {
             PlaybackData playback = playbackQueryService.getPlaybackById(playbackState.getCurrentPlaybackId());
-            CrewData djCrew = aggregatePort.findCrew(partyroomId.getId(), playback.getUserId())
+            CrewData djCrew = aggregatePort.findCrew(partyroomId, playback.getUserId())
                     .orElseThrow();
             UserId djUserId = djCrew.getUserId();
             ProfileSettingDto profileSettingDto = userProfileQueryPort.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
@@ -144,11 +144,11 @@ public class PartyroomQueryService {
 
     @Transactional(readOnly = true)
     public Optional<CrewData> getCrewByUserId(PartyroomId partyroomId, UserId userId) {
-        return aggregatePort.findCrew(partyroomId.getId(), userId);
+        return aggregatePort.findCrew(partyroomId, userId);
     }
 
     @Transactional(readOnly = true)
-    public CrewData getCrewOrThrow(Long partyroomId, UserId userId) {
+    public CrewData getCrewOrThrow(PartyroomId partyroomId, UserId userId) {
         return aggregatePort.findCrew(partyroomId, userId)
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
     }
@@ -166,12 +166,12 @@ public class PartyroomQueryService {
         DjQueueData djQueue = aggregatePort.findDjQueueState(partyroom.getId());
         boolean isPlaybackActivated = playbackState.isActivated();
         QueueStatus queueStatus = djQueue.isClosed() ? QueueStatus.CLOSE : QueueStatus.OPEN;
-        boolean isRegistered = isAlreadyRegistered(partyroom.getId());
+        boolean isRegistered = isAlreadyRegistered(partyroom.getPartyroomId());
         PlaybackData playback = null;
         if (isPlaybackActivated) {
             playback = playbackQueryService.getPlaybackById(playbackState.getCurrentPlaybackId());
         }
-        List<DjWithProfileDto> djWithProfiles = getDjs(partyroom.getId());
+        List<DjWithProfileDto> djWithProfiles = getDjs(partyroom.getPartyroomId());
         return new DjQueueInfoResult(isPlaybackActivated, queueStatus, isRegistered, playback, djWithProfiles);
     }
 

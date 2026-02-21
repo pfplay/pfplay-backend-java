@@ -5,6 +5,7 @@ import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class PartyroomAggregateService {
     /**
      * DJ큐에서 제거 + 순서 재배치 (atomic operation)
      */
-    public void removeDjFromQueue(Long partyroomId, CrewId crewId) {
+    public void removeDjFromQueue(PartyroomId partyroomId, CrewId crewId) {
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         List<DjData> toDelete = queuedDjs.stream()
                 .filter(dj -> dj.getCrewId().equals(crewId))
@@ -40,7 +41,7 @@ public class PartyroomAggregateService {
     /**
      * DJ큐 로테이션 (1번→마지막, 나머지 -1)
      */
-    public void rotateDjQueue(Long partyroomId) {
+    public void rotateDjQueue(PartyroomId partyroomId) {
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         int totalElements = queuedDjs.size();
         queuedDjs.forEach(dj -> {
@@ -57,8 +58,8 @@ public class PartyroomAggregateService {
      * 재생 비활성화 + 전체 DJ 일괄 삭제
      * @return 엔티티에서 수집된 도메인 이벤트 목록
      */
-    public List<DomainEvent> deactivatePlayback(Long partyroomId) {
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
+    public List<DomainEvent> deactivatePlayback(PartyroomId partyroomId) {
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
         playbackState.deactivate();
         aggregatePort.savePlaybackState(playbackState);
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
@@ -69,7 +70,7 @@ public class PartyroomAggregateService {
     /**
      * DJ큐에 활성 DJ가 존재하는지 확인
      */
-    public boolean hasQueuedDjs(Long partyroomId) {
+    public boolean hasQueuedDjs(PartyroomId partyroomId) {
         return aggregatePort.hasDjs(partyroomId);
     }
 }

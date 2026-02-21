@@ -83,11 +83,11 @@ class CrewPenaltyCommandServiceTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
 
         CrewData punisherCrew = CrewData.builder()
-                .id(10L).partyroomId(1L).userId(userId).gradeType(GradeType.HOST).isActive(true).build();
-        when(partyroomQueryService.getCrewOrThrow(1L, userId)).thenReturn(punisherCrew);
+                .id(10L).partyroomId(partyroomId).userId(userId).gradeType(GradeType.HOST).isActive(true).build();
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(punisherCrew);
 
         CrewData punishedCrew = CrewData.builder()
-                .id(20L).partyroomId(1L).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
+                .id(20L).partyroomId(partyroomId).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(punishedCrew));
 
         PunishPenaltyCommand command = new PunishPenaltyCommand(20L, PenaltyType.CHAT_BAN_30_SECONDS, "Spam");
@@ -113,11 +113,11 @@ class CrewPenaltyCommandServiceTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
 
         CrewData punisherCrew = CrewData.builder()
-                .id(10L).partyroomId(1L).userId(userId).gradeType(GradeType.HOST).isActive(true).build();
-        when(partyroomQueryService.getCrewOrThrow(1L, userId)).thenReturn(punisherCrew);
+                .id(10L).partyroomId(partyroomId).userId(userId).gradeType(GradeType.HOST).isActive(true).build();
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(punisherCrew);
 
         CrewData punishedCrew = CrewData.builder()
-                .id(20L).partyroomId(1L).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
+                .id(20L).partyroomId(partyroomId).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(punishedCrew));
 
         PunishPenaltyCommand command = new PunishPenaltyCommand(20L, PenaltyType.PERMANENT_EXPULSION, "Harassment");
@@ -139,11 +139,11 @@ class CrewPenaltyCommandServiceTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(createPartyroom());
 
         CrewData punisherCrew = CrewData.builder()
-                .id(10L).partyroomId(1L).userId(userId).gradeType(GradeType.CLUBBER).isActive(true).build();
-        when(partyroomQueryService.getCrewOrThrow(1L, userId)).thenReturn(punisherCrew);
+                .id(10L).partyroomId(partyroomId).userId(userId).gradeType(GradeType.CLUBBER).isActive(true).build();
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(punisherCrew);
 
         CrewData punishedCrew = CrewData.builder()
-                .id(20L).partyroomId(1L).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
+                .id(20L).partyroomId(partyroomId).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(punishedCrew));
 
         PunishPenaltyCommand command = new PunishPenaltyCommand(20L, PenaltyType.ONE_TIME_EXPULSION, "Reason");
@@ -163,8 +163,8 @@ class CrewPenaltyCommandServiceTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(createPartyroom());
 
         CrewData releaserCrew = CrewData.builder()
-                .id(10L).partyroomId(1L).userId(userId).gradeType(GradeType.HOST).isActive(true).build();
-        when(partyroomQueryService.getCrewOrThrow(1L, userId)).thenReturn(releaserCrew);
+                .id(10L).partyroomId(partyroomId).userId(userId).gradeType(GradeType.HOST).isActive(true).build();
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(releaserCrew);
 
         CrewPenaltyHistoryData historyData = CrewPenaltyHistoryData.builder()
                 .id(5L).partyroomId(partyroomId).punishedCrewId(new CrewId(20L))
@@ -174,7 +174,7 @@ class CrewPenaltyCommandServiceTest {
                 .thenReturn(Optional.of(historyData));
 
         CrewData punishedCrew = CrewData.builder()
-                .id(20L).partyroomId(1L).userId(new UserId(2L)).gradeType(GradeType.CLUBBER)
+                .id(20L).partyroomId(partyroomId).userId(new UserId(2L)).gradeType(GradeType.CLUBBER)
                 .isActive(false).isBanned(true).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(punishedCrew));
 
@@ -196,8 +196,8 @@ class CrewPenaltyCommandServiceTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(createPartyroom());
 
         CrewData releaserCrew = CrewData.builder()
-                .id(10L).partyroomId(1L).userId(userId).gradeType(GradeType.CLUBBER).isActive(true).build();
-        when(partyroomQueryService.getCrewOrThrow(1L, userId)).thenReturn(releaserCrew);
+                .id(10L).partyroomId(partyroomId).userId(userId).gradeType(GradeType.CLUBBER).isActive(true).build();
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(releaserCrew);
 
         // when & then
         assertThatThrownBy(() -> crewPenaltyCommandService.releaseCrewPenalty(partyroomId, 5L))
@@ -212,8 +212,8 @@ class CrewPenaltyCommandServiceTest {
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(createPartyroom());
 
         CrewData releaserCrew = CrewData.builder()
-                .id(10L).partyroomId(1L).userId(userId).gradeType(GradeType.HOST).isActive(true).build();
-        when(partyroomQueryService.getCrewOrThrow(1L, userId)).thenReturn(releaserCrew);
+                .id(10L).partyroomId(partyroomId).userId(userId).gradeType(GradeType.HOST).isActive(true).build();
+        when(partyroomQueryService.getCrewOrThrow(partyroomId, userId)).thenReturn(releaserCrew);
 
         when(crewPenaltyHistoryRepository.findByIdAndPartyroomIdAndReleasedIsFalse(99L, partyroomId))
                 .thenReturn(Optional.empty());

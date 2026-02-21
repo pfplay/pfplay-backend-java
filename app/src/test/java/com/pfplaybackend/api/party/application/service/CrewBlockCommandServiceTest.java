@@ -11,6 +11,7 @@ import com.pfplaybackend.api.party.domain.entity.data.history.CrewBlockHistoryDa
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
 import com.pfplaybackend.api.party.application.dto.command.AddBlockCommand;
 import org.junit.jupiter.api.AfterEach;
@@ -68,7 +69,7 @@ class CrewBlockCommandServiceTest {
 
         UserId blockedUserId = new UserId(2L);
         CrewData blockedCrew = CrewData.builder()
-                .id(20L).partyroomId(1L).userId(blockedUserId).gradeType(GradeType.CLUBBER)
+                .id(20L).partyroomId(new PartyroomId(1L)).userId(blockedUserId).gradeType(GradeType.CLUBBER)
                 .isActive(true).isBanned(false).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(blockedCrew));
 

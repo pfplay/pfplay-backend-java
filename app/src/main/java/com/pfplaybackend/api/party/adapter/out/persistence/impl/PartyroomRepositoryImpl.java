@@ -43,7 +43,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         qPlayback.currentDjCrewId
                 ))
                 .from(qCrewData)
-                .join(qPartyroomData).on(qPartyroomData.id.eq(qCrewData.partyroomId))
+                .join(qPartyroomData).on(qPartyroomData.id.eq(qCrewData.partyroomId.id))
                 .join(qPlayback).on(qPlayback.partyroomId.eq(qPartyroomData.id))
                 .join(qDjQueue).on(qDjQueue.partyroomId.eq(qPartyroomData.id))
                 .where(qCrewData.userId.eq(userId)
@@ -64,7 +64,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
         JPQLQuery<Long> crewCountSubquery = JPAExpressions
                 .select(qCrewData.count())
                 .from(qCrewData)
-                .where(qCrewData.partyroomId.eq(qPartyroomData.id)
+                .where(qCrewData.partyroomId.id.eq(qPartyroomData.id)
                         .and(qCrewData.isActive.eq(true))
                         .and(qCrewData.isBanned.eq(false))
                 );
@@ -96,7 +96,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 .join(qPlayback).on(qPlayback.partyroomId.eq(qPartyroomData.id))
                 .join(qDjQueue).on(qDjQueue.partyroomId.eq(qPartyroomData.id))
                 .leftJoin(qCrewData)
-                .on(qCrewData.partyroomId.eq(qPartyroomData.id)
+                .on(qCrewData.partyroomId.id.eq(qPartyroomData.id)
                         .and(qCrewData.isActive.eq(true))
                         .and(qCrewData.isBanned.eq(false))
                 )

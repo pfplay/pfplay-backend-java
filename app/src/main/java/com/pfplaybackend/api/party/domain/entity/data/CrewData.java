@@ -2,6 +2,7 @@ package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import jakarta.persistence.Index;
@@ -33,8 +34,11 @@ public class CrewData extends BaseEntity {
     @Column(name = "crew_id")
     private Long id;
 
-    @Column(name = "partyroom_id", nullable = false)
-    private Long partyroomId;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "partyroom_id", nullable = false)),
+    })
+    private PartyroomId partyroomId;
 
     @Embedded
     @AttributeOverrides({
@@ -58,7 +62,7 @@ public class CrewData extends BaseEntity {
     protected CrewData() {}
 
     @Builder
-    public CrewData(Long id, Long partyroomId, UserId userId, GradeType gradeType,
+    public CrewData(Long id, PartyroomId partyroomId, UserId userId, GradeType gradeType,
                     boolean isActive, boolean isBanned, LocalDateTime enteredAt, LocalDateTime exitedAt,
                     LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
@@ -75,7 +79,7 @@ public class CrewData extends BaseEntity {
 
     // ── Business Methods ──
 
-    public static CrewData create(Long partyroomId, UserId userId, GradeType gradeType) {
+    public static CrewData create(PartyroomId partyroomId, UserId userId, GradeType gradeType) {
         return CrewData.builder()
                 .partyroomId(partyroomId)
                 .userId(userId)
