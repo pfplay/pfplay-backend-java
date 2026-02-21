@@ -147,7 +147,7 @@ public class PartyroomData extends BaseEntity {
 
     public void terminate() {
         this.isTerminated = true;
-        registerEvent(new PartyroomClosedEvent(this.partyroomId));
+        registerEvent(new PartyroomClosedEvent(this.partyroomId, this.hostId, this.title));
     }
 
     public PartyroomData assignPartyroomId(PartyroomId partyroomId) {

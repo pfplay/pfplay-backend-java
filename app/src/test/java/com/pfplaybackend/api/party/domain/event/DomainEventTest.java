@@ -1,7 +1,11 @@
 package com.pfplaybackend.api.party.domain.event;
 
 import com.pfplaybackend.api.common.domain.event.DomainEvent;
+import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.party.domain.enums.DjChangeType;
+import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +17,7 @@ class DomainEventTest {
     @DisplayName("DomainEvent — eventId가 자동 생성된다")
     void domainEvent_hasEventId() {
         // given
-        DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L));
+        DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
 
         // then
         assertThat(event.getEventId()).isNotNull();
@@ -23,7 +27,7 @@ class DomainEventTest {
     @DisplayName("DomainEvent — occurredAt이 자동 설정된다")
     void domainEvent_hasOccurredAt() {
         // given
-        DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L));
+        DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
 
         // then
         assertThat(event.getOccurredAt()).isNotNull();
@@ -33,7 +37,7 @@ class DomainEventTest {
     @DisplayName("DomainEvent — eventType이 클래스 이름으로 설정된다")
     void domainEvent_hasEventType() {
         // given
-        DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L));
+        DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
 
         // then
         assertThat(event.getEventType()).isEqualTo("PartyroomClosedEvent");
@@ -43,8 +47,8 @@ class DomainEventTest {
     @DisplayName("DomainEvent — 서로 다른 이벤트 인스턴스는 서로 다른 eventId를 갖는다")
     void domainEvent_uniqueEventId() {
         // given
-        DomainEvent event1 = new PartyroomClosedEvent(new PartyroomId(1L));
-        DomainEvent event2 = new PartyroomClosedEvent(new PartyroomId(1L));
+        DomainEvent event1 = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
+        DomainEvent event2 = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
 
         // then
         assertThat(event1.getEventId()).isNotEqualTo(event2.getEventId());
@@ -54,7 +58,7 @@ class DomainEventTest {
     @DisplayName("getAggregateId — partyroomId를 문자열로 반환한다")
     void getAggregateId_returnsPartyroomIdAsString() {
         // given
-        DomainEvent event = new PartyroomClosedEvent(new PartyroomId(42L));
+        DomainEvent event = new PartyroomClosedEvent(new PartyroomId(42L), new UserId(1L), "Test Room");
 
         // then
         assertThat(event.getAggregateId()).isEqualTo("42");
@@ -64,9 +68,9 @@ class DomainEventTest {
     @DisplayName("eventType — 이벤트 클래스마다 다른 이름이 설정된다")
     void eventType_variesByClass() {
         // given
-        DomainEvent closed = new PartyroomClosedEvent(new PartyroomId(1L));
-        DomainEvent deactivated = new PlaybackDeactivatedEvent(new PartyroomId(1L));
-        DomainEvent queueChanged = new DjQueueChangedEvent(new PartyroomId(1L));
+        DomainEvent closed = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
+        DomainEvent deactivated = new PlaybackDeactivatedEvent(new PartyroomId(1L), new PlaybackId(10L), new CrewId(5L));
+        DomainEvent queueChanged = new DjQueueChangedEvent(new PartyroomId(1L), DjChangeType.ENQUEUE, new CrewId(1L));
 
         // then
         assertThat(closed.getEventType()).isEqualTo("PartyroomClosedEvent");

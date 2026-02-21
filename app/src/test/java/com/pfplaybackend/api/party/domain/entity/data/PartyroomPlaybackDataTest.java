@@ -127,5 +127,7 @@ class PartyroomPlaybackDataTest {
         assertThat(events.get(0)).isInstanceOf(PlaybackDeactivatedEvent.class);
         PlaybackDeactivatedEvent event = (PlaybackDeactivatedEvent) events.get(0);
         assertThat(event.getPartyroomId().getId()).isEqualTo(1L);
+        assertThat(event.getLastPlaybackId()).isEqualTo(new PlaybackId(10L));
+        assertThat(event.getLastDjCrewId()).isEqualTo(new CrewId(5L));
     }
 }

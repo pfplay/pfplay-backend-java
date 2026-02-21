@@ -9,6 +9,7 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.party.domain.enums.AccessType;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
+import com.pfplaybackend.api.party.domain.enums.DjChangeType;
 import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
@@ -151,7 +152,7 @@ public class PartyroomAccessCommandService {
         partyroomAggregateService.removeDjFromQueue(partyroom.getPartyroomId(), crewId);
 
         if (wasInDjQueue) {
-            eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
+            eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.DEQUEUE_EXIT, crewId));
         }
         if (wasCurrentDj) {
             playbackCommandService.skipBySystem(partyroom.getPartyroomId());

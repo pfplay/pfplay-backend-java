@@ -16,11 +16,11 @@
 | 2 | 헥사고널 아키텍처 준수 | **5.0** | 5.0 | admin 포트 완료, partyview ArchUnit 포함. AdminDemoService→AdminPartyroomPort 전환 |
 | 3 | 도메인 모델 풍부성 | **5.0** | 5.0 | ReactionPostProcessResult 불변 record 변환 완료 |
 | 4 | Aggregate / VO 일관성 | **5.0** | 5.0 | FK VO化 완료, 포트 파라미터 VO化, `@AggregateRoot` 마커 7개 엔티티 적용 + ArchUnit 검증 |
-| 5 | 도메인 이벤트 성숙도 | **4.5** | 5.0 | user/playlist 이벤트 4건 도입, 총 14 이벤트 |
+| 5 | 도메인 이벤트 성숙도 | **5.0** | 5.0 | 14개 이벤트 payload 보강 완료, 감사 가능 수준 컨텍스트 전달 |
 | 6 | 테스트 전략 | **4.5** | 5.0 | Testcontainers 3클래스, @WebMvcTest 4클래스, 334 테스트 |
 | 7 | 전략적 DDD 문서화 | **5.0** | 5.0 | 성숙도 평가 + 로드맵 + 문서-코드 동기화 |
 | 8 | 모듈 구조 / 의존 관리 | **5.0** | 5.0 | cross-module 포트 100%, admin 포트 완료, partyview ArchUnit 포함 |
-| | **종합** | **39.0/40 (97.5%)** | **40.0/40 (100%)** | |
+| | **종합** | **39.5/40 (98.8%)** | **40.0/40 (100%)** | |
 
 ---
 
@@ -170,26 +170,35 @@
 | 4 | **9+ 이벤트. 베이스 클래스에 eventId/occurredAt/eventType 메타데이터. 이벤트 ID가 VO. TransactionalEventListener 사용.** 일부 모듈 이벤트 부재. |
 | 5 | 모든 모듈에 도메인 이벤트 적용. 이벤트가 충분한 컨텍스트 전달 (감사 용도 가능). 이벤트 소싱 또는 이벤트 저장소 존재. |
 
-### 현재 수준: 4.5 (← 4.0에서 상향)
+### 현재 수준: 5.0 (← 4.5에서 상향)
 
-**달성 (#4)**:
+**달성 (#4 + payload 보강)**:
 - `DomainEvent`: `eventId(UUID)`, `occurredAt`, `eventType`, 추상 `getAggregateId()`
 - 이벤트 ID → VO 전환 완료 (`CrewId` in 3 events)
 - party 도메인: 10개 이벤트, 모두 domain layer 순수
 - user 모듈 이벤트 도입 (#4): `MemberRegisteredEvent`, `UserProfileChangedEvent` (`059c86f`)
 - playlist 모듈 이벤트 도입 (#4): `TrackAddedEvent`, `TrackRemovedEvent` (`059c86f`)
 - 총 **14개** 도메인 이벤트 (party 10 + user 2 + playlist 2)
+- **이벤트 payload 보강** (7개 이벤트):
+  - `DjQueueChangedEvent`: `DjChangeType changeType`, `CrewId affectedCrewId` 추가
+  - `PlaybackDeactivatedEvent`: `PlaybackId lastPlaybackId`, `CrewId lastDjCrewId` 추가
+  - `PartyroomClosedEvent`: `UserId hostId`, `String title` 추가
+  - `UserProfileChangedEvent`: `ProfileChangeType changeType` 추가
+  - `TrackAddedEvent`: `Long playlistId` → `PlaylistId` VO, `String trackName` 추가
+  - `TrackRemovedEvent`: `Long playlistId` → `PlaylistId` VO, `String linkId`, `String trackName` 추가
+  - `MemberRegisteredEvent`: `ProviderType providerType` 추가
+- 신규 enum: `DjChangeType` (party), `ProfileChangeType` (user)
+- 추가 DB 조회 **0건** (기존 로컬 변수/필드에서 전달)
 
 **미달**:
-- `DjQueueChangedEvent`, `PlaybackDeactivatedEvent`: 최소 컨텍스트만 전달
-- 이벤트 저장소(Event Store) 없음
+- 이벤트 저장소(Event Store) 없음 (선택 사항)
 
-### 5.0 도달 조건
+### 5.0 도달 조건 — 전부 충족
 
 - [x] user 모듈 이벤트 도입 (`MemberRegisteredEvent`, `UserProfileChangedEvent`)
 - [x] playlist 모듈 이벤트 도입 (`TrackAddedEvent`, `TrackRemovedEvent`)
-- [ ] 최소 컨텍스트 이벤트에 payload 보강
-- [ ] 이벤트 저장소(Event Store) 도입 (선택)
+- [x] 최소 컨텍스트 이벤트에 payload 보강
+- 참고: 이벤트 저장소(Event Store) 도입은 선택 사항으로 보류
 
 ---
 
@@ -300,7 +309,8 @@
 
 | 일자 | 종합 점수 | 주요 변경 |
 |------|-----------|----------|
-| 2026-02-22 | **39.0/40 (97.5%)** | `@AggregateRoot` 마커 어노테이션 도입 (7 엔티티), ArchUnit 검증. Aggregate/VO 4.5→5.0 |
+| 2026-02-22 | **39.5/40 (98.8%)** | 이벤트 payload 보강 7건, DjChangeType/ProfileChangeType 도입. 도메인 이벤트 4.5→5.0 |
+| 2026-02-22 | 39.0/40 (97.5%) | `@AggregateRoot` 마커 어노테이션 도입 (7 엔티티), ArchUnit 검증. Aggregate/VO 4.5→5.0 |
 | 2026-02-22 | 38.5/40 (96.3%) | AdminDemoService→AdminPartyroomPort 전환, 헥사고널 준수 4.5→5.0 |
 | 2026-02-22 | 38.0/40 (95.0%) | D-1/D-2 FK VO化, F-1/F-3/F-5 모듈 경계, #4 도메인 이벤트, #6 불변화, E-3/E-4 테스트 반영 |
 | 2026-02-21 (Phase A~F) | 35.0/40 (87.5%) | Phase A~F 완료: 도메인 순수성 5.0, 헥사고널 4.0, 모델 풍부성 4.5, VO 4.0, 테스트 4.0, 문서 5.0, 모듈 4.5 |

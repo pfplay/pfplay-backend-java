@@ -15,6 +15,7 @@ import com.pfplaybackend.api.party.domain.specification.DjEnqueueSpecification;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.domain.value.*;
+import com.pfplaybackend.api.party.domain.enums.DjChangeType;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.exception.DjException;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
@@ -64,7 +65,7 @@ public class DjCommandService {
         playbackState.activate(null, null);
         aggregatePort.savePlaybackState(playbackState);
 
-        eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
+        eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.ENQUEUE, crewId));
 
         if(isPostActivationProcessingRequired) {
             playbackCommandService.start(partyroom);
@@ -83,7 +84,7 @@ public class DjCommandService {
         boolean wasCurrentDj = playbackState.isActivated() && playbackState.isCurrentDj(crewId);
         partyroomAggregateService.removeDjFromQueue(partyroomId, crewId);
 
-        eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
+        eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.DEQUEUE, crewId));
         if (wasCurrentDj) {
             playbackCommandService.skipBySystem(partyroomId);
         }
@@ -107,7 +108,7 @@ public class DjCommandService {
         boolean wasCurrentDj = playbackState.isActivated() && playbackState.isCurrentDj(targetDj.getCrewId());
         partyroomAggregateService.removeDjFromQueue(partyroomId, targetDj.getCrewId());
 
-        eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
+        eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.DEQUEUE_ADMIN, targetDj.getCrewId()));
         if (wasCurrentDj) {
             playbackCommandService.skipBySystem(partyroomId);
         }

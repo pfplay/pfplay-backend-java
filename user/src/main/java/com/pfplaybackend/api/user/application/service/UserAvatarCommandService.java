@@ -2,6 +2,7 @@ package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.user.domain.enums.ProfileChangeType;
 import com.pfplaybackend.api.user.domain.event.UserProfileChangedEvent;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
@@ -73,7 +74,7 @@ public class UserAvatarCommandService {
         }
 
         memberRepository.save(member);
-        eventPublisher.publishEvent(new UserProfileChangedEvent(member.getUserId()));
+        eventPublisher.publishEvent(new UserProfileChangedEvent(member.getUserId(), ProfileChangeType.AVATAR));
     }
 
     public AvatarIconUri findAvatarIconPairWithSingleBody(AvatarBodyDto avatarBodyDto) {

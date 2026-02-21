@@ -59,10 +59,12 @@ public class PartyroomPlaybackData extends BaseEntity {
     }
 
     public void deactivate() {
+        PlaybackId lastPlaybackId = this.currentPlaybackId;
+        CrewId lastDjCrewId = this.currentDjCrewId;
         this.currentPlaybackId = null;
         this.currentDjCrewId = null;
         this.isActivated = false;
-        registerEvent(new PlaybackDeactivatedEvent(this.partyroomId));
+        registerEvent(new PlaybackDeactivatedEvent(this.partyroomId, lastPlaybackId, lastDjCrewId));
     }
 
     public void updatePlayback(PlaybackId playbackId, CrewId djCrewId) {

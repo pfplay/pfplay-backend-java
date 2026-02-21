@@ -52,7 +52,7 @@ public class MemberSignService {
         playlistSetupPort.createDefaultPlaylist(member.getUserId());
 
         MemberData saved = memberRepository.save(member);
-        eventPublisher.publishEvent(new MemberRegisteredEvent(saved.getUserId(), saved.getEmail()));
+        eventPublisher.publishEvent(new MemberRegisteredEvent(saved.getUserId(), saved.getEmail(), providerType));
         return saved;
     }
 }

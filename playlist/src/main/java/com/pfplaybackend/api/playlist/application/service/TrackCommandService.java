@@ -66,7 +66,7 @@ public class TrackCommandService {
                 .build();
 
         aggregatePort.saveTrack(trackData);
-        eventPublisher.publishEvent(new TrackAddedEvent(playlistId, command.linkId()));
+        eventPublisher.publishEvent(new TrackAddedEvent(new PlaylistId(playlistId), command.linkId(), command.name()));
     }
 
     @Transactional
@@ -143,7 +143,7 @@ public class TrackCommandService {
         Integer deleteOrderNumber = trackData.getOrderNumber();
         aggregatePort.shiftUpTrackOrderByDelete(playlistId, deleteOrderNumber);
         aggregatePort.deleteTrack(trackData);
-        eventPublisher.publishEvent(new TrackRemovedEvent(playlistId, trackId));
+        eventPublisher.publishEvent(new TrackRemovedEvent(new PlaylistId(playlistId), trackId, trackData.getLinkId(), trackData.getName()));
     }
 
     @Transactional

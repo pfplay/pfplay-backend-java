@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.user.domain.enums.ProfileChangeType;
 import com.pfplaybackend.api.user.domain.event.UserProfileChangedEvent;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
@@ -24,6 +25,6 @@ public class UserBioCommandService {
         MemberData memberData = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
         memberData.updateProfileBio(updateBioCommand.nickName(), updateBioCommand.introduction());
         memberRepository.save(memberData);
-        eventPublisher.publishEvent(new UserProfileChangedEvent(memberData.getUserId()));
+        eventPublisher.publishEvent(new UserProfileChangedEvent(memberData.getUserId(), ProfileChangeType.BIO));
     }
 }

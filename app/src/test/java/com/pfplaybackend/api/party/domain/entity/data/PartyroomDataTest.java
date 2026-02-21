@@ -97,6 +97,9 @@ class PartyroomDataTest {
         List<DomainEvent> events = partyroom.pollDomainEvents();
         assertThat(events).hasSize(1);
         assertThat(events.get(0)).isInstanceOf(PartyroomClosedEvent.class);
+        PartyroomClosedEvent event = (PartyroomClosedEvent) events.get(0);
+        assertThat(event.getHostId()).isEqualTo(new UserId(1L));
+        assertThat(event.getTitle()).isEqualTo("Test Room");
     }
 
     @Test
