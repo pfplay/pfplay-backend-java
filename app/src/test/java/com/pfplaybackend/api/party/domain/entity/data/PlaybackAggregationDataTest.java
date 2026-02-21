@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
+import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,10 +12,10 @@ class PlaybackAggregationDataTest {
     @DisplayName("createFor — 팩토리 메서드로 생성 시 모든 카운트가 0으로 초기화된다")
     void createFor_defaultZero() {
         // when
-        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(1L);
+        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(new PlaybackId(1L));
 
         // then
-        assertThat(aggregation.getPlaybackId()).isEqualTo(1L);
+        assertThat(aggregation.getPlaybackId()).isEqualTo(new PlaybackId(1L));
         assertThat(aggregation.getLikeCount()).isZero();
         assertThat(aggregation.getDislikeCount()).isZero();
         assertThat(aggregation.getGrabCount()).isZero();
@@ -24,7 +25,7 @@ class PlaybackAggregationDataTest {
     @DisplayName("updateAggregation — 양수 델타로 카운트가 증가한다")
     void updateAggregation_positiveDelta() {
         // given
-        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(1L);
+        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(new PlaybackId(1L));
 
         // when
         aggregation.updateAggregation(3, 1, 2);
@@ -39,7 +40,7 @@ class PlaybackAggregationDataTest {
     @DisplayName("updateAggregation — 음수 델타로 카운트가 감소한다")
     void updateAggregation_negativeDelta() {
         // given
-        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(1L);
+        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(new PlaybackId(1L));
         aggregation.updateAggregation(5, 3, 2);
 
         // when
@@ -55,7 +56,7 @@ class PlaybackAggregationDataTest {
     @DisplayName("updateAggregation — 누적 호출 시 카운트가 합산된다")
     void updateAggregation_accumulates() {
         // given
-        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(1L);
+        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(new PlaybackId(1L));
 
         // when
         aggregation.updateAggregation(1, 0, 0);

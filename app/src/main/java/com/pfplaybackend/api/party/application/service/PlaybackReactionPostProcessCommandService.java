@@ -39,7 +39,7 @@ public class PlaybackReactionPostProcessCommandService {
             updateDjActivityScore(playback.getUserId(), postProcessDto.deltaScore());
         }
         if(postProcessDto.isAggregationChanged()) {
-            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(playback.getId(), postProcessDto.deltaRecord());
+            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(new PlaybackId(playback.getId()), postProcessDto.deltaRecord());
             publishAggregationChangedEvent(partyroomId, aggregation);
         }
         publishMotionChangedEvent(partyroomId, reactionType, postProcessDto.determinedMotionType(), crewId);

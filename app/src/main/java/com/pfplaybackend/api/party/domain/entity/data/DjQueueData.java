@@ -3,6 +3,7 @@ package com.pfplaybackend.api.party.domain.entity.data;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.domain.exception.DjException;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
@@ -15,22 +16,22 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 public class DjQueueData extends BaseEntity {
 
-    @Id
-    @Column(name = "partyroom_id")
-    private Long partyroomId;
+    @EmbeddedId
+    @AttributeOverride(name = "id", column = @Column(name = "partyroom_id"))
+    private PartyroomId partyroomId;
 
     private boolean isClosed;
 
     protected DjQueueData() {}
 
-    private DjQueueData(Long partyroomId) {
+    private DjQueueData(PartyroomId partyroomId) {
         this.partyroomId = partyroomId;
         this.isClosed = false;
     }
 
     // ── Factory Method ──
 
-    public static DjQueueData createFor(Long partyroomId) {
+    public static DjQueueData createFor(PartyroomId partyroomId) {
         return new DjQueueData(partyroomId);
     }
 

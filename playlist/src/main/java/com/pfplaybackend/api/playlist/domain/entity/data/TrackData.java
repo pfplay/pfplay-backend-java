@@ -2,6 +2,7 @@ package com.pfplaybackend.api.playlist.domain.entity.data;
 
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.DurationConverter;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -27,8 +28,11 @@ public class TrackData extends BaseEntity {
     @Column(columnDefinition = "integer unsigned")
     private Long id;
 
-    @Column(name = "playlist_id", nullable = false)
-    private Long playlistId;
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "id", column = @Column(name = "playlist_id", nullable = false))
+    })
+    private PlaylistId playlistId;
 
     @Comment("플레이리스트의 곡 순서")
     @Column(columnDefinition = "integer unsigned")
@@ -50,7 +54,7 @@ public class TrackData extends BaseEntity {
     protected TrackData() { }
 
     @Builder
-    public TrackData(Long playlistId, Integer orderNumber, String name, Duration duration, String linkId, String thumbnailImage) {
+    public TrackData(PlaylistId playlistId, Integer orderNumber, String name, Duration duration, String linkId, String thumbnailImage) {
         this.playlistId = playlistId;
         this.orderNumber = orderNumber;
         this.name = name;
@@ -65,7 +69,7 @@ public class TrackData extends BaseEntity {
         this.orderNumber = newOrderNumber;
     }
 
-    public void moveToPlaylist(Long targetPlaylistId, int newOrderNumber) {
+    public void moveToPlaylist(PlaylistId targetPlaylistId, int newOrderNumber) {
         this.playlistId = targetPlaylistId;
         this.orderNumber = newOrderNumber;
     }

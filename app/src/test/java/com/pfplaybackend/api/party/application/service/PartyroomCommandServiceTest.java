@@ -261,8 +261,8 @@ class PartyroomCommandServiceTest {
                 .noticeContent("").isTerminated(false).build();
         when(aggregatePort.findPartyroomById(1L)).thenReturn(Optional.of(partyroom));
 
-        DjQueueData djQueue = DjQueueData.createFor(1L);
-        when(aggregatePort.findDjQueueState(1L)).thenReturn(djQueue);
+        DjQueueData djQueue = DjQueueData.createFor(new PartyroomId(1L));
+        when(aggregatePort.findDjQueueState(new PartyroomId(1L))).thenReturn(djQueue);
 
         UpdateDjQueueStatusCommand command = new UpdateDjQueueStatusCommand(QueueStatus.CLOSE);
 
@@ -286,9 +286,9 @@ class PartyroomCommandServiceTest {
                 .noticeContent("").isTerminated(false).build();
         when(aggregatePort.findPartyroomById(1L)).thenReturn(Optional.of(partyroom));
 
-        DjQueueData djQueue = DjQueueData.createFor(1L);
+        DjQueueData djQueue = DjQueueData.createFor(new PartyroomId(1L));
         djQueue.close();
-        when(aggregatePort.findDjQueueState(1L)).thenReturn(djQueue);
+        when(aggregatePort.findDjQueueState(new PartyroomId(1L))).thenReturn(djQueue);
 
         UpdateDjQueueStatusCommand command = new UpdateDjQueueStatusCommand(QueueStatus.OPEN);
 

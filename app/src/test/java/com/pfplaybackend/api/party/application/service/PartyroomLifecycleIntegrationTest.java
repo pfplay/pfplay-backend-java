@@ -67,12 +67,12 @@ class PartyroomLifecycleIntegrationTest extends AbstractIntegrationTest {
         assertThat(foundPartyroom.get().getTitle()).isEqualTo("라이프사이클 테스트");
 
         // then — PartyroomPlaybackData
-        Optional<PartyroomPlaybackData> foundPlayback = partyroomPlaybackRepository.findById(created.getId());
+        Optional<PartyroomPlaybackData> foundPlayback = partyroomPlaybackRepository.findById(created.getPartyroomId());
         assertThat(foundPlayback).isPresent();
         assertThat(foundPlayback.get().isActivated()).isFalse();
 
         // then — DjQueueData
-        Optional<DjQueueData> foundDjQueue = djQueueRepository.findById(created.getId());
+        Optional<DjQueueData> foundDjQueue = djQueueRepository.findById(created.getPartyroomId());
         assertThat(foundDjQueue).isPresent();
         assertThat(foundDjQueue.get().isClosed()).isFalse();
     }

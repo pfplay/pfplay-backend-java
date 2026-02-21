@@ -14,6 +14,7 @@ import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
 import com.pfplaybackend.api.playlist.application.dto.command.MoveTrackCommand;
 import com.pfplaybackend.api.playlist.application.dto.command.UpdateTrackOrderCommand;
 import com.pfplaybackend.api.common.domain.value.Duration;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.playlist.domain.event.TrackAddedEvent;
@@ -47,7 +48,7 @@ public class TrackCommandService {
         PlaylistData playlistData = aggregatePort.findPlaylistByIdAndOwner(playlistId, authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 트랙 중복 검사
-        Optional<TrackData> optional = aggregatePort.findTrackByPlaylistAndLink(playlistData.getId(), command.linkId());
+        Optional<TrackData> optional = aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(playlistData.getId()), command.linkId());
         if (optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 최대 보유 한계치 초과 검사
         PlaylistSummaryDto playlistSummary = playlistQueryService.getPlaylist(playlistId);
@@ -56,7 +57,7 @@ public class TrackCommandService {
         long nextMusicOrderNumber = playlistSummary.musicCount() == 0 ? 1 : playlistSummary.musicCount() + 1;
 
         TrackData trackData = TrackData.builder()
-                .playlistId(playlistData.getId())
+                .playlistId(new PlaylistId(playlistData.getId()))
                 .name(command.name())
                 .linkId(command.linkId())
                 .duration(Duration.fromString(command.duration()))
@@ -76,7 +77,7 @@ public class TrackCommandService {
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         // 타겟 트랙 존재 여부 검사
-        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)
+        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, new PlaylistId(playlistId))
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
 
         Integer prevOrderNumber = trackData.getOrderNumber();
@@ -112,10 +113,10 @@ public class TrackCommandService {
         PlaylistData targetPlaylistData = aggregatePort.findPlaylistByIdAndOwner(command.targetPlaylistId(), ownerId)
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
         // 소스에서 트랙 조회
-        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, sourcePlaylistId)
+        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, new PlaylistId(sourcePlaylistId))
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
         // 타겟에 동일 linkId 중복 검사
-        Optional<TrackData> duplicate = aggregatePort.findTrackByPlaylistAndLink(targetPlaylistData.getId(), trackData.getLinkId());
+        Optional<TrackData> duplicate = aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(targetPlaylistData.getId()), trackData.getLinkId());
         if (duplicate.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
         // 타겟 트랙 개수 15개 제한 검사
         PlaylistSummaryDto targetSummary = playlistQueryService.getPlaylist(command.targetPlaylistId());
@@ -124,7 +125,7 @@ public class TrackCommandService {
         aggregatePort.shiftUpTrackOrderByDelete(sourcePlaylistId, trackData.getOrderNumber());
         // 트랙을 타겟 플레이리스트로 이동
         int nextOrderNumber = (int) (targetSummary.musicCount() + 1);
-        trackData.moveToPlaylist(targetPlaylistData.getId(), nextOrderNumber);
+        trackData.moveToPlaylist(new PlaylistId(targetPlaylistData.getId()), nextOrderNumber);
         aggregatePort.saveTrack(trackData);
     }
 
@@ -136,7 +137,7 @@ public class TrackCommandService {
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         // 타겟 트랙 존재 여부 검사
-        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)
+        TrackData trackData = aggregatePort.findTrackByIdAndPlaylist(trackId, new PlaylistId(playlistId))
                 .orElseThrow(() -> ExceptionCreator.create(TrackException.NOT_FOUND_TRACK));
 
         Integer deleteOrderNumber = trackData.getOrderNumber();
@@ -148,7 +149,7 @@ public class TrackCommandService {
     @Transactional
     public PlaybackTrackDto getFirstTrack(Long playlistId) {
         Pageable pageable = PageRequest.of(0, 5, Sort.by(Sort.Direction.ASC, "orderNumber"));
-        Page<PlaylistTrackDto> page = queryPort.getTracksWithPagination(playlistId, pageable);
+        Page<PlaylistTrackDto> page = queryPort.getTracksWithPagination(new PlaylistId(playlistId), pageable);
         rotateTrackOrder(playlistId, page.getTotalElements());
         PlaylistTrackDto dto = page.getContent().get(0);
         return new PlaybackTrackDto(

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence;
 
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
@@ -73,7 +74,7 @@ public class PlaylistAggregateAdapter implements PlaylistAggregatePort, Playlist
     }
 
     @Override
-    public Optional<TrackData> findTrackByPlaylistAndLink(Long playlistId, String linkId) {
+    public Optional<TrackData> findTrackByPlaylistAndLink(PlaylistId playlistId, String linkId) {
         return trackRepository.findByPlaylistIdAndLinkId(playlistId, linkId);
     }
 
@@ -83,12 +84,12 @@ public class PlaylistAggregateAdapter implements PlaylistAggregatePort, Playlist
     }
 
     @Override
-    public Optional<TrackData> findTrackByIdAndPlaylist(Long trackId, Long playlistId) {
+    public Optional<TrackData> findTrackByIdAndPlaylist(Long trackId, PlaylistId playlistId) {
         return trackRepository.findByIdAndPlaylistId(trackId, playlistId);
     }
 
     @Override
-    public boolean hasTracksByPlaylist(Long playlistId) {
+    public boolean hasTracksByPlaylist(PlaylistId playlistId) {
         return trackRepository.existsByPlaylistId(playlistId);
     }
 
@@ -127,7 +128,7 @@ public class PlaylistAggregateAdapter implements PlaylistAggregatePort, Playlist
     }
 
     @Override
-    public Page<PlaylistTrackDto> getTracksWithPagination(Long playlistId, Pageable pageable) {
+    public Page<PlaylistTrackDto> getTracksWithPagination(PlaylistId playlistId, Pageable pageable) {
         return trackRepository.getTracksWithPagination(playlistId, pageable);
     }
 }

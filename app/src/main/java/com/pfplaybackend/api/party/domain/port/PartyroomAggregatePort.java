@@ -37,10 +37,10 @@ public interface PartyroomAggregatePort {
     void removeDjs(List<DjData> djs);
 
     // ===== Playback State: PartyroomPlaybackData =====
-    PartyroomPlaybackData findPlaybackState(Long partyroomId);
+    PartyroomPlaybackData findPlaybackState(PartyroomId partyroomId);
     void savePlaybackState(PartyroomPlaybackData state);
 
     // ===== DJ Queue State: DjQueueData =====
-    DjQueueData findDjQueueState(Long partyroomId);
+    DjQueueData findDjQueueState(PartyroomId partyroomId);
     void saveDjQueueState(DjQueueData djQueue);
 }

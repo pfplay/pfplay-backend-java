@@ -73,7 +73,7 @@ public class PartyroomSetupQueryService {
 
             Optional<PlaybackReactionHistoryData> optional = playbackReactionQueryService.findPrevHistoryData(
                     new PlaybackId(playback.getId()), authContext.getUserId());
-            PlaybackAggregationData aggregation = playbackQueryService.getPlaybackAggregationById(playback.getId());
+            PlaybackAggregationData aggregation = playbackQueryService.getPlaybackAggregationById(new PlaybackId(playback.getId()));
             AggregationDto aggregationDto = new AggregationDto(aggregation.getLikeCount(), aggregation.getDislikeCount(), aggregation.getGrabCount());
             ReactionDto reactionDto = ReactionDto.from(getHistory(optional), aggregationDto);
             PlaybackDto playbackDto = PlaybackDto.withEndTime(playback.getId(), playback.getLinkId(), playback.getName(), playback.getDuration().toDisplayString(), playback.getThumbnailImage(), playback.getEndTime());

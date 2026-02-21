@@ -129,7 +129,7 @@ public class PartyroomAggregateAdapter implements PartyroomAggregatePort, Partyr
     // ===== Playback State: PartyroomPlaybackData =====
 
     @Override
-    public PartyroomPlaybackData findPlaybackState(Long partyroomId) {
+    public PartyroomPlaybackData findPlaybackState(PartyroomId partyroomId) {
         return partyroomPlaybackRepository.findById(partyroomId).orElseThrow();
     }
 
@@ -141,7 +141,7 @@ public class PartyroomAggregateAdapter implements PartyroomAggregatePort, Partyr
     // ===== DJ Queue State: DjQueueData =====
 
     @Override
-    public DjQueueData findDjQueueState(Long partyroomId) {
+    public DjQueueData findDjQueueState(PartyroomId partyroomId) {
         return djQueueRepository.findById(partyroomId).orElseThrow();
     }
 

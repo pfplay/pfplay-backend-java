@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence;
 
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.custom.TrackRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,22 +12,22 @@ import java.util.Optional;
 
 public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRepositoryCustom {
 
-    Optional<TrackData> findByPlaylistIdAndLinkId(Long playlistDataId, String linkId);
+    Optional<TrackData> findByPlaylistIdAndLinkId(PlaylistId playlistId, String linkId);
     TrackData findFirstByLinkId(String linkId);
-    Optional<TrackData> findByIdAndPlaylistId(Long id, Long playlistDataId);
-    boolean existsByPlaylistId(Long playlistDataId);
+    Optional<TrackData> findByIdAndPlaylistId(Long id, PlaylistId playlistId);
+    boolean existsByPlaylistId(PlaylistId playlistId);
 
     @Modifying
     @Query("UPDATE TrackData pm SET pm.orderNumber = CASE " +
             "WHEN pm.orderNumber = 1 THEN :totalElements " +
             "ELSE pm.orderNumber - 1 END " +
-            "WHERE pm.playlistId = :playlistId")
+            "WHERE pm.playlistId.id = :playlistId")
     void reorderTracks(@Param("playlistId") Long playlistId, @Param("totalElements") long totalElements);
 
     @Modifying
     @Query("UPDATE TrackData pm " +
             "SET pm.orderNumber =  pm.orderNumber - 1" +
-            "WHERE pm.playlistId = :playlistId " +
+            "WHERE pm.playlistId.id = :playlistId " +
             "AND pm.orderNumber > :deleteOrderNumber "
     )
     void shiftUpOrderByDelete(@Param("playlistId") Long playlistId, @Param("deleteOrderNumber") Integer deleteOrderNumber);
@@ -34,7 +35,7 @@ public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRe
     @Modifying
     @Query("UPDATE TrackData pm " +
             "SET pm.orderNumber =  pm.orderNumber - 1" +
-            "WHERE pm.playlistId = :playlistId " +
+            "WHERE pm.playlistId.id = :playlistId " +
             "AND pm.orderNumber > :prevOrderNumber " +
             "AND pm.orderNumber <= :nextOrderNumber "
     )
@@ -43,7 +44,7 @@ public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRe
     @Modifying
     @Query("UPDATE TrackData pm " +
             "SET pm.orderNumber =  pm.orderNumber + 1" +
-            "WHERE pm.playlistId = :playlistId " +
+            "WHERE pm.playlistId.id = :playlistId " +
             "AND pm.orderNumber < :prevOrderNumber " +
             "AND pm.orderNumber >= :nextOrderNumber "
     )

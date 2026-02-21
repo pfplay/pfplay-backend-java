@@ -6,7 +6,7 @@ import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.domain.value.PlaylistId;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -114,14 +114,14 @@ class PartyroomAggregateServiceTest {
         @DisplayName("playbackState를 비활성화하고 모든 DJ를 삭제한다")
         void deactivatesAndDeletesAll() {
             // given
-            PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(10L);
+            PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(new PartyroomId(10L));
             playbackState.activate(new PlaybackId(1L), new CrewId(1L));
 
             DjData dj1 = createDj(1L, new CrewId(1L), 1);
             DjData dj2 = createDj(2L, new CrewId(2L), 2);
             List<DjData> djs = new ArrayList<>(List.of(dj1, dj2));
 
-            when(aggregatePort.findPlaybackState(10L)).thenReturn(playbackState);
+            when(aggregatePort.findPlaybackState(new PartyroomId(10L))).thenReturn(playbackState);
             when(aggregatePort.findDjsOrdered(new PartyroomId(10L))).thenReturn(djs);
 
             // when

@@ -39,7 +39,7 @@ public class PlaybackQueryService {
     }
 
     @Transactional
-    public PlaybackAggregationData updatePlaybackAggregation(Long playbackId, List<Integer> deltaRecord) {
+    public PlaybackAggregationData updatePlaybackAggregation(PlaybackId playbackId, List<Integer> deltaRecord) {
         PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playbackId).orElseThrow();
         aggregation.updateAggregation(deltaRecord.get(0), deltaRecord.get(1), deltaRecord.get(2));
         return playbackAggregationRepository.save(aggregation);
@@ -51,7 +51,7 @@ public class PlaybackQueryService {
     }
 
     @Transactional(readOnly = true)
-    public PlaybackAggregationData getPlaybackAggregationById(Long playbackId) {
+    public PlaybackAggregationData getPlaybackAggregationById(PlaybackId playbackId) {
         return playbackAggregationRepository.findById(playbackId).orElseThrow();
     }
 

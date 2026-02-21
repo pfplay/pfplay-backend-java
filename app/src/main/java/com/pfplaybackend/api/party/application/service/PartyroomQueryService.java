@@ -126,7 +126,7 @@ public class PartyroomQueryService {
     public PartyroomSummaryResult getSummaryInfo(PartyroomId partyroomId) {
         PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
         if(playbackState.isActivated()) {
             PlaybackData playback = playbackQueryService.getPlaybackById(playbackState.getCurrentPlaybackId());
             CrewData djCrew = aggregatePort.findCrew(partyroomId, playback.getUserId())
@@ -162,8 +162,8 @@ public class PartyroomQueryService {
     @Transactional(readOnly = true)
     public DjQueueInfoResult getDjQueueInfo(PartyroomId partyroomId) {
         PartyroomData partyroom = getPartyroomById(partyroomId);
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getId());
-        DjQueueData djQueue = aggregatePort.findDjQueueState(partyroom.getId());
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getPartyroomId());
+        DjQueueData djQueue = aggregatePort.findDjQueueState(partyroom.getPartyroomId());
         boolean isPlaybackActivated = playbackState.isActivated();
         QueueStatus queueStatus = djQueue.isClosed() ? QueueStatus.CLOSE : QueueStatus.OPEN;
         boolean isRegistered = isAlreadyRegistered(partyroom.getPartyroomId());

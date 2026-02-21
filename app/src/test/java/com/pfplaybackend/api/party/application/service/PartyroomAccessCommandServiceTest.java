@@ -135,13 +135,13 @@ class PartyroomAccessCommandServiceTest {
                 .isTerminated(false)
                 .build();
 
-        PartyroomPlaybackData oldPlaybackState = PartyroomPlaybackData.createFor(1L);
+        PartyroomPlaybackData oldPlaybackState = PartyroomPlaybackData.createFor(new PartyroomId(1L));
 
         when(partyroomQueryService.getPartyroomById(oldRoomId)).thenReturn(oldPartyroomData);
         // exit() mock: crew lookup
         when(aggregatePort.findCrew(oldRoomId, userId)).thenReturn(Optional.of(oldCrew));
         when(aggregatePort.findDj(oldRoomId, new CrewId(5L))).thenReturn(Optional.empty());
-        when(aggregatePort.findPlaybackState(oldRoomId.getId())).thenReturn(oldPlaybackState);
+        when(aggregatePort.findPlaybackState(oldRoomId)).thenReturn(oldPlaybackState);
 
         // addOrActivateCrew mock for new room: inactive crew found → reactivate
         when(aggregatePort.findCrew(newRoomId, userId)).thenReturn(Optional.of(newRoomCrew));

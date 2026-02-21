@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
@@ -30,11 +31,11 @@ public class TrackQueryService {
                 .orElseThrow(() -> ExceptionCreator.create(PlaylistException.NOT_FOUND_PLAYLIST));
 
         Pageable pageable = PageRequest.of(pageNo, pageSize, Sort.by(Sort.Direction.ASC, "orderNumber"));
-        return queryPort.getTracksWithPagination(playlistId, pageable);
+        return queryPort.getTracksWithPagination(new PlaylistId(playlistId), pageable);
     }
 
     @Transactional(readOnly = true)
     public boolean isEmptyPlaylist(Long playlistId) {
-        return !aggregatePort.hasTracksByPlaylist(playlistId);
+        return !aggregatePort.hasTracksByPlaylist(new PlaylistId(playlistId));
     }
 }

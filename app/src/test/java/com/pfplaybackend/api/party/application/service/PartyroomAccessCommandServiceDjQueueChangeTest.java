@@ -14,7 +14,7 @@ import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.domain.value.PlaylistId;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
@@ -79,7 +79,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
                 .partyroomId(partyroomId)
                 .build();
 
-        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(partyroomId);
         playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
@@ -87,7 +87,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
         when(aggregatePort.findDj(partyroomId, new CrewId(1L))).thenReturn(Optional.of(
                 DjData.builder().id(100L).crewId(new CrewId(1L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
         ));
-        when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
+        when(aggregatePort.findPlaybackState(partyroomId)).thenReturn(playbackState);
 
         // when
         partyroomAccessCommandService.exit(partyroomId);
@@ -114,12 +114,12 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
                 .partyroomId(partyroomId)
                 .build();
 
-        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(partyroomId);
 
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroomData);
         when(aggregatePort.findCrew(partyroomId, userId)).thenReturn(Optional.of(crew));
         when(aggregatePort.findDj(partyroomId, new CrewId(1L))).thenReturn(Optional.empty());
-        when(aggregatePort.findPlaybackState(partyroomId.getId())).thenReturn(playbackState);
+        when(aggregatePort.findPlaybackState(partyroomId)).thenReturn(playbackState);
 
         // when
         partyroomAccessCommandService.exit(partyroomId);
@@ -147,13 +147,13 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
                 .partyroomId(partyroomId)
                 .build();
 
-        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(partyroomId);
         playbackState.activate(new PlaybackId(1L), new CrewId(99L));
 
         when(aggregatePort.findDj(partyroomId, new CrewId(2L))).thenReturn(Optional.of(
                 DjData.builder().id(100L).crewId(new CrewId(2L)).playlistId(new PlaylistId(10L)).orderNumber(2).build()
         ));
-        when(aggregatePort.findPlaybackState(partyroomData.getId())).thenReturn(playbackState);
+        when(aggregatePort.findPlaybackState(partyroomData.getPartyroomId())).thenReturn(playbackState);
 
         // when
         partyroomAccessCommandService.expel(partyroomData, targetCrew, false);
@@ -182,10 +182,10 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
                 .partyroomId(partyroomId)
                 .build();
 
-        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(1L);
+        PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(partyroomId);
 
         when(aggregatePort.findDj(partyroomId, new CrewId(2L))).thenReturn(Optional.empty());
-        when(aggregatePort.findPlaybackState(partyroomData.getId())).thenReturn(playbackState);
+        when(aggregatePort.findPlaybackState(partyroomData.getPartyroomId())).thenReturn(playbackState);
 
         // when
         partyroomAccessCommandService.expel(partyroomData, targetCrew, false);

@@ -1,4 +1,4 @@
-package com.pfplaybackend.api.party.domain.value;
+package com.pfplaybackend.api.common.domain.value;
 
 import jakarta.persistence.Embeddable;
 import lombok.Getter;

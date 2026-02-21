@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
 import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
@@ -13,9 +14,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 public class PlaybackAggregationData extends BaseEntity {
 
-    @Id
-    @Column(name = "playback_id")
-    private Long playbackId;
+    @EmbeddedId
+    @AttributeOverride(name = "id", column = @Column(name = "playback_id"))
+    private PlaybackId playbackId;
 
     private int likeCount;
     private int dislikeCount;
@@ -23,7 +24,7 @@ public class PlaybackAggregationData extends BaseEntity {
 
     protected PlaybackAggregationData() {}
 
-    private PlaybackAggregationData(Long playbackId) {
+    private PlaybackAggregationData(PlaybackId playbackId) {
         this.playbackId = playbackId;
         this.likeCount = 0;
         this.dislikeCount = 0;
@@ -32,7 +33,7 @@ public class PlaybackAggregationData extends BaseEntity {
 
     // ── Factory Method ──
 
-    public static PlaybackAggregationData createFor(Long playbackId) {
+    public static PlaybackAggregationData createFor(PlaybackId playbackId) {
         return new PlaybackAggregationData(playbackId);
     }
 

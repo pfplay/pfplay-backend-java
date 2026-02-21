@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.adapter.out.external;
 
 import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
-import com.pfplaybackend.api.party.domain.value.PlaylistId;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.playlist.application.service.GrabTrackService;
 import com.pfplaybackend.api.playlist.application.service.TrackCommandService;
 import com.pfplaybackend.api.common.domain.value.UserId;

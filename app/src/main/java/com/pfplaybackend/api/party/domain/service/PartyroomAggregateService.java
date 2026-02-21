@@ -59,7 +59,7 @@ public class PartyroomAggregateService {
      * @return 엔티티에서 수집된 도메인 이벤트 목록
      */
     public List<DomainEvent> deactivatePlayback(PartyroomId partyroomId) {
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
         playbackState.deactivate();
         aggregatePort.savePlaybackState(playbackState);
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);

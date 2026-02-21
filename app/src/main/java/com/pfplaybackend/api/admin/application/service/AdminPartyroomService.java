@@ -205,7 +205,7 @@ public class AdminPartyroomService {
     public SimulateReactionsResult simulateReactions(Long partyroomId) {
         PartyroomData partyroom = partyroomRepository.findById(partyroomId)
                 .orElseThrow(() -> ExceptionCreator.create(AdminException.PARTYROOM_NOT_FOUND));
-        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(partyroomId).orElseThrow();
+        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(new PartyroomId(partyroomId)).orElseThrow();
 
         PlaybackId playbackId = playbackState.getCurrentPlaybackId();
         if (playbackId == null) {
@@ -293,7 +293,7 @@ public class AdminPartyroomService {
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
 
-        PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playbackId.getId()).orElseThrow();
+        PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playbackId).orElseThrow();
 
         log.info("Simulated reactions completed: partyroomId={}, playbackId={}, reactions={}, likes={}, grabs={}",
                 partyroomId, playbackId.getId(), reactions.size(), likeGroup.size(), grabGroup.size());

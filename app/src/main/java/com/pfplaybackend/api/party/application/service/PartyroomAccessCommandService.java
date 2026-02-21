@@ -144,7 +144,7 @@ public class PartyroomAccessCommandService {
     private void handleDjQueueOnLeave(PartyroomData partyroom, CrewId crewId) {
         boolean wasInDjQueue = aggregatePort.findDj(partyroom.getPartyroomId(), crewId)
                 .isPresent();
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getId());
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getPartyroomId());
         boolean wasCurrentDj = playbackState.isActivated() && wasInDjQueue
                 && playbackState.isCurrentDj(crewId);
 

@@ -2,6 +2,7 @@ package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
@@ -66,7 +67,7 @@ class TrackQueryServiceTest {
                 new PlaylistTrackDto(2L, "def", "Song B", 1, "4:00", "https://img.example.com/b.jpg")
         );
         Page<PlaylistTrackDto> expectedPage = new PageImpl<>(tracks);
-        when(queryPort.getTracksWithPagination(eq(playlistId), any(Pageable.class))).thenReturn(expectedPage);
+        when(queryPort.getTracksWithPagination(eq(new PlaylistId(playlistId)), any(Pageable.class))).thenReturn(expectedPage);
 
         // when
         Page<PlaylistTrackDto> result = trackQueryService.getTracks(playlistId, 0, 10);
@@ -75,7 +76,7 @@ class TrackQueryServiceTest {
         assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent().get(0).name()).isEqualTo("Song A");
         verify(aggregatePort).findPlaylistByIdAndOwner(playlistId, userId);
-        verify(queryPort).getTracksWithPagination(eq(playlistId), any(Pageable.class));
+        verify(queryPort).getTracksWithPagination(eq(new PlaylistId(playlistId)), any(Pageable.class));
     }
 
     @Test
@@ -94,7 +95,7 @@ class TrackQueryServiceTest {
     @DisplayName("isEmptyPlaylist — 트랙이 없으면 true를 반환한다")
     void isEmptyPlaylist_true() {
         // given
-        when(aggregatePort.hasTracksByPlaylist(1L)).thenReturn(false);
+        when(aggregatePort.hasTracksByPlaylist(new PlaylistId(1L))).thenReturn(false);
 
         // when & then
         assertThat(trackQueryService.isEmptyPlaylist(1L)).isTrue();
@@ -104,7 +105,7 @@ class TrackQueryServiceTest {
     @DisplayName("isEmptyPlaylist — 트랙이 있으면 false를 반환한다")
     void isEmptyPlaylist_false() {
         // given
-        when(aggregatePort.hasTracksByPlaylist(1L)).thenReturn(true);
+        when(aggregatePort.hasTracksByPlaylist(new PlaylistId(1L))).thenReturn(true);
 
         // when & then
         assertThat(trackQueryService.isEmptyPlaylist(1L)).isFalse();

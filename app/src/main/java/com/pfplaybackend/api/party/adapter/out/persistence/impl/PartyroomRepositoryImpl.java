@@ -44,8 +44,8 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                 ))
                 .from(qCrewData)
                 .join(qPartyroomData).on(qPartyroomData.id.eq(qCrewData.partyroomId.id))
-                .join(qPlayback).on(qPlayback.partyroomId.eq(qPartyroomData.id))
-                .join(qDjQueue).on(qDjQueue.partyroomId.eq(qPartyroomData.id))
+                .join(qPlayback).on(qPlayback.partyroomId.id.eq(qPartyroomData.id))
+                .join(qDjQueue).on(qDjQueue.partyroomId.id.eq(qPartyroomData.id))
                 .where(qCrewData.userId.eq(userId)
                         .and(qCrewData.isActive.eq(true)))
                 .fetchOne();
@@ -93,8 +93,8 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
                         qCrewData.gradeType
                 )
                 .from(qPartyroomData)
-                .join(qPlayback).on(qPlayback.partyroomId.eq(qPartyroomData.id))
-                .join(qDjQueue).on(qDjQueue.partyroomId.eq(qPartyroomData.id))
+                .join(qPlayback).on(qPlayback.partyroomId.id.eq(qPartyroomData.id))
+                .join(qDjQueue).on(qDjQueue.partyroomId.id.eq(qPartyroomData.id))
                 .leftJoin(qCrewData)
                 .on(qCrewData.partyroomId.id.eq(qPartyroomData.id)
                         .and(qCrewData.isActive.eq(true))

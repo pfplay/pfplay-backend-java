@@ -69,7 +69,7 @@ class PlaybackQueryServiceTest {
     @DisplayName("updatePlaybackAggregation — 집계 데이터를 업데이트하고 저장한다")
     void updatePlaybackAggregation_success() {
         // given
-        Long playbackId = 1L;
+        PlaybackId playbackId = new PlaybackId(1L);
         PlaybackAggregationData aggregation = mock(PlaybackAggregationData.class);
         when(playbackAggregationRepository.findById(playbackId)).thenReturn(Optional.of(aggregation));
         when(playbackAggregationRepository.save(aggregation)).thenReturn(aggregation);

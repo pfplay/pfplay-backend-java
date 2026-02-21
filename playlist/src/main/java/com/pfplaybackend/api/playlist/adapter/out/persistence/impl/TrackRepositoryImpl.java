@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence.impl;
 
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
 import com.pfplaybackend.api.playlist.domain.entity.data.QTrackData;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.custom.TrackRepositoryCustom;
@@ -18,7 +19,7 @@ public class TrackRepositoryImpl implements TrackRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<PlaylistTrackDto> getTracksWithPagination(Long playlistId, Pageable pageable) {
+    public Page<PlaylistTrackDto> getTracksWithPagination(PlaylistId playlistId, Pageable pageable) {
         QTrackData qTrackData = QTrackData.trackData;
 
         List<PlaylistTrackDto> tracks = queryFactory

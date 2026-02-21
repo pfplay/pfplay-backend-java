@@ -8,6 +8,7 @@ import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,7 +60,7 @@ class GrabTrackServiceTest {
 
         when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
         when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(aggregatePort.findTrackByPlaylistAndLink(grablist.getId(), linkId)).thenReturn(Optional.empty());
+        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), linkId)).thenReturn(Optional.empty());
 
         // when
         grabTrackService.grabTrack(userId, linkId);
@@ -88,7 +89,7 @@ class GrabTrackServiceTest {
 
         when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
         when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(aggregatePort.findTrackByPlaylistAndLink(grablist.getId(), linkId))
+        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), linkId))
                 .thenReturn(Optional.of(track));
 
         // when & then
@@ -105,7 +106,7 @@ class GrabTrackServiceTest {
 
         when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
         when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(aggregatePort.findTrackByPlaylistAndLink(grablist.getId(), linkId)).thenReturn(Optional.empty());
+        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), linkId)).thenReturn(Optional.empty());
 
         ArgumentCaptor<AddTrackCommand> captor = ArgumentCaptor.forClass(AddTrackCommand.class);
 

@@ -27,7 +27,7 @@ import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.party.domain.value.PlaylistId;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
@@ -189,7 +189,7 @@ public class AdminDemoService {
 
         DemoTrackConstants.TrackInfo track = DemoTrackConstants.getRandomTrack();
         TrackData trackData = TrackData.builder()
-                .playlistId(savedPlaylist.getId())
+                .playlistId(new PlaylistId(savedPlaylist.getId()))
                 .name(track.getName())
                 .linkId(track.getLinkId())
                 .duration(Duration.fromString(track.getDuration()))
@@ -217,8 +217,8 @@ public class AdminDemoService {
                     PlaybackTimeLimit.ofMinutes(command.playbackTimeLimit()),
                     StageType.GENERAL, hostUserId);
             PartyroomData savedPartyroom = partyroomRepository.save(partyroom);
-            partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(savedPartyroom.getId()));
-            djQueueRepository.save(DjQueueData.createFor(savedPartyroom.getId()));
+            partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(savedPartyroom.getPartyroomId()));
+            djQueueRepository.save(DjQueueData.createFor(savedPartyroom.getPartyroomId()));
 
             // Enter host
             partyroomAccessCommandService.enterByHost(hostUserId, savedPartyroom);
@@ -304,7 +304,7 @@ public class AdminDemoService {
 
         PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
-        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(loadedPartyroom.getId()).orElseThrow();
+        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(loadedPartyroom.getPartyroomId()).orElseThrow();
 
         boolean isPostActivationProcessingRequired = !playbackState.isActivated();
 
@@ -425,7 +425,7 @@ public class AdminDemoService {
                 .map(p -> {
                     int crewCount = (int) crewRepository.countByPartyroomIdAndIsActiveTrue(p.getPartyroomId());
                     int djCount = djRepository.findByPartyroomIdOrderByOrderNumberAsc(p.getPartyroomId()).size();
-                    boolean isPlaybackActivated = partyroomPlaybackRepository.findById(p.getId())
+                    boolean isPlaybackActivated = partyroomPlaybackRepository.findById(p.getPartyroomId())
                             .map(PartyroomPlaybackData::isActivated).orElse(false);
                     return new AdminPartyroomListResult.PartyroomItem(
                             p.getId(),

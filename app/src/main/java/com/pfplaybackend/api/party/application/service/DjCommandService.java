@@ -13,6 +13,7 @@ import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.party.domain.specification.DjEnqueueSpecification;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.domain.value.*;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
 import com.pfplaybackend.api.party.domain.exception.DjException;
@@ -39,8 +40,8 @@ public class DjCommandService {
     public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
-        DjQueueData djQueue = aggregatePort.findDjQueueState(partyroomId.getId());
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
+        DjQueueData djQueue = aggregatePort.findDjQueueState(partyroomId);
 
         boolean isPostActivationProcessingRequired = !playbackState.isActivated();
 
@@ -74,7 +75,7 @@ public class DjCommandService {
     public void dequeueDj(PartyroomId partyroomId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
 
         CrewData crew = partyroomQueryService.getCrewOrThrow(partyroomId, authContext.getUserId());
         CrewId crewId = new CrewId(crew.getId());
@@ -92,7 +93,7 @@ public class DjCommandService {
     public void dequeueDj(PartyroomId partyroomId, DjId djId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
 
         // 관리자 등급 체크
         CrewData adjusterCrew = partyroomQueryService.getCrewOrThrow(partyroomId, authContext.getUserId());

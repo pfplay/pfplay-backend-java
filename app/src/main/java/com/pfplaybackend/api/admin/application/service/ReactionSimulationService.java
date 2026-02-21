@@ -90,7 +90,7 @@ public class ReactionSimulationService {
 
         // Update playback aggregation (includes GRAB count)
         if (postProcessDto.isAggregationChanged()) {
-            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(playback.getId(), postProcessDto.deltaRecord());
+            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(new PlaybackId(playback.getId()), postProcessDto.deltaRecord());
             playbackReactionPostProcessCommandService.publishAggregationChangedEvent(partyroomId, aggregation);
         }
 

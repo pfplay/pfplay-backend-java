@@ -17,9 +17,9 @@ import org.hibernate.annotations.DynamicUpdate;
 @Entity
 public class PartyroomPlaybackData extends BaseEntity {
 
-    @Id
-    @Column(name = "partyroom_id")
-    private Long partyroomId;
+    @EmbeddedId
+    @AttributeOverride(name = "id", column = @Column(name = "partyroom_id"))
+    private PartyroomId partyroomId;
 
     @Embedded
     @AttributeOverrides({
@@ -37,14 +37,14 @@ public class PartyroomPlaybackData extends BaseEntity {
 
     protected PartyroomPlaybackData() {}
 
-    private PartyroomPlaybackData(Long partyroomId) {
+    private PartyroomPlaybackData(PartyroomId partyroomId) {
         this.partyroomId = partyroomId;
         this.isActivated = false;
     }
 
     // ── Factory Method ──
 
-    public static PartyroomPlaybackData createFor(Long partyroomId) {
+    public static PartyroomPlaybackData createFor(PartyroomId partyroomId) {
         return new PartyroomPlaybackData(partyroomId);
     }
 
@@ -60,7 +60,7 @@ public class PartyroomPlaybackData extends BaseEntity {
         this.currentPlaybackId = null;
         this.currentDjCrewId = null;
         this.isActivated = false;
-        registerEvent(new PlaybackDeactivatedEvent(new PartyroomId(this.partyroomId)));
+        registerEvent(new PlaybackDeactivatedEvent(this.partyroomId));
     }
 
     public void updatePlayback(PlaybackId playbackId, CrewId djCrewId) {

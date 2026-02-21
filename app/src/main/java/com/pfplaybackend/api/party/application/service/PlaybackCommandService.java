@@ -121,9 +121,9 @@ public class PlaybackCommandService {
         }
 
         PlaybackData playbackData = playbackRepository.save(nextPlayback);
-        playbackAggregationRepository.save(PlaybackAggregationData.createFor(playbackData.getId()));
+        playbackAggregationRepository.save(PlaybackAggregationData.createFor(new PlaybackId(playbackData.getId())));
         // Update playback state in PARTYROOM_PLAYBACK
-        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getId());
+        PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroom.getPartyroomId());
         playbackState.updatePlayback(new PlaybackId(playbackData.getId()), new CrewId(djCrew.getId()));
         aggregatePort.savePlaybackState(playbackState);
         // Schedule Task to wait for playback time

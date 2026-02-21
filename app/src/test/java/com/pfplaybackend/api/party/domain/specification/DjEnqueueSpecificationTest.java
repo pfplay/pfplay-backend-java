@@ -3,6 +3,7 @@ package com.pfplaybackend.api.party.domain.specification;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,11 +21,11 @@ class DjEnqueueSpecificationTest {
     }
 
     private DjQueueData openQueue() {
-        return DjQueueData.createFor(1L);
+        return DjQueueData.createFor(new PartyroomId(1L));
     }
 
     private DjQueueData closedQueue() {
-        DjQueueData queue = DjQueueData.createFor(1L);
+        DjQueueData queue = DjQueueData.createFor(new PartyroomId(1L));
         queue.close();
         return queue;
     }

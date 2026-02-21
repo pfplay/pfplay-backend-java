@@ -68,8 +68,8 @@ public class PartyroomCommandService {
                 PlaybackTimeLimit.ofMinutes(command.playbackTimeLimit()),
                 stageType, hostId);
         PartyroomData saved = aggregatePort.savePartyroom(partyroom);
-        aggregatePort.savePlaybackState(PartyroomPlaybackData.createFor(saved.getId()));
-        aggregatePort.saveDjQueueState(DjQueueData.createFor(saved.getId()));
+        aggregatePort.savePlaybackState(PartyroomPlaybackData.createFor(saved.getPartyroomId()));
+        aggregatePort.saveDjQueueState(DjQueueData.createFor(saved.getPartyroomId()));
         return saved;
     }
 
@@ -115,7 +115,7 @@ public class PartyroomCommandService {
         PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.validateHost(authContext.getUserId());
-        DjQueueData djQueue = aggregatePort.findDjQueueState(partyroomId.getId());
+        DjQueueData djQueue = aggregatePort.findDjQueueState(partyroomId);
         if (command.queueStatus().equals(QueueStatus.CLOSE)) djQueue.close();
         if (command.queueStatus().equals(QueueStatus.OPEN)) djQueue.open();
         aggregatePort.saveDjQueueState(djQueue);

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.playlist.domain.port;
 
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
@@ -22,10 +23,10 @@ public interface PlaylistAggregatePort {
     // ===== Child: TrackData =====
     TrackData saveTrack(TrackData track);
     void deleteTrack(TrackData track);
-    Optional<TrackData> findTrackByPlaylistAndLink(Long playlistId, String linkId);
+    Optional<TrackData> findTrackByPlaylistAndLink(PlaylistId playlistId, String linkId);
     TrackData findFirstTrackByLink(String linkId);
-    Optional<TrackData> findTrackByIdAndPlaylist(Long trackId, Long playlistId);
-    boolean hasTracksByPlaylist(Long playlistId);
+    Optional<TrackData> findTrackByIdAndPlaylist(Long trackId, PlaylistId playlistId);
+    boolean hasTracksByPlaylist(PlaylistId playlistId);
 
     // ===== Track Reordering (batch operations) =====
     void rotateTrackOrder(Long playlistId, long totalCount);

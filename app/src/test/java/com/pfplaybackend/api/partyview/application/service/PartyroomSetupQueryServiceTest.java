@@ -87,7 +87,7 @@ class PartyroomSetupQueryServiceTest {
                 .name("Song").linkId("link1").duration(Duration.fromString("3:00"))
                 .thumbnailImage("thumb.jpg").endTime(999L).build();
 
-        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(playbackId.getId());
+        PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(playbackId);
         aggregation.updateAggregation(5, 1, 2);
 
         when(partyroomQueryService.getActiveCrews(partyroomId)).thenReturn(List.of(crew1, djCrew));
@@ -98,7 +98,7 @@ class PartyroomSetupQueryServiceTest {
                 ));
         when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
         when(playbackQueryService.getPlaybackById(playbackId)).thenReturn(playback);
-        when(playbackQueryService.getPlaybackAggregationById(playbackId.getId())).thenReturn(aggregation);
+        when(playbackQueryService.getPlaybackAggregationById(playbackId)).thenReturn(aggregation);
         when(playbackReactionQueryService.findPrevHistoryData(any(), any()))
                 .thenReturn(Optional.empty());
 
