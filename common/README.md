@@ -11,7 +11,6 @@
 - **인프라 설정**: JPA, Redis, JWT, QueryDSL, Swagger, Security 공통 config
 - **공통 서비스**: JWT 토큰 발급/검증(`JwtService`), 분산 락(`RedisLockService`)
 - **예외 체계**: `DomainException`, `ExceptionCreator`, HTTP 예외 클래스
-- **WebSocket 어댑터**: `JwtWebSocketAuthAdapter` (realtime 모듈의 `WebSocketAuthPort` 구현)
 
 ## 제공하는 요소
 
@@ -24,16 +23,10 @@
 | Config | `JpaConfig`, `RedisConfig`, `SecurityConfig`, `SwaggerConfig`, `QueryDslConfig` |
 | Exception | `DomainException`, `ExceptionCreator`, `NotFoundException`, `ForbiddenException`, etc. |
 
-## 소비하는 외부 Port
-
-| Port | 모듈 | 용도 |
-|------|------|------|
-| `WebSocketAuthPort` | realtime | JWT 기반 WebSocket 인증 어댑터 구현 |
-
 ## 의존 방향
 
 ```
-common → realtime (WebSocket 인프라)
+common은 외부 모듈에 의존하지 않음
 ```
 
 ## 핵심 패턴

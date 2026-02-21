@@ -23,4 +23,7 @@ dependencies {
 
 	// Passay (password/nickname validation)
 	implementation 'org.passay:passay:1.6.4'
+
+	// Test
+	testImplementation 'org.springframework.security:spring-security-test'
 }

@@ -116,6 +116,7 @@
 ### 어댑터
 - `PlaylistSetupAdapter` — User의 `PlaylistSetupPort` 구현 (Playlist 서비스 호출)
 - `OAuth2RedirectAdapter` — User의 `OAuth2RedirectPort` 구현 (Auth 서비스 호출)
+- `JwtWebSocketAuthAdapter` — Realtime의 `WebSocketAuthPort` 구현 (JWT 쿠키 인증)
 
 ---
 
