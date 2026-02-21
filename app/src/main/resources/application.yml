@@ -1,0 +1,152 @@
+spring:
+  profiles:
+    active: local # default
+    group:
+      local:
+        - common
+      dev:
+        - common
+      prod:
+        - common
+
+---
+# 🟢 공통 설정
+spring:
+  config:
+    activate:
+      on-profile: common
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/pfplay?characterEncoding=UTF-8&useUnicode=true&serverTimezone=Asia/Seoul}
+    username: ${DB_USERNAME:pfplay}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+
+  sql:
+    init:
+      mode: always
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      repositories:
+        enabled: false
+
+server:
+  tomcat:
+    relaxed-query-chars: '[,],|,{,},^,`,<,>'
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: false
+
+springdoc:
+  version: 'v1'
+  swagger-ui:
+    display-request-duration: true
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    use-root-path: false
+    path: /spec/api
+  show-actuator: true
+  group-configs:
+    - group: api
+      paths-to-match: /api/**
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+
+service-api:
+  pytube:
+    uri: ${PYTUBE_URI:http://localhost:9000}
+    api-key: ${PYTUBE_API_KEY:pfplay_streaming}
+    api-secret: ${PYTUBE_API_SECRET}
+
+# 🔐 커스텀 앱 설정
+app:
+  oauth2:
+    providers:
+      google:
+        client-id: ${GOOGLE_CLIENT_ID}
+        client-secret: ${GOOGLE_CLIENT_SECRET}
+        redirect-uri: ${GOOGLE_REDIRECT_URI:https://localhost:3000/auth/callback/google}
+        authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+        token-uri: https://oauth2.googleapis.com/token
+        user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
+        scopes:
+          - email
+        access-type: offline    # Google 전용: refresh token 받기
+        prompt: consent         # Google 전용: 매번 동의 화면
+
+      twitter:
+        client-id: ${TWITTER_CLIENT_ID}
+        client-secret: ${TWITTER_CLIENT_SECRET}
+        redirect-uri: ${TWITTER_REDIRECT_URI:http://localhost:3000/auth/callback/twitter}
+        authorization-uri: https://twitter.com/i/oauth2/authorize
+        token-uri: https://api.twitter.com/2/oauth2/token
+        user-info-uri: https://api.twitter.com/2/users/me
+        scopes:
+          - users.read
+          - tweet.read
+
+  jwt:
+    secret: ${JWT_SECRET}
+    expiration-ms: 86400000 # 24시간
+    refresh-expiration-ms: 604800000 # 7일
+
+    cookie:
+      access-token-name: AccessToken
+      refresh-token-name: RefreshToken
+      domain: localhost
+      path: /
+      access-token-expiry-seconds: 86400
+      refresh-token-expiry-seconds: 604800
+      secure: true
+      same-site: None
+
+  webclient:
+    timeout:
+      connection: 5000
+      read: 5000
+      write: 5000
+
+---
+
+# 🟡 개발 환경 (추후 필요 시 확장)
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+---
+
+# 🔴 운영 환경
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+app:
+  jwt:
+    cookie:
+      secure: true
+      same-site: Strict
+      domain: ${PRODUCTION_DOMAIN}
+
+springdoc:
+  # 운영에서는 Swagger 비활성화 권장
+  swagger-ui:
+    enabled: false

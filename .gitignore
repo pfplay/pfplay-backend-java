@@ -37,5 +37,8 @@ api/src/main/resources/key/private_key.pem
 api/src/main/resources/key/public_key.pem
 api/src/main/resources/application.yml
 api/*.env
+.env
+.env.*
+!.env.example
 api/src/main/resources/private_key.pem
 api/src/main/resources/public_key.pem
