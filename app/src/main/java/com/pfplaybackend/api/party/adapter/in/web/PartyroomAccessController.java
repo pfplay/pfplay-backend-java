@@ -1,17 +1,12 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
-import com.pfplaybackend.api.common.config.security.jwt.JwtService;
-import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
+import com.pfplaybackend.api.party.application.port.out.GuestAuthPort;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.in.web.payload.response.access.EnterPartyroomResponse;
-import com.pfplaybackend.api.user.application.service.GuestSignService;
-import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -30,9 +25,8 @@ import java.util.Map;
 public class PartyroomAccessController {
 
     private final PartyroomAccessService partyroomAccessService;
-    private final GuestSignService guestSignService;
+    private final GuestAuthPort guestAuthPort;
     private final CookieUtil cookieUtil;
-    private final JwtService jwtService;
 
     /**
      *
@@ -60,13 +54,8 @@ public class PartyroomAccessController {
         // 비인증 사용자인 경우 게스트 토큰 자동 발급
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            GuestData guest = guestSignService.getGuestOrCreate();
-            cookieUtil.addAccessTokenCookie(response, jwtService.generateAccessToken(new TokenClaimsRequest(
-                    guest.getUserId().getUid().toString(),
-                    "N/A",
-                    AccessLevel.ROLE_GUEST,
-                    AuthorityTier.GT
-            )));
+            String guestToken = guestAuthPort.getOrCreateGuestToken();
+            cookieUtil.addAccessTokenCookie(response, guestToken);
         }
         return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomAccessService.getRedirectUri(linkDomain)));
     }
