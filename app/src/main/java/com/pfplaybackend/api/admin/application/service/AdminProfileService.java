@@ -1,12 +1,12 @@
 package com.pfplaybackend.api.admin.application.service;
 
-import com.pfplaybackend.api.user.application.service.AvatarResourceService;
+import com.pfplaybackend.api.user.application.service.AvatarResourceQueryService;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.value.Nickname;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.application.service.UserAvatarService;
+import com.pfplaybackend.api.user.application.service.UserAvatarCommandService;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
@@ -23,8 +23,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AdminProfileService {
 
-    private final AvatarResourceService avatarResourceService;
-    private final UserAvatarService userAvatarService;
+    private final AvatarResourceQueryService avatarResourceQueryService;
+    private final UserAvatarCommandService userAvatarCommandService;
 
     /**
      * Create profile for virtual member with auto-generated nickname and default avatar
@@ -67,7 +67,7 @@ public class AdminProfileService {
                 : new AvatarFaceUri();  // Empty for SINGLE_BODY type
 
         // Get avatar body info for position values
-        AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(finalBodyUri);
+        AvatarBodyDto avatarBodyDto = avatarResourceQueryService.findAvatarBodyByUri(finalBodyUri);
 
         // Auto-detect composition type and face source type from face URI pattern
         AvatarCompositionType compositionType;
@@ -91,14 +91,14 @@ public class AdminProfileService {
         AvatarIconUri iconUri;
         if (compositionType == AvatarCompositionType.SINGLE_BODY) {
             // SINGLE_BODY: Use body-paired icon
-            iconUri = userAvatarService.findAvatarIconPairWithSingleBody(avatarBodyDto);
+            iconUri = userAvatarCommandService.findAvatarIconPairWithSingleBody(avatarBodyDto);
         } else if (faceSourceType == FaceSourceType.NFT_URI) {
             // BODY_WITH_FACE with NFT: NFT face URI becomes icon URI
             iconUri = new AvatarIconUri(finalFaceUri.getAvatarFaceUri());
         } else {
             // BODY_WITH_FACE with INTERNAL_IMAGE: Use face-paired icon
             iconUri = new AvatarIconUri(
-                    avatarResourceService.findPairAvatarIconByFaceUri(finalFaceUri).resourceUri()
+                    avatarResourceQueryService.findPairAvatarIconByFaceUri(finalFaceUri).resourceUri()
             );
         }
 

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.application.dto.command.CrewProfilePreCheckCommand;
-import com.pfplaybackend.api.party.application.service.CrewProfileChangeHandler;
+import com.pfplaybackend.api.party.application.service.CrewProfileChangeEventHandler;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfileMessage;
 import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfilePreCheckMessage;
@@ -20,7 +20,7 @@ public class CrewProfilePreCheckTopicListener implements MessageListener {
 
     private ObjectMapper objectMapper;
     private DistributedLockExecutor distributedLockExecutor;
-    private CrewProfileChangeHandler crewProfileService;
+    private CrewProfileChangeEventHandler crewProfileService;
     private RedisMessagePublisher messagePublisher;
 
     @Override

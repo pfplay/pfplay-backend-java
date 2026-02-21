@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service.cache;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
-import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
+import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PartyroomSessionCacheManager implements SessionCachePort {
     private final RedisTemplate<String, Object> redisTemplate;
-    private final PartyroomInfoService partyroomInfoService;
+    private final PartyroomQueryService partyroomQueryService;
 
     @Transactional
     public void saveSessionCache(String sessionId, String userId, String destination) {
@@ -54,7 +54,7 @@ public class PartyroomSessionCacheManager implements SessionCachePort {
     }
 
     private Optional<PartyroomSessionDto> createSessionData(String sessionId, UserId userId) {
-        Optional<ActivePartyroomDto> optional = partyroomInfoService.getMyActivePartyroom(userId);
+        Optional<ActivePartyroomDto> optional = partyroomQueryService.getMyActivePartyroom(userId);
         if (optional.isPresent()) {
             PartyroomId partyroomId = new PartyroomId(optional.get().id());
             long crewId = optional.get().crewId();

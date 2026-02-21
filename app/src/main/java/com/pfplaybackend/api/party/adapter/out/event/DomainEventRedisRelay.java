@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.application.dto.crew.CrewSummaryDto;
 import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
-import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
+import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.enums.AccessType;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
@@ -23,7 +23,7 @@ public class DomainEventRedisRelay {
 
     private final RedisMessagePublisher messagePublisher;
     private final UserProfileQueryPort userProfileService;
-    private final PartyroomInfoService partyroomInfoService;
+    private final PartyroomQueryService partyroomQueryService;
     private final CrewRepository crewRepository;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
@@ -45,7 +45,7 @@ public class DomainEventRedisRelay {
         messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE.topic(),
                 DjQueueChangeMessage.create(
                         event.getPartyroomId(),
-                        partyroomInfoService.getDjs(event.getPartyroomId().getId())
+                        partyroomQueryService.getDjs(event.getPartyroomId().getId())
                 ));
     }
 

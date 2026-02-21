@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.listener;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
+import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import com.pfplaybackend.api.party.application.dto.PlaybackDurationWaitPayload;
 import lombok.AllArgsConstructor;
@@ -15,7 +15,7 @@ public class PlaybackDurationWaitTopicListener implements MessageListener {
     private RedisTemplate<String, Object> redisTemplate;
     private ObjectMapper objectMapper;
     private DistributedLockExecutor distributedLockExecutor;
-    private PlaybackManagementService playbackManagementService;
+    private PlaybackCommandService playbackCommandService;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
@@ -27,7 +27,7 @@ public class PlaybackDurationWaitTopicListener implements MessageListener {
             String suffixId = deserialized.userId().getUid().toString();
             distributedLockExecutor.performTaskWithLock(suffixId, () -> {
                 redisTemplate.delete(argsKey);
-                playbackManagementService.complete(deserialized.partyroomId(), deserialized.userId());
+                playbackCommandService.complete(deserialized.partyroomId(), deserialized.userId());
                 return null;
             });
         }

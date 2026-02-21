@@ -8,8 +8,8 @@ import com.pfplaybackend.api.admin.application.dto.result.SimulateReactionsResul
 import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
-import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
+import com.pfplaybackend.api.party.application.service.PartyroomAccessCommandService;
+import com.pfplaybackend.api.party.application.service.PlaybackQueryService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
@@ -54,9 +54,9 @@ public class AdminPartyroomService {
     private final PartyroomPlaybackRepository partyroomPlaybackRepository;
     private final PlaybackAggregationRepository playbackAggregationRepository;
     private final CrewRepository crewRepository;
-    private final PartyroomAccessService partyroomAccessService;
+    private final PartyroomAccessCommandService partyroomAccessCommandService;
     private final AdminUserService adminUserService;
-    private final PlaybackInfoService playbackInfoService;
+    private final PlaybackQueryService playbackQueryService;
     private final ReactionSimulationService reactionSimulationService;
 
     // ExecutorService for async reaction simulation
@@ -77,7 +77,7 @@ public class AdminPartyroomService {
                 linkDomain,
                 command.playbackTimeLimit(),
                 StageType.GENERAL, hostUserId);
-        partyroomAccessService.enterByHost(hostUserId, partyroom);
+        partyroomAccessCommandService.enterByHost(hostUserId, partyroom);
 
         log.info("Admin created partyroom: partyroomId={}, hostUserId={}, title={}",
                 partyroom.getPartyroomId().getId(), hostUserId.getUid(), partyroom.getTitle());
@@ -115,7 +115,7 @@ public class AdminPartyroomService {
                     linkDomain,
                     command.playbackTimeLimit(),
                     StageType.GENERAL, hostUserId);
-            partyroomAccessService.enterByHost(hostUserId, partyroom);
+            partyroomAccessCommandService.enterByHost(hostUserId, partyroom);
 
             for (int j = 1; j < virtualMembers.size(); j++) {
                 MemberData member = virtualMembers.get(j);
@@ -212,7 +212,7 @@ public class AdminPartyroomService {
             throw ExceptionCreator.create(AdminException.NO_ACTIVE_PLAYBACK);
         }
 
-        PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
+        PlaybackData playback = playbackQueryService.getPlaybackById(playbackId);
         UserId djUserId = playback.getUserId();
 
         List<CrewData> eligibleCrew = crewRepository.findByPartyroomIdAndIsActiveTrue(partyroomId).stream()

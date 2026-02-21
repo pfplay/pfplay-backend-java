@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.stomp;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.party.application.service.chat.PartyroomChatService;
+import com.pfplaybackend.api.party.application.service.chat.PartyroomChatCommandService;
 
 import com.pfplaybackend.api.party.adapter.in.web.api.PartyroomChatApi;
 import com.pfplaybackend.api.party.adapter.in.web.dto.IncomingGroupChatMessage;
@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class PartyroomChatController implements PartyroomChatApi {
-    private final PartyroomChatService partyroomChatService;
+    private final PartyroomChatCommandService partyroomChatCommandService;
 
     @Operation(summary = "Send a message to WebSocket topic")
     @MessageMapping("/groups/{chatroomId}/send")
     public ResponseEntity<?> sendGroupMessage(@Header("simpSessionId") String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) {
         // chatroomId == partyroomId
-        partyroomChatService.sendMessage(sessionId, incomingGroupChatMessage.getContent());
+        partyroomChatCommandService.sendMessage(sessionId, incomingGroupChatMessage.getContent());
         return ResponseEntity.ok(ApiCommonResponse.success("OK"));
     }
 

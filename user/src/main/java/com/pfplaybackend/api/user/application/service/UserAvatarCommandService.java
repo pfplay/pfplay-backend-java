@@ -1,0 +1,91 @@
+package com.pfplaybackend.api.user.application.service;
+
+import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.user.application.event.UserProfileEventPublisher;
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
+import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
+import com.pfplaybackend.api.user.application.dto.command.SetAvatarCommand;
+import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
+import com.pfplaybackend.api.user.domain.entity.data.MemberData;
+import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
+import com.pfplaybackend.api.user.domain.exception.UserAvatarException;
+import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
+import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
+import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
+import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class UserAvatarCommandService {
+
+    private final MemberRepository memberRepository;
+    private final AvatarResourceQueryService avatarResourceQueryService;
+    private final UserProfileEventPublisher userProfileEventPublisher;
+
+    @Transactional
+    public void setUserAvatar(SetAvatarCommand command) {
+        AuthContext authContext = ThreadLocalContext.getAuthContext();
+        MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
+
+        // 0. 리소스 접근 권한 유효성 검증
+        AvatarBodyDto avatarBodyDto = avatarResourceQueryService.findAvatarBodyByUri(new AvatarBodyUri(command.body().uri()));
+        if (!avatarBodyDto.getObtainableType().equals(ObtainmentType.BASIC)) {
+            ActivityType activityType = ActivityType.of(avatarBodyDto.getObtainableType());
+            ActivityData activity = member.getActivityDataMap().get(activityType);
+            if (!activity.getScore().isAtLeast(avatarBodyDto.getObtainableScore())) {
+                throw ExceptionCreator.create(UserAvatarException.AVATAR_SELECTION_FORBIDDEN);
+            }
+        }
+
+        AvatarFaceUri avatarFaceUri;
+        AvatarIconUri avatarIconUri;
+        member.updateAvatarBody(
+                new AvatarBodyUri(avatarBodyDto.getResourceUri()),
+                avatarBodyDto.getCombinePositionX(),
+                avatarBodyDto.getCombinePositionY());
+
+        if(command.avatarCompositionType().equals(AvatarCompositionType.SINGLE_BODY)) {
+            avatarFaceUri = new AvatarFaceUri();
+            avatarIconUri = findAvatarIconPairWithSingleBody(avatarBodyDto);
+
+            member.updateAvatarFace(avatarFaceUri);
+            member.updateAvatarIcon(avatarIconUri);
+        }else {
+            avatarFaceUri = new AvatarFaceUri(command.face().uri());
+            avatarIconUri = findAvatarIconByFaceSourceType(avatarFaceUri, command.face().sourceType());
+
+            member.updateAvatarFace(avatarFaceUri, command.face().sourceType(),
+                    command.face().transform().offsetX(),
+                    command.face().transform().offsetY(),
+                    command.face().transform().scale());
+            member.updateAvatarIcon(avatarIconUri);
+        }
+
+        memberRepository.save(member);
+        userProfileEventPublisher.publishProfileChangedEvent(member);
+    }
+
+    public AvatarIconUri findAvatarIconPairWithSingleBody(AvatarBodyDto avatarBodyDto) {
+        AvatarIconDto avatarIconDto = avatarResourceQueryService.findPairAvatarIconByBodyUri(new AvatarBodyUri(avatarBodyDto.getResourceUri()));
+        return new AvatarIconUri(avatarIconDto.resourceUri());
+    }
+
+    public AvatarIconUri findAvatarIconByFaceSourceType(AvatarFaceUri faceUri, FaceSourceType sourceType) {
+        if (sourceType.equals(FaceSourceType.INTERNAL_IMAGE)) {
+            AvatarIconDto avatarIconDto = avatarResourceQueryService.findPairAvatarIconByFaceUri(faceUri);
+            return new AvatarIconUri(avatarIconDto.resourceUri());
+        } else {
+            return new AvatarIconUri(faceUri.getAvatarFaceUri());
+        }
+    }
+}

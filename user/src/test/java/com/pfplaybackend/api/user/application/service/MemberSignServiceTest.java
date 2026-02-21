@@ -29,8 +29,8 @@ class MemberSignServiceTest {
 
     @Mock OAuth2RedirectPort oauth2RedirectPort;
     @Mock MemberRepository memberRepository;
-    @Mock UserProfileService userProfileService;
-    @Mock UserActivityService userActivityService;
+    @Mock UserProfileCommandService userProfileCommandService;
+    @Mock UserActivityCommandService userActivityCommandService;
     @Mock PlaylistSetupPort playlistSetupPort;
     @InjectMocks MemberSignService memberSignService;
 
@@ -59,10 +59,10 @@ class MemberSignServiceTest {
         when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
 
         ProfileData profile = mock(ProfileData.class);
-        when(userProfileService.createProfileDataForMember(any(UserId.class))).thenReturn(profile);
+        when(userProfileCommandService.createProfileDataForMember(any(UserId.class))).thenReturn(profile);
 
         Map<ActivityType, ActivityData> activityMap = Map.of();
-        when(userActivityService.createUserActivities(any(UserId.class))).thenReturn(activityMap);
+        when(userActivityCommandService.createUserActivities(any(UserId.class))).thenReturn(activityMap);
 
         when(memberRepository.save(any(MemberData.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -72,8 +72,8 @@ class MemberSignServiceTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getEmail()).isEqualTo(email);
-        verify(userProfileService).createProfileDataForMember(any(UserId.class));
-        verify(userActivityService).createUserActivities(any(UserId.class));
+        verify(userProfileCommandService).createProfileDataForMember(any(UserId.class));
+        verify(userActivityCommandService).createUserActivities(any(UserId.class));
         verify(playlistSetupPort).createDefaultPlaylist(any(UserId.class));
         verify(memberRepository).save(any(MemberData.class));
     }

@@ -3,8 +3,8 @@ package com.pfplaybackend.api.admin.application.service;
 import com.pfplaybackend.api.admin.application.dto.result.SimulateReactionsResult;
 import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
-import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
-import com.pfplaybackend.api.party.application.service.PlaybackReactionPostProcessService;
+import com.pfplaybackend.api.party.application.service.PlaybackQueryService;
+import com.pfplaybackend.api.party.application.service.PlaybackReactionPostProcessCommandService;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
@@ -30,10 +30,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReactionSimulationService {
 
-    private final PlaybackInfoService playbackInfoService;
+    private final PlaybackQueryService playbackQueryService;
     private final PlaybackReactionDomainService playbackReactionDomainService;
     private final PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
-    private final PlaybackReactionPostProcessService playbackReactionPostProcessService;
+    private final PlaybackReactionPostProcessCommandService playbackReactionPostProcessCommandService;
     private final UserActivityPort userActivityPort;
 
     /**
@@ -78,7 +78,7 @@ public class ReactionSimulationService {
                 .determinePostProcessing(existingState, targetState);
 
         // 6. Execute post-processing manually (avoid ThreadLocalContext dependency)
-        PlaybackData playback = playbackInfoService.getPlaybackById(playbackId);
+        PlaybackData playback = playbackQueryService.getPlaybackById(playbackId);
 
         // Note: Skip actual grab music operation for simulation
         // Only events and aggregation will be updated
@@ -90,12 +90,12 @@ public class ReactionSimulationService {
 
         // Update playback aggregation (includes GRAB count)
         if (postProcessDto.isAggregationChanged()) {
-            PlaybackAggregationData aggregation = playbackInfoService.updatePlaybackAggregation(playback.getId(), postProcessDto.getDeltaRecord());
-            playbackReactionPostProcessService.publishAggregationChangedEvent(partyroomId, aggregation);
+            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(playback.getId(), postProcessDto.getDeltaRecord());
+            playbackReactionPostProcessCommandService.publishAggregationChangedEvent(partyroomId, aggregation);
         }
 
         // Publish motion event (includes GRAB motion)
-        playbackReactionPostProcessService.publishMotionChangedEvent(
+        playbackReactionPostProcessCommandService.publishMotionChangedEvent(
                 partyroomId,
                 reactionType,
                 postProcessDto.getDeterminedMotionType(),

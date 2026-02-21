@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.user.application.service;
 
-import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.application.service.UserProfileCommandService;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class GuestSignService {
 
     private final GuestRepository guestRepository;
-    private final UserProfileService userProfileService;
+    private final UserProfileCommandService userProfileCommandService;
 
     @Transactional
     public GuestData getGuestOrCreate() {
         GuestData guest = GuestData.create();
-        ProfileData profile = userProfileService.createProfileDataForGuest(guest.getUserId());
+        ProfileData profile = userProfileCommandService.createProfileDataForGuest(guest.getUserId());
         guest.initiateProfile(profile);
         return guestRepository.save(guest);
     }

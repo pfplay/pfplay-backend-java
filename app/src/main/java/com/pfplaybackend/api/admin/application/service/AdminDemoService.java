@@ -13,8 +13,8 @@ import com.pfplaybackend.api.user.adapter.out.persistence.AvatarFaceResourceRepo
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.party.application.service.PartyroomAccessService;
-import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
+import com.pfplaybackend.api.party.application.service.PartyroomAccessCommandService;
+import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
@@ -73,12 +73,12 @@ public class AdminDemoService {
     private final DjQueueRepository djQueueRepository;
     private final CrewRepository crewRepository;
     private final DjRepository djRepository;
-    private final PartyroomAccessService partyroomAccessService;
+    private final PartyroomAccessCommandService partyroomAccessCommandService;
     private final PlaylistRepository playlistRepository;
     private final TrackRepository trackRepository;
     private final AvatarBodyResourceRepository avatarBodyResourceRepository;
     private final AvatarFaceResourceRepository avatarFaceResourceRepository;
-    private final PlaybackManagementService playbackManagementService;
+    private final PlaybackCommandService playbackCommandService;
 
     private static final int TOTAL_MEMBERS = 400;
     private static final int SPECIAL_MEMBERS = 13;  // 1 main stage DJ + 12 general room hosts
@@ -224,7 +224,7 @@ public class AdminDemoService {
             djQueueRepository.save(DjQueueData.createFor(savedPartyroom.getId()));
 
             // Enter host
-            partyroomAccessService.enterByHost(hostUserId, savedPartyroom);
+            partyroomAccessCommandService.enterByHost(hostUserId, savedPartyroom);
 
             rooms.add(savedPartyroom);
             log.info("Created general room {}/{}: partyroomId={}, title={}, host={}",
@@ -335,7 +335,7 @@ public class AdminDemoService {
 
         // Start playback if this is the first DJ
         if (isPostActivationProcessingRequired) {
-            playbackManagementService.start(loadedPartyroom);
+            playbackCommandService.start(loadedPartyroom);
             log.info("Started playback for partyroom: partyroomId={}, djUserId={}",
                     partyroom.getPartyroomId().getId(), userId.getUid());
         }

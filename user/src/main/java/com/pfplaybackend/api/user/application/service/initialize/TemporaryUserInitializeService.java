@@ -3,8 +3,8 @@ package com.pfplaybackend.api.user.application.service.initialize;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
-import com.pfplaybackend.api.user.application.service.UserActivityService;
-import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.application.service.UserActivityCommandService;
+import com.pfplaybackend.api.user.application.service.UserProfileCommandService;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
@@ -26,8 +26,8 @@ public class TemporaryUserInitializeService {
 
     private final GuestRepository guestRepository;
     private final MemberRepository memberRepository;
-    private final UserProfileService userProfileService;
-    private final UserActivityService userActivityService;
+    private final UserProfileCommandService userProfileCommandService;
+    private final UserActivityCommandService userActivityCommandService;
     private final PlaylistSetupPort playlistSetupPort;
     private final JwtService jwtService;
 
@@ -49,7 +49,7 @@ public class TemporaryUserInitializeService {
 
     public void addGuest(UserId userId) {
         GuestData guest = GuestData.createWithFixedUserId(userId, "Firefox/MacOS");
-        ProfileData profile = userProfileService.createProfileDataForGuest(guest.getUserId());
+        ProfileData profile = userProfileCommandService.createProfileDataForGuest(guest.getUserId());
         guest.initiateProfile(profile);
         // System.out.println("GT JWT: " + jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder().uid(guest.getUserId().getUid().toString()).email("N/A").accessLevel(AccessLevel.ROLE_GUEST).authorityTier(AuthorityTier.GT).build()));
         guestRepository.save(guest);
@@ -57,8 +57,8 @@ public class TemporaryUserInitializeService {
 
     public MemberData addAssociateMember(UserId userId, String email) {
         MemberData member = MemberData.createWithFixedUserId(userId, email, ProviderType.GOOGLE);
-        ProfileData profile = userProfileService.createProfileDataForMember(member.getUserId());
-        Map<ActivityType, ActivityData> activityMap = userActivityService.createUserActivities(member.getUserId());
+        ProfileData profile = userProfileCommandService.createProfileDataForMember(member.getUserId());
+        Map<ActivityType, ActivityData> activityMap = userActivityCommandService.createUserActivities(member.getUserId());
         member.initializeProfile(profile);
         member.initializeActivityMap(activityMap);
 

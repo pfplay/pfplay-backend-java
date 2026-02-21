@@ -6,8 +6,8 @@ import com.pfplaybackend.api.party.adapter.in.listener.CrewProfilePreCheckTopicL
 import com.pfplaybackend.api.party.adapter.in.listener.GroupBroadcastTopicListener;
 import com.pfplaybackend.api.party.adapter.in.listener.PlaybackDurationWaitTopicListener;
 import com.pfplaybackend.api.party.adapter.in.listener.message.*;
-import com.pfplaybackend.api.party.application.service.CrewProfileChangeHandler;
-import com.pfplaybackend.api.party.application.service.PlaybackManagementService;
+import com.pfplaybackend.api.party.application.service.CrewProfileChangeEventHandler;
+import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import com.pfplaybackend.realtime.sender.SimpMessageSender;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +32,8 @@ public class RedisListenerConfig {
                                                         SimpMessageSender simpMessageSender,
                                                         RedisTemplate<String, Object> redisTemplate,
                                                         DistributedLockExecutor distributedLockExecutor,
-                                                        CrewProfileChangeHandler crewProfileService,
-                                                        PlaybackManagementService playbackManagementService,
+                                                        CrewProfileChangeEventHandler crewProfileService,
+                                                        PlaybackCommandService playbackCommandService,
                                                         RedisMessagePublisher messagePublisher,
                                                         ObjectMapper objectMapper) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
@@ -59,7 +59,7 @@ public class RedisListenerConfig {
 
         // Special listeners with business logic
         container.addMessageListener(new CrewProfilePreCheckTopicListener(objectMapper, distributedLockExecutor, crewProfileService, messagePublisher), new ChannelTopic("crew_profile_pre_check"));
-        container.addMessageListener(new PlaybackDurationWaitTopicListener(redisTemplate, objectMapper, distributedLockExecutor, playbackManagementService), new PatternTopic("__keyevent@*__:expired"));
+        container.addMessageListener(new PlaybackDurationWaitTopicListener(redisTemplate, objectMapper, distributedLockExecutor, playbackCommandService), new PatternTopic("__keyevent@*__:expired"));
         return container;
     }
 }

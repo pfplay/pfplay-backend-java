@@ -4,7 +4,7 @@ import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
-import com.pfplaybackend.api.user.application.service.UserActivityService;
+import com.pfplaybackend.api.user.application.service.UserActivityCommandService;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
@@ -31,7 +31,7 @@ import java.util.UUID;
 public class AdminUserService {
 
     private final MemberRepository memberRepository;
-    private final UserActivityService userActivityService;
+    private final UserActivityCommandService userActivityCommandService;
     private final AdminProfileService adminProfileService;
     private final PlaylistCommandService playlistCommandService;
 
@@ -75,7 +75,7 @@ public class AdminUserService {
         );
 
         // 4. Initialize activity map (all activities start at 0)
-        Map<ActivityType, ActivityData> activityMap = userActivityService.createUserActivities(member.getUserId());
+        Map<ActivityType, ActivityData> activityMap = userActivityCommandService.createUserActivities(member.getUserId());
 
         // 5. Update member with profile and activities
         member.initializeProfile(profile);

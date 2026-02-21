@@ -19,7 +19,7 @@ import static org.mockito.Mockito.*;
 class GuestSignServiceTest {
 
     @Mock GuestRepository guestRepository;
-    @Mock UserProfileService userProfileService;
+    @Mock UserProfileCommandService userProfileCommandService;
     @InjectMocks GuestSignService guestSignService;
 
     @Test
@@ -27,7 +27,7 @@ class GuestSignServiceTest {
     void getGuestOrCreate_success() {
         // given
         ProfileData profile = mock(ProfileData.class);
-        when(userProfileService.createProfileDataForGuest(any())).thenReturn(profile);
+        when(userProfileCommandService.createProfileDataForGuest(any())).thenReturn(profile);
         when(guestRepository.save(any(GuestData.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
@@ -36,7 +36,7 @@ class GuestSignServiceTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.isGuest()).isTrue();
-        verify(userProfileService).createProfileDataForGuest(any());
+        verify(userProfileCommandService).createProfileDataForGuest(any());
         verify(guestRepository).save(any(GuestData.class));
     }
 
@@ -45,7 +45,7 @@ class GuestSignServiceTest {
     void getGuestOrCreate_profileInitialized() {
         // given
         ProfileData profile = mock(ProfileData.class);
-        when(userProfileService.createProfileDataForGuest(any())).thenReturn(profile);
+        when(userProfileCommandService.createProfileDataForGuest(any())).thenReturn(profile);
         when(guestRepository.save(any(GuestData.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when

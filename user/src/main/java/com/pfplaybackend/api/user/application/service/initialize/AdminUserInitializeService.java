@@ -2,10 +2,10 @@ package com.pfplaybackend.api.user.application.service.initialize;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
-import com.pfplaybackend.api.user.application.service.AvatarResourceService;
-import com.pfplaybackend.api.user.application.service.UserActivityService;
-import com.pfplaybackend.api.user.application.service.UserAvatarService;
-import com.pfplaybackend.api.user.application.service.UserProfileService;
+import com.pfplaybackend.api.user.application.service.AvatarResourceQueryService;
+import com.pfplaybackend.api.user.application.service.UserActivityCommandService;
+import com.pfplaybackend.api.user.application.service.UserAvatarCommandService;
+import com.pfplaybackend.api.user.application.service.UserProfileCommandService;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
@@ -26,10 +26,10 @@ public class AdminUserInitializeService {
     private static final long ADMIN_FIXED_ID = 1000000000000000L;
 
     private final MemberRepository memberRepository;
-    private final UserProfileService userProfileService;
-    private final UserActivityService userActivityService;
-    private final AvatarResourceService avatarResourceService;
-    private final UserAvatarService userAvatarService;
+    private final UserProfileCommandService userProfileCommandService;
+    private final UserActivityCommandService userActivityCommandService;
+    private final AvatarResourceQueryService avatarResourceQueryService;
+    private final UserAvatarCommandService userAvatarCommandService;
 
     @Transactional
     public UserId addAdminUser() {
@@ -42,8 +42,8 @@ public class AdminUserInitializeService {
 
     private MemberData addAssociateMember(UserId userId) {
         MemberData member = MemberData.createWithFixedUserId(userId, "N/A", ProviderType.GOOGLE);
-        ProfileData profile = userProfileService.createProfileDataForMember(member.getUserId());
-        Map<ActivityType, ActivityData> activityMap = userActivityService.createUserActivities(member.getUserId());
+        ProfileData profile = userProfileCommandService.createProfileDataForMember(member.getUserId());
+        Map<ActivityType, ActivityData> activityMap = userActivityCommandService.createUserActivities(member.getUserId());
         member.initializeProfile(profile);
         member.initializeActivityMap(activityMap);
         return memberRepository.save(member);
@@ -59,9 +59,9 @@ public class AdminUserInitializeService {
     }
 
     private MemberData updateAvatarBody(MemberData member, AvatarBodyUri avatarBodyUri) {
-        AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(avatarBodyUri);
+        AvatarBodyDto avatarBodyDto = avatarResourceQueryService.findAvatarBodyByUri(avatarBodyUri);
         AvatarFaceUri avatarFaceUri = new AvatarFaceUri();
-        AvatarIconUri avatarIconUri = userAvatarService.findAvatarIconPairWithSingleBody(avatarBodyDto);
+        AvatarIconUri avatarIconUri = userAvatarCommandService.findAvatarIconPairWithSingleBody(avatarBodyDto);
 
         member.updateAvatarBody(
                 new AvatarBodyUri(avatarBodyDto.getResourceUri()),
