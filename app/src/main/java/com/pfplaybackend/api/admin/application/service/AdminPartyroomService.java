@@ -30,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.annotation.PreDestroy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -54,6 +56,19 @@ public class AdminPartyroomService {
 
     // ExecutorService for async reaction simulation
     private final ExecutorService reactionExecutor = Executors.newFixedThreadPool(10);
+
+    @PreDestroy
+    void shutdownExecutor() {
+        reactionExecutor.shutdown();
+        try {
+            if (!reactionExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
+                reactionExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            reactionExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
 
     @Transactional
     public AdminPartyroomResult createPartyroomWithHost(AdminCreatePartyroomCommand command) {

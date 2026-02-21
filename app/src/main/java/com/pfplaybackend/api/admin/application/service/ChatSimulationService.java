@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PreDestroy;
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -33,6 +35,21 @@ public class ChatSimulationService {
 
     // Track active simulations
     private final Map<Long, ScheduledFuture<?>> activeSimulations = new ConcurrentHashMap<>();
+
+    @PreDestroy
+    void shutdownExecutor() {
+        activeSimulations.values().forEach(f -> f.cancel(false));
+        activeSimulations.clear();
+        chatExecutor.shutdown();
+        try {
+            if (!chatExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
+                chatExecutor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            chatExecutor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+    }
 
     /**
      * CHILL script - Relaxed, laid-back music appreciation messages (50 messages)
