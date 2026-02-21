@@ -1,0 +1,91 @@
+spring:
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: false
+
+  sql:
+    init:
+      mode: never
+
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+server:
+  tomcat:
+    relaxed-query-chars: '[,],|,{,},^,`,<,>'
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: false
+
+springdoc:
+  version: 'v1'
+  api-docs:
+    enabled: false
+
+decorator:
+  datasource:
+    enabled: false
+
+logging:
+  level:
+    ROOT: WARN
+    com.pfplaybackend: INFO
+
+service-api:
+  pytube:
+    uri: http://localhost:9999
+    api-key: test-key
+    api-secret: test-secret
+
+app:
+  initialization:
+    enabled: false
+
+  oauth2:
+    providers:
+      google:
+        client-id: test-client-id
+        client-secret: test-client-secret
+        redirect-uri: http://localhost:3000/auth/callback/google
+        authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+        token-uri: https://oauth2.googleapis.com/token
+        user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
+        scopes:
+          - email
+      twitter:
+        client-id: test-client-id
+        client-secret: test-client-secret
+        redirect-uri: http://localhost:3000/auth/callback/twitter
+        authorization-uri: https://twitter.com/i/oauth2/authorize
+        token-uri: https://api.twitter.com/2/oauth2/token
+        user-info-uri: https://api.twitter.com/2/users/me
+        scopes:
+          - users.read
+
+  jwt:
+    secret: dGVzdC1zZWNyZXQta2V5LWZvci1pbnRlZ3JhdGlvbi10ZXN0cw==
+    expiration-ms: 86400000
+    refresh-expiration-ms: 604800000
+    cookie:
+      access-token-name: AccessToken
+      refresh-token-name: RefreshToken
+      domain: localhost
+      path: /
+      access-token-expiry-seconds: 86400
+      refresh-token-expiry-seconds: 604800
+      secure: false
+      same-site: Lax
+
+  webclient:
+    timeout:
+      connection: 5000
+      read: 5000
+      write: 5000

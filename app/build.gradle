@@ -28,6 +28,9 @@ dependencies {
 
 	testImplementation 'org.springframework.security:spring-security-test'
 	testImplementation 'org.assertj:assertj-core:3.24.2'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.testcontainers:mysql:1.19.6'
+	testImplementation 'org.testcontainers:junit-jupiter:1.19.6'
 
 	// OAuth2 + JWT
 	implementation 'com.auth0:java-jwt:4.4.0'
