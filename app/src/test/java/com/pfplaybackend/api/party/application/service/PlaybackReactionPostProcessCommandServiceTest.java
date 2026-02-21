@@ -34,6 +34,7 @@ import static org.mockito.Mockito.*;
 class PlaybackReactionPostProcessCommandServiceTest {
 
     @Mock PlaybackQueryService playbackQueryService;
+    @Mock PlaybackCommandService playbackCommandService;
     @Mock ApplicationEventPublisher eventPublisher;
     @Mock PlaylistCommandPort playlistCommandPort;
     @Mock UserActivityPort userActivityPort;
@@ -111,14 +112,14 @@ class PlaybackReactionPostProcessCommandServiceTest {
         when(aggregation.getLikeCount()).thenReturn(5);
         when(aggregation.getDislikeCount()).thenReturn(1);
         when(aggregation.getGrabCount()).thenReturn(2);
-        when(playbackQueryService.updatePlaybackAggregation(playbackId, List.of(1, 0, 0)))
+        when(playbackCommandService.updatePlaybackAggregation(playbackId, List.of(1, 0, 0)))
                 .thenReturn(aggregation);
 
         // when
         service.postProcess(dto, ReactionType.LIKE, partyroomId, playbackId, crewId);
 
         // then
-        verify(playbackQueryService).updatePlaybackAggregation(playbackId, List.of(1, 0, 0));
+        verify(playbackCommandService).updatePlaybackAggregation(playbackId, List.of(1, 0, 0));
         verify(eventPublisher).publishEvent(any(ReactionAggregationChangedEvent.class));
         verify(eventPublisher).publishEvent(any(ReactionMotionChangedEvent.class));
     }

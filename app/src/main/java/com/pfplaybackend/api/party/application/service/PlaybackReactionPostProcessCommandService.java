@@ -25,6 +25,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PlaybackReactionPostProcessCommandService {
     private final PlaybackQueryService playbackQueryService;
+    private final PlaybackCommandService playbackCommandService;
     private final ApplicationEventPublisher eventPublisher;
     private final PlaylistCommandPort playlistCommandPort;
     private final UserActivityPort userActivityPort;
@@ -39,7 +40,7 @@ public class PlaybackReactionPostProcessCommandService {
             updateDjActivityScore(playback.getUserId(), postProcessDto.deltaScore());
         }
         if(postProcessDto.isAggregationChanged()) {
-            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(new PlaybackId(playback.getId()), postProcessDto.deltaRecord());
+            PlaybackAggregationData aggregation = playbackCommandService.updatePlaybackAggregation(new PlaybackId(playback.getId()), postProcessDto.deltaRecord());
             publishAggregationChangedEvent(partyroomId, aggregation);
         }
         publishMotionChangedEvent(partyroomId, reactionType, postProcessDto.determinedMotionType(), crewId);

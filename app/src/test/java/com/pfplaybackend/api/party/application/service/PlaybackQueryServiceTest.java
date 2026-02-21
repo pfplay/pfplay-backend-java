@@ -3,9 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
 import com.pfplaybackend.api.party.application.port.out.PartyroomQueryPort;
-import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
-import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
@@ -34,7 +32,6 @@ class PlaybackQueryServiceTest {
     @Mock PartyroomQueryPort partyroomQueryPort;
     @Mock PlaybackRepository playbackRepository;
     @Mock PlaybackAggregationRepository playbackAggregationRepository;
-    @Mock PlaylistCommandPort playlistCommandPort;
     @Mock UserProfileQueryPort userProfileQueryPort;
     @InjectMocks PlaybackQueryService playbackQueryService;
 
@@ -63,26 +60,6 @@ class PlaybackQueryServiceTest {
         // when & then
         assertThatThrownBy(() -> playbackQueryService.getPlaybackById(playbackId))
                 .isInstanceOf(java.util.NoSuchElementException.class);
-    }
-
-    @Test
-    @DisplayName("updatePlaybackAggregation — 집계 데이터를 업데이트하고 저장한다")
-    void updatePlaybackAggregation_success() {
-        // given
-        PlaybackId playbackId = new PlaybackId(1L);
-        PlaybackAggregationData aggregation = mock(PlaybackAggregationData.class);
-        when(playbackAggregationRepository.findById(playbackId)).thenReturn(Optional.of(aggregation));
-        when(playbackAggregationRepository.save(aggregation)).thenReturn(aggregation);
-
-        List<Integer> deltaRecord = List.of(1, -1, 0);
-
-        // when
-        PlaybackAggregationData result = playbackQueryService.updatePlaybackAggregation(playbackId, deltaRecord);
-
-        // then
-        verify(aggregation).updateAggregation(1, -1, 0);
-        verify(playbackAggregationRepository).save(aggregation);
-        assertThat(result).isSameAs(aggregation);
     }
 
     @Test

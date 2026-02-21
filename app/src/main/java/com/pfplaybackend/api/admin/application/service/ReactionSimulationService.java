@@ -4,6 +4,7 @@ import com.pfplaybackend.api.admin.application.dto.result.SimulateReactionsResul
 import com.pfplaybackend.api.admin.application.port.out.AdminPartyroomPort;
 import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
+import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.application.service.PlaybackQueryService;
 import com.pfplaybackend.api.party.application.service.PlaybackReactionPostProcessCommandService;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
@@ -32,6 +33,7 @@ public class ReactionSimulationService {
 
     private final AdminPartyroomPort adminPartyroomPort;
     private final PlaybackQueryService playbackQueryService;
+    private final PlaybackCommandService playbackCommandService;
     private final PlaybackReactionDomainService playbackReactionDomainService;
     private final PlaybackReactionPostProcessCommandService playbackReactionPostProcessCommandService;
     private final UserActivityPort userActivityPort;
@@ -90,7 +92,7 @@ public class ReactionSimulationService {
 
         // Update playback aggregation (includes GRAB count)
         if (postProcessDto.isAggregationChanged()) {
-            PlaybackAggregationData aggregation = playbackQueryService.updatePlaybackAggregation(new PlaybackId(playback.getId()), postProcessDto.deltaRecord());
+            PlaybackAggregationData aggregation = playbackCommandService.updatePlaybackAggregation(new PlaybackId(playback.getId()), postProcessDto.deltaRecord());
             playbackReactionPostProcessCommandService.publishAggregationChangedEvent(partyroomId, aggregation);
         }
 

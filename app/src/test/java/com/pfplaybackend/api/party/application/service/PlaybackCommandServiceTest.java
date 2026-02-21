@@ -9,6 +9,7 @@ import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
+import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.application.service.task.ExpirationTaskScheduler;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
@@ -40,7 +41,7 @@ class PlaybackCommandServiceTest {
 
     @Mock PlaybackRepository playbackRepository;
     @Mock PlaybackAggregationRepository playbackAggregationRepository;
-    @Mock PlaybackQueryService playbackQueryService;
+    @Mock PlaylistCommandPort playlistCommandPort;
     @Mock UserActivityPort userActivityPort;
     @Mock ApplicationEventPublisher eventPublisher;
     @Mock PartyroomAggregatePort aggregatePort;

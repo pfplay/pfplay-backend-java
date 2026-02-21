@@ -4,9 +4,11 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
+import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.domain.value.PlaybackSnapshot;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.application.service.task.ExpirationTaskScheduler;
+import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -41,7 +43,7 @@ public class PlaybackCommandService {
 
     private final PlaybackRepository playbackRepository;
     private final PlaybackAggregationRepository playbackAggregationRepository;
-    private final PlaybackQueryService playbackQueryService;
+    private final PlaylistCommandPort playlistCommandPort;
     private final UserActivityPort userActivityPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomAggregatePort aggregatePort;
@@ -105,7 +107,7 @@ public class PlaybackCommandService {
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getPartyroomId());
         DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
         CrewData djCrew = aggregatePort.findCrewById(nextDj.getCrewId().getId()).orElseThrow();
-        PlaybackData nextPlayback = playbackQueryService.getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj, djCrew.getUserId());
+        PlaybackData nextPlayback = getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj, djCrew.getUserId());
 
         if (partyroom.getPlaybackTimeLimit().exceedsDuration(nextPlayback.getDuration())) {
             if (remainingAttempts <= 1) {
@@ -135,6 +137,19 @@ public class PlaybackCommandService {
                 playbackData.getDuration().toDisplayString(), playbackData.getThumbnailImage(), playbackData.getEndTime());
         eventPublisher.publishEvent(new PlaybackStartedEvent(partyroom.getPartyroomId(), new CrewId(djCrew.getId()), snapshot));
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.ROTATE, new CrewId(djCrew.getId())));
+    }
+
+    PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj, UserId djUserId) {
+        PlaybackTrackDto trackDto = playlistCommandPort.getFirstTrack(dj.getPlaylistId());
+        return PlaybackData.create(partyroomId, djUserId,
+                trackDto.name(), trackDto.duration(), trackDto.linkId(), trackDto.thumbnailImage());
+    }
+
+    @Transactional
+    public PlaybackAggregationData updatePlaybackAggregation(PlaybackId playbackId, List<Integer> deltaRecord) {
+        PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playbackId).orElseThrow();
+        aggregation.updateAggregation(deltaRecord.get(0), deltaRecord.get(1), deltaRecord.get(2));
+        return playbackAggregationRepository.save(aggregation);
     }
 
     private void deactivateAndNotify(PartyroomData partyroom) {
