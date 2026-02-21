@@ -16,7 +16,10 @@ import com.pfplaybackend.api.playlist.application.dto.command.UpdateTrackOrderCo
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
+import com.pfplaybackend.api.playlist.domain.event.TrackAddedEvent;
+import com.pfplaybackend.api.playlist.domain.event.TrackRemovedEvent;
 import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -35,6 +38,7 @@ public class TrackCommandService {
     private final PlaylistAggregatePort aggregatePort;
     private final PlaylistQueryPort queryPort;
     private final PlaylistQueryService playlistQueryService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void addTrackInPlaylist(Long playlistId, AddTrackCommand command) {
@@ -61,6 +65,7 @@ public class TrackCommandService {
                 .build();
 
         aggregatePort.saveTrack(trackData);
+        eventPublisher.publishEvent(new TrackAddedEvent(playlistId, command.linkId()));
     }
 
     @Transactional
@@ -137,6 +142,7 @@ public class TrackCommandService {
         Integer deleteOrderNumber = trackData.getOrderNumber();
         aggregatePort.shiftUpTrackOrderByDelete(playlistId, deleteOrderNumber);
         aggregatePort.deleteTrack(trackData);
+        eventPublisher.publishEvent(new TrackRemovedEvent(playlistId, trackId));
     }
 
     @Transactional

@@ -9,7 +9,9 @@ import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
+import com.pfplaybackend.api.user.domain.event.MemberRegisteredEvent;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +34,7 @@ class MemberSignServiceTest {
     @Mock UserProfileCommandService userProfileCommandService;
     @Mock UserActivityCommandService userActivityCommandService;
     @Mock PlaylistSetupPort playlistSetupPort;
+    @Mock ApplicationEventPublisher eventPublisher;
     @InjectMocks MemberSignService memberSignService;
 
     @Test
@@ -49,6 +52,7 @@ class MemberSignServiceTest {
         assertThat(result).isSameAs(existing);
         verify(memberRepository, never()).save(any());
         verify(playlistSetupPort, never()).createDefaultPlaylist(any());
+        verify(eventPublisher, never()).publishEvent(any(MemberRegisteredEvent.class));
     }
 
     @Test
@@ -76,6 +80,7 @@ class MemberSignServiceTest {
         verify(userActivityCommandService).createUserActivities(any(UserId.class));
         verify(playlistSetupPort).createDefaultPlaylist(any(UserId.class));
         verify(memberRepository).save(any(MemberData.class));
+        verify(eventPublisher).publishEvent(any(MemberRegisteredEvent.class));
     }
 
     @Test

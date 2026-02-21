@@ -9,7 +9,9 @@ import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.application.dto.command.SignMemberCommand;
+import com.pfplaybackend.api.user.domain.event.MemberRegisteredEvent;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class MemberSignService {
     private final UserProfileCommandService userProfileCommandService;
     private final UserActivityCommandService userActivityCommandService;
     private final PlaylistSetupPort playlistSetupPort;
+    private final ApplicationEventPublisher eventPublisher;
 
     public String getOAuth2RedirectUri(SignMemberCommand command, String redirectLocation) {
         return oauth2RedirectPort.getRedirectUri(command.oauth2Provider(), redirectLocation);
@@ -48,6 +51,8 @@ public class MemberSignService {
 
         playlistSetupPort.createDefaultPlaylist(member.getUserId());
 
-        return memberRepository.save(member);
+        MemberData saved = memberRepository.save(member);
+        eventPublisher.publishEvent(new MemberRegisteredEvent(saved.getUserId(), saved.getEmail()));
+        return saved;
     }
 }

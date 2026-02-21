@@ -2,7 +2,7 @@ package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.user.application.event.UserProfileEventPublisher;
+import com.pfplaybackend.api.user.domain.event.UserProfileChangedEvent;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
@@ -20,6 +20,7 @@ import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +31,7 @@ public class UserAvatarCommandService {
 
     private final MemberRepository memberRepository;
     private final AvatarResourceQueryService avatarResourceQueryService;
-    private final UserProfileEventPublisher userProfileEventPublisher;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void setUserAvatar(SetAvatarCommand command) {
@@ -72,7 +73,7 @@ public class UserAvatarCommandService {
         }
 
         memberRepository.save(member);
-        userProfileEventPublisher.publishProfileChangedEvent(member);
+        eventPublisher.publishEvent(new UserProfileChangedEvent(member.getUserId()));
     }
 
     public AvatarIconUri findAvatarIconPairWithSingleBody(AvatarBodyDto avatarBodyDto) {

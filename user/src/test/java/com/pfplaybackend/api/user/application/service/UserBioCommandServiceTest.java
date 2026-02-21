@@ -4,7 +4,8 @@ import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
-import com.pfplaybackend.api.user.application.event.UserProfileEventPublisher;
+import com.pfplaybackend.api.user.domain.event.UserProfileChangedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.*;
 class UserBioCommandServiceTest {
 
     @Mock MemberRepository memberRepository;
-    @Mock UserProfileEventPublisher userProfileEventPublisher;
+    @Mock ApplicationEventPublisher eventPublisher;
     @InjectMocks UserBioCommandService userBioService;
 
     private UserId userId;
@@ -58,7 +59,7 @@ class UserBioCommandServiceTest {
         // then
         verify(member).updateProfileBio(command.nickName(), command.introduction());
         verify(memberRepository).save(member);
-        verify(userProfileEventPublisher).publishProfileChangedEvent(member);
+        verify(eventPublisher).publishEvent(any(UserProfileChangedEvent.class));
     }
 
     @Test
