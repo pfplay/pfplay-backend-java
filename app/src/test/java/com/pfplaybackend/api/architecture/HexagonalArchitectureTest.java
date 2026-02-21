@@ -128,6 +128,17 @@ class HexagonalArchitectureTest {
 
             rule.check(adminClasses);
         }
+
+        @Test
+        @DisplayName("admin application 패키지는 party adapter.out.persistence 패키지에 의존하지 않는다")
+        void applicationShouldNotDependOnPartyPersistence() {
+            ArchRule rule = noClasses()
+                    .that().resideInAPackage("..admin.application..")
+                    .should().dependOnClassesThat()
+                    .resideInAPackage("..party.adapter.out.persistence..");
+
+            rule.check(adminClasses);
+        }
     }
 
     @Nested

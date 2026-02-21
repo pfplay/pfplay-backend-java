@@ -13,14 +13,14 @@
 | # | 차원 | 현재 | 목표 | 비고 |
 |---|------|------|------|------|
 | 1 | 도메인 레이어 순수성 | **5.0** | 5.0 | domain→adapter 0건, domain→application 0건 |
-| 2 | 헥사고널 아키텍처 준수 | **4.5** | 5.0 | admin 포트 완료, partyview ArchUnit 포함. AdminDemoService→party repos 잔존 |
+| 2 | 헥사고널 아키텍처 준수 | **5.0** | 5.0 | admin 포트 완료, partyview ArchUnit 포함. AdminDemoService→AdminPartyroomPort 전환 |
 | 3 | 도메인 모델 풍부성 | **5.0** | 5.0 | ReactionPostProcessResult 불변 record 변환 완료 |
 | 4 | Aggregate / VO 일관성 | **4.5** | 5.0 | FK VO化 완료 (D-1/D-2), 포트 파라미터 VO化. PK Long/Aggregate Root 마커 잔존 |
 | 5 | 도메인 이벤트 성숙도 | **4.5** | 5.0 | user/playlist 이벤트 4건 도입, 총 14 이벤트 |
 | 6 | 테스트 전략 | **4.5** | 5.0 | Testcontainers 3클래스, @WebMvcTest 4클래스, 334 테스트 |
 | 7 | 전략적 DDD 문서화 | **5.0** | 5.0 | 성숙도 평가 + 로드맵 + 문서-코드 동기화 |
 | 8 | 모듈 구조 / 의존 관리 | **5.0** | 5.0 | cross-module 포트 100%, admin 포트 완료, partyview ArchUnit 포함 |
-| | **종합** | **38.0/40 (95.0%)** | **40.0/40 (100%)** | |
+| | **종합** | **38.5/40 (96.3%)** | **40.0/40 (100%)** | |
 
 ---
 
@@ -64,26 +64,26 @@
 | 4 | **cross-module 포트 100%. Aggregate Port 일관 적용. application→adapter.in 위반 0건 (Command/Query DTO 분리). 컨트롤러 경계 대부분 준수.** |
 | 5 | 모든 경계에서 포트 적용. admin 포함 전 도메인 준수. 컨트롤러는 오직 application service + port만 호출. |
 
-### 현재 수준: 4.5 (← 4.0에서 상향)
+### 현재 수준: 5.0 (← 4.5에서 상향)
 
-**달성 (Phase B + E-1 + F)**:
+**달성 (Phase B + E-1 + F + AdminPartyroomPort)**:
 - application→adapter.in 위반: **0건** (ArchUnit 예외 전부 해소, 77파일 변경)
 - `PartyroomInfoController`: Repository 직접 주입 제거 → `PartyroomInfoService.getDjQueueInfo()` 호출
 - `LogoutService` → `PartyCleanupPort` 포트 경유 (auth→party 경계 정리)
 - `PartyroomAccessController` → `GuestAuthPort` 포트 경유 (party→user 경계 정리)
-- 13개 포트 인터페이스 + 13개 어댑터 (F-1, F-2에서 2쌍 추가)
+- 14개 포트 인터페이스 + 14개 어댑터 (F-1, F-2에서 2쌍 추가, AdminPartyroomPort 1쌍 추가)
 - admin 도메인 포트 도입 (F-1): `AdminMemberPort`, `AdminAvatarResourcePort`, `AdminPlaylistPort` + 3 Adapter
+- `AdminDemoService` → `AdminPartyroomPort` 포트 경유 (party Repository 5개 직접 참조 제거, ArchUnit 규칙 추가)
 - `partyview` ArchUnit 검증 범위 포함 (F-5): `HexagonalArchitectureTest`에 partyviewClasses 규칙 추가
 - `PartyroomSetupQueryService`: Repository 직접 import 0건 — application service 경유 확인 (#8 해소)
 
-**미달**:
-- `AdminDemoService`: 인트라모듈(party) Repository 직접 접근 잔존 (cross-module은 포트 경유)
+**미달**: 없음 (5.0 도달 조건 전부 충족)
 
-### 5.0 도달 조건
+### 5.0 도달 조건 — 전부 충족
 
 - [x] admin 도메인 포트 도입 (`AdminMemberPort`, `AdminAvatarResourcePort`, `AdminPlaylistPort`)
 - [x] `partyview` ArchUnit 검증 범위 포함
-- [ ] `AdminDemoService` 인트라모듈 Repository 접근 → 서비스 경유로 전환
+- [x] `AdminDemoService` 인트라모듈 Repository 접근 → `AdminPartyroomPort` 포트 경유로 전환
 
 ---
 
@@ -296,7 +296,8 @@
 
 | 일자 | 종합 점수 | 주요 변경 |
 |------|-----------|----------|
-| 2026-02-22 | **38.0/40 (95.0%)** | D-1/D-2 FK VO化, F-1/F-3/F-5 모듈 경계, #4 도메인 이벤트, #6 불변화, E-3/E-4 테스트 반영 |
+| 2026-02-22 | **38.5/40 (96.3%)** | AdminDemoService→AdminPartyroomPort 전환, 헥사고널 준수 4.5→5.0 |
+| 2026-02-22 | 38.0/40 (95.0%) | D-1/D-2 FK VO化, F-1/F-3/F-5 모듈 경계, #4 도메인 이벤트, #6 불변화, E-3/E-4 테스트 반영 |
 | 2026-02-21 (Phase A~F) | 35.0/40 (87.5%) | Phase A~F 완료: 도메인 순수성 5.0, 헥사고널 4.0, 모델 풍부성 4.5, VO 4.0, 테스트 4.0, 문서 5.0, 모듈 4.5 |
 | 2026-02-21 (초기 평가) | 31.0/40 (77.5%) | 도메인 순수성 5건 해소, 평가 기준 문서 최초 작성 |
 | 2026-02-20 | 30.5/40 (76.3%) | Phase 0~8 + 모듈 재구조화 + ERD 정규화 완료 |

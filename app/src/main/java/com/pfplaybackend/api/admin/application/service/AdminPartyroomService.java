@@ -5,9 +5,9 @@ import com.pfplaybackend.api.admin.application.dto.command.BulkPreviewCommand;
 import com.pfplaybackend.api.admin.application.dto.result.AdminPartyroomResult;
 import com.pfplaybackend.api.admin.application.dto.result.BulkPreviewResult;
 import com.pfplaybackend.api.admin.application.dto.result.SimulateReactionsResult;
+import com.pfplaybackend.api.admin.application.port.out.AdminPartyroomPort;
 import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessCommandService;
 import com.pfplaybackend.api.party.application.service.PlaybackQueryService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
@@ -23,10 +23,6 @@ import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -50,10 +46,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminPartyroomService {
 
-    private final PartyroomRepository partyroomRepository;
-    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
-    private final PlaybackAggregationRepository playbackAggregationRepository;
-    private final CrewRepository crewRepository;
+    private final AdminPartyroomPort adminPartyroomPort;
     private final PartyroomAccessCommandService partyroomAccessCommandService;
     private final AdminUserService adminUserService;
     private final PlaybackQueryService playbackQueryService;
@@ -162,15 +155,15 @@ public class AdminPartyroomService {
                 LinkDomain.of(linkDomain),
                 PlaybackTimeLimit.ofMinutes(playbackTimeLimit),
                 stageType, hostId);
-        return partyroomRepository.save(partyroom);
+        return adminPartyroomPort.savePartyroom(partyroom);
     }
 
     private void enterMemberAsRegularCrew(PartyroomData partyroom, UserId userId) {
-        PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
+        PartyroomData loadedPartyroom = adminPartyroomPort.findPartyroomById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
         CrewData crew = CrewData.create(loadedPartyroom.getPartyroomId(), userId, GradeType.LISTENER);
-        crewRepository.save(crew);
+        adminPartyroomPort.saveCrew(crew);
     }
 
     private String generateUniqueLinkDomain() {
@@ -190,7 +183,7 @@ public class AdminPartyroomService {
     }
 
     private boolean isLinkDomainDuplicated(String linkDomain) {
-        return partyroomRepository.findByLinkDomain(LinkDomain.of(linkDomain)).isPresent();
+        return adminPartyroomPort.findPartyroomByLinkDomain(LinkDomain.of(linkDomain)).isPresent();
     }
 
     private UserId parseUserId(String userIdString) {
@@ -203,9 +196,9 @@ public class AdminPartyroomService {
     }
 
     public SimulateReactionsResult simulateReactions(Long partyroomId) {
-        PartyroomData partyroom = partyroomRepository.findById(partyroomId)
+        PartyroomData partyroom = adminPartyroomPort.findPartyroomById(partyroomId)
                 .orElseThrow(() -> ExceptionCreator.create(AdminException.PARTYROOM_NOT_FOUND));
-        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(new PartyroomId(partyroomId)).orElseThrow();
+        PartyroomPlaybackData playbackState = adminPartyroomPort.findPlaybackState(new PartyroomId(partyroomId)).orElseThrow();
 
         PlaybackId playbackId = playbackState.getCurrentPlaybackId();
         if (playbackId == null) {
@@ -215,7 +208,7 @@ public class AdminPartyroomService {
         PlaybackData playback = playbackQueryService.getPlaybackById(playbackId);
         UserId djUserId = playback.getUserId();
 
-        List<CrewData> eligibleCrew = crewRepository.findByPartyroomIdAndIsActiveTrue(new PartyroomId(partyroomId)).stream()
+        List<CrewData> eligibleCrew = adminPartyroomPort.findActiveCrewByPartyroom(new PartyroomId(partyroomId)).stream()
                 .filter(crew -> !crew.getUserId().equals(djUserId))
                 .collect(Collectors.toList());
 
@@ -293,7 +286,7 @@ public class AdminPartyroomService {
                 .map(CompletableFuture::join)
                 .collect(Collectors.toList());
 
-        PlaybackAggregationData aggregation = playbackAggregationRepository.findById(playbackId).orElseThrow();
+        PlaybackAggregationData aggregation = adminPartyroomPort.findPlaybackAggregation(playbackId).orElseThrow();
 
         log.info("Simulated reactions completed: partyroomId={}, playbackId={}, reactions={}, likes={}, grabs={}",
                 partyroomId, playbackId.getId(), reactions.size(), likeGroup.size(), grabGroup.size());

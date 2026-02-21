@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.admin.application.service;
 
+import com.pfplaybackend.api.admin.application.port.out.AdminPartyroomPort;
 import com.pfplaybackend.api.admin.domain.enums.ChatScriptType;
 import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
@@ -8,7 +9,6 @@ import com.pfplaybackend.api.party.application.dto.chat.ChatMessageDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ import java.util.concurrent.*;
 @RequiredArgsConstructor
 public class ChatSimulationService {
 
-    private final CrewRepository crewRepository;
+    private final AdminPartyroomPort adminPartyroomPort;
     private final RedisMessagePublisher messagePublisher;
 
     // ExecutorService for background chat simulation
@@ -159,7 +159,7 @@ public class ChatSimulationService {
             return;
         }
 
-        List<CrewData> crewList = crewRepository.findByPartyroomIdAndIsActiveTrue(new PartyroomId(partyroomId));
+        List<CrewData> crewList = adminPartyroomPort.findActiveCrewByPartyroom(new PartyroomId(partyroomId));
         if (crewList.isEmpty()) {
             throw ExceptionCreator.create(AdminException.NO_CREW_MEMBERS);
         }

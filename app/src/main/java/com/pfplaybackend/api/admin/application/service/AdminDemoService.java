@@ -2,6 +2,7 @@ package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.admin.application.port.out.AdminAvatarResourcePort;
 import com.pfplaybackend.api.admin.application.port.out.AdminMemberPort;
+import com.pfplaybackend.api.admin.application.port.out.AdminPartyroomPort;
 import com.pfplaybackend.api.admin.application.port.out.AdminPlaylistPort;
 import com.pfplaybackend.api.admin.domain.DemoTrackConstants;
 import com.pfplaybackend.api.admin.application.dto.command.InitializeDemoCommand;
@@ -13,7 +14,6 @@ import com.pfplaybackend.api.admin.application.util.NicknameGenerator;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessCommandService;
 import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
@@ -28,11 +28,6 @@ import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.common.domain.value.PlaylistId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
@@ -69,11 +64,7 @@ public class AdminDemoService {
     private final AdminMemberPort adminMemberPort;
     private final AdminAvatarResourcePort adminAvatarResourcePort;
     private final AdminPlaylistPort adminPlaylistPort;
-    private final PartyroomRepository partyroomRepository;
-    private final PartyroomPlaybackRepository partyroomPlaybackRepository;
-    private final DjQueueRepository djQueueRepository;
-    private final CrewRepository crewRepository;
-    private final DjRepository djRepository;
+    private final AdminPartyroomPort adminPartyroomPort;
     private final PartyroomAccessCommandService partyroomAccessCommandService;
     private final PlaybackCommandService playbackCommandService;
 
@@ -174,7 +165,7 @@ public class AdminDemoService {
     }
 
     private PartyroomData findMainStage() {
-        PartyroomData mainStage = partyroomRepository.findAll().stream()
+        PartyroomData mainStage = adminPartyroomPort.findAllPartyrooms().stream()
                 .filter(p -> p.getStageType() == StageType.MAIN)
                 .findFirst()
                 .orElseThrow(() -> ExceptionCreator.create(AdminException.MAIN_STAGE_NOT_FOUND));
@@ -216,9 +207,9 @@ public class AdminDemoService {
                     LinkDomain.of(linkDomain),
                     PlaybackTimeLimit.ofMinutes(command.playbackTimeLimit()),
                     StageType.GENERAL, hostUserId);
-            PartyroomData savedPartyroom = partyroomRepository.save(partyroom);
-            partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(savedPartyroom.getPartyroomId()));
-            djQueueRepository.save(DjQueueData.createFor(savedPartyroom.getPartyroomId()));
+            PartyroomData savedPartyroom = adminPartyroomPort.savePartyroom(partyroom);
+            adminPartyroomPort.savePlaybackState(PartyroomPlaybackData.createFor(savedPartyroom.getPartyroomId()));
+            adminPartyroomPort.saveDjQueue(DjQueueData.createFor(savedPartyroom.getPartyroomId()));
 
             // Enter host
             partyroomAccessCommandService.enterByHost(hostUserId, savedPartyroom);
@@ -263,11 +254,11 @@ public class AdminDemoService {
     }
 
     private void enterMemberAsRegularCrew(PartyroomData partyroom, UserId userId) {
-        PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
+        PartyroomData loadedPartyroom = adminPartyroomPort.findPartyroomById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
         CrewData crew = CrewData.create(loadedPartyroom.getPartyroomId(), userId, GradeType.LISTENER);
-        crewRepository.save(crew);
+        adminPartyroomPort.saveCrew(crew);
     }
 
     private int registerDjsInQueues(
@@ -302,33 +293,33 @@ public class AdminDemoService {
 
         PlaylistData playlist = playlistOpt.get();
 
-        PartyroomData loadedPartyroom = partyroomRepository.findById(partyroom.getPartyroomId().getId())
+        PartyroomData loadedPartyroom = adminPartyroomPort.findPartyroomById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
-        PartyroomPlaybackData playbackState = partyroomPlaybackRepository.findById(loadedPartyroom.getPartyroomId()).orElseThrow();
+        PartyroomPlaybackData playbackState = adminPartyroomPort.findPlaybackState(loadedPartyroom.getPartyroomId()).orElseThrow();
 
         boolean isPostActivationProcessingRequired = !playbackState.isActivated();
 
         // Find crew
-        CrewData crew = crewRepository.findByPartyroomIdAndUserId(loadedPartyroom.getPartyroomId(), userId)
+        CrewData crew = adminPartyroomPort.findCrewByPartyroomAndUser(loadedPartyroom.getPartyroomId(), userId)
                 .orElseThrow();
         CrewId crewId = new CrewId(crew.getId());
 
         // Check if already registered
-        if (djRepository.existsByPartyroomIdAndCrewId(loadedPartyroom.getPartyroomId(), crewId)) {
+        if (adminPartyroomPort.existsDjByPartyroomAndCrew(loadedPartyroom.getPartyroomId(), crewId)) {
             log.warn("DJ already registered for user {}, skipping", userId.getUid());
             return;
         }
 
         // Calculate next order number
-        List<DjData> queuedDjs = djRepository.findByPartyroomIdOrderByOrderNumberAsc(loadedPartyroom.getPartyroomId());
+        List<DjData> queuedDjs = adminPartyroomPort.findDjsByPartyroomOrderByOrder(loadedPartyroom.getPartyroomId());
         int nextOrder = queuedDjs.size() + 1;
 
         // Create and save DJ
         DjData dj = DjData.create(loadedPartyroom.getPartyroomId(), new PlaylistId(playlist.getId()), crewId, nextOrder);
-        djRepository.save(dj);
+        adminPartyroomPort.saveDj(dj);
 
         playbackState.activate(null, null);
-        partyroomPlaybackRepository.save(playbackState);
+        adminPartyroomPort.savePlaybackState(playbackState);
 
         // Start playback if this is the first DJ
         if (isPostActivationProcessingRequired) {
@@ -409,7 +400,7 @@ public class AdminDemoService {
     @Transactional(readOnly = true)
     public DemoStatusResult getDemoEnvironmentStatus() {
         long virtualMemberCount = adminMemberPort.countMembersByProviderType(ProviderType.ADMIN);
-        long generalRoomCount = partyroomRepository.findAll().stream()
+        long generalRoomCount = adminPartyroomPort.findAllPartyrooms().stream()
                 .filter(p -> !p.isTerminated() && p.getStageType() == StageType.GENERAL)
                 .count();
 
@@ -420,12 +411,12 @@ public class AdminDemoService {
 
     @Transactional(readOnly = true)
     public AdminPartyroomListResult getPartyrooms() {
-        List<AdminPartyroomListResult.PartyroomItem> items = partyroomRepository.findAll().stream()
+        List<AdminPartyroomListResult.PartyroomItem> items = adminPartyroomPort.findAllPartyrooms().stream()
                 .filter(p -> !p.isTerminated())
                 .map(p -> {
-                    int crewCount = (int) crewRepository.countByPartyroomIdAndIsActiveTrue(p.getPartyroomId());
-                    int djCount = djRepository.findByPartyroomIdOrderByOrderNumberAsc(p.getPartyroomId()).size();
-                    boolean isPlaybackActivated = partyroomPlaybackRepository.findById(p.getPartyroomId())
+                    int crewCount = (int) adminPartyroomPort.countActiveCrewByPartyroom(p.getPartyroomId());
+                    int djCount = adminPartyroomPort.findDjsByPartyroomOrderByOrder(p.getPartyroomId()).size();
+                    boolean isPlaybackActivated = adminPartyroomPort.findPlaybackState(p.getPartyroomId())
                             .map(PartyroomPlaybackData::isActivated).orElse(false);
                     return new AdminPartyroomListResult.PartyroomItem(
                             p.getId(),

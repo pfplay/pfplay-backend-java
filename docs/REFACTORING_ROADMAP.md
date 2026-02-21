@@ -3,7 +3,7 @@
 > 2026-02-21 성숙도 재평가에서 도출된 잔존 과제를 체계화한 장기 리팩토링 계획.
 > 이전 리팩토링(Phase 0~8, 모듈 재구조화, ERD 정규화)은 `docs/archive/`에 아카이빙됨.
 
-**현재 종합 점수**: 38.0/40 (95.0%)
+**현재 종합 점수**: 38.5/40 (96.3%)
 **목표 종합 점수**: 40.0/40 (100%)
 **평가 기준 문서**: `docs/MATURITY_ASSESSMENT.md`
 
@@ -31,9 +31,10 @@ Phase F — 모듈 경계 및 admin 도메인 정리               ✅ 완료
 | D (D-1/D-2) | 35.5 | 36.0 | FK VO化 57파일, 포트 파라미터 VO化 |
 | E | 36.0 | 37.0 | Testcontainers 3클래스, @WebMvcTest 4클래스, 334 테스트 |
 | F | 37.0 | 37.5 | admin 포트 3쌍, JwtWebSocketAuthAdapter 이동, partyview ArchUnit |
-| #4+#6 | 37.5 | **38.0** | user/playlist 이벤트 4건, ReactionPostProcessResult 불변화 |
+| #4+#6 | 37.5 | 38.0 | user/playlist 이벤트 4건, ReactionPostProcessResult 불변화 |
+| #11 | 38.0 | **38.5** | AdminDemoService→AdminPartyroomPort 전환, 헥사고널 준수 4.5→5.0 |
 
-> 최종 점수 38.0은 2026-02-22 재평가에서 이전 미반영 완료 항목을 모두 반영한 결과.
+> 최종 점수 38.5는 2026-02-22 AdminPartyroomPort 도입으로 차원 2 4.5→5.0 달성.
 
 ---
 
@@ -134,6 +135,7 @@ Phase F — 모듈 경계 및 admin 도메인 정리               ✅ 완료
 |---|------|------|------|
 | ~~8~~ | ~~PartyroomSetupQueryService Repo 직접 접근 제거~~ | ~~2~~ | ✅ 이미 해소 — Repository 직접 import 0건 확인 |
 | ~~9~~ | ~~partyview ArchUnit 검증 범위 추가 (F-5)~~ | ~~2, 6~~ | ✅ 완료 — HexagonalArchitectureTest에 partyviewClasses 포함 |
+| ~~11~~ | ~~AdminDemoService 인트라모듈 Repository 접근 제거~~ | ~~2~~ | ✅ 완료 — AdminPartyroomPort + Adapter, party repo 5개→0개 |
 | 10 | admin 서비스 단위 테스트 | 6 | 데모/시뮬레이션 서비스 |
 
 ---

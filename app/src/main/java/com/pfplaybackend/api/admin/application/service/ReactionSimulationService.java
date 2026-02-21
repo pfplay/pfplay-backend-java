@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.admin.application.dto.result.SimulateReactionsResult;
+import com.pfplaybackend.api.admin.application.port.out.AdminPartyroomPort;
 import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.application.service.PlaybackQueryService;
@@ -14,7 +15,6 @@ import com.pfplaybackend.api.party.domain.service.PlaybackReactionDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackReactionHistoryRepository;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReactionSimulationService {
 
+    private final AdminPartyroomPort adminPartyroomPort;
     private final PlaybackQueryService playbackQueryService;
     private final PlaybackReactionDomainService playbackReactionDomainService;
-    private final PlaybackReactionHistoryRepository playbackReactionHistoryRepository;
     private final PlaybackReactionPostProcessCommandService playbackReactionPostProcessCommandService;
     private final UserActivityPort userActivityPort;
 
@@ -58,8 +58,8 @@ public class ReactionSimulationService {
             int delayMs) {
 
         // 1. Get or create reaction history
-        PlaybackReactionHistoryData historyData = playbackReactionHistoryRepository
-                .findByPlaybackIdAndUserId(playbackId, userId)
+        PlaybackReactionHistoryData historyData = adminPartyroomPort
+                .findReactionHistory(playbackId, userId)
                 .orElse(new PlaybackReactionHistoryData(userId, playbackId));
 
         // 2. Get existing state
@@ -71,7 +71,7 @@ public class ReactionSimulationService {
         ReactionState targetState = playbackReactionDomainService.getTargetReactionState(existingState, reactionType);
 
         // 4. Save reaction history
-        playbackReactionHistoryRepository.save(historyData.applyReactionState(targetState));
+        adminPartyroomPort.saveReactionHistory(historyData.applyReactionState(targetState));
 
         // 5. Determine post-processing
         ReactionPostProcessResult postProcessDto = playbackReactionDomainService
