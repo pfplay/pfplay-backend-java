@@ -304,6 +304,75 @@
 
 ---
 
+## 부록 A: 의도적 보류 항목 — 기술적 근거
+
+> DDD 성숙도 40.0/40 달성 과정에서 **의도적으로 보류한 2개 항목**에 대한 기술적 근거를 기록한다.
+> 두 항목 모두 도입 비용 대비 효과가 낮거나 기존 아키텍처로 동일한 목표를 이미 달성한 경우에 해당한다.
+
+### A-1. Event Store (이벤트 소싱) 보류 근거
+
+#### 1. Redis Pub/Sub로 실시간 동기화 요구 충족
+
+- `DomainEventRedisRelay`가 `@TransactionalEventListener(AFTER_COMMIT)`로 9개 이벤트를 Redis 토픽으로 릴레이
+- `RedisListenerConfig`에서 11개 `ChannelTopic` 리스너 등록 (+ 패턴 토픽 1개)
+- 파티룸은 실시간 소비 모델 — 이벤트 히스토리 리플레이 불필요
+
+#### 2. 릴레이 시점에 감사 가능 컨텍스트 보강 완료
+
+- `DomainEventRedisRelay`, `UserDomainEventRelay`가 릴레이 시 크루/프로필 데이터를 조회 후 메시지에 포함
+- 14개 이벤트에 `DjChangeType`, `ProfileChangeType`, `PlaybackId`, `CrewId` 등 감사급 payload 이미 탑재
+
+#### 3. 파티룸 도메인에 리플레이/콜드스타트 시나리오 없음
+
+- 파티룸은 **생성 → 사용 → 종료**의 일시적(ephemeral) 생명주기
+- 재생 이력은 `PlaybackData`, `PlaybackReactionHistoryData` 테이블로 별도 관리 (목적별 읽기 모델)
+
+#### 4. 도입 비용: 3+ 신규 테이블, 직렬화 인프라, 버전 마이그레이션
+
+- `EVENT_STORE` 테이블 (JSON 직렬화 payload)
+- 스냅샷 테이블 + 데드레터/재시도 테이블
+- 14개 이벤트 타입의 Jackson 다형성 역직렬화 설정
+- 이벤트 스키마 진화 시 upcasting 로직 필요
+
+#### 5. 현재 아키텍처로 CQRS 패턴 이미 실현
+
+- `*CommandService` / `*QueryService` 분리 완료
+- JPA 기반 상태 관리를 이벤트 소싱으로 대체 시 21개 테이블 전면 재설계 필요
+
+### A-2. 엔티티 PK → VO 감싸기 보류 근거
+
+#### 1. JPA 스펙 제약: `@GeneratedValue` + `@EmbeddedId` 비호환
+
+- JPA 3.1 명세: `@GeneratedValue`는 `@Id` 단순 타입(`Long`, `Integer`)에만 적용 가능
+- `@EmbeddedId`에는 `@GeneratedValue` 적용 불가 — 스펙 수준 제약
+
+#### 2. 우회(클라이언트 ID 생성) 비용 과다
+
+- 18+ 엔티티의 `AUTO_INCREMENT` 컬럼 마이그레이션 필요
+- 엔티티별 TSID 생성기 설정, 충돌 방지 로직
+- MySQL 네이티브 auto-increment 성능 상실
+- 고동시성 환경에서 TSID 순서 보장 이슈
+
+#### 3. 현재 하이브리드 패턴은 실용적 표준
+
+- `@Id Long id` + `@Transient PartyroomId` + `@PostPersist`/`@PostLoad` 콜백
+- JPA 호환성 유지하면서 도메인 코드에서 VO 타입 접근 제공
+- 참조 코드: `PartyroomData.java` (lines 38–84)
+
+#### 4. FK 컬럼은 이미 전부 VO化 완료
+
+- `CrewData.partyroomId`, `DjData.partyroomId`, `PlaybackData.partyroomId`, `TrackData.playlistId` 등
+- 22+ VO 정의, inter-aggregate 참조 전부 VO 타입
+- 갭은 오직 auto-generated PK뿐
+
+#### 5. 도메인 코드에서 VO 접근 이미 보장
+
+- `getPartyroomId()`, `getPlaybackId()` 등 접근자가 VO 반환
+- 서비스, 이벤트, 포트 인터페이스 모두 VO 타입으로 동작
+- 내부 `Long id`는 JPA 인프라에만 노출
+
+---
+
 ## 평가 이력
 
 | 일자 | 종합 점수 | 주요 변경 |
