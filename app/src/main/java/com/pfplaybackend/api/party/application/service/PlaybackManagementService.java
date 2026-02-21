@@ -132,7 +132,7 @@ public class PlaybackManagementService {
         PlaybackSnapshot snapshot = new PlaybackSnapshot(
                 playbackData.getId(), playbackData.getLinkId(), playbackData.getName(),
                 playbackData.getDuration().toDisplayString(), playbackData.getThumbnailImage(), playbackData.getEndTime());
-        eventPublisher.publishEvent(new PlaybackStartedEvent(partyroom.getPartyroomId(), djCrew.getId(), snapshot));
+        eventPublisher.publishEvent(new PlaybackStartedEvent(partyroom.getPartyroomId(), new CrewId(djCrew.getId()), snapshot));
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId()));
     }
 

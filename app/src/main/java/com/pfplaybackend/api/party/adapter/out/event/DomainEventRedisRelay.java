@@ -30,11 +30,11 @@ public class DomainEventRedisRelay {
     public void on(CrewAccessedEvent event) {
         CrewSummaryDto crewSummary;
         if (event.getAccessType() == AccessType.ENTER) {
-            CrewData crew = crewRepository.findById(event.getCrewId()).orElseThrow();
+            CrewData crew = crewRepository.findById(event.getCrewId().getId()).orElseThrow();
             ProfileSettingDto profile = userProfileService.getUserProfileSetting(event.getUserId());
             crewSummary = CrewSummaryDto.from(crew, profile);
         } else {
-            crewSummary = CrewSummaryDto.exitOnly(event.getCrewId());
+            crewSummary = CrewSummaryDto.exitOnly(event.getCrewId().getId());
         }
         messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(),
                 PartyroomAccessMessage.create(event.getPartyroomId(), event.getAccessType(), crewSummary));
@@ -53,7 +53,7 @@ public class DomainEventRedisRelay {
     public void on(PlaybackStartedEvent event) {
         messagePublisher.publish(MessageTopic.PLAYBACK_START.topic(),
                 new PlaybackStartMessage(event.getPartyroomId(), MessageTopic.PLAYBACK_START,
-                        event.getCrewId(), event.getPlayback()));
+                        event.getCrewId().getId(), event.getPlayback()));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
@@ -80,7 +80,7 @@ public class DomainEventRedisRelay {
     public void on(ReactionMotionChangedEvent event) {
         messagePublisher.publish(MessageTopic.REACTION_MOTION.topic(),
                 ReactionMotionMessage.from(event.getPartyroomId(), event.getReactionType(),
-                        event.getMotionType(), new com.pfplaybackend.api.party.domain.value.CrewId(event.getCrewId())));
+                        event.getMotionType(), event.getCrewId()));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)

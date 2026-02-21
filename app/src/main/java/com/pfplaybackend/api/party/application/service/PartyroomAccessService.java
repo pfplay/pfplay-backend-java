@@ -102,7 +102,7 @@ public class PartyroomAccessService {
     }
 
     private void publishAccessChangedEvent(PartyroomId partyroomId, CrewData crew, UserId userId) {
-        eventPublisher.publishEvent(new CrewAccessedEvent(partyroomId, crew.getId(), userId, AccessType.ENTER));
+        eventPublisher.publishEvent(new CrewAccessedEvent(partyroomId, new CrewId(crew.getId()), userId, AccessType.ENTER));
     }
 
     @Transactional
@@ -131,7 +131,7 @@ public class PartyroomAccessService {
 
         handleDjQueueOnLeave(partyroom, new CrewId(crew.getId()));
 
-        eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), crew.getId(), authContext.getUserId(), AccessType.EXIT));
+        eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), new CrewId(crew.getId()), authContext.getUserId(), AccessType.EXIT));
     }
 
     @Transactional
@@ -142,7 +142,7 @@ public class PartyroomAccessService {
 
         handleDjQueueOnLeave(partyroom, new CrewId(crew.getId()));
 
-        eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), crew.getId(), crew.getUserId(), AccessType.EXIT));
+        eventPublisher.publishEvent(new CrewAccessedEvent(partyroom.getPartyroomId(), new CrewId(crew.getId()), crew.getUserId(), AccessType.EXIT));
     }
 
     private void handleDjQueueOnLeave(PartyroomData partyroom, CrewId crewId) {

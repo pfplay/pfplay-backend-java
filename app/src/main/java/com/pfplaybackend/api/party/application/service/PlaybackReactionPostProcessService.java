@@ -46,7 +46,7 @@ public class PlaybackReactionPostProcessService {
     }
 
     public void publishMotionChangedEvent(PartyroomId partyroomId, ReactionType reactionType, MotionType motionType, CrewId crewId) {
-        eventPublisher.publishEvent(new ReactionMotionChangedEvent(partyroomId, reactionType, motionType, crewId.getId()));
+        eventPublisher.publishEvent(new ReactionMotionChangedEvent(partyroomId, reactionType, motionType, crewId));
     }
 
     public void updateDjActivityScore(UserId djUserId, int deltaScore) {

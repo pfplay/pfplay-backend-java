@@ -5,7 +5,6 @@ import com.pfplaybackend.api.user.application.dto.command.UpdateWalletCommand;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.WalletAddress;
-import com.pfplaybackend.api.user.domain.service.WalletDomainService;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class UserWalletService {
 
     private final MemberRepository memberRepository;
-    private final WalletDomainService walletDomainService;
+    // TODO: 향후 지갑 서명 검증 도메인 서비스 도입 시 추가
 
     @Transactional
     public MemberData updateMyWalletAddress(UpdateWalletCommand updateWalletCommand) {
