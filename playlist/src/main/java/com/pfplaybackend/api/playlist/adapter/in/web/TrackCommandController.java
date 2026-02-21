@@ -1,6 +1,9 @@
 package com.pfplaybackend.api.playlist.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
+import com.pfplaybackend.api.playlist.application.dto.command.MoveTrackCommand;
+import com.pfplaybackend.api.playlist.application.dto.command.UpdateTrackOrderCommand;
 import com.pfplaybackend.api.playlist.application.service.TrackCommandService;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MoveTrackRequest;
@@ -23,7 +26,8 @@ public class TrackCommandController {
     @PostMapping("{playlistId}/tracks")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<ApiCommonResponse<Void>> addTrack(@PathVariable Long playlistId, @RequestBody AddTrackRequest request) {
-        trackCommandService.addTrackInPlaylist(playlistId, request);
+        AddTrackCommand command = new AddTrackCommand(request.getName(), request.getLinkId(), request.getDuration(), request.getThumbnailImage());
+        trackCommandService.addTrackInPlaylist(playlistId, command);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.ok());
@@ -39,7 +43,8 @@ public class TrackCommandController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<Void> moveTrack(@PathVariable Long playlistId, @PathVariable Long trackId,
                                           @RequestBody MoveTrackRequest request) {
-        trackCommandService.moveTrackToPlaylist(playlistId, trackId, request);
+        MoveTrackCommand command = new MoveTrackCommand(request.getTargetPlaylistId());
+        trackCommandService.moveTrackToPlaylist(playlistId, trackId, command);
         return ResponseEntity.accepted().build();
     }
 
@@ -50,7 +55,8 @@ public class TrackCommandController {
     @PutMapping("{playlistId}/tracks/{trackId}")
     public ResponseEntity<Void> updateMusicOrder(@PathVariable Long playlistId, @PathVariable Long trackId,
                                                  @RequestBody UpdateTrackOrderRequest request) {
-        trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, request);
+        UpdateTrackOrderCommand command = new UpdateTrackOrderCommand(request.getNextOrderNumber());
+        trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command);
         return ResponseEntity.accepted().build();
     }
 

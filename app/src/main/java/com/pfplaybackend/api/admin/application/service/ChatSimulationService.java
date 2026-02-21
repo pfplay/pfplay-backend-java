@@ -4,7 +4,7 @@ import com.pfplaybackend.api.admin.domain.enums.ChatScriptType;
 import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.adapter.in.listener.message.OutgoingGroupChatMessage;
+import com.pfplaybackend.api.party.application.dto.chat.ChatMessagePayload;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -239,11 +239,11 @@ public class ChatSimulationService {
     }
 
     private void sendChatMessage(Long partyroomId, Long crewId, String content) {
-        OutgoingGroupChatMessage chatMessage = new OutgoingGroupChatMessage(
+        ChatMessagePayload chatMessage = new ChatMessagePayload(
                 new PartyroomId(partyroomId),
                 MessageTopic.CHAT,
-                new OutgoingGroupChatMessage.CrewInfo(crewId),
-                new OutgoingGroupChatMessage.ChatContent(System.currentTimeMillis() + ":" + crewId, content)
+                new ChatMessagePayload.CrewInfo(crewId),
+                new ChatMessagePayload.ChatContent(System.currentTimeMillis() + ":" + crewId, content)
         );
 
         messagePublisher.publish(MessageTopic.CHAT.topic(), chatMessage);

@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
+import com.pfplaybackend.api.party.application.dto.command.AdjustGradeCommand;
 import com.pfplaybackend.api.party.application.service.CrewGradeService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -31,7 +32,8 @@ public class CrewGradeController {
     public ResponseEntity<Void> updateCrewGrade(@PathVariable("partyroomId") long partyroomId,
                             @PathVariable("crewId") long crewId,
                             @RequestBody AdjustGradeRequest request) {
-        crewGradeService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId), request);
+        crewGradeService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId),
+                new AdjustGradeCommand(request.getGradeType()));
         return ResponseEntity.noContent().build();
     }
 }

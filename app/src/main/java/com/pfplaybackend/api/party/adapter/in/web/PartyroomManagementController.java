@@ -1,6 +1,9 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.party.application.dto.command.CreatePartyroomCommand;
+import com.pfplaybackend.api.party.application.dto.command.UpdateDjQueueStatusCommand;
+import com.pfplaybackend.api.party.application.dto.command.UpdatePartyroomCommand;
 import com.pfplaybackend.api.party.application.service.PartyroomManagementService;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -25,14 +28,16 @@ public class PartyroomManagementController {
     private final PartyroomManagementService partyRoomManagementService;
 
     @PostMapping
-    public ResponseEntity<ApiCommonResponse<CreatePartyroomResponse>> createPartyroom(@RequestBody CreatePartyroomRequest createPartyroomRequest) {
-        PartyroomData partyRoom = partyRoomManagementService.createGeneralPartyRoom(createPartyroomRequest);
+    public ResponseEntity<ApiCommonResponse<CreatePartyroomResponse>> createPartyroom(@RequestBody CreatePartyroomRequest request) {
+        PartyroomData partyRoom = partyRoomManagementService.createGeneralPartyRoom(
+                new CreatePartyroomCommand(request.getTitle(), request.getIntroduction(), request.getLinkDomain(), request.getPlaybackTimeLimit()));
         return ResponseEntity.ok().body(ApiCommonResponse.success(CreatePartyroomResponse.from(partyRoom)));
     }
 
     @PutMapping("/{partyroomId}")
     public ResponseEntity<ApiCommonResponse<Void>> updatePartyroom(@PathVariable Long partyroomId, @RequestBody UpdatePartyroomRequest request) {
-        partyRoomManagementService.updatePartyroom(new PartyroomId(partyroomId), request);
+        partyRoomManagementService.updatePartyroom(new PartyroomId(partyroomId),
+                new UpdatePartyroomCommand(request.getTitle(), request.getIntroduction(), request.getLinkDomain(), request.getPlaybackTimeLimit()));
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.ok());
     }
@@ -45,7 +50,8 @@ public class PartyroomManagementController {
 
     @PutMapping("/{partyroomId}/dj-queue")
     public ResponseEntity<ApiCommonResponse<Void>> updateDjQueue(@PathVariable Long partyroomId, @RequestBody UpdateDjQueueStatusRequest request) {
-        partyRoomManagementService.updateDjQueueStatus(new PartyroomId(partyroomId), request);
+        partyRoomManagementService.updateDjQueueStatus(new PartyroomId(partyroomId),
+                new UpdateDjQueueStatusCommand(request.getQueueStatus()));
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.ok());
     }

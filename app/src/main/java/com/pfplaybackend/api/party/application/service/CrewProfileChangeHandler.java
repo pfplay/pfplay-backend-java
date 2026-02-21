@@ -1,11 +1,9 @@
 package com.pfplaybackend.api.party.application.service;
 
-import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.common.domain.enums.MessageTopic;
-import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfileMessage;
-import com.pfplaybackend.api.party.adapter.in.listener.message.CrewProfilePreCheckMessage;
+import com.pfplaybackend.api.party.application.dto.command.CrewProfileChangedCommand;
+import com.pfplaybackend.api.party.application.dto.command.CrewProfilePreCheckCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,16 +17,15 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CrewProfileChangeHandler {
 
-    private final RedisMessagePublisher messagePublisher;
     private final PartyroomInfoService partyroomInfoService;
 
-    private void publishProfileChangedEvent(ActivePartyroomDto dto, CrewProfilePreCheckMessage message) {
-        messagePublisher.publish(MessageTopic.CREW_PROFILE.topic(),
-                CrewProfileMessage.from(new PartyroomId(dto.id()), dto.crewId(), message));
-    }
-
-    public void preCheck(CrewProfilePreCheckMessage message) {
-        Optional<ActivePartyroomDto> optional = partyroomInfoService.getMyActivePartyroom(message.userId());
-        optional.ifPresent(activePartyroomDto -> publishProfileChangedEvent(activePartyroomDto, message));
+    public Optional<CrewProfileChangedCommand> preCheck(CrewProfilePreCheckCommand command) {
+        Optional<ActivePartyroomDto> optional = partyroomInfoService.getMyActivePartyroom(command.userId());
+        return optional.map(dto -> new CrewProfileChangedCommand(
+                new PartyroomId(dto.id()), dto.crewId(),
+                command.nickname(), command.avatarCompositionType(),
+                command.avatarBodyUri(), command.avatarFaceUri(), command.avatarIconUri(),
+                command.combinePositionX(), command.combinePositionY(),
+                command.offsetX(), command.offsetY(), command.scale()));
     }
 }

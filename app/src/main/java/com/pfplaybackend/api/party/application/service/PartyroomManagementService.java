@@ -15,9 +15,9 @@ import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateDjQueueStatusRequest;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdatePartyroomRequest;
+import com.pfplaybackend.api.party.application.dto.command.CreatePartyroomCommand;
+import com.pfplaybackend.api.party.application.dto.command.UpdateDjQueueStatusCommand;
+import com.pfplaybackend.api.party.application.dto.command.UpdatePartyroomCommand;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -38,31 +38,34 @@ public class PartyroomManagementService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void createMainStage(CreatePartyroomRequest request, UserId adminId) {
-        PartyroomData createdPartyroom = createPartyroom(request, StageType.MAIN, adminId);
+    public void createMainStage(CreatePartyroomCommand command, UserId adminId) {
+        PartyroomData createdPartyroom = createPartyroom(command, StageType.MAIN, adminId);
         partyroomAccessService.enterByHost(adminId, createdPartyroom);
     }
 
     @Transactional
-    public PartyroomData createGeneralPartyRoom(CreatePartyroomRequest request) {
+    public PartyroomData createGeneralPartyRoom(CreatePartyroomCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         new PartyroomCreationPolicy().enforce(authContext.getAuthorityTier());
         Optional<PartyroomData> optionalActive = aggregatePort.findActiveHostRoom(authContext.getUserId());
         if(optionalActive.isPresent()) throw ExceptionCreator.create(PartyroomException.ALREADY_HOST);
 
-        if(request.getLinkDomain().isEmpty()) {
-            request.setLinkDomain(UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12));
+        String linkDomain = command.linkDomain();
+        if(linkDomain == null || linkDomain.isEmpty()) {
+            linkDomain = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 12);
         }
-        PartyroomData createdPartyroom = createPartyroom(request, StageType.GENERAL, authContext.getUserId());
+        PartyroomData createdPartyroom = createPartyroom(
+                new CreatePartyroomCommand(command.title(), command.introduction(), linkDomain, command.playbackTimeLimit()),
+                StageType.GENERAL, authContext.getUserId());
         partyroomAccessService.enterByHost(authContext.getUserId(), createdPartyroom);
         return createdPartyroom;
     }
 
-    private PartyroomData createPartyroom(CreatePartyroomRequest request, StageType stageType, UserId hostId) {
+    private PartyroomData createPartyroom(CreatePartyroomCommand command, StageType stageType, UserId hostId) {
         PartyroomData partyroom = PartyroomData.create(
-                request.getTitle(), request.getIntroduction(),
-                LinkDomain.of(request.getLinkDomain()),
-                PlaybackTimeLimit.ofMinutes(request.getPlaybackTimeLimit()),
+                command.title(), command.introduction(),
+                LinkDomain.of(command.linkDomain()),
+                PlaybackTimeLimit.ofMinutes(command.playbackTimeLimit()),
                 stageType, hostId);
         PartyroomData saved = aggregatePort.savePartyroom(partyroom);
         aggregatePort.savePlaybackState(PartyroomPlaybackData.createFor(saved.getId()));
@@ -71,14 +74,14 @@ public class PartyroomManagementService {
     }
 
     @Transactional
-    public void updatePartyroom(PartyroomId partyroomId, UpdatePartyroomRequest request) {
+    public void updatePartyroom(PartyroomId partyroomId, UpdatePartyroomCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.validateHost(authContext.getUserId());
-        partyroom.updateBaseInfo(request.getTitle(), request.getIntroduction(),
-                LinkDomain.of(request.getLinkDomain()),
-                PlaybackTimeLimit.ofMinutes(request.getPlaybackTimeLimit()));
+        partyroom.updateBaseInfo(command.title(), command.introduction(),
+                LinkDomain.of(command.linkDomain()),
+                PlaybackTimeLimit.ofMinutes(command.playbackTimeLimit()));
         aggregatePort.savePartyroom(partyroom);
     }
 
@@ -107,23 +110,23 @@ public class PartyroomManagementService {
     }
 
     @Transactional
-    public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusRequest request) {
+    public void updateDjQueueStatus(PartyroomId partyroomId, UpdateDjQueueStatusCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         partyroom.validateHost(authContext.getUserId());
         DjQueueData djQueue = aggregatePort.findDjQueueState(partyroomId.getId());
-        if (request.getQueueStatus().equals(QueueStatus.CLOSE)) djQueue.close();
-        if (request.getQueueStatus().equals(QueueStatus.OPEN)) djQueue.open();
+        if (command.queueStatus().equals(QueueStatus.CLOSE)) djQueue.close();
+        if (command.queueStatus().equals(QueueStatus.OPEN)) djQueue.open();
         aggregatePort.saveDjQueueState(djQueue);
     }
 
     public void initializeMainStage(UserId adminId) {
-        CreatePartyroomRequest request = new CreatePartyroomRequest(
+        CreatePartyroomCommand command = new CreatePartyroomCommand(
                 "Main Stage",
                 "Welcome to the main stage",
                 "main",
                 10);
-        createMainStage(request, adminId);
+        createMainStage(command, adminId);
     }
 }

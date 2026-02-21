@@ -14,9 +14,9 @@ import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateDjQueueStatusRequest;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdatePartyroomRequest;
+import com.pfplaybackend.api.party.application.dto.command.CreatePartyroomCommand;
+import com.pfplaybackend.api.party.application.dto.command.UpdateDjQueueStatusCommand;
+import com.pfplaybackend.api.party.application.dto.command.UpdatePartyroomCommand;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,7 +68,7 @@ class PartyroomManagementServiceTest {
     @DisplayName("createGeneralPartyRoom — 정상 생성 시 파티룸, 재생 상태, DJ 큐 상태를 저장한다")
     void createGeneralPartyRoom_success() {
         // given
-        CreatePartyroomRequest request = new CreatePartyroomRequest("My Room", "Intro", "mylink", 10);
+        CreatePartyroomCommand command = new CreatePartyroomCommand("My Room", "Intro", "mylink", 10);
         when(aggregatePort.findActiveHostRoom(userId)).thenReturn(Optional.empty());
         when(aggregatePort.savePartyroom(any(PartyroomData.class))).thenAnswer(invocation -> {
             PartyroomData p = invocation.getArgument(0);
@@ -80,7 +80,7 @@ class PartyroomManagementServiceTest {
         });
 
         // when
-        PartyroomData result = partyroomManagementService.createGeneralPartyRoom(request);
+        PartyroomData result = partyroomManagementService.createGeneralPartyRoom(command);
 
         // then
         assertThat(result.getTitle()).isEqualTo("My Room");
@@ -94,12 +94,12 @@ class PartyroomManagementServiceTest {
     @DisplayName("createGeneralPartyRoom — 이미 호스트인 파티룸이 있으면 예외가 발생한다")
     void createGeneralPartyRoom_alreadyHost() {
         // given
-        CreatePartyroomRequest request = new CreatePartyroomRequest("My Room", "Intro", "mylink", 10);
+        CreatePartyroomCommand command = new CreatePartyroomCommand("My Room", "Intro", "mylink", 10);
         PartyroomData existing = PartyroomData.builder().id(99L).hostId(userId).build();
         when(aggregatePort.findActiveHostRoom(userId)).thenReturn(Optional.of(existing));
 
         // when & then
-        assertThatThrownBy(() -> partyroomManagementService.createGeneralPartyRoom(request))
+        assertThatThrownBy(() -> partyroomManagementService.createGeneralPartyRoom(command))
                 .isInstanceOf(ForbiddenException.class);
     }
 
@@ -107,8 +107,10 @@ class PartyroomManagementServiceTest {
     @DisplayName("createGeneralPartyRoom — linkDomain이 비어있으면 자동 생성된다")
     void createGeneralPartyRoom_autoGeneratesLinkDomain() {
         // given
-        CreatePartyroomRequest request = new CreatePartyroomRequest("My Room", "Intro", "", 10);
+        CreatePartyroomCommand command = new CreatePartyroomCommand("My Room", "Intro", "", 10);
         when(aggregatePort.findActiveHostRoom(userId)).thenReturn(Optional.empty());
+
+        ArgumentCaptor<PartyroomData> captor = ArgumentCaptor.forClass(PartyroomData.class);
         when(aggregatePort.savePartyroom(any(PartyroomData.class))).thenAnswer(invocation -> {
             PartyroomData p = invocation.getArgument(0);
             return PartyroomData.builder()
@@ -119,11 +121,12 @@ class PartyroomManagementServiceTest {
         });
 
         // when
-        partyroomManagementService.createGeneralPartyRoom(request);
+        partyroomManagementService.createGeneralPartyRoom(command);
 
         // then
-        assertThat(request.getLinkDomain()).isNotEmpty();
-        assertThat(request.getLinkDomain()).hasSize(12);
+        verify(aggregatePort).savePartyroom(captor.capture());
+        assertThat(captor.getValue().getLinkDomain().getValue()).isNotEmpty();
+        assertThat(captor.getValue().getLinkDomain().getValue()).hasSize(12);
     }
 
     // ========== updatePartyroom ==========
@@ -140,14 +143,10 @@ class PartyroomManagementServiceTest {
                 .noticeContent("").isTerminated(false).build();
         when(aggregatePort.findPartyroomById(1L)).thenReturn(Optional.of(partyroom));
 
-        UpdatePartyroomRequest request = new UpdatePartyroomRequest();
-        request.setTitle("New Title");
-        request.setIntroduction("New Intro");
-        request.setLinkDomain("newlink");
-        request.setPlaybackTimeLimit(10);
+        UpdatePartyroomCommand command = new UpdatePartyroomCommand("New Title", "New Intro", "newlink", 10);
 
         // when
-        partyroomManagementService.updatePartyroom(partyroomId, request);
+        partyroomManagementService.updatePartyroom(partyroomId, command);
 
         // then
         verify(aggregatePort).savePartyroom(partyroom);
@@ -161,10 +160,10 @@ class PartyroomManagementServiceTest {
         PartyroomId partyroomId = new PartyroomId(999L);
         when(aggregatePort.findPartyroomById(999L)).thenReturn(Optional.empty());
 
-        UpdatePartyroomRequest request = new UpdatePartyroomRequest();
+        UpdatePartyroomCommand command = new UpdatePartyroomCommand("title", "intro", "link", 5);
 
         // when & then
-        assertThatThrownBy(() -> partyroomManagementService.updatePartyroom(partyroomId, request))
+        assertThatThrownBy(() -> partyroomManagementService.updatePartyroom(partyroomId, command))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -265,11 +264,10 @@ class PartyroomManagementServiceTest {
         DjQueueData djQueue = DjQueueData.createFor(1L);
         when(aggregatePort.findDjQueueState(1L)).thenReturn(djQueue);
 
-        UpdateDjQueueStatusRequest request = new UpdateDjQueueStatusRequest();
-        request.setQueueStatus(QueueStatus.CLOSE);
+        UpdateDjQueueStatusCommand command = new UpdateDjQueueStatusCommand(QueueStatus.CLOSE);
 
         // when
-        partyroomManagementService.updateDjQueueStatus(partyroomId, request);
+        partyroomManagementService.updateDjQueueStatus(partyroomId, command);
 
         // then
         assertThat(djQueue.isClosed()).isTrue();
@@ -292,11 +290,10 @@ class PartyroomManagementServiceTest {
         djQueue.close();
         when(aggregatePort.findDjQueueState(1L)).thenReturn(djQueue);
 
-        UpdateDjQueueStatusRequest request = new UpdateDjQueueStatusRequest();
-        request.setQueueStatus(QueueStatus.OPEN);
+        UpdateDjQueueStatusCommand command = new UpdateDjQueueStatusCommand(QueueStatus.OPEN);
 
         // when
-        partyroomManagementService.updateDjQueueStatus(partyroomId, request);
+        partyroomManagementService.updateDjQueueStatus(partyroomId, command);
 
         // then
         assertThat(djQueue.isClosed()).isFalse();

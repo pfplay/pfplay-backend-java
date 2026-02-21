@@ -4,7 +4,7 @@ import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
+import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
@@ -65,7 +65,7 @@ class GrabTrackServiceTest {
         grabTrackService.grabTrack(userId, linkId);
 
         // then
-        verify(trackCommandService).addTrackInPlaylist(eq(grablist.getId()), any(AddTrackRequest.class));
+        verify(trackCommandService).addTrackInPlaylist(eq(grablist.getId()), any(AddTrackCommand.class));
     }
 
     @Test
@@ -107,16 +107,16 @@ class GrabTrackServiceTest {
         when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
         when(aggregatePort.findTrackByPlaylistAndLink(grablist.getId(), linkId)).thenReturn(Optional.empty());
 
-        ArgumentCaptor<AddTrackRequest> captor = ArgumentCaptor.forClass(AddTrackRequest.class);
+        ArgumentCaptor<AddTrackCommand> captor = ArgumentCaptor.forClass(AddTrackCommand.class);
 
         // when
         grabTrackService.grabTrack(userId, linkId);
 
         // then
         verify(trackCommandService).addTrackInPlaylist(eq(grablist.getId()), captor.capture());
-        AddTrackRequest request = captor.getValue();
-        assertThat(request.getName()).isEqualTo("Test Song");
-        assertThat(request.getLinkId()).isEqualTo(linkId);
-        assertThat(request.getThumbnailImage()).isEqualTo("https://img.example.com/thumb.jpg");
+        AddTrackCommand command = captor.getValue();
+        assertThat(command.name()).isEqualTo("Test Song");
+        assertThat(command.linkId()).isEqualTo(linkId);
+        assertThat(command.thumbnailImage()).isEqualTo("https://img.example.com/thumb.jpg");
     }
 }

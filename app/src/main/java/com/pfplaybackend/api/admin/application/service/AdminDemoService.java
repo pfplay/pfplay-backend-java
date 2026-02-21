@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.admin.application.service;
 
 import com.pfplaybackend.api.admin.domain.DemoTrackConstants;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.request.InitializeDemoEnvironmentRequest;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentResponse;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.AdminPartyroomListResponse;
-import com.pfplaybackend.api.admin.adapter.in.web.dto.response.DemoEnvironmentStatusResponse;
+import com.pfplaybackend.api.admin.application.dto.command.InitializeDemoCommand;
+import com.pfplaybackend.api.admin.application.dto.result.AdminPartyroomListResult;
+import com.pfplaybackend.api.admin.application.dto.result.DemoEnvironmentResult;
+import com.pfplaybackend.api.admin.application.dto.result.DemoStatusResult;
 import com.pfplaybackend.api.admin.domain.exception.AdminException;
 import com.pfplaybackend.api.admin.application.util.NicknameGenerator;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
@@ -31,7 +31,6 @@ import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.DjRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomRepository;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.CreatePartyroomRequest;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
@@ -90,7 +89,7 @@ public class AdminDemoService {
     private final Random random = new Random();
 
     @Transactional
-    public DemoEnvironmentResponse initializeDemoEnvironment(InitializeDemoEnvironmentRequest request) {
+    public DemoEnvironmentResult initializeDemoEnvironment(InitializeDemoCommand command) {
         long startTime = System.currentTimeMillis();
 
         log.info("Starting demo environment initialization...");
@@ -116,7 +115,7 @@ public class AdminDemoService {
 
         // Step 2: Create general partyrooms only (main stage already exists)
         log.info("Step 2: Creating {} general partyrooms...", GENERAL_ROOMS_COUNT);
-        List<PartyroomData> generalRooms = createGeneralRooms(request, specialMembers);
+        List<PartyroomData> generalRooms = createGeneralRooms(command, specialMembers);
 
         // Step 3: Enter members into rooms
         log.info("Step 3: Entering members into rooms...");
@@ -124,7 +123,7 @@ public class AdminDemoService {
 
         // Step 4: Register DJs (optional)
         int djsRegistered = 0;
-        if (request.getRegisterDjs()) {
+        if (command.registerDjs()) {
             log.info("Step 4: Registering DJs in queues...");
             djsRegistered = registerDjsInQueues(mainStage, generalRooms, specialMembers);
         }
@@ -205,27 +204,20 @@ public class AdminDemoService {
     }
 
     private List<PartyroomData> createGeneralRooms(
-            InitializeDemoEnvironmentRequest request,
+            InitializeDemoCommand command,
             List<MemberData> specialMembers) {
 
         List<PartyroomData> rooms = new ArrayList<>();
 
         for (int i = 0; i < GENERAL_ROOMS_COUNT; i++) {
             UserId hostUserId = specialMembers.get(i + 1).getUserId();
-            String title = String.format("%s %d", request.getTitlePrefix(), i + 1);
+            String title = String.format("%s %d", command.titlePrefix(), i + 1);
             String linkDomain = String.format("demo-room-%d", i + 1);
 
-            CreatePartyroomRequest createRequest = new CreatePartyroomRequest(
-                    title,
-                    request.getIntroduction(),
-                    linkDomain,
-                    request.getPlaybackTimeLimit()
-            );
-
             PartyroomData partyroom = PartyroomData.create(
-                    createRequest.getTitle(), createRequest.getIntroduction(),
-                    LinkDomain.of(createRequest.getLinkDomain()),
-                    PlaybackTimeLimit.ofMinutes(createRequest.getPlaybackTimeLimit()),
+                    title, command.introduction(),
+                    LinkDomain.of(linkDomain),
+                    PlaybackTimeLimit.ofMinutes(command.playbackTimeLimit()),
                     StageType.GENERAL, hostUserId);
             PartyroomData savedPartyroom = partyroomRepository.save(partyroom);
             partyroomPlaybackRepository.save(PartyroomPlaybackData.createFor(savedPartyroom.getId()));
@@ -352,7 +344,7 @@ public class AdminDemoService {
                 userId.getUid(), playlist.getId(), partyroom.getPartyroomId().getId());
     }
 
-    private DemoEnvironmentResponse buildResponse(
+    private DemoEnvironmentResult buildResponse(
             PartyroomData mainStage,
             List<PartyroomData> generalRooms,
             List<MemberData> specialMembers,
@@ -362,46 +354,46 @@ public class AdminDemoService {
         UserId mainStageDjUserId = specialMembers.get(0).getUserId();
         Long mainStagePlaylistId = findPlaylistId(mainStageDjUserId);
 
-        DemoEnvironmentResponse.PartyroomDetail mainStageDetail = DemoEnvironmentResponse.PartyroomDetail.builder()
-                .partyroomId(mainStage.getPartyroomId().getId())
-                .stageType(mainStage.getStageType().name())
-                .title(mainStage.getTitle())
-                .linkDomain(mainStage.getLinkDomain().getValue())
-                .hostUserId(null)
-                .totalCrewCount(MAIN_STAGE_CREW)
-                .djUserId(mainStageDjUserId.getUid().toString())
-                .playlistId(mainStagePlaylistId)
-                .build();
+        DemoEnvironmentResult.PartyroomDetail mainStageDetail = new DemoEnvironmentResult.PartyroomDetail(
+                mainStage.getPartyroomId().getId(),
+                mainStage.getStageType().name(),
+                mainStage.getTitle(),
+                mainStage.getLinkDomain().getValue(),
+                null,
+                MAIN_STAGE_CREW,
+                mainStageDjUserId.getUid().toString(),
+                mainStagePlaylistId
+        );
 
-        List<DemoEnvironmentResponse.PartyroomDetail> generalRoomDetails = new ArrayList<>();
+        List<DemoEnvironmentResult.PartyroomDetail> generalRoomDetails = new ArrayList<>();
         for (int i = 0; i < generalRooms.size(); i++) {
             PartyroomData room = generalRooms.get(i);
             UserId hostUserId = specialMembers.get(i + 1).getUserId();
             Long playlistId = findPlaylistId(hostUserId);
 
-            DemoEnvironmentResponse.PartyroomDetail detail = DemoEnvironmentResponse.PartyroomDetail.builder()
-                    .partyroomId(room.getPartyroomId().getId())
-                    .stageType(room.getStageType().name())
-                    .title(room.getTitle())
-                    .linkDomain(room.getLinkDomain().getValue())
-                    .hostUserId(hostUserId.getUid().toString())
-                    .totalCrewCount(GENERAL_ROOM_CREW)
-                    .djUserId(hostUserId.getUid().toString())
-                    .playlistId(playlistId)
-                    .build();
+            DemoEnvironmentResult.PartyroomDetail detail = new DemoEnvironmentResult.PartyroomDetail(
+                    room.getPartyroomId().getId(),
+                    room.getStageType().name(),
+                    room.getTitle(),
+                    room.getLinkDomain().getValue(),
+                    hostUserId.getUid().toString(),
+                    GENERAL_ROOM_CREW,
+                    hostUserId.getUid().toString(),
+                    playlistId
+            );
 
             generalRoomDetails.add(detail);
         }
 
-        return DemoEnvironmentResponse.builder()
-                .totalMembers(TOTAL_MEMBERS)
-                .specialMembers(SPECIAL_MEMBERS)
-                .totalPartyrooms(1 + GENERAL_ROOMS_COUNT)
-                .totalDjsRegistered(djsRegistered)
-                .executionTimeMs(executionTime)
-                .mainStage(mainStageDetail)
-                .generalRooms(generalRoomDetails)
-                .build();
+        return new DemoEnvironmentResult(
+                TOTAL_MEMBERS,
+                SPECIAL_MEMBERS,
+                1 + GENERAL_ROOMS_COUNT,
+                djsRegistered,
+                executionTime,
+                mainStageDetail,
+                generalRoomDetails
+        );
     }
 
     private Long findPlaylistId(UserId userId) {
@@ -419,7 +411,7 @@ public class AdminDemoService {
     }
 
     @Transactional(readOnly = true)
-    public DemoEnvironmentStatusResponse getDemoEnvironmentStatus() {
+    public DemoStatusResult getDemoEnvironmentStatus() {
         long virtualMemberCount = memberRepository.countByProviderType(ProviderType.ADMIN);
         long generalRoomCount = partyroomRepository.findAll().stream()
                 .filter(p -> !p.isTerminated() && p.getStageType() == StageType.GENERAL)
@@ -427,36 +419,30 @@ public class AdminDemoService {
 
         boolean initialized = virtualMemberCount > 0;
 
-        return DemoEnvironmentStatusResponse.builder()
-                .initialized(initialized)
-                .virtualMemberCount(virtualMemberCount)
-                .generalRoomCount(generalRoomCount)
-                .build();
+        return new DemoStatusResult(initialized, virtualMemberCount, generalRoomCount);
     }
 
     @Transactional(readOnly = true)
-    public AdminPartyroomListResponse getPartyrooms() {
-        List<AdminPartyroomListResponse.PartyroomItem> items = partyroomRepository.findAll().stream()
+    public AdminPartyroomListResult getPartyrooms() {
+        List<AdminPartyroomListResult.PartyroomItem> items = partyroomRepository.findAll().stream()
                 .filter(p -> !p.isTerminated())
                 .map(p -> {
                     int crewCount = (int) crewRepository.countByPartyroomIdAndIsActiveTrue(p.getId());
                     int djCount = djRepository.findByPartyroomIdOrderByOrderNumberAsc(p.getId()).size();
                     boolean isPlaybackActivated = partyroomPlaybackRepository.findById(p.getId())
                             .map(PartyroomPlaybackData::isActivated).orElse(false);
-                    return AdminPartyroomListResponse.PartyroomItem.builder()
-                            .partyroomId(p.getId())
-                            .stageType(p.getStageType().name())
-                            .title(p.getTitle())
-                            .linkDomain(p.getLinkDomain().getValue())
-                            .crewCount(crewCount)
-                            .djCount(djCount)
-                            .isPlaybackActivated(isPlaybackActivated)
-                            .build();
+                    return new AdminPartyroomListResult.PartyroomItem(
+                            p.getId(),
+                            p.getStageType().name(),
+                            p.getTitle(),
+                            p.getLinkDomain().getValue(),
+                            crewCount,
+                            djCount,
+                            isPlaybackActivated
+                    );
                 })
                 .toList();
 
-        return AdminPartyroomListResponse.builder()
-                .partyrooms(items)
-                .build();
+        return new AdminPartyroomListResult(items);
     }
 }

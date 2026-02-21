@@ -2,6 +2,7 @@ package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.user.application.dto.command.SignMemberCommand;
 import com.pfplaybackend.api.user.application.port.out.OAuth2RedirectPort;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
@@ -84,12 +85,10 @@ class MemberSignServiceTest {
         String expectedUri = "https://accounts.google.com/o/oauth2/v2/auth?...";
         when(oauth2RedirectPort.getRedirectUri("google", "/callback")).thenReturn(expectedUri);
 
-        com.pfplaybackend.api.user.adapter.in.web.payload.request.SignMemberRequest request =
-                mock(com.pfplaybackend.api.user.adapter.in.web.payload.request.SignMemberRequest.class);
-        when(request.getOauth2Provider()).thenReturn("google");
+        SignMemberCommand command = new SignMemberCommand("google");
 
         // when
-        String result = memberSignService.getOAuth2RedirectUri(request, "/callback");
+        String result = memberSignService.getOAuth2RedirectUri(command, "/callback");
 
         // then
         assertThat(result).isEqualTo(expectedUri);

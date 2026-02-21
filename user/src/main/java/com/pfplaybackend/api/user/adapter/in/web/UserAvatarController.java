@@ -2,6 +2,7 @@ package com.pfplaybackend.api.user.adapter.in.web;
 
 import com.pfplaybackend.api.user.application.validation.AvatarRequestValidator;
 import com.pfplaybackend.api.user.adapter.in.web.payload.request.SetAvatarRequest;
+import com.pfplaybackend.api.user.application.dto.command.SetAvatarCommand;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.application.service.UserAvatarService;
@@ -45,8 +46,29 @@ public class UserAvatarController implements UserAvatarApi {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @PutMapping("/me/profile/avatar")
     public ResponseEntity<ApiCommonResponse<Void>> setMyAvatar(@Valid @RequestBody SetAvatarRequest request) {
-        avatarRequestValidator.validate(request);
-        userAvatarService.setUserAvatar(request);
+        SetAvatarCommand command = toCommand(request);
+        avatarRequestValidator.validate(command);
+        userAvatarService.setUserAvatar(command);
         return ResponseEntity.ok().body(ApiCommonResponse.ok());
+    }
+
+    private SetAvatarCommand toCommand(SetAvatarRequest request) {
+        SetAvatarCommand.AvatarFaceSpec faceSpec = null;
+        if (request.getFace() != null) {
+            faceSpec = new SetAvatarCommand.AvatarFaceSpec(
+                    request.getFace().getUri(),
+                    request.getFace().getSourceType(),
+                    new SetAvatarCommand.AvatarTransformSpec(
+                            request.getFace().getTransform().getOffsetX(),
+                            request.getFace().getTransform().getOffsetY(),
+                            request.getFace().getTransform().getScale()
+                    )
+            );
+        }
+        return new SetAvatarCommand(
+                request.getAvatarCompositionType(),
+                new SetAvatarCommand.AvatarBodySpec(request.getBody().getUri()),
+                faceSpec
+        );
     }
 }

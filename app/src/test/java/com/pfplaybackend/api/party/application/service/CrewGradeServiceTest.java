@@ -6,7 +6,7 @@ import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
+import com.pfplaybackend.api.party.application.dto.command.AdjustGradeCommand;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
@@ -58,10 +58,8 @@ class CrewGradeServiceTest {
         ThreadLocalContext.clearContext();
     }
 
-    private AdjustGradeRequest createRequest(GradeType gradeType) {
-        AdjustGradeRequest request = mock(AdjustGradeRequest.class);
-        lenient().when(request.getGradeType()).thenReturn(gradeType);
-        return request;
+    private AdjustGradeCommand createCommand(GradeType gradeType) {
+        return new AdjustGradeCommand(gradeType);
     }
 
     @Test
@@ -81,10 +79,10 @@ class CrewGradeServiceTest {
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
         when(aggregatePort.saveCrew(any())).thenReturn(adjustedCrew);
 
-        AdjustGradeRequest request = createRequest(GradeType.MODERATOR);
+        AdjustGradeCommand command = createCommand(GradeType.MODERATOR);
 
         // when
-        crewGradeService.updateGrade(partyroomId, adjustedCrewId, request);
+        crewGradeService.updateGrade(partyroomId, adjustedCrewId, command);
 
         // then
         assertThat(adjustedCrew.getGradeType()).isEqualTo(GradeType.MODERATOR);
@@ -97,10 +95,10 @@ class CrewGradeServiceTest {
         // given
         when(partyroomInfoService.getPartyroomById(partyroomId))
                 .thenThrow(new NotFoundException("PTR-001", "Can not find Partyroom"));
-        AdjustGradeRequest request = createRequest(GradeType.MODERATOR);
+        AdjustGradeCommand command = createCommand(GradeType.MODERATOR);
 
         // when & then
-        assertThatThrownBy(() -> crewGradeService.updateGrade(partyroomId, adjustedCrewId, request))
+        assertThatThrownBy(() -> crewGradeService.updateGrade(partyroomId, adjustedCrewId, command))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -120,10 +118,10 @@ class CrewGradeServiceTest {
         when(userProfileQueryPort.getAuthorityTier(adjustedUserId)).thenReturn(AuthorityTier.FM);
         when(partyroomInfoService.getCrewOrThrow(partyroomId.getId(), adjusterUserId)).thenReturn(adjusterCrew);
 
-        AdjustGradeRequest request = createRequest(GradeType.MODERATOR);
+        AdjustGradeCommand command = createCommand(GradeType.MODERATOR);
 
         // when & then
-        assertThatThrownBy(() -> crewGradeService.updateGrade(partyroomId, adjustedCrewId, request))
+        assertThatThrownBy(() -> crewGradeService.updateGrade(partyroomId, adjustedCrewId, command))
                 .isInstanceOf(ForbiddenException.class);
     }
 }

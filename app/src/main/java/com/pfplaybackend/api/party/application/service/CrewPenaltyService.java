@@ -17,7 +17,7 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewPenaltyHistoryRepository;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.PunishPenaltyRequest;
+import com.pfplaybackend.api.party.application.dto.command.PunishPenaltyCommand;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
@@ -67,16 +67,16 @@ public class CrewPenaltyService {
     }
 
     @Transactional
-    public void addPenalty(PartyroomId partyroomId, PunishPenaltyRequest request) {
+    public void addPenalty(PartyroomId partyroomId, PunishPenaltyCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomInfoService.getPartyroomById(partyroomId);
 
-        CrewId punishedCrewId = new CrewId(request.getCrewId());
+        CrewId punishedCrewId = new CrewId(command.crewId());
         CrewData punisherCrew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
         CrewData punishedCrew = aggregatePort.findCrewById(punishedCrewId.getId())
                 .orElseThrow();
         GradeType punishedGradeType = punishedCrew.getGradeType();
-        PenaltyType penaltyType = request.getPenaltyType();
+        PenaltyType penaltyType = command.penaltyType();
 
         // 권한 검증
         if (punisherCrew.isBelowGrade(GradeType.MODERATOR)) throw ExceptionCreator.create(GradeException.MANAGER_GRADE_REQUIRED);
@@ -92,16 +92,16 @@ public class CrewPenaltyService {
         }
 
         eventPublisher.publishEvent(new CrewPenalizedEvent(
-                partyroomId, new CrewId(punisherCrew.getId()), punishedCrewId, request.getDetail(), request.getPenaltyType()));
+                partyroomId, new CrewId(punisherCrew.getId()), punishedCrewId, command.detail(), command.penaltyType()));
 
         if(PenaltyType.PERMANENT_EXPULSION.equals(penaltyType)) {
             CrewPenaltyHistoryData crewPenaltyHistoryData = CrewPenaltyHistoryData.builder()
                     .partyroomId(partyroomId)
                     .punishedCrewId(punishedCrewId)
                     .punisherCrewId(new CrewId(punisherCrew.getId()))
-                    .penaltyReason(request.getDetail())
+                    .penaltyReason(command.detail())
                     .penaltyDate(LocalDateTime.now())
-                    .penaltyType(request.getPenaltyType())
+                    .penaltyType(command.penaltyType())
                     .released(false)
                     .build();
             crewPenaltyHistoryRepository.save(crewPenaltyHistoryData);

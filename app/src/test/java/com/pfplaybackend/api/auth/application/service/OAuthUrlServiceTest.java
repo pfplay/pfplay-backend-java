@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.auth.application.service;
 
 import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
-import com.pfplaybackend.api.auth.adapter.in.web.dto.response.OAuthUrlResponse;
+import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,12 +46,12 @@ class OAuthUrlServiceTest {
         when(stateStorePort.generateAndStoreState("google")).thenReturn("test-state");
 
         // when
-        OAuthUrlResponse response = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, "test-verifier");
+        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, "test-verifier");
 
         // then
         verify(stateStorePort, times(1)).generateAndStoreState("google");
-        assertThat(response.getState()).isEqualTo("test-state");
-        assertThat(response.getAuthUrl()).contains("state=test-state");
+        assertThat(result.state()).isEqualTo("test-state");
+        assertThat(result.authUrl()).contains("state=test-state");
     }
 
     @Test

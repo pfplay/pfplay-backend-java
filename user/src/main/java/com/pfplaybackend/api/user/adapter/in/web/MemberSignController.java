@@ -2,6 +2,7 @@ package com.pfplaybackend.api.user.adapter.in.web;
 
 import com.pfplaybackend.api.user.application.service.MemberSignService;
 import com.pfplaybackend.api.user.adapter.in.web.payload.request.SignMemberRequest;
+import com.pfplaybackend.api.user.application.dto.command.SignMemberCommand;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ public class MemberSignController {
 
     @GetMapping("/members/sign")
     public String memberSign(@ModelAttribute @Valid SignMemberRequest request) {
-        return memberSignService.getOAuth2RedirectUri(request, "oauth-redirect");
+        SignMemberCommand command = new SignMemberCommand(request.getOauth2Provider());
+        return memberSignService.getOAuth2RedirectUri(command, "oauth-redirect");
     }
 }

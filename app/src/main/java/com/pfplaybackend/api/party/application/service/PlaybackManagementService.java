@@ -21,7 +21,7 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
-import com.pfplaybackend.api.party.adapter.in.listener.message.PlaybackDurationWaitMessage;
+import com.pfplaybackend.api.party.application.dto.PlaybackDurationWaitPayload;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.service.PartyroomAggregateService;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
@@ -52,7 +52,7 @@ public class PlaybackManagementService {
         long seconds = playback.getDuration().toSeconds();
         PartyroomId partyroomId = playback.getPartyroomId();
         UserId userId = playback.getUserId();
-        PlaybackDurationWaitMessage playbackDurationWaitMessage = new PlaybackDurationWaitMessage(partyroomId, userId);
+        PlaybackDurationWaitPayload playbackDurationWaitMessage = new PlaybackDurationWaitPayload(partyroomId, userId);
         scheduleService.setKeyWithExpiration(String.valueOf(partyroomId.getId()), playbackDurationWaitMessage, seconds, TimeUnit.SECONDS);
     }
 

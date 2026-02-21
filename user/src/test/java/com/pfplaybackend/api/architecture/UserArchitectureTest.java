@@ -50,15 +50,10 @@ class UserArchitectureTest {
     }
 
     @Test
-    @DisplayName("application 패키지는 adapter.in 패키지에 의존하지 않는다 (Request/Response DTO 참조 예외)")
+    @DisplayName("application 패키지는 adapter.in 패키지에 의존하지 않는다")
     void applicationShouldNotDependOnInboundAdapter() {
-        // TODO: MemberSignService, UserInfoService, AvatarRequestValidator, UserAvatarService가 adapter.in의 DTO를 참조 중
         ArchRule rule = noClasses()
                 .that().resideInAPackage("..user.application..")
-                .and().doNotHaveSimpleName("MemberSignService")
-                .and().doNotHaveSimpleName("UserInfoService")
-                .and().doNotHaveSimpleName("AvatarRequestValidator")
-                .and().doNotHaveSimpleName("UserAvatarService")
                 .should().dependOnClassesThat()
                 .resideInAPackage("..user.adapter.in..");
 

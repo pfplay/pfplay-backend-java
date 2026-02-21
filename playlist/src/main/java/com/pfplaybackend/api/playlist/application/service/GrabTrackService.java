@@ -6,7 +6,7 @@ import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
 import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
+import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,12 +31,12 @@ public class GrabTrackService {
         Optional<TrackData> optional = aggregatePort.findTrackByPlaylistAndLink(playlistData.getId(), linkId);
         if(optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
 
-        AddTrackRequest request = new AddTrackRequest(
+        AddTrackCommand command = new AddTrackCommand(
                 targetTrackData.getName(),
                 targetTrackData.getLinkId(),
                 targetTrackData.getDuration().toDisplayString(),
                 targetTrackData.getThumbnailImage()
         );
-        trackCommandService.addTrackInPlaylist(playlistData.getId(), request);
+        trackCommandService.addTrackInPlaylist(playlistData.getId(), command);
     }
 }

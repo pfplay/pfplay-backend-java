@@ -2,6 +2,7 @@ package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.application.dto.result.BlockedCrewResult;
+import com.pfplaybackend.api.party.application.dto.command.AddBlockCommand;
 import com.pfplaybackend.api.party.application.service.CrewBlockService;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.AddBlockRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +28,7 @@ public class CrewBlockController {
 
     @PostMapping("/me/blocks")
     public ResponseEntity<ApiCommonResponse<Void>> blockOtherCrew(@RequestBody AddBlockRequest request)  {
-        crewBlockService.addBlock(request);
+        crewBlockService.addBlock(new AddBlockCommand(request.getCrewId()));
         return ResponseEntity.ok()
                 .body(ApiCommonResponse.ok());
     }

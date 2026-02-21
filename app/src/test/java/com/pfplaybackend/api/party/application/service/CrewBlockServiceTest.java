@@ -12,7 +12,7 @@ import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.AddBlockRequest;
+import com.pfplaybackend.api.party.application.dto.command.AddBlockCommand;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,10 +74,10 @@ class CrewBlockServiceTest {
                 .isActive(true).isBanned(false).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(blockedCrew));
 
-        AddBlockRequest request = new AddBlockRequest(20L);
+        AddBlockCommand command = new AddBlockCommand(20L);
 
         // when
-        crewBlockService.addBlock(request);
+        crewBlockService.addBlock(command);
 
         // then
         ArgumentCaptor<CrewBlockHistoryData> captor = ArgumentCaptor.forClass(CrewBlockHistoryData.class);
@@ -103,10 +103,10 @@ class CrewBlockServiceTest {
         when(blockHistoryRepository.findByBlockerCrewIdAndBlockedCrewIdAndUnblockedIsFalse(blockerCrewId, blockedCrewId))
                 .thenReturn(Optional.of(existing));
 
-        AddBlockRequest request = new AddBlockRequest(20L);
+        AddBlockCommand command = new AddBlockCommand(20L);
 
         // when & then
-        assertThatThrownBy(() -> crewBlockService.addBlock(request))
+        assertThatThrownBy(() -> crewBlockService.addBlock(command))
                 .isInstanceOf(BadRequestException.class);
     }
 

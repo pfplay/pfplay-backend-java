@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.auth.application.service;
 
 import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
-import com.pfplaybackend.api.auth.adapter.in.web.dto.response.OAuthUrlResponse;
+import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.auth.domain.exception.AuthException;
 import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
@@ -25,7 +25,7 @@ public class OAuthUrlService {
     /**
      * OAuth 인증 URL 생성
      */
-    public OAuthUrlResponse generateAuthUrl(OAuthProvider provider, String codeVerifier) {
+    public OAuthUrlResult generateAuthUrl(OAuthProvider provider, String codeVerifier) {
         OAuth2Properties.Provider config = getProviderConfig(provider);
 
         // State 생성 및 Redis에 저장
@@ -39,12 +39,7 @@ public class OAuthUrlService {
 
         log.debug("Generated OAuth URL for provider: {}", provider);
 
-        return OAuthUrlResponse.builder()
-                .authUrl(authUrl)
-                .state(state)
-                .provider(provider.getValue())
-                .expiresIn(600L) // 10분 후 만료 (Redis TTL과 일치)
-                .build();
+        return new OAuthUrlResult(authUrl, state, provider.getValue(), 600L);
     }
 
     /**

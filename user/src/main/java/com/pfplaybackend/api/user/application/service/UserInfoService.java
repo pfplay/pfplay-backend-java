@@ -3,7 +3,7 @@ package com.pfplaybackend.api.user.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.domain.entity.data.UserAccountData;
-import com.pfplaybackend.api.user.adapter.in.web.payload.response.MyInfoResponse;
+import com.pfplaybackend.api.user.application.dto.result.MyInfoResult;
 import com.pfplaybackend.api.user.adapter.out.persistence.UserAccountRepository;
 import com.pfplaybackend.api.common.exception.http.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +17,10 @@ public class UserInfoService {
     private final UserAccountRepository userAccountRepository;
 
     @Transactional(readOnly = true)
-    public MyInfoResponse getMyInfo() {
+    public MyInfoResult getMyInfo() {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         UserAccountData user = userAccountRepository.findByUserId(authContext.getUserId())
                 .orElseThrow(() -> new UnauthorizedException("USER_NOT_FOUND", "User not found"));
-        return MyInfoResponse.from(user);
+        return MyInfoResult.from(user);
     }
 }

@@ -23,7 +23,7 @@ public class PartyroomChatController implements PartyroomChatApi {
     @MessageMapping("/groups/{chatroomId}/send")
     public ResponseEntity<?> sendGroupMessage(@Header("simpSessionId") String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) {
         // chatroomId == partyroomId
-        partyroomChatService.sendMessage(sessionId, incomingGroupChatMessage);
+        partyroomChatService.sendMessage(sessionId, incomingGroupChatMessage.getContent());
         return ResponseEntity.ok(ApiCommonResponse.success("OK"));
     }
 

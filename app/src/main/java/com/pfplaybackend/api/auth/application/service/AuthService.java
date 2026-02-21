@@ -2,8 +2,8 @@ package com.pfplaybackend.api.auth.application.service;
 
 import com.mysema.commons.lang.Assert;
 import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
-import com.pfplaybackend.api.auth.adapter.in.web.dto.request.OAuthLoginRequest;
-import com.pfplaybackend.api.auth.adapter.in.web.dto.response.AuthResponse;
+import com.pfplaybackend.api.auth.application.dto.command.OAuthLoginCommand;
+import com.pfplaybackend.api.auth.application.dto.result.AuthResult;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
@@ -30,17 +30,17 @@ public class AuthService {
     private final StateStorePort stateStorePort;
 
     @Transactional
-    public AuthResponse processOAuthLogin(OAuthLoginRequest request) {
+    public AuthResult processOAuthLogin(OAuthLoginCommand command) {
 
         try {
-            OAuthProvider provider = OAuthProvider.fromString(request.getProvider());
+            OAuthProvider provider = OAuthProvider.fromString(command.provider());
             log.debug("Processing OAuth login for provider: {}", provider);
 
             // 1. Exchange authorization code for access token
             var tokenResponse = oAuthClientService.exchangeCodeForToken(
                     provider,
-                    request.getCode(),
-                    request.getCodeVerifier()
+                    command.code(),
+                    command.codeVerifier()
             );
 
             // 2. Get user profile from OAuth provider
@@ -62,12 +62,7 @@ public class AuthService {
             ));
 
             // 5. Build response
-            return AuthResponse.builder()
-                    .accessToken(accessToken)
-                    .tokenType("Cookie")
-                    .expiresIn(jwtService.getAccessTokenExpiration())
-                    .issuedAt(LocalDateTime.now())
-                    .build();
+            return new AuthResult(accessToken, "Cookie", jwtService.getAccessTokenExpiration(), LocalDateTime.now());
 
         } catch (Exception e) {
             log.error("OAuth login failed: {}", e.getMessage(), e);

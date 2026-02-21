@@ -11,9 +11,9 @@ import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MoveTrackRequest;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdateTrackOrderRequest;
+import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
+import com.pfplaybackend.api.playlist.application.dto.command.MoveTrackCommand;
+import com.pfplaybackend.api.playlist.application.dto.command.UpdateTrackOrderCommand;
 import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -72,7 +72,7 @@ class TrackCommandServiceTest {
         PlaylistData playlistData = PlaylistData.builder()
                 .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
-        AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
+        AddTrackCommand command = new AddTrackCommand("song", "linkId1", "03:00", "thumb.jpg");
 
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByPlaylistAndLink(playlistId, "linkId1")).thenReturn(Optional.empty());
@@ -80,7 +80,7 @@ class TrackCommandServiceTest {
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 3L));
 
         // when
-        trackCommandService.addTrackInPlaylist(playlistId, request);
+        trackCommandService.addTrackInPlaylist(playlistId, command);
 
         // then
         verify(aggregatePort, times(1)).saveTrack(argThat(track ->
@@ -93,11 +93,11 @@ class TrackCommandServiceTest {
     void addTrackInPlaylist_playlistNotFound() {
         // given
         Long playlistId = 999L;
-        AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
+        AddTrackCommand command = new AddTrackCommand("song", "linkId1", "03:00", "thumb.jpg");
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> trackCommandService.addTrackInPlaylist(playlistId, request))
+        assertThatThrownBy(() -> trackCommandService.addTrackInPlaylist(playlistId, command))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -109,7 +109,7 @@ class TrackCommandServiceTest {
         PlaylistData playlistData = PlaylistData.builder()
                 .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
-        AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
+        AddTrackCommand command = new AddTrackCommand("song", "linkId1", "03:00", "thumb.jpg");
         TrackData existingTrack = TrackData.builder()
                 .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(1).build();
 
@@ -117,7 +117,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findTrackByPlaylistAndLink(playlistId, "linkId1")).thenReturn(Optional.of(existingTrack));
 
         // when & then
-        assertThatThrownBy(() -> trackCommandService.addTrackInPlaylist(playlistId, request))
+        assertThatThrownBy(() -> trackCommandService.addTrackInPlaylist(playlistId, command))
                 .isInstanceOf(ConflictException.class);
     }
 
@@ -129,7 +129,7 @@ class TrackCommandServiceTest {
         PlaylistData playlistData = PlaylistData.builder()
                 .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
-        AddTrackRequest request = new AddTrackRequest("song", "linkId1", "03:00", "thumb.jpg");
+        AddTrackCommand command = new AddTrackCommand("song", "linkId1", "03:00", "thumb.jpg");
 
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByPlaylistAndLink(playlistId, "linkId1")).thenReturn(Optional.empty());
@@ -137,7 +137,7 @@ class TrackCommandServiceTest {
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 15L));
 
         // when & then
-        assertThatThrownBy(() -> trackCommandService.addTrackInPlaylist(playlistId, request))
+        assertThatThrownBy(() -> trackCommandService.addTrackInPlaylist(playlistId, command))
                 .isInstanceOf(ConflictException.class);
     }
 
@@ -202,7 +202,7 @@ class TrackCommandServiceTest {
         TrackData trackData = TrackData.builder()
                 .playlistId(sourcePlaylist.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
-        MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
+        MoveTrackCommand command = new MoveTrackCommand(targetPlaylistId);
 
         when(aggregatePort.findPlaylistByIdAndOwner(sourcePlaylistId, userId)).thenReturn(Optional.of(sourcePlaylist));
         when(aggregatePort.findPlaylistByIdAndOwner(targetPlaylistId, userId)).thenReturn(Optional.of(targetPlaylist));
@@ -212,7 +212,7 @@ class TrackCommandServiceTest {
                 .thenReturn(new PlaylistSummary(targetPlaylistId, "target", 1, PlaylistType.PLAYLIST, 5L));
 
         // when
-        trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, request);
+        trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, command);
 
         // then
         verify(aggregatePort, times(1)).shiftUpTrackOrderByDelete(sourcePlaylistId, 2);
@@ -227,12 +227,12 @@ class TrackCommandServiceTest {
         // given
         Long sourcePlaylistId = 999L;
         Long trackId = 10L;
-        MoveTrackRequest request = new MoveTrackRequest(2L);
+        MoveTrackCommand command = new MoveTrackCommand(2L);
 
         when(aggregatePort.findPlaylistByIdAndOwner(sourcePlaylistId, userId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, request))
+        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, command))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -247,13 +247,13 @@ class TrackCommandServiceTest {
         PlaylistData sourcePlaylist = PlaylistData.builder()
                 .id(sourcePlaylistId).ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
 
-        MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
+        MoveTrackCommand command = new MoveTrackCommand(targetPlaylistId);
 
         when(aggregatePort.findPlaylistByIdAndOwner(sourcePlaylistId, userId)).thenReturn(Optional.of(sourcePlaylist));
         when(aggregatePort.findPlaylistByIdAndOwner(targetPlaylistId, userId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, request))
+        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, command))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -276,7 +276,7 @@ class TrackCommandServiceTest {
         TrackData duplicateTrack = TrackData.builder()
                 .playlistId(targetPlaylist.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(1).build();
 
-        MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
+        MoveTrackCommand command = new MoveTrackCommand(targetPlaylistId);
 
         when(aggregatePort.findPlaylistByIdAndOwner(sourcePlaylistId, userId)).thenReturn(Optional.of(sourcePlaylist));
         when(aggregatePort.findPlaylistByIdAndOwner(targetPlaylistId, userId)).thenReturn(Optional.of(targetPlaylist));
@@ -284,7 +284,7 @@ class TrackCommandServiceTest {
         when(aggregatePort.findTrackByPlaylistAndLink(targetPlaylistId, "linkId1")).thenReturn(Optional.of(duplicateTrack));
 
         // when & then
-        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, request))
+        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, command))
                 .isInstanceOf(ConflictException.class);
     }
 
@@ -305,7 +305,7 @@ class TrackCommandServiceTest {
         TrackData trackData = TrackData.builder()
                 .playlistId(sourcePlaylist.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
-        MoveTrackRequest request = new MoveTrackRequest(targetPlaylistId);
+        MoveTrackCommand command = new MoveTrackCommand(targetPlaylistId);
 
         when(aggregatePort.findPlaylistByIdAndOwner(sourcePlaylistId, userId)).thenReturn(Optional.of(sourcePlaylist));
         when(aggregatePort.findPlaylistByIdAndOwner(targetPlaylistId, userId)).thenReturn(Optional.of(targetPlaylist));
@@ -315,7 +315,7 @@ class TrackCommandServiceTest {
                 .thenReturn(new PlaylistSummary(targetPlaylistId, "target", 1, PlaylistType.PLAYLIST, 15L));
 
         // when & then
-        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, request))
+        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, command))
                 .isInstanceOf(ConflictException.class);
     }
 
@@ -333,7 +333,7 @@ class TrackCommandServiceTest {
         TrackData trackData = TrackData.builder()
                 .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
-        UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(4);
+        UpdateTrackOrderCommand command = new UpdateTrackOrderCommand(4);
 
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)).thenReturn(Optional.of(trackData));
@@ -341,7 +341,7 @@ class TrackCommandServiceTest {
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 
         // when
-        trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, request);
+        trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command);
 
         // then
         verify(aggregatePort, times(1)).shiftUpTrackOrderByDnD(playlistId, 2, 4);
@@ -360,7 +360,7 @@ class TrackCommandServiceTest {
         TrackData trackData = TrackData.builder()
                 .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(4).build();
 
-        UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(2);
+        UpdateTrackOrderCommand command = new UpdateTrackOrderCommand(2);
 
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)).thenReturn(Optional.of(trackData));
@@ -368,7 +368,7 @@ class TrackCommandServiceTest {
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 
         // when
-        trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, request);
+        trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command);
 
         // then
         verify(aggregatePort, times(1)).shiftDownTrackOrderByDnD(playlistId, 4, 2);
@@ -388,7 +388,7 @@ class TrackCommandServiceTest {
                 .playlistId(playlistData.getId()).name("song").linkId("linkId1").duration(Duration.fromString("03:00")).orderNumber(2).build();
 
         // nextOrderNumber == prevOrderNumber → invalid
-        UpdateTrackOrderRequest request = new UpdateTrackOrderRequest(2);
+        UpdateTrackOrderCommand command = new UpdateTrackOrderCommand(2);
 
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
         when(aggregatePort.findTrackByIdAndPlaylist(trackId, playlistId)).thenReturn(Optional.of(trackData));
@@ -396,7 +396,7 @@ class TrackCommandServiceTest {
                 .thenReturn(new PlaylistSummary(playlistId, "test", 0, PlaylistType.PLAYLIST, 5L));
 
         // when & then
-        assertThatThrownBy(() -> trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, request))
+        assertThatThrownBy(() -> trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command))
                 .isInstanceOf(BadRequestException.class);
     }
 }

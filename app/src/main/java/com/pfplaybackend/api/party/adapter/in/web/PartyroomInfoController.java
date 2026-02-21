@@ -6,6 +6,7 @@ import com.pfplaybackend.api.party.adapter.out.persistence.DjQueueRepository;
 import com.pfplaybackend.api.party.adapter.out.persistence.PartyroomPlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.dj.DjWithProfileDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomWithCrewDto;
+import com.pfplaybackend.api.party.application.dto.result.PartyroomSummaryResult;
 import com.pfplaybackend.api.party.application.service.PartyroomInfoService;
 import com.pfplaybackend.api.party.application.service.PlaybackInfoService;
 import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
@@ -52,7 +53,7 @@ public class PartyroomInfoController {
      * → 파티룸 내에서 우측 상단의 '파티 정보' 클릭 시 호출 API
      */
     @GetMapping("/{partyroomId}/summary")
-    public ResponseEntity<ApiCommonResponse<QueryPartyroomSummaryResponse>> getPartyroomSummaryInfo(@PathVariable Long partyroomId) {
+    public ResponseEntity<ApiCommonResponse<PartyroomSummaryResult>> getPartyroomSummaryInfo(@PathVariable Long partyroomId) {
         return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomInfoService.getSummaryInfo(new PartyroomId(partyroomId))));
     }
 

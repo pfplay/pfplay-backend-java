@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.listener.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.adapter.in.listener.CrewProfilePreCheckTopicListener;
 import com.pfplaybackend.api.party.adapter.in.listener.GroupBroadcastTopicListener;
 import com.pfplaybackend.api.party.adapter.in.listener.PlaybackDurationWaitTopicListener;
@@ -33,6 +34,7 @@ public class RedisListenerConfig {
                                                         DistributedLockExecutor distributedLockExecutor,
                                                         CrewProfileChangeHandler crewProfileService,
                                                         PlaybackManagementService playbackManagementService,
+                                                        RedisMessagePublisher messagePublisher,
                                                         ObjectMapper objectMapper) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
@@ -56,7 +58,7 @@ public class RedisListenerConfig {
                         new ChannelTopic(topic)));
 
         // Special listeners with business logic
-        container.addMessageListener(new CrewProfilePreCheckTopicListener(objectMapper, distributedLockExecutor, crewProfileService), new ChannelTopic("crew_profile_pre_check"));
+        container.addMessageListener(new CrewProfilePreCheckTopicListener(objectMapper, distributedLockExecutor, crewProfileService, messagePublisher), new ChannelTopic("crew_profile_pre_check"));
         container.addMessageListener(new PlaybackDurationWaitTopicListener(redisTemplate, objectMapper, distributedLockExecutor, playbackManagementService), new PatternTopic("__keyevent@*__:expired"));
         return container;
     }

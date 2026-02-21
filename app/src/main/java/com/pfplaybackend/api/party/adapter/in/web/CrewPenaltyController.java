@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.party.application.dto.command.PunishPenaltyCommand;
 import com.pfplaybackend.api.party.application.dto.result.PenaltyResult;
 import com.pfplaybackend.api.party.application.service.CrewPenaltyService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -40,7 +41,8 @@ public class CrewPenaltyController {
     public ResponseEntity<Void> imposeCrewPenalty(@PathVariable("partyroomId") Long partyroomId,
                                   @Valid @RequestBody PunishPenaltyRequest request) {
         // TODO targetCrewId 정보를 요청 본문으로 이동
-        crewPenaltyService.addPenalty(new PartyroomId(partyroomId), request);
+        crewPenaltyService.addPenalty(new PartyroomId(partyroomId),
+                new PunishPenaltyCommand(request.getCrewId(), request.getPenaltyType(), request.getDetail()));
         return ResponseEntity.accepted().build();
     }
 

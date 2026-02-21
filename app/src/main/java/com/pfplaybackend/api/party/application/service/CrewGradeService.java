@@ -13,7 +13,7 @@ import com.pfplaybackend.api.party.domain.specification.GradeAdjustmentSpecifica
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
+import com.pfplaybackend.api.party.application.dto.command.AdjustGradeCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class CrewGradeService {
     private final UserProfileQueryPort userProfileQueryPort;
 
     @Transactional
-    public void updateGrade(PartyroomId partyroomId, CrewId adjustedCrewId, AdjustGradeRequest request) {
+    public void updateGrade(PartyroomId partyroomId, CrewId adjustedCrewId, AdjustGradeCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         partyroomInfoService.getPartyroomById(partyroomId);
 
@@ -37,7 +37,7 @@ public class CrewGradeService {
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
         AuthorityTier authorityTier = userProfileQueryPort.getAuthorityTier(adjustedCrew.getUserId());
         GradeType prevGradeType = adjustedCrew.getGradeType();
-        GradeType targetGradeType = request.getGradeType();
+        GradeType targetGradeType = command.gradeType();
         CrewData adjusterCrew = partyroomInfoService.getCrewOrThrow(partyroomId.getId(), authContext.getUserId());
 
         new GradeAdjustmentSpecification().validate(adjusterCrew, adjustedCrew, targetGradeType, authorityTier);

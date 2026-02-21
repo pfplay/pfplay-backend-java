@@ -8,7 +8,7 @@ import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
-import com.pfplaybackend.api.user.adapter.in.web.payload.request.SignMemberRequest;
+import com.pfplaybackend.api.user.application.dto.command.SignMemberCommand;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +26,8 @@ public class MemberSignService {
     private final UserActivityService userActivityService;
     private final PlaylistSetupPort playlistSetupPort;
 
-    public String getOAuth2RedirectUri(SignMemberRequest request, String redirectLocation) {
-        return oauth2RedirectPort.getRedirectUri(request.getOauth2Provider(), redirectLocation);
+    public String getOAuth2RedirectUri(SignMemberCommand command, String redirectLocation) {
+        return oauth2RedirectPort.getRedirectUri(command.oauth2Provider(), redirectLocation);
     }
 
     @Transactional

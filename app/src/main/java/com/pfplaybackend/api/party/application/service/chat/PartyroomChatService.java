@@ -6,9 +6,8 @@ import com.pfplaybackend.realtime.port.SessionCachePort;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
-import com.pfplaybackend.api.party.adapter.in.listener.message.OutgoingGroupChatMessage;
+import com.pfplaybackend.api.party.application.dto.chat.ChatMessagePayload;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.adapter.in.web.dto.IncomingGroupChatMessage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +29,7 @@ public class PartyroomChatService {
 
     private final ObjectMapper objectMapper;
 
-    public void sendMessage(String sessionId, IncomingGroupChatMessage incomingGroupChatMessage) {
+    public void sendMessage(String sessionId, String content) {
         Optional<Object> optional = sessionCachePort.getSessionCache(sessionId);
 
         if (optional.isEmpty()) {
@@ -42,13 +41,13 @@ public class PartyroomChatService {
             try {
                 PartyroomSessionDto sessionDto = objectMapper.convertValue(object, PartyroomSessionDto.class);
                 if(isPossibleChat(sessionDto.crewId())) {
-                    OutgoingGroupChatMessage outgoingGroupChatMessage = OutgoingGroupChatMessage.from(sessionDto, incomingGroupChatMessage.getContent());
-                    messagePublisher.publish(MessageTopic.CHAT.topic(), outgoingGroupChatMessage);
+                    ChatMessagePayload chatPayload = ChatMessagePayload.from(sessionDto, content);
+                    messagePublisher.publish(MessageTopic.CHAT.topic(), chatPayload);
                 }
             } catch (IllegalArgumentException e) {
                 logger.error(
                         "Cannot send message, SessionId: " + sessionId
-                                + ", message: " + incomingGroupChatMessage.getContent()
+                                + ", message: " + content
                                 + ", ex: " + e.getMessage()
                 );
             }

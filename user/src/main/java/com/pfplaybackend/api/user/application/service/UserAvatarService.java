@@ -9,6 +9,7 @@ import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
+import com.pfplaybackend.api.user.application.dto.command.SetAvatarCommand;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
@@ -83,12 +84,12 @@ public class UserAvatarService {
     }
 
     @Transactional
-    public void setUserAvatar(com.pfplaybackend.api.user.adapter.in.web.payload.request.SetAvatarRequest request) {
+    public void setUserAvatar(SetAvatarCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         MemberData member = memberRepository.findByUserId(authContext.getUserId()).orElseThrow();
 
         // 0. 리소스 접근 권한 유효성 검증
-        AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(new AvatarBodyUri(request.getBody().getUri()));
+        AvatarBodyDto avatarBodyDto = avatarResourceService.findAvatarBodyByUri(new AvatarBodyUri(command.body().uri()));
         if (!avatarBodyDto.getObtainableType().equals(ObtainmentType.BASIC)) {
             ActivityType activityType = ActivityType.of(avatarBodyDto.getObtainableType());
             ActivityData activity = member.getActivityDataMap().get(activityType);
@@ -101,21 +102,21 @@ public class UserAvatarService {
         AvatarIconUri avatarIconUri;
         member.updateAvatarBody(avatarBodyDto);
 
-        if(request.getAvatarCompositionType().equals(AvatarCompositionType.SINGLE_BODY)) {
+        if(command.avatarCompositionType().equals(AvatarCompositionType.SINGLE_BODY)) {
             avatarFaceUri = new AvatarFaceUri();
             avatarIconUri = userAvatarDomainService.findAvatarIconPairWithSingleBody(avatarBodyDto);
 
             member.updateAvatarFace(avatarFaceUri);
             member.updateAvatarIcon(avatarIconUri);
         }else {
-            avatarFaceUri = new AvatarFaceUri(request.getFace().getUri());
+            avatarFaceUri = new AvatarFaceUri(command.face().uri());
             avatarIconUri = userAvatarDomainService.findAvatarIconByFaceSourceType(
-                    avatarFaceUri, request.getFace().getSourceType());
+                    avatarFaceUri, command.face().sourceType());
 
-            member.updateAvatarFace(avatarFaceUri, request.getFace().getSourceType(),
-                    request.getFace().getTransform().getOffsetX(),
-                    request.getFace().getTransform().getOffsetY(),
-                    request.getFace().getTransform().getScale());
+            member.updateAvatarFace(avatarFaceUri, command.face().sourceType(),
+                    command.face().transform().offsetX(),
+                    command.face().transform().offsetY(),
+                    command.face().transform().scale());
             member.updateAvatarIcon(avatarIconUri);
         }
 

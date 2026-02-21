@@ -45,13 +45,10 @@ class PlaylistArchitectureTest {
     }
 
     @Test
-    @DisplayName("application 패키지는 adapter.in 패키지에 의존하지 않는다 (Request DTO 참조 예외)")
+    @DisplayName("application 패키지는 adapter.in 패키지에 의존하지 않는다")
     void applicationShouldNotDependOnInboundAdapter() {
-        // TODO: TrackCommandService, GrabTrackService가 adapter.in의 Request DTO를 참조 중
         ArchRule rule = noClasses()
                 .that().resideInAPackage("..playlist.application..")
-                .and().doNotHaveSimpleName("TrackCommandService")
-                .and().doNotHaveSimpleName("GrabTrackService")
                 .should().dependOnClassesThat()
                 .resideInAPackage("..playlist.adapter.in..");
 

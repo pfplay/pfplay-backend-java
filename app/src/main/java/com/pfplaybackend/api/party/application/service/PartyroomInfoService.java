@@ -22,7 +22,7 @@ import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
-import com.pfplaybackend.api.party.adapter.in.web.payload.response.info.QueryPartyroomSummaryResponse;
+import com.pfplaybackend.api.party.application.dto.result.PartyroomSummaryResult;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -115,7 +115,7 @@ public class PartyroomInfoService {
     }
 
     @Transactional(readOnly = true)
-    public QueryPartyroomSummaryResponse getSummaryInfo(PartyroomId partyroomId) {
+    public PartyroomSummaryResult getSummaryInfo(PartyroomId partyroomId) {
         PartyroomData partyroom = aggregatePort.findPartyroomById(partyroomId.getId())
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
         PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId.getId());
@@ -125,9 +125,12 @@ public class PartyroomInfoService {
                     .orElseThrow();
             UserId djUserId = djCrew.getUserId();
             ProfileSettingDto profileSettingDto = userProfileQueryPort.getUsersProfileSetting(Collections.singletonList(djUserId)).get(djUserId);
-            return QueryPartyroomSummaryResponse.from(partyroom, djCrew, profileSettingDto);
+            return new PartyroomSummaryResult(partyroom.getTitle(), partyroom.getIntroduction(),
+                    partyroom.getLinkDomain().getValue(), partyroom.getPlaybackTimeLimit().getMinutes(),
+                    new DjWithProfileDto(djCrew.getId(), 0, profileSettingDto.nickname(), profileSettingDto.avatarIconUri()));
         }else {
-            return QueryPartyroomSummaryResponse.from(partyroom, null, null);
+            return new PartyroomSummaryResult(partyroom.getTitle(), partyroom.getIntroduction(),
+                    partyroom.getLinkDomain().getValue(), partyroom.getPlaybackTimeLimit().getMinutes(), null);
         }
     }
 

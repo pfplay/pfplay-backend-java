@@ -19,7 +19,7 @@ import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewPenaltyHistoryRepository;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.PunishPenaltyRequest;
+import com.pfplaybackend.api.party.application.dto.command.PunishPenaltyCommand;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -92,16 +92,13 @@ class CrewPenaltyServiceTest {
                 .id(20L).partyroomId(1L).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(punishedCrew));
 
-        PunishPenaltyRequest request = mock(PunishPenaltyRequest.class);
-        when(request.getCrewId()).thenReturn(20L);
-        when(request.getPenaltyType()).thenReturn(PenaltyType.CHAT_BAN_30_SECONDS);
-        when(request.getDetail()).thenReturn("Spam");
+        PunishPenaltyCommand command = new PunishPenaltyCommand(20L, PenaltyType.CHAT_BAN_30_SECONDS, "Spam");
 
         ValueOperations<String, Object> valueOps = mock(ValueOperations.class);
         when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // when
-        crewPenaltyService.addPenalty(partyroomId, request);
+        crewPenaltyService.addPenalty(partyroomId, command);
 
         // then
         verify(valueOps).set(eq("PENALTY:CHAT_BAN:20"), eq(30), any(java.time.Duration.class));
@@ -125,13 +122,10 @@ class CrewPenaltyServiceTest {
                 .id(20L).partyroomId(1L).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(punishedCrew));
 
-        PunishPenaltyRequest request = mock(PunishPenaltyRequest.class);
-        when(request.getCrewId()).thenReturn(20L);
-        when(request.getPenaltyType()).thenReturn(PenaltyType.PERMANENT_EXPULSION);
-        when(request.getDetail()).thenReturn("Harassment");
+        PunishPenaltyCommand command = new PunishPenaltyCommand(20L, PenaltyType.PERMANENT_EXPULSION, "Harassment");
 
         // when
-        crewPenaltyService.addPenalty(partyroomId, request);
+        crewPenaltyService.addPenalty(partyroomId, command);
 
         // then
         verify(partyroomAccessService).expel(partyroom, punishedCrew, true);
@@ -154,12 +148,10 @@ class CrewPenaltyServiceTest {
                 .id(20L).partyroomId(1L).userId(new UserId(2L)).gradeType(GradeType.CLUBBER).isActive(true).build();
         when(aggregatePort.findCrewById(20L)).thenReturn(Optional.of(punishedCrew));
 
-        PunishPenaltyRequest request = mock(PunishPenaltyRequest.class);
-        when(request.getCrewId()).thenReturn(20L);
-        lenient().when(request.getPenaltyType()).thenReturn(PenaltyType.ONE_TIME_EXPULSION);
+        PunishPenaltyCommand command = new PunishPenaltyCommand(20L, PenaltyType.ONE_TIME_EXPULSION, "Reason");
 
         // when & then
-        assertThatThrownBy(() -> crewPenaltyService.addPenalty(partyroomId, request))
+        assertThatThrownBy(() -> crewPenaltyService.addPenalty(partyroomId, command))
                 .isInstanceOf(ForbiddenException.class);
     }
 

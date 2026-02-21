@@ -7,6 +7,9 @@ import com.pfplaybackend.api.auth.adapter.in.web.dto.response.AuthResponse;
 import com.pfplaybackend.api.auth.adapter.in.web.dto.request.OAuthLoginRequest;
 import com.pfplaybackend.api.auth.adapter.in.web.dto.request.OAuthUrlRequest;
 import com.pfplaybackend.api.auth.adapter.in.web.dto.response.OAuthUrlResponse;
+import com.pfplaybackend.api.auth.application.dto.command.OAuthLoginCommand;
+import com.pfplaybackend.api.auth.application.dto.result.AuthResult;
+import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -39,9 +42,14 @@ public class AuthController {
 
         try {
             OAuthProvider provider = OAuthProvider.fromString(request.getProvider());
-            OAuthUrlResponse response = oAuthUrlService.generateAuthUrl(provider, request.getCodeVerifier());
+            OAuthUrlResult result = oAuthUrlService.generateAuthUrl(provider, request.getCodeVerifier());
 
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(OAuthUrlResponse.builder()
+                    .authUrl(result.authUrl())
+                    .state(result.state())
+                    .provider(result.provider())
+                    .expiresIn(result.expiresIn())
+                    .build());
 
         } catch (IllegalArgumentException e) {
             log.error("Invalid provider: {}", request.getProvider());
@@ -87,13 +95,20 @@ public class AuthController {
             }
 
             // OAuth 로그인 처리
-            AuthResponse authResponse = authService.processOAuthLogin(request);
+            OAuthLoginCommand command = new OAuthLoginCommand(request.getProvider(), request.getCode(), request.getCodeVerifier());
+            AuthResult authResult = authService.processOAuthLogin(command);
 
             // JWT 토큰을 HttpOnly 쿠키로 저장
-            cookieUtil.addAccessTokenCookie(response, authResponse.getAccessToken());
+            cookieUtil.addAccessTokenCookie(response, authResult.accessToken());
 
             // 쿠키 전용 응답 반환 (토큰 정보 제거)
-            return ResponseEntity.ok(authResponse.forCookieResponse());
+            return ResponseEntity.ok(AuthResponse.builder()
+                    .tokenType(authResult.tokenType())
+                    .expiresIn(authResult.expiresIn())
+                    .issuedAt(authResult.issuedAt())
+                    .success(true)
+                    .message("Authentication successful")
+                    .build());
 
         } catch (IllegalArgumentException e) {
             log.error("Invalid provider in OAuth callback: {}", e.getMessage());

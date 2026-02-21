@@ -72,20 +72,10 @@ class HexagonalArchitectureTest {
         }
 
         @Test
-        @DisplayName("application 패키지는 adapter.in 패키지에 의존하지 않는다 (Request/Message DTO 참조 예외)")
+        @DisplayName("application 패키지는 adapter.in 패키지에 의존하지 않는다")
         void applicationShouldNotDependOnInboundAdapter() {
-            // TODO: 다수의 Application Service가 adapter.in의 Request/Message DTO를 직접 참조 중
-            //       향후 application/dto/command로 이동하여 해소 예정
             ArchRule rule = noClasses()
                     .that().resideInAPackage("..party.application..")
-                    .and().doNotHaveSimpleName("CrewGradeService")
-                    .and().doNotHaveSimpleName("CrewBlockService")
-                    .and().doNotHaveSimpleName("CrewPenaltyService")
-                    .and().doNotHaveSimpleName("CrewProfileChangeHandler")
-                    .and().doNotHaveSimpleName("PartyroomInfoService")
-                    .and().doNotHaveSimpleName("PartyroomManagementService")
-                    .and().doNotHaveSimpleName("PartyroomChatService")
-                    .and().doNotHaveSimpleName("PlaybackManagementService")
                     .should().dependOnClassesThat()
                     .resideInAPackage("..party.adapter.in..");
 
@@ -109,13 +99,10 @@ class HexagonalArchitectureTest {
         }
 
         @Test
-        @DisplayName("auth application 패키지는 adapter.in 패키지에 의존하지 않는다 (Request/Response DTO 참조 예외)")
+        @DisplayName("auth application 패키지는 adapter.in 패키지에 의존하지 않는다")
         void applicationShouldNotDependOnInboundAdapter() {
-            // TODO: AuthService, OAuthUrlService가 adapter.in의 Request/Response DTO를 참조 중
             ArchRule rule = noClasses()
                     .that().resideInAPackage("..auth.application..")
-                    .and().doNotHaveSimpleName("AuthService")
-                    .and().doNotHaveSimpleName("OAuthUrlService")
                     .should().dependOnClassesThat()
                     .resideInAPackage("..auth.adapter.in..");
 
@@ -128,14 +115,10 @@ class HexagonalArchitectureTest {
     class AdminDomainLayerRules {
 
         @Test
-        @DisplayName("admin application 패키지는 adapter.in 패키지에 의존하지 않는다 (Request/Response DTO 참조 예외)")
+        @DisplayName("admin application 패키지는 adapter.in 패키지에 의존하지 않는다")
         void applicationShouldNotDependOnInboundAdapter() {
-            // TODO: AdminPartyroomService, AdminDemoService, ReactionSimulationService가 adapter.in의 DTO를 참조 중
             ArchRule rule = noClasses()
                     .that().resideInAPackage("..admin.application..")
-                    .and().doNotHaveSimpleName("AdminPartyroomService")
-                    .and().doNotHaveSimpleName("AdminDemoService")
-                    .and().doNotHaveSimpleName("ReactionSimulationService")
                     .should().dependOnClassesThat()
                     .resideInAPackage("..admin.adapter.in..");
 

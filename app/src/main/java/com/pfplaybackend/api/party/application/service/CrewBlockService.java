@@ -12,7 +12,7 @@ import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.AddBlockRequest;
+import com.pfplaybackend.api.party.application.dto.command.AddBlockCommand;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import com.pfplaybackend.api.user.application.service.UserProfileService;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -46,12 +46,12 @@ public class CrewBlockService {
     }
 
     @Transactional
-    public void addBlock(AddBlockRequest request) {
+    public void addBlock(AddBlockCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         ActivePartyroomDto dto = partyroomInfoService.getMyActivePartyroomOrThrow(authContext.getUserId());
 
         CrewId blockerCrewId = new CrewId(dto.crewId());
-        CrewId blockedCrewId = new CrewId(request.getCrewId());
+        CrewId blockedCrewId = new CrewId(command.crewId());
         Optional<CrewBlockHistoryData> historyDataOptional = blockHistoryRepository.findByBlockerCrewIdAndBlockedCrewIdAndUnblockedIsFalse(blockerCrewId, blockedCrewId);
         if(historyDataOptional.isPresent()) throw ExceptionCreator.create(BlockException.ALREADY_BLOCKED_CREW);
 
