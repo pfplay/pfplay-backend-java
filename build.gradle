@@ -6,6 +6,7 @@ plugins {
 subprojects {
 	apply plugin: 'java'
 	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'jacoco'
 
 	group = 'com.pfplaybackend'
 	version = '0.0.1-SNAPSHOT'
@@ -36,5 +37,15 @@ subprojects {
 
 	tasks.named('test') {
 		useJUnitPlatform()
+		finalizedBy jacocoTestReport
+	}
+
+	jacocoTestReport {
+		dependsOn test
+		reports {
+			html.required = true
+			xml.required = true
+			csv.required = false
+		}
 	}
 }

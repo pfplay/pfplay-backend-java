@@ -68,3 +68,23 @@ dependencies {
 	// TSID (Snowflake ID generation)
 	implementation 'io.hypersistence:hypersistence-tsid:2.1.3'
 }
+
+// Aggregated JaCoCo report across all modules
+tasks.register('jacocoAggregatedReport', JacocoReport) {
+	def modules = rootProject.subprojects
+
+	dependsOn modules.collect { it.tasks.named('test') }
+
+	additionalSourceDirs.from(modules.collect { it.sourceSets.main.allJava.srcDirs })
+	additionalClassDirs.from(modules.collect { it.sourceSets.main.output })
+	executionData.from(modules.collect { module ->
+		module.layout.buildDirectory.file('jacoco/test.exec')
+	})
+
+	reports {
+		html.required = true
+		html.outputLocation = layout.buildDirectory.dir('reports/jacoco/aggregated/html')
+		xml.required = true
+		xml.outputLocation = layout.buildDirectory.file('reports/jacoco/aggregated/jacoco.xml')
+	}
+}
