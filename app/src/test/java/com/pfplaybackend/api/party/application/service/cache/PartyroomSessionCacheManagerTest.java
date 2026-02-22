@@ -1,0 +1,118 @@
+package com.pfplaybackend.api.party.application.service.cache;
+
+import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.exception.http.NotFoundException;
+import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
+import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
+import com.pfplaybackend.api.party.domain.value.CrewId;
+import com.pfplaybackend.api.party.domain.value.PlaybackId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+class PartyroomSessionCacheManagerTest {
+
+    @Mock RedisTemplate<String, Object> redisTemplate;
+    @Mock ValueOperations<String, Object> valueOperations;
+    @Mock PartyroomQueryService partyroomQueryService;
+
+    @InjectMocks PartyroomSessionCacheManager partyroomSessionCacheManager;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+    }
+
+    @Test
+    @DisplayName("saveSessionCache — 파티룸 구독 시 세션이 저장된다")
+    void saveSessionCache_partyroomSubscription_savesSession() {
+        // given
+        String sessionId = "session-123";
+        String userIdStr = "1";
+        String destination = "/sub/partyrooms/1";
+        UserId userId = UserId.fromString(userIdStr);
+        ActivePartyroomDto activeDto = new ActivePartyroomDto(
+                1L, false, 10L, true, new PlaybackId(1L), new CrewId(5L)
+        );
+        when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
+
+        // when
+        partyroomSessionCacheManager.saveSessionCache(sessionId, userIdStr, destination);
+
+        // then
+        verify(valueOperations).set(eq(sessionId), any());
+    }
+
+    @Test
+    @DisplayName("saveSessionCache — 활성 파티룸이 없으면 예외가 발생한다")
+    void saveSessionCache_noActivePartyroom_throws() {
+        // given
+        String sessionId = "session-123";
+        String userIdStr = "1";
+        String destination = "/sub/partyrooms/1";
+        UserId userId = UserId.fromString(userIdStr);
+        when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() ->
+                partyroomSessionCacheManager.saveSessionCache(sessionId, userIdStr, destination))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("deleteSessionCache — 세션이 삭제된다")
+    void deleteSessionCache_deletesFromRedis() {
+        // given
+        String sessionId = "session-123";
+
+        // when
+        partyroomSessionCacheManager.deleteSessionCache(sessionId);
+
+        // then
+        verify(redisTemplate).delete(sessionId);
+    }
+
+    @Test
+    @DisplayName("getSessionCache — 세션이 있으면 반환한다")
+    void getSessionCache_exists_returnsPresent() {
+        // given
+        String sessionId = "session-123";
+        Object cached = new Object();
+        when(valueOperations.get(sessionId)).thenReturn(cached);
+
+        // when
+        Optional<Object> result = partyroomSessionCacheManager.getSessionCache(sessionId);
+
+        // then
+        assertThat(result).isPresent();
+    }
+
+    @Test
+    @DisplayName("getSessionCache — 세션이 없으면 empty를 반환한다")
+    void getSessionCache_notExists_returnsEmpty() {
+        // given
+        String sessionId = "session-123";
+        when(valueOperations.get(sessionId)).thenReturn(null);
+
+        // when
+        Optional<Object> result = partyroomSessionCacheManager.getSessionCache(sessionId);
+
+        // then
+        assertThat(result).isEmpty();
+    }
+}
