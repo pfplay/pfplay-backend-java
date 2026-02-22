@@ -50,7 +50,7 @@ public class PartyroomQueryController {
     public ResponseEntity<ApiCommonResponse<QueryDjQueueResponse>> getDjQueueInfo(@PathVariable Long partyroomId) {
         DjQueueInfoResult result = partyroomQueryService.getDjQueueInfo(new PartyroomId(partyroomId));
         return ResponseEntity.ok().body(ApiCommonResponse.success(
-                QueryDjQueueResponse.from(result.isPlaybackActivated(), result.queueStatus(),
-                        result.isRegistered(), result.currentPlayback(), result.djs())));
+                QueryDjQueueResponse.from(result.playbackActivated(), result.queueStatus(),
+                        result.registered(), result.currentPlayback(), result.djs())));
     }
 }

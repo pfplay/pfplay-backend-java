@@ -11,6 +11,6 @@ public record AdminPartyroomListResult(List<PartyroomItem> partyrooms) {
             String linkDomain,
             Integer crewCount,
             Integer djCount,
-            Boolean isPlaybackActivated
+            Boolean playbackActivated
     ) {}
 }

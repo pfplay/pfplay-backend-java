@@ -9,7 +9,7 @@ public record MyInfoResult(
         String uid,
         String email,
         AuthorityTier authorityTier,
-        boolean isProfileUpdated,
+        boolean profileUpdated,
         LocalDate registrationDate
 ) {
     public static MyInfoResult from(UserAccountData user) {

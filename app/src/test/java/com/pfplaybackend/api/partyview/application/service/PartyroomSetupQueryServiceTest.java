@@ -106,7 +106,7 @@ class PartyroomSetupQueryServiceTest {
         PartyroomSetupResult result = partyroomSetupQueryService.getSetupInfo(partyroomId);
 
         // then
-        assertThat(result.display().isPlaybackActivated()).isTrue();
+        assertThat(result.display().playbackActivated()).isTrue();
         assertThat(result.display().playback()).isNotNull();
         assertThat(result.display().playback().getName()).isEqualTo("Song");
         assertThat(result.display().currentDj()).isNotNull();
@@ -129,7 +129,7 @@ class PartyroomSetupQueryServiceTest {
         PartyroomSetupResult result = partyroomSetupQueryService.getSetupInfo(partyroomId);
 
         // then
-        assertThat(result.display().isPlaybackActivated()).isFalse();
+        assertThat(result.display().playbackActivated()).isFalse();
         assertThat(result.display().playback()).isNull();
         assertThat(result.display().reaction()).isNull();
         assertThat(result.display().currentDj()).isNull();

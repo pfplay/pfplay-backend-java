@@ -65,7 +65,7 @@ public class AdminDemoController {
                                 .linkDomain(item.linkDomain())
                                 .crewCount(item.crewCount())
                                 .djCount(item.djCount())
-                                .isPlaybackActivated(item.isPlaybackActivated())
+                                .isPlaybackActivated(item.playbackActivated())
                                 .build())
                         .collect(Collectors.toList()))
                 .build();

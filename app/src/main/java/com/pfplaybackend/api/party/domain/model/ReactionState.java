@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.domain.model;
 
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 
-public record ReactionState(boolean isLiked, boolean isDisliked, boolean isGrabbed) {
+public record ReactionState(boolean liked, boolean disliked, boolean grabbed) {
 
     public static ReactionState createBaseState() {
         return new ReactionState(false, false, false);

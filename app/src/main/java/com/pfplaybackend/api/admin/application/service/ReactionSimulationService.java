@@ -86,12 +86,12 @@ public class ReactionSimulationService {
         // Only events and aggregation will be updated
 
         // Update DJ activity score
-        if (postProcessDto.isDjActivityScoreChanged()) {
+        if (postProcessDto.djActivityScoreChanged()) {
             userActivityPort.updateDjPointScore(playback.getUserId(), postProcessDto.deltaScore());
         }
 
         // Update playback aggregation (includes GRAB count)
-        if (postProcessDto.isAggregationChanged()) {
+        if (postProcessDto.aggregationChanged()) {
             PlaybackAggregationData aggregation = playbackCommandService.updatePlaybackAggregation(new PlaybackId(playback.getId()), postProcessDto.deltaRecord());
             playbackReactionPostProcessCommandService.publishAggregationChangedEvent(partyroomId, aggregation);
         }

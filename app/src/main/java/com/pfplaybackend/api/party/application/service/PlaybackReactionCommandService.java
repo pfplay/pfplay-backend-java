@@ -51,9 +51,9 @@ public class PlaybackReactionCommandService {
         CrewData crew = optional.orElseThrow();
         playbackReactionPostProcessCommandService.postProcess(reactionPostProcessDto, reactionType, partyroomId, playbackId, new CrewId(crew.getId()));
         return Map.of(
-            "isLiked", targetState.isLiked(),
-            "isDisliked", targetState.isDisliked(),
-            "isGrabbed", targetState.isGrabbed()
+            "isLiked", targetState.liked(),
+            "isDisliked", targetState.disliked(),
+            "isGrabbed", targetState.grabbed()
         );
     }
 

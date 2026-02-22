@@ -64,7 +64,7 @@ public class PartyroomSetupQueryService {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         ActivePartyroomDto activePartyroom = partyroomQueryService.getMyActivePartyroom(authContext.getUserId())
                 .orElseThrow(() -> ExceptionCreator.create(CrewException.NOT_FOUND_ACTIVE_ROOM));
-        boolean isPlaybackActivated = activePartyroom.isPlaybackActivated();
+        boolean isPlaybackActivated = activePartyroom.playbackActivated();
 
         if (isPlaybackActivated) {
             PlaybackData playback = playbackQueryService.getPlaybackById(activePartyroom.currentPlaybackId());

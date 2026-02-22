@@ -32,9 +32,9 @@ class PlaybackReactionDomainServiceTest {
         ReactionState state = service.getReactionStateByHistory(history);
 
         // then
-        assertThat(state.isLiked()).isTrue();
-        assertThat(state.isDisliked()).isFalse();
-        assertThat(state.isGrabbed()).isTrue();
+        assertThat(state.liked()).isTrue();
+        assertThat(state.disliked()).isFalse();
+        assertThat(state.grabbed()).isTrue();
     }
 
     @Test
@@ -81,10 +81,10 @@ class PlaybackReactionDomainServiceTest {
             ReactionPostProcessResult result = service.determinePostProcessing(liked, liked);
 
             // then
-            assertThat(result.isMotionChanged()).isFalse();
-            assertThat(result.isDjActivityScoreChanged()).isFalse();
-            assertThat(result.isAggregationChanged()).isFalse();
-            assertThat(result.isGrabStatusChanged()).isFalse();
+            assertThat(result.motionChanged()).isFalse();
+            assertThat(result.djActivityScoreChanged()).isFalse();
+            assertThat(result.aggregationChanged()).isFalse();
+            assertThat(result.grabStatusChanged()).isFalse();
         }
 
         @Test
@@ -98,11 +98,11 @@ class PlaybackReactionDomainServiceTest {
             ReactionPostProcessResult result = service.determinePostProcessing(base, liked);
 
             // then
-            assertThat(result.isMotionChanged()).isTrue();
+            assertThat(result.motionChanged()).isTrue();
             assertThat(result.determinedMotionType()).isEqualTo(MotionType.DANCE_TYPE_1);
-            assertThat(result.isDjActivityScoreChanged()).isTrue();
+            assertThat(result.djActivityScoreChanged()).isTrue();
             assertThat(result.deltaScore()).isEqualTo(1);
-            assertThat(result.isAggregationChanged()).isTrue();
+            assertThat(result.aggregationChanged()).isTrue();
             assertThat(result.deltaRecord()).isEqualTo(List.of(1, 0, 0));
         }
 
@@ -117,11 +117,11 @@ class PlaybackReactionDomainServiceTest {
             ReactionPostProcessResult result = service.determinePostProcessing(liked, likedGrabbed);
 
             // then
-            assertThat(result.isMotionChanged()).isTrue();
+            assertThat(result.motionChanged()).isTrue();
             assertThat(result.determinedMotionType()).isEqualTo(MotionType.DANCE_TYPE_2);
-            assertThat(result.isDjActivityScoreChanged()).isTrue();
+            assertThat(result.djActivityScoreChanged()).isTrue();
             assertThat(result.deltaScore()).isEqualTo(2);
-            assertThat(result.isGrabStatusChanged()).isTrue();
+            assertThat(result.grabStatusChanged()).isTrue();
             assertThat(result.deltaRecord()).isEqualTo(List.of(0, 0, 1));
         }
 
@@ -136,11 +136,11 @@ class PlaybackReactionDomainServiceTest {
             ReactionPostProcessResult result = service.determinePostProcessing(liked, disliked);
 
             // then
-            assertThat(result.isMotionChanged()).isTrue();
+            assertThat(result.motionChanged()).isTrue();
             assertThat(result.determinedMotionType()).isEqualTo(MotionType.NONE);
-            assertThat(result.isDjActivityScoreChanged()).isTrue();
+            assertThat(result.djActivityScoreChanged()).isTrue();
             assertThat(result.deltaScore()).isEqualTo(-1);
-            assertThat(result.isAggregationChanged()).isTrue();
+            assertThat(result.aggregationChanged()).isTrue();
             assertThat(result.deltaRecord()).isEqualTo(List.of(-1, 1, 0));
         }
 
@@ -155,7 +155,7 @@ class PlaybackReactionDomainServiceTest {
             ReactionPostProcessResult result = service.determinePostProcessing(likedGrabbed, dislikedGrabbed);
 
             // then
-            assertThat(result.isGrabStatusChanged()).isFalse();
+            assertThat(result.grabStatusChanged()).isFalse();
         }
     }
 }

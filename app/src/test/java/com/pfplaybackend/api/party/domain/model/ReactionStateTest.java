@@ -15,45 +15,45 @@ class ReactionStateTest {
         ReactionState state = ReactionState.createBaseState();
 
         // then
-        assertThat(state.isLiked()).isFalse();
-        assertThat(state.isDisliked()).isFalse();
-        assertThat(state.isGrabbed()).isFalse();
+        assertThat(state.liked()).isFalse();
+        assertThat(state.disliked()).isFalse();
+        assertThat(state.grabbed()).isFalse();
     }
 
     @Test
-    @DisplayName("createState(LIKE) — 좋아요 상태 생성 시 isLiked만 true이다")
+    @DisplayName("createState(LIKE) — 좋아요 상태 생성 시 liked만 true이다")
     void createState_like() {
         // when
         ReactionState state = ReactionState.createState(ReactionType.LIKE);
 
         // then
-        assertThat(state.isLiked()).isTrue();
-        assertThat(state.isDisliked()).isFalse();
-        assertThat(state.isGrabbed()).isFalse();
+        assertThat(state.liked()).isTrue();
+        assertThat(state.disliked()).isFalse();
+        assertThat(state.grabbed()).isFalse();
     }
 
     @Test
-    @DisplayName("createState(DISLIKE) — 싫어요 상태 생성 시 isDisliked만 true이다")
+    @DisplayName("createState(DISLIKE) — 싫어요 상태 생성 시 disliked만 true이다")
     void createState_dislike() {
         // when
         ReactionState state = ReactionState.createState(ReactionType.DISLIKE);
 
         // then
-        assertThat(state.isLiked()).isFalse();
-        assertThat(state.isDisliked()).isTrue();
-        assertThat(state.isGrabbed()).isFalse();
+        assertThat(state.liked()).isFalse();
+        assertThat(state.disliked()).isTrue();
+        assertThat(state.grabbed()).isFalse();
     }
 
     @Test
-    @DisplayName("createState(GRAB) — 그랩 상태 생성 시 isLiked과 isGrabbed이 true이다")
+    @DisplayName("createState(GRAB) — 그랩 상태 생성 시 liked과 grabbed이 true이다")
     void createState_grab() {
         // when
         ReactionState state = ReactionState.createState(ReactionType.GRAB);
 
         // then
-        assertThat(state.isLiked()).isTrue();
-        assertThat(state.isDisliked()).isFalse();
-        assertThat(state.isGrabbed()).isTrue();
+        assertThat(state.liked()).isTrue();
+        assertThat(state.disliked()).isFalse();
+        assertThat(state.grabbed()).isTrue();
     }
 
     @Test

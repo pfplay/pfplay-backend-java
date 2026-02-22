@@ -7,9 +7,9 @@ import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import java.util.List;
 
 public record DjQueueInfoResult(
-        boolean isPlaybackActivated,
+        boolean playbackActivated,
         QueueStatus queueStatus,
-        boolean isRegistered,
+        boolean registered,
         PlaybackData currentPlayback,
         List<DjWithProfileDto> djs
 ) {}

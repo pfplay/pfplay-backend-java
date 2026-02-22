@@ -35,9 +35,9 @@ public class PlaybackReactionDomainService {
         int deltaScore = isDifferentDjActivityScore ? targetResolved.getScore() - existingResolved.getScore() : 0;
         List<Integer> deltaRecord = isDifferentAggregation
                 ? List.of(
-                    convertBooleanToInt(targetState.isLiked()) - convertBooleanToInt(existingState.isLiked()),
-                    convertBooleanToInt(targetState.isDisliked()) - convertBooleanToInt(existingState.isDisliked()),
-                    convertBooleanToInt(targetState.isGrabbed()) - convertBooleanToInt(existingState.isGrabbed()))
+                    convertBooleanToInt(targetState.liked()) - convertBooleanToInt(existingState.liked()),
+                    convertBooleanToInt(targetState.disliked()) - convertBooleanToInt(existingState.disliked()),
+                    convertBooleanToInt(targetState.grabbed()) - convertBooleanToInt(existingState.grabbed()))
                 : null;
 
         return new ReactionPostProcessResult(
@@ -59,7 +59,7 @@ public class PlaybackReactionDomainService {
     }
 
     private boolean diffGrabStatus(ReactionState existingState, ReactionState targetState) {
-        return !existingState.isGrabbed() && targetState.isGrabbed();
+        return !existingState.grabbed() && targetState.grabbed();
     }
 
     private int convertBooleanToInt(boolean b) {

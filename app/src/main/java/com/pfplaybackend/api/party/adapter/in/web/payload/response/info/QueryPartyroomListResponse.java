@@ -22,7 +22,7 @@ public class QueryPartyroomListResponse {
             StageType stageType,
             String title,
             String introduction,
-            boolean isPlaybackActivated,
+            boolean playbackActivated,
             long crewCount,
             Map<String, Object> playback,
             List<Map<String, Object>> primaryIcons
@@ -31,7 +31,7 @@ public class QueryPartyroomListResponse {
     public static List<PartyroomElement> from(List<PartyroomWithCrewDto> partyrooms, Map<UserId, ProfileSettingDto> profileSettings) {
         return partyrooms.stream().map(partyroomWithCrewDto -> {
             Map<String, Object> playback = null;
-            if(partyroomWithCrewDto.isPlaybackActivated()) {
+            if(partyroomWithCrewDto.playbackActivated()) {
                 playback = new HashMap<>();
                 playback.put("name", partyroomWithCrewDto.playbackDto().getName());
                 playback.put("thumbnailImage", partyroomWithCrewDto.playbackDto().getThumbnailImage());
@@ -47,7 +47,7 @@ public class QueryPartyroomListResponse {
                     partyroomWithCrewDto.stageType(),
                     partyroomWithCrewDto.title(),
                     partyroomWithCrewDto.introduction(),
-                    partyroomWithCrewDto.isPlaybackActivated(),
+                    partyroomWithCrewDto.playbackActivated(),
                     partyroomWithCrewDto.crewCount(),
                     playback,
                     primaryIcons

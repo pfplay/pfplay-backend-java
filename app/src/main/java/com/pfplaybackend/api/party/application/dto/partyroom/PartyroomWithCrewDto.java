@@ -13,8 +13,8 @@ public record PartyroomWithCrewDto(
         UserId hostId,
         String title,
         String introduction,
-        boolean isPlaybackActivated,
-        boolean isQueueClosed,
+        boolean playbackActivated,
+        boolean queueClosed,
         Long crewCount,
         PlaybackDto playbackDto,
         List<CrewDto> crews
@@ -22,6 +22,6 @@ public record PartyroomWithCrewDto(
     public static PartyroomWithCrewDto from(PartyroomWithCrewDto dto, List<CrewDto> members) {
         return new PartyroomWithCrewDto(
                 dto.partyroomId(), dto.stageType(), dto.hostId(), dto.title(), dto.introduction(),
-                dto.isPlaybackActivated(), dto.isQueueClosed(), dto.crewCount(), dto.playbackDto(), members);
+                dto.playbackActivated(), dto.queueClosed(), dto.crewCount(), dto.playbackDto(), members);
     }
 }

@@ -56,9 +56,9 @@ public class PlaybackReactionHistoryData extends BaseEntity {
     }
 
     public PlaybackReactionHistoryData applyReactionState(ReactionState reactionState) {
-        this.liked = reactionState.isLiked();
-        this.disliked = reactionState.isDisliked();
-        this.grabbed = reactionState.isGrabbed();
+        this.liked = reactionState.liked();
+        this.disliked = reactionState.disliked();
+        this.grabbed = reactionState.grabbed();
         return this;
     }
 }

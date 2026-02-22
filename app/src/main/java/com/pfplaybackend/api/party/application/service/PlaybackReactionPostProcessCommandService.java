@@ -33,13 +33,13 @@ public class PlaybackReactionPostProcessCommandService {
     public void postProcess(ReactionPostProcessResult postProcessDto, ReactionType reactionType, PartyroomId partyroomId, PlaybackId playbackId, CrewId crewId) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PlaybackData playback = playbackQueryService.getPlaybackById(playbackId);
-        if(postProcessDto.isGrabStatusChanged()) {
+        if(postProcessDto.grabStatusChanged()) {
             grabTrack(authContext.getUserId(), playback);
         }
-        if(postProcessDto.isDjActivityScoreChanged()) {
+        if(postProcessDto.djActivityScoreChanged()) {
             updateDjActivityScore(playback.getUserId(), postProcessDto.deltaScore());
         }
-        if(postProcessDto.isAggregationChanged()) {
+        if(postProcessDto.aggregationChanged()) {
             PlaybackAggregationData aggregation = playbackCommandService.updatePlaybackAggregation(new PlaybackId(playback.getId()), postProcessDto.deltaRecord());
             publishAggregationChangedEvent(partyroomId, aggregation);
         }
