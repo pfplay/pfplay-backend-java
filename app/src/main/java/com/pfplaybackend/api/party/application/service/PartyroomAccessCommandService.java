@@ -26,6 +26,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -38,6 +40,7 @@ public class PartyroomAccessCommandService {
     private final PartyroomAggregateService partyroomAggregateService;
     private final PartyroomQueryService partyroomQueryService;
     private final PlaybackControlPort playbackControlPort;
+    private final Clock clock;
 
     @Transactional
     public CrewData tryEnter(PartyroomId partyroomId) {
@@ -89,12 +92,12 @@ public class PartyroomAccessCommandService {
             CrewData crew = existingCrew.get();
             log.info("[addOrActivateCrew] Reactivating inactive crew - userId={}, partyroomId={}",
                     userId, partyroom.getPartyroomId().getId());
-            crew.activatePresence();
+            crew.activatePresence(LocalDateTime.now(clock));
             return aggregatePort.saveCrew(crew);
         } else {
             log.info("[addOrActivateCrew] Adding new crew - userId={}, partyroomId={}, gradeType=LISTENER",
                     userId, partyroom.getPartyroomId().getId());
-            CrewData crew = CrewData.create(partyroom.getPartyroomId(), userId, GradeType.LISTENER);
+            CrewData crew = CrewData.create(partyroom.getPartyroomId(), userId, GradeType.LISTENER, LocalDateTime.now(clock));
             return aggregatePort.saveCrew(crew);
         }
     }
@@ -105,7 +108,7 @@ public class PartyroomAccessCommandService {
 
     @Transactional
     public void enterByHost(UserId hostId, PartyroomData partyroom) {
-        CrewData crew = CrewData.create(partyroom.getPartyroomId(), hostId, GradeType.HOST);
+        CrewData crew = CrewData.create(partyroom.getPartyroomId(), hostId, GradeType.HOST, LocalDateTime.now(clock));
         aggregatePort.saveCrew(crew);
     }
 
@@ -124,7 +127,7 @@ public class PartyroomAccessCommandService {
         }
 
         CrewData crew = optionalCrew.get();
-        crew.deactivatePresence();
+        crew.deactivatePresence(LocalDateTime.now(clock));
         aggregatePort.saveCrew(crew);
 
         handleDjQueueOnLeave(partyroom, new CrewId(crew.getId()));
@@ -134,7 +137,7 @@ public class PartyroomAccessCommandService {
 
     @Transactional
     public void expel(PartyroomData partyroom, CrewData crew, boolean isPermanent)  {
-        crew.deactivatePresence();
+        crew.deactivatePresence(LocalDateTime.now(clock));
         if(isPermanent) crew.enforceBan();
         aggregatePort.saveCrew(crew);
 

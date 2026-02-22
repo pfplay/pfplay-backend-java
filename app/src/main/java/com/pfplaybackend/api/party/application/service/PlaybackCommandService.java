@@ -35,6 +35,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -51,6 +52,7 @@ public class PlaybackCommandService implements PlaybackControlPort {
     private final ExpirationTaskPort expirationTaskPort;
     private final PartyroomAggregateService partyroomAggregateService;
     private final PartyroomQueryService partyroomQueryService;
+    private final Clock clock;
 
     private void scheduleTask(PlaybackData playback) {
         long seconds = playback.getDuration().toSeconds();
@@ -145,7 +147,7 @@ public class PlaybackCommandService implements PlaybackControlPort {
     PlaybackData getNextPlaybackInPlaylist(PartyroomId partyroomId, DjData dj, UserId djUserId) {
         PlaybackTrackDto trackDto = playlistCommandPort.getFirstTrack(dj.getPlaylistId());
         return PlaybackData.create(partyroomId, djUserId,
-                trackDto.name(), trackDto.duration(), trackDto.linkId(), trackDto.thumbnailImage());
+                trackDto.name(), trackDto.duration(), trackDto.linkId(), trackDto.thumbnailImage(), clock.instant());
     }
 
     @Transactional

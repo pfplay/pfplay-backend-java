@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -162,7 +163,7 @@ public class AdminPartyroomService {
         PartyroomData loadedPartyroom = adminPartyroomPort.findPartyroomById(partyroom.getPartyroomId().getId())
                 .orElseThrow();
 
-        CrewData crew = CrewData.create(loadedPartyroom.getPartyroomId(), userId, GradeType.LISTENER);
+        CrewData crew = CrewData.create(loadedPartyroom.getPartyroomId(), userId, GradeType.LISTENER, LocalDateTime.now(clock));
         adminPartyroomPort.saveCrew(crew);
     }
 

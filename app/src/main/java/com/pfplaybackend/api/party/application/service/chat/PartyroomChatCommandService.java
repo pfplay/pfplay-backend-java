@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ public class PartyroomChatCommandService {
     private final ChatPenaltyCachePort chatPenaltyCachePort;
     private final RedisMessagePublisher messagePublisher;
     private final SessionCachePort sessionCachePort;
+    private final Clock clock;
 
     private final ObjectMapper objectMapper;
 
@@ -41,7 +43,7 @@ public class PartyroomChatCommandService {
             try {
                 PartyroomSessionDto sessionDto = objectMapper.convertValue(object, PartyroomSessionDto.class);
                 if(isPossibleChat(sessionDto.crewId())) {
-                    ChatMessageDto chatPayload = ChatMessageDto.from(sessionDto, content);
+                    ChatMessageDto chatPayload = ChatMessageDto.from(sessionDto, content, clock.millis());
                     messagePublisher.publish(MessageTopic.CHAT.topic(), chatPayload);
                 }
             } catch (IllegalArgumentException e) {

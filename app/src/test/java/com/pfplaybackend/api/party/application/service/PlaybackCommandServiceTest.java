@@ -38,6 +38,9 @@ import org.springframework.context.ApplicationEventPublisher;
 
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,6 +60,7 @@ class PlaybackCommandServiceTest {
     @Mock ExpirationTaskPort expirationTaskPort;
     @Mock PartyroomAggregateService partyroomAggregateService;
     @Mock PartyroomQueryService partyroomQueryService;
+    @Mock Clock clock;
 
     @InjectMocks PlaybackCommandService playbackCommandService;
 
@@ -65,6 +69,9 @@ class PlaybackCommandServiceTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(clock.instant()).thenReturn(Instant.parse("2025-01-01T00:00:00Z"));
+        lenient().when(clock.getZone()).thenReturn(ZoneId.of("UTC"));
+        lenient().when(clock.millis()).thenReturn(1735689600000L);
         AuthContext authContext = mock(AuthContext.class);
         lenient().when(authContext.getUserId()).thenReturn(userId);
         lenient().when(authContext.getAuthorityTier()).thenReturn(AuthorityTier.FM);

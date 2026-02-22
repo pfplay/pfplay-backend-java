@@ -25,6 +25,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.context.ApplicationEventPublisher;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +41,7 @@ class PartyroomAccessCommandServiceTest {
     @Mock private PartyroomAggregateService partyroomAggregateService;
     @Mock private PartyroomQueryService partyroomQueryService;
     @Mock private PlaybackControlPort playbackControlPort;
+    @Mock private Clock clock;
 
     @InjectMocks
     private PartyroomAccessCommandService partyroomAccessCommandService;
@@ -47,6 +51,9 @@ class PartyroomAccessCommandServiceTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(clock.instant()).thenReturn(Instant.parse("2025-01-01T00:00:00Z"));
+        lenient().when(clock.getZone()).thenReturn(ZoneId.of("UTC"));
+        lenient().when(clock.millis()).thenReturn(1735689600000L);
         userId = new UserId();
         partyroomId = new PartyroomId(1L);
 

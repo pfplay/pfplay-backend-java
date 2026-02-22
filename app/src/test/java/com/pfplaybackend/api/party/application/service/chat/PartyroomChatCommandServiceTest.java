@@ -10,6 +10,7 @@ import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto
 import com.pfplaybackend.api.party.application.port.out.ChatPenaltyCachePort;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.realtime.port.SessionCachePort;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,9 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -34,9 +38,17 @@ class PartyroomChatCommandServiceTest {
     @Mock ChatPenaltyCachePort chatPenaltyCachePort;
     @Mock RedisMessagePublisher messagePublisher;
     @Mock SessionCachePort sessionCachePort;
+    @Mock Clock clock;
     @Spy ObjectMapper objectMapper = new ObjectMapper();
 
     @InjectMocks PartyroomChatCommandService partyroomChatCommandService;
+
+    @BeforeEach
+    void setUp() {
+        lenient().when(clock.instant()).thenReturn(Instant.parse("2025-01-01T00:00:00Z"));
+        lenient().when(clock.getZone()).thenReturn(ZoneId.of("UTC"));
+        lenient().when(clock.millis()).thenReturn(1735689600000L);
+    }
 
     @Test
     @DisplayName("유효한 세션으로 메시지를 전송하면 Redis에 publish된다")

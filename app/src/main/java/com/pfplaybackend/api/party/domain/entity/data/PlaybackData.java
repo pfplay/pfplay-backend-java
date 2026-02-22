@@ -5,6 +5,7 @@ import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.DurationConverter;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import java.time.Instant;
 import jakarta.persistence.*;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -72,7 +73,7 @@ public class PlaybackData extends BaseEntity {
     // ── Factory Method ──
 
     public static PlaybackData create(PartyroomId partyroomId, UserId userId,
-                                       String name, String duration, String linkId, String thumbnailImage) {
+                                       String name, String duration, String linkId, String thumbnailImage, Instant now) {
         Duration dur = Duration.fromString(duration);
         return PlaybackData.builder()
                 .partyroomId(partyroomId)
@@ -81,7 +82,12 @@ public class PlaybackData extends BaseEntity {
                 .duration(dur)
                 .linkId(linkId)
                 .thumbnailImage(thumbnailImage)
-                .endTime(dur.calculateEndTimeEpochMilli())
+                .endTime(dur.calculateEndTimeEpochMilli(now))
                 .build();
+    }
+
+    public static PlaybackData create(PartyroomId partyroomId, UserId userId,
+                                       String name, String duration, String linkId, String thumbnailImage) {
+        return create(partyroomId, userId, name, duration, linkId, thumbnailImage, Instant.now());
     }
 }

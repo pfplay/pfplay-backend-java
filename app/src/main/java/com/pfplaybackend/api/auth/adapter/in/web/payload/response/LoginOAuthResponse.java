@@ -81,11 +81,15 @@ public class LoginOAuthResponse {
     /**
      * 에러 응답 생성
      */
-    public static LoginOAuthResponse error(String message) {
+    public static LoginOAuthResponse error(String message, LocalDateTime issuedAt) {
         return LoginOAuthResponse.builder()
                 .success(false)
                 .message(message)
-                .issuedAt(java.time.LocalDateTime.now())
+                .issuedAt(issuedAt)
                 .build();
+    }
+
+    public static LoginOAuthResponse error(String message) {
+        return error(message, LocalDateTime.now());
     }
 }
