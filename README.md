@@ -163,10 +163,13 @@ The project follows **Hexagonal Architecture (Ports & Adapters)** with DDD princ
 - Decoupled components via message passing
 - Scalable distributed architecture
 
-**3. Gradle Multi-Module**
-- `api` — all domain code and business logic
+**3. Gradle Multi-Module (5 modules)**
+- `common` — Shared Kernel + infrastructure config (JPA, Redis, JWT, Security)
 - `realtime` — WebSocket infrastructure (zero domain imports, port interfaces only)
-- Unidirectional dependency: `api` → `realtime`
+- `playlist` — Playlist domain (depends: `common`)
+- `user` — User domain (depends: `common`)
+- `app` — Auth, Party, Admin, Bootstrap (depends: all modules)
+- Dependency direction: `app → user → common → realtime`, `app → playlist → common`
 
 **4. Distributed Systems**
 - Redis-based distributed locks
@@ -197,7 +200,7 @@ docker-compose up -d
 
 3. **Configure application properties**
 
-Create `api/src/main/resources/application-local.yml`:
+Create `app/src/main/resources/application-local.yml`:
 ```yaml
 spring:
   datasource:
@@ -225,8 +228,8 @@ jwt:
 
 4. **Build and run the application**
 ```bash
-./gradlew :api:build
-./gradlew :api:bootRun --args='--spring.profiles.active=local'
+./gradlew :app:build
+./gradlew :app:bootRun --args='--spring.profiles.active=local'
 ```
 
 The application will start on `http://localhost:8080`
@@ -373,22 +376,14 @@ stompClient.subscribe('/sub/events/' + partyroomId + '/playback-start',
 
 ```
 pfplay-backend-java/
-├── api/                                # Main application module
-│   └── src/main/java/com/pfplaybackend/api/
-│       ├── admin/                      # Admin functionality
-│       ├── auth/                       # Authentication & OAuth
-│       ├── avatarresource/             # Avatar resource management
-│       ├── common/                     # Shared components
-│       │   ├── config/                 # Configuration (security, redis, cache)
-│       │   ├── entity/                 # Base entities
-│       │   ├── enums/                  # Common enums
-│       │   ├── exception/              # Exception handling
-│       │   └── adapter/realtime/       # Realtime port implementations
-│       ├── party/                      # Party room domain (rooms, crew, DJ, playback, chat)
-│       ├── playlist/                   # Playlist management
-│       ├── profile/                    # User profiles & avatars
-│       └── user/                       # User management (member, guest)
-├── realtime/                           # WebSocket infrastructure module
+├── common/                             # Shared Kernel + infrastructure config
+│   └── src/main/java/com/pfplaybackend/api/common/
+│       ├── config/                     # Configuration (Security, Redis, JPA, Cache, Swagger)
+│       ├── domain/value/               # Shared Value Objects (UserId, Duration)
+│       ├── entity/                     # Base entities
+│       ├── enums/                      # Common enums
+│       └── exception/                  # Exception handling (GlobalExceptionHandler)
+├── realtime/                           # WebSocket infrastructure (zero domain imports)
 │   └── src/main/java/com/pfplaybackend/realtime/
 │       ├── config/                     # WebSocket/STOMP configuration
 │       ├── controller/                 # Heartbeat controller
@@ -396,9 +391,25 @@ pfplay-backend-java/
 │       ├── interceptor/                # WebSocket handshake interceptor
 │       ├── port/                       # Port interfaces (WebSocketAuthPort, SessionCachePort)
 │       └── sender/                     # SimpMessageSender
+├── playlist/                           # Playlist domain
+│   └── src/main/java/com/pfplaybackend/api/playlist/
+│       ├── adapter/                    # REST controllers, JPA repositories
+│       ├── application/                # Use cases, DTOs
+│       └── domain/                     # Entities, services, value objects
+├── user/                               # User domain (member, guest, profile, avatar)
+│   └── src/main/java/com/pfplaybackend/api/user/
+│       ├── adapter/                    # REST controllers, JPA repositories
+│       ├── application/                # Use cases, ports, DTOs
+│       └── domain/                     # Entities, services, value objects
+├── app/                                # Auth, Party, Admin, Bootstrap (composition root)
+│   └── src/main/java/com/pfplaybackend/api/
+│       ├── auth/                       # Authentication & OAuth
+│       ├── party/                      # Party room domain (rooms, crew, DJ, playback, chat)
+│       ├── admin/                      # Administrative tools
+│       └── bootstrap/                  # Cross-module adapters
 ├── build.gradle                        # Root Gradle config
-├── settings.gradle                     # Multi-module settings
-├── docker-compose.yml                  # Docker services
+├── settings.gradle                     # Multi-module settings (5 modules)
+├── docs/                               # Design documents (ADRs, context map, naming)
 ├── Dockerfile                          # Container image
 └── README.md                           # This file
 ```
@@ -441,7 +452,7 @@ The application supports multiple profiles:
 
 Activate a profile:
 ```bash
-./gradlew :api:bootRun --args='--spring.profiles.active=local'
+./gradlew :app:bootRun --args='--spring.profiles.active=local'
 ```
 
 ### Environment Variables
@@ -477,6 +488,13 @@ Key configuration properties:
 - **Notion Page**: [PFPlay Overview](https://www.notion.so/pfplay/PFPlay-PFP-Playground-for-music-05c88a7cd37f43cdb35756c04d922182)
 - **KanBan Board**: [Project Management](https://www.notion.so/pfplay/0578d4b85a93408d99d55f8911e552e6?v=88f049beb991436fa4533fe0c8739045)
 - **Research Board**: [Backend Research](https://www.notion.so/pfplay/Backend-Research-Board-a878cfabbf8d418884164fe0d14b8434)
+
+### Design Documents
+- [Architecture Decision Records](docs/adr/) — 5 ADRs on key architectural choices
+- [Context Map](docs/CONTEXT_MAP.md) — Bounded context boundaries and relationships
+- [Naming Convention](docs/NAMING_CONVENTION.md) — Project naming rules
+- [DDD Maturity Assessment](docs/MATURITY_ASSESSMENT.md) — Domain-driven design maturity evaluation
+- [Refactoring Roadmap](docs/REFACTORING_ROADMAP.md) — Future improvement plans
 
 ### Reference Documentation
 - [Spring Boot Documentation](https://docs.spring.io/spring-boot/docs/current/reference/html/)

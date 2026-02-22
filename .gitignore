@@ -45,3 +45,7 @@ api/src/main/resources/public_key.pem
 
 # Claude Code
 .claude/
+
+# Internal docs (AI context, archived)
+CLAUDE.md
+docs/archive/
