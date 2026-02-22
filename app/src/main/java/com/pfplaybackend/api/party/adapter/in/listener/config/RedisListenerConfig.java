@@ -7,6 +7,7 @@ import com.pfplaybackend.api.party.adapter.in.listener.GroupBroadcastTopicListen
 import com.pfplaybackend.api.party.adapter.in.listener.PlaybackDurationWaitTopicListener;
 import com.pfplaybackend.api.party.adapter.in.listener.message.*;
 import com.pfplaybackend.api.party.application.service.CrewProfileChangeEventHandler;
+import com.pfplaybackend.api.party.application.port.out.ExpirationTaskPort;
 import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import com.pfplaybackend.realtime.sender.SimpMessageSender;
@@ -34,6 +35,7 @@ public class RedisListenerConfig {
                                                         DistributedLockExecutor distributedLockExecutor,
                                                         CrewProfileChangeEventHandler crewProfileService,
                                                         PlaybackCommandService playbackCommandService,
+                                                        ExpirationTaskPort expirationTaskPort,
                                                         RedisMessagePublisher messagePublisher,
                                                         ObjectMapper objectMapper) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
@@ -59,7 +61,7 @@ public class RedisListenerConfig {
 
         // Special listeners with business logic
         container.addMessageListener(new CrewProfilePreCheckTopicListener(objectMapper, distributedLockExecutor, crewProfileService, messagePublisher), new ChannelTopic("crew_profile_pre_check"));
-        container.addMessageListener(new PlaybackDurationWaitTopicListener(redisTemplate, objectMapper, distributedLockExecutor, playbackCommandService), new PatternTopic("__keyevent@*__:expired"));
+        container.addMessageListener(new PlaybackDurationWaitTopicListener(expirationTaskPort, distributedLockExecutor, playbackCommandService), new PatternTopic("__keyevent@*__:expired"));
         return container;
     }
 }

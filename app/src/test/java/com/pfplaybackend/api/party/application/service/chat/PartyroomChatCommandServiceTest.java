@@ -7,6 +7,7 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.party.application.dto.chat.ChatMessageDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
+import com.pfplaybackend.api.party.application.port.out.ChatPenaltyCachePort;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.realtime.port.SessionCachePort;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PartyroomChatCommandServiceTest {
 
-    @Mock RedisTemplate<String, Object> redisTemplate;
+    @Mock ChatPenaltyCachePort chatPenaltyCachePort;
     @Mock RedisMessagePublisher messagePublisher;
     @Mock SessionCachePort sessionCachePort;
     @Spy ObjectMapper objectMapper = new ObjectMapper();
@@ -50,7 +50,7 @@ class PartyroomChatCommandServiceTest {
         sessionMap.put("crewId", 5L);
 
         when(sessionCachePort.getSessionCache(sessionId)).thenReturn(Optional.of(sessionMap));
-        when(redisTemplate.hasKey("PENALTY:CHAT_BAN:5")).thenReturn(false);
+        when(chatPenaltyCachePort.isChatBanned(5L)).thenReturn(false);
 
         // when
         partyroomChatCommandService.sendMessage(sessionId, "Hello!");
@@ -82,7 +82,7 @@ class PartyroomChatCommandServiceTest {
         sessionMap.put("crewId", 5L);
 
         when(sessionCachePort.getSessionCache(sessionId)).thenReturn(Optional.of(sessionMap));
-        when(redisTemplate.hasKey("PENALTY:CHAT_BAN:5")).thenReturn(true);
+        when(chatPenaltyCachePort.isChatBanned(5L)).thenReturn(true);
 
         // when
         partyroomChatCommandService.sendMessage(sessionId, "Hello!");
@@ -95,7 +95,7 @@ class PartyroomChatCommandServiceTest {
     @DisplayName("isPossibleChat — 채팅 밴 키가 없으면 true를 반환한다")
     void isPossibleChat_noBanKey_returnsTrue() {
         // given
-        when(redisTemplate.hasKey("PENALTY:CHAT_BAN:5")).thenReturn(false);
+        when(chatPenaltyCachePort.isChatBanned(5L)).thenReturn(false);
 
         // when & then
         assertThat(partyroomChatCommandService.isPossibleChat(5L)).isTrue();
@@ -105,7 +105,7 @@ class PartyroomChatCommandServiceTest {
     @DisplayName("isPossibleChat — 채팅 밴 키가 있으면 false를 반환한다")
     void isPossibleChat_banKeyExists_returnsFalse() {
         // given
-        when(redisTemplate.hasKey("PENALTY:CHAT_BAN:5")).thenReturn(true);
+        when(chatPenaltyCachePort.isChatBanned(5L)).thenReturn(true);
 
         // when & then
         assertThat(partyroomChatCommandService.isPossibleChat(5L)).isFalse();

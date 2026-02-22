@@ -47,8 +47,12 @@ public class Duration implements Serializable {
         return this.totalSeconds > other.totalSeconds;
     }
 
+    public long calculateEndTimeEpochMilli(Instant now) {
+        return now.plusSeconds(totalSeconds).toEpochMilli();
+    }
+
     public long calculateEndTimeEpochMilli() {
-        return Instant.now().plusSeconds(totalSeconds).toEpochMilli();
+        return calculateEndTimeEpochMilli(Instant.now());
     }
 
     public String toDisplayString() {

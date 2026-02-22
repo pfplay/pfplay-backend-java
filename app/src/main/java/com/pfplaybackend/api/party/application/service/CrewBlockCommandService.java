@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ public class CrewBlockCommandService {
     private final PartyroomAggregatePort aggregatePort;
     private final CrewBlockHistoryRepository blockHistoryRepository;
     private final PartyroomQueryService partyroomQueryService;
+    private final Clock clock;
 
     @Transactional
     public void addBlock(AddBlockCommand command) {
@@ -44,7 +46,7 @@ public class CrewBlockCommandService {
                 .blockerCrewId(blockerCrewId)
                 .blockedCrewId(blockedCrewId)
                 .blockedUserId(blockedCrew.getUserId())
-                .blockDate(LocalDateTime.now())
+                .blockDate(LocalDateTime.now(clock))
                 .unblocked(false)
                 .build();
 
@@ -60,7 +62,7 @@ public class CrewBlockCommandService {
         CrewBlockHistoryData historyData  = blockHistoryRepository.findByIdAndBlockerCrewIdAndUnblockedIsFalse(blockId, blockerCrewId)
                 .orElseThrow(() -> ExceptionCreator.create(BlockException.BLOCK_HISTORY_NOT_FOUND));
 
-        historyData.unblock();
+        historyData.unblock(LocalDateTime.now(clock));
 
         blockHistoryRepository.save(historyData);
     }

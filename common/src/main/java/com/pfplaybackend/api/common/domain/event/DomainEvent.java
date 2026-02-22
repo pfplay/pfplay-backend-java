@@ -8,10 +8,15 @@ import java.util.UUID;
 @Getter
 public abstract class DomainEvent {
     private final UUID eventId = UUID.randomUUID();
-    private final LocalDateTime occurredAt = LocalDateTime.now();
+    private final LocalDateTime occurredAt;
     private final String eventType;
 
     protected DomainEvent() {
+        this(LocalDateTime.now());
+    }
+
+    protected DomainEvent(LocalDateTime occurredAt) {
+        this.occurredAt = occurredAt;
         this.eventType = this.getClass().getSimpleName();
     }
 

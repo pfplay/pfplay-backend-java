@@ -7,6 +7,7 @@ import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.ForbiddenException;
+import com.pfplaybackend.api.party.application.port.out.PlaybackControlPort;
 import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
@@ -39,7 +40,7 @@ import static org.mockito.Mockito.*;
 class DjCommandServiceTest {
 
     @Mock PartyroomAggregatePort aggregatePort;
-    @Mock PlaybackCommandService playbackCommandService;
+    @Mock PlaybackControlPort playbackControlPort;
     @Mock PlaylistQueryPort playlistQueryPort;
     @Mock ApplicationEventPublisher eventPublisher;
     @Mock PartyroomAggregateService partyroomAggregateService;
@@ -160,7 +161,7 @@ class DjCommandServiceTest {
         djCommandService.enqueueDj(partyroomId, playlistId);
 
         // then
-        verify(playbackCommandService).start(partyroom);
+        verify(playbackControlPort).startPlayback(partyroom);
     }
 
     @Test
@@ -185,6 +186,6 @@ class DjCommandServiceTest {
 
         // then
         verify(partyroomAggregateService).removeDjFromQueue(partyroomId, new CrewId(1L));
-        verify(playbackCommandService, never()).skipBySystem(any());
+        verify(playbackControlPort, never()).skipPlayback(any());
     }
 }

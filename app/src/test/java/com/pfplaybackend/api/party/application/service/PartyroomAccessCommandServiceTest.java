@@ -8,6 +8,7 @@ import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
+import com.pfplaybackend.api.party.application.port.out.PlaybackControlPort;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
@@ -36,7 +37,7 @@ class PartyroomAccessCommandServiceTest {
     @Mock private PartyroomAggregatePort aggregatePort;
     @Mock private PartyroomAggregateService partyroomAggregateService;
     @Mock private PartyroomQueryService partyroomQueryService;
-    @Mock private PlaybackCommandService playbackCommandService;
+    @Mock private PlaybackControlPort playbackControlPort;
 
     @InjectMocks
     private PartyroomAccessCommandService partyroomAccessCommandService;

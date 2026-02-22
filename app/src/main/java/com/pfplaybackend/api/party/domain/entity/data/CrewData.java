@@ -79,25 +79,37 @@ public class CrewData extends BaseEntity {
 
     // ── Business Methods ──
 
-    public static CrewData create(PartyroomId partyroomId, UserId userId, GradeType gradeType) {
+    public static CrewData create(PartyroomId partyroomId, UserId userId, GradeType gradeType, LocalDateTime now) {
         return CrewData.builder()
                 .partyroomId(partyroomId)
                 .userId(userId)
                 .gradeType(gradeType)
                 .isActive(true)
                 .isBanned(false)
-                .enteredAt(LocalDateTime.now())
+                .enteredAt(now)
                 .build();
     }
 
-    public void deactivatePresence() {
+    public static CrewData create(PartyroomId partyroomId, UserId userId, GradeType gradeType) {
+        return create(partyroomId, userId, gradeType, LocalDateTime.now());
+    }
+
+    public void deactivatePresence(LocalDateTime now) {
         this.isActive = false;
-        this.exitedAt = LocalDateTime.now();
+        this.exitedAt = now;
+    }
+
+    public void deactivatePresence() {
+        deactivatePresence(LocalDateTime.now());
+    }
+
+    public void activatePresence(LocalDateTime now) {
+        this.isActive = true;
+        this.enteredAt = now;
     }
 
     public void activatePresence() {
-        this.isActive = true;
-        this.enteredAt = LocalDateTime.now();
+        activatePresence(LocalDateTime.now());
     }
 
     public void updateGrade(GradeType gradeType) {

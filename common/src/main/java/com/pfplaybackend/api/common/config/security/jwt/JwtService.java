@@ -29,6 +29,7 @@ import java.util.Map;
 public class JwtService {
 
     private final JwtProperties jwtProperties;
+    private final java.time.Clock clock;
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
@@ -59,7 +60,7 @@ public class JwtService {
     }
 
     private String createToken(Map<String, Object> claims, String subject, long expiration) {
-        Date now = new Date();
+        Date now = Date.from(clock.instant());
         Date expiryDate = new Date(now.getTime() + expiration);
 
         return Jwts.builder()
@@ -76,7 +77,7 @@ public class JwtService {
         calendar.set(2099, Calendar.DECEMBER, 31, 23, 59, 59);
         Date expiryDate = calendar.getTime();
 
-        Date now = new Date();
+        Date now = Date.from(clock.instant());
 
         return Jwts.builder()
                 .claims(claims)
@@ -142,7 +143,7 @@ public class JwtService {
         try {
             Claims claims = extractClaims(token);
             Date expiration = claims.getExpiration();
-            Date now = new Date();
+            Date now = Date.from(clock.instant());
             long timeUntilExpiry = expiration.getTime() - now.getTime();
             return timeUntilExpiry < 600_000L;
         } catch (Exception e) {

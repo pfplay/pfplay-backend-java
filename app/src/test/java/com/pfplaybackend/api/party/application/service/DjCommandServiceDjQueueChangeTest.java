@@ -3,6 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.party.application.port.out.PlaybackControlPort;
 import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.*;
 class DjCommandServiceDjQueueChangeTest {
 
     @Mock private PartyroomAggregatePort aggregatePort;
-    @Mock private PlaybackCommandService playbackCommandService;
+    @Mock private PlaybackControlPort playbackControlPort;
     @Mock private PlaylistQueryPort playlistQueryPort;
     @Mock private ApplicationEventPublisher eventPublisher;
     @Mock private PartyroomAggregateService partyroomAggregateService;
@@ -131,7 +132,7 @@ class DjCommandServiceDjQueueChangeTest {
         verify(partyroomAggregateService).removeDjFromQueue(partyroomId, new CrewId(1L));
         verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
         // 대기 DJ(currentDj가 아님)이므로 skipBySystem은 호출되지 않아야 한다
-        verify(playbackCommandService, never()).skipBySystem(any());
+        verify(playbackControlPort, never()).skipPlayback(any());
     }
 
     @Test
@@ -163,7 +164,7 @@ class DjCommandServiceDjQueueChangeTest {
         // then
         verify(partyroomAggregateService).removeDjFromQueue(partyroomId, new CrewId(1L));
         verify(eventPublisher).publishEvent(any(DjQueueChangedEvent.class));
-        verify(playbackCommandService).skipBySystem(partyroomId);
+        verify(playbackControlPort).skipPlayback(partyroomId);
     }
 
     @Test

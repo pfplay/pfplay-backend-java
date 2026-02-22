@@ -7,7 +7,8 @@ import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.domain.value.PlaybackSnapshot;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
-import com.pfplaybackend.api.party.application.service.task.ExpirationTaskScheduler;
+import com.pfplaybackend.api.party.application.port.out.ExpirationTaskPort;
+import com.pfplaybackend.api.party.application.port.out.PlaybackControlPort;
 import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
@@ -39,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class PlaybackCommandService {
+public class PlaybackCommandService implements PlaybackControlPort {
 
     private final PlaybackRepository playbackRepository;
     private final PlaybackAggregationRepository playbackAggregationRepository;
@@ -47,7 +48,7 @@ public class PlaybackCommandService {
     private final UserActivityPort userActivityPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomAggregatePort aggregatePort;
-    private final ExpirationTaskScheduler scheduleService;
+    private final ExpirationTaskPort expirationTaskPort;
     private final PartyroomAggregateService partyroomAggregateService;
     private final PartyroomQueryService partyroomQueryService;
 
@@ -56,11 +57,11 @@ public class PlaybackCommandService {
         PartyroomId partyroomId = playback.getPartyroomId();
         UserId userId = playback.getUserId();
         PlaybackDurationWaitDto playbackDurationWaitMessage = new PlaybackDurationWaitDto(partyroomId, userId);
-        scheduleService.setKeyWithExpiration(String.valueOf(partyroomId.getId()), playbackDurationWaitMessage, seconds, TimeUnit.SECONDS);
+        expirationTaskPort.scheduleExpiration(String.valueOf(partyroomId.getId()), playbackDurationWaitMessage, seconds, TimeUnit.SECONDS);
     }
 
     private void cancelTask(PartyroomId partyroomId) {
-        scheduleService.deleteKey(String.valueOf(partyroomId.getId()));
+        expirationTaskPort.cancelExpiration(String.valueOf(partyroomId.getId()));
     }
 
     @Transactional
@@ -79,8 +80,9 @@ public class PlaybackCommandService {
         tryProceed(partyroomId);
     }
 
+    @Override
     @Transactional
-    public void skipBySystem(PartyroomId partyroomId) {
+    public void skipPlayback(PartyroomId partyroomId) {
         cancelTask(partyroomId);
         tryProceed(partyroomId);
     }
@@ -89,13 +91,14 @@ public class PlaybackCommandService {
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
 
         if(partyroomAggregateService.hasQueuedDjs(partyroomId)) {
-            start(partyroom);
+            startPlayback(partyroom);
         }else{
             deactivateAndNotify(partyroom);
         }
     }
 
-    public void start(PartyroomData partyroom) {
+    @Override
+    public void startPlayback(PartyroomData partyroom) {
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getPartyroomId());
         int maxAttempts = queuedDjs.size();
         doStart(partyroom, maxAttempts);

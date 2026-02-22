@@ -1,9 +1,9 @@
-package com.pfplaybackend.api.party.application.service.cache;
+package com.pfplaybackend.api.party.adapter.out.persistence;
 
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
-import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
+import com.pfplaybackend.api.party.application.port.out.PartyroomQueryPort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,13 +25,13 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class PartyroomSessionCacheManagerTest {
+class RedisSessionCacheAdapterTest {
 
     @Mock RedisTemplate<String, Object> redisTemplate;
     @Mock ValueOperations<String, Object> valueOperations;
-    @Mock PartyroomQueryService partyroomQueryService;
+    @Mock PartyroomQueryPort partyroomQueryPort;
 
-    @InjectMocks PartyroomSessionCacheManager partyroomSessionCacheManager;
+    @InjectMocks RedisSessionCacheAdapter redisSessionCacheAdapter;
 
     @BeforeEach
     void setUp() {
@@ -49,10 +49,10 @@ class PartyroomSessionCacheManagerTest {
         ActivePartyroomDto activeDto = new ActivePartyroomDto(
                 1L, false, 10L, true, new PlaybackId(1L), new CrewId(5L)
         );
-        when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
+        when(partyroomQueryPort.getActivePartyroomByUserId(userId)).thenReturn(Optional.of(activeDto));
 
         // when
-        partyroomSessionCacheManager.saveSessionCache(sessionId, userIdStr, destination);
+        redisSessionCacheAdapter.saveSessionCache(sessionId, userIdStr, destination);
 
         // then
         verify(valueOperations).set(eq(sessionId), any());
@@ -66,11 +66,11 @@ class PartyroomSessionCacheManagerTest {
         String userIdStr = "1";
         String destination = "/sub/partyrooms/1";
         UserId userId = UserId.fromString(userIdStr);
-        when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.empty());
+        when(partyroomQueryPort.getActivePartyroomByUserId(userId)).thenReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() ->
-                partyroomSessionCacheManager.saveSessionCache(sessionId, userIdStr, destination))
+                redisSessionCacheAdapter.saveSessionCache(sessionId, userIdStr, destination))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -81,7 +81,7 @@ class PartyroomSessionCacheManagerTest {
         String sessionId = "session-123";
 
         // when
-        partyroomSessionCacheManager.deleteSessionCache(sessionId);
+        redisSessionCacheAdapter.deleteSessionCache(sessionId);
 
         // then
         verify(redisTemplate).delete(sessionId);
@@ -96,7 +96,7 @@ class PartyroomSessionCacheManagerTest {
         when(valueOperations.get(sessionId)).thenReturn(cached);
 
         // when
-        Optional<Object> result = partyroomSessionCacheManager.getSessionCache(sessionId);
+        Optional<Object> result = redisSessionCacheAdapter.getSessionCache(sessionId);
 
         // then
         assertThat(result).isPresent();
@@ -110,7 +110,7 @@ class PartyroomSessionCacheManagerTest {
         when(valueOperations.get(sessionId)).thenReturn(null);
 
         // when
-        Optional<Object> result = partyroomSessionCacheManager.getSessionCache(sessionId);
+        Optional<Object> result = redisSessionCacheAdapter.getSessionCache(sessionId);
 
         // then
         assertThat(result).isEmpty();

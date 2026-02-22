@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PreDestroy;
 
+import java.time.Clock;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -29,26 +30,16 @@ public class ChatSimulationService {
 
     private final AdminPartyroomPort adminPartyroomPort;
     private final RedisMessagePublisher messagePublisher;
-
-    // ExecutorService for background chat simulation
-    private final ScheduledExecutorService chatExecutor = Executors.newScheduledThreadPool(5);
+    private final Clock clock;
+    private final ScheduledExecutorService chatSimulationExecutor;
 
     // Track active simulations
     private final Map<Long, ScheduledFuture<?>> activeSimulations = new ConcurrentHashMap<>();
 
     @PreDestroy
-    void shutdownExecutor() {
+    void cancelActiveSimulations() {
         activeSimulations.values().forEach(f -> f.cancel(false));
         activeSimulations.clear();
-        chatExecutor.shutdown();
-        try {
-            if (!chatExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
-                chatExecutor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            chatExecutor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
     }
 
     /**
@@ -186,7 +177,7 @@ public class ChatSimulationService {
         log.info("Starting chat simulation for partyroom: {} with {} crew members, scriptType: {}",
                 partyroomId, crewList.size(), scriptType);
 
-        ScheduledFuture<?> future = chatExecutor.scheduleWithFixedDelay(
+        ScheduledFuture<?> future = chatSimulationExecutor.scheduleWithFixedDelay(
                 new ChatSimulationTask(partyroomId, crewList, scripts),
                 0,
                 1,
@@ -219,7 +210,7 @@ public class ChatSimulationService {
         private final List<CrewData> crewList;
         private final List<String> scripts;
         private int currentIndex = 0;
-        private long nextMessageTime = System.currentTimeMillis();
+        private long nextMessageTime = clock.millis();
 
         public ChatSimulationTask(Long partyroomId, List<CrewData> crewList, List<String> scripts) {
             this.partyroomId = partyroomId;
@@ -230,7 +221,7 @@ public class ChatSimulationService {
         @Override
         public void run() {
             try {
-                long currentTime = System.currentTimeMillis();
+                long currentTime = clock.millis();
 
                 if (currentTime < nextMessageTime) {
                     return;
@@ -260,7 +251,7 @@ public class ChatSimulationService {
                 new PartyroomId(partyroomId),
                 MessageTopic.CHAT,
                 new ChatMessageDto.CrewInfo(crewId),
-                new ChatMessageDto.ChatContent(System.currentTimeMillis() + ":" + crewId, content)
+                new ChatMessageDto.ChatContent(clock.millis() + ":" + crewId, content)
         );
 
         messagePublisher.publish(MessageTopic.CHAT.topic(), chatMessage);

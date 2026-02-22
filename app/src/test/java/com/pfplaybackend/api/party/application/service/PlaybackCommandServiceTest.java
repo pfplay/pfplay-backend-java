@@ -11,7 +11,7 @@ import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
-import com.pfplaybackend.api.party.application.service.task.ExpirationTaskScheduler;
+import com.pfplaybackend.api.party.application.port.out.ExpirationTaskPort;
 import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
@@ -54,7 +54,7 @@ class PlaybackCommandServiceTest {
     @Mock UserActivityPort userActivityPort;
     @Mock ApplicationEventPublisher eventPublisher;
     @Mock PartyroomAggregatePort aggregatePort;
-    @Mock ExpirationTaskScheduler scheduleService;
+    @Mock ExpirationTaskPort expirationTaskPort;
     @Mock PartyroomAggregateService partyroomAggregateService;
     @Mock PartyroomQueryService partyroomQueryService;
 
@@ -124,7 +124,7 @@ class PlaybackCommandServiceTest {
         playbackCommandService.skipByManager(partyroomId);
 
         // then
-        verify(scheduleService).deleteKey(String.valueOf(partyroomId.getId()));
+        verify(expirationTaskPort).cancelExpiration(String.valueOf(partyroomId.getId()));
         verify(partyroomAggregateService).deactivatePlayback(partyroomId);
     }
 
@@ -145,18 +145,18 @@ class PlaybackCommandServiceTest {
     }
 
     @Test
-    @DisplayName("skipBySystem — 스케줄 태스크를 취소하고 tryProceed를 실행한다")
-    void skipBySystem_cancelsTaskAndProceeds() {
+    @DisplayName("skipPlayback — 스케줄 태스크를 취소하고 tryProceed를 실행한다")
+    void skipPlayback_cancelsTaskAndProceeds() {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
         when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(false);
 
         // when
-        playbackCommandService.skipBySystem(partyroomId);
+        playbackCommandService.skipPlayback(partyroomId);
 
         // then
-        verify(scheduleService).deleteKey(String.valueOf(partyroomId.getId()));
+        verify(expirationTaskPort).cancelExpiration(String.valueOf(partyroomId.getId()));
         verify(partyroomAggregateService).deactivatePlayback(partyroomId);
     }
 

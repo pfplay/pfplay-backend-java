@@ -24,6 +24,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,12 +39,16 @@ class CrewBlockCommandServiceTest {
     @Mock PartyroomAggregatePort aggregatePort;
     @Mock CrewBlockHistoryRepository blockHistoryRepository;
     @Mock PartyroomQueryService partyroomQueryService;
+    @Mock Clock clock;
     @InjectMocks CrewBlockCommandService crewBlockCommandService;
 
     private UserId userId;
 
     @BeforeEach
     void setUp() {
+        lenient().when(clock.instant()).thenReturn(Instant.parse("2025-01-01T00:00:00Z"));
+        lenient().when(clock.getZone()).thenReturn(ZoneId.of("UTC"));
+        lenient().when(clock.millis()).thenReturn(1735689600000L);
         userId = new UserId(1L);
         AuthContext authContext = mock(AuthContext.class);
         lenient().when(authContext.getUserId()).thenReturn(userId);

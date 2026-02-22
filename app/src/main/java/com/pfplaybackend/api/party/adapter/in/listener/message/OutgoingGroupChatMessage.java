@@ -16,12 +16,16 @@ public record OutgoingGroupChatMessage(
     public record CrewInfo(long crewId) {}
     public record ChatContent(String messageId, String content) {}
 
-    public static OutgoingGroupChatMessage from(PartyroomSessionDto sessionDto, String content) {
+    public static OutgoingGroupChatMessage from(PartyroomSessionDto sessionDto, String content, long timestamp) {
         return new OutgoingGroupChatMessage(
                 sessionDto.partyroomId(),
                 MessageTopic.CHAT,
                 new CrewInfo(sessionDto.crewId()),
-                new ChatContent(System.currentTimeMillis() + ":" + sessionDto.crewId(), content)
+                new ChatContent(timestamp + ":" + sessionDto.crewId(), content)
         );
+    }
+
+    public static OutgoingGroupChatMessage from(PartyroomSessionDto sessionDto, String content) {
+        return from(sessionDto, content, System.currentTimeMillis());
     }
 }

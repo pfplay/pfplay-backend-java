@@ -7,11 +7,11 @@ import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.common.config.redis.RedisMessagePublisher;
 import com.pfplaybackend.api.party.application.dto.chat.ChatMessageDto;
+import com.pfplaybackend.api.party.application.port.out.ChatPenaltyCachePort;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -23,7 +23,7 @@ public class PartyroomChatCommandService {
 
     private static final Logger logger = LoggerFactory.getLogger(PartyroomChatCommandService.class);
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final ChatPenaltyCachePort chatPenaltyCachePort;
     private final RedisMessagePublisher messagePublisher;
     private final SessionCachePort sessionCachePort;
 
@@ -55,7 +55,6 @@ public class PartyroomChatCommandService {
     }
 
     public boolean isPossibleChat(Long crewIdValue) {
-        String key = "PENALTY:CHAT_BAN:" + crewIdValue;
-        return Boolean.FALSE.equals(redisTemplate.hasKey(key));
+        return !chatPenaltyCachePort.isChatBanned(crewIdValue);
     }
 }

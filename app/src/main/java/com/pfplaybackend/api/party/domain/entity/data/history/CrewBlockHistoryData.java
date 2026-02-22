@@ -57,8 +57,12 @@ public class CrewBlockHistoryData extends BaseEntity {
 
     // ── Business Methods ──
 
-    public void unblock() {
+    public void unblock(LocalDateTime now) {
         this.unblocked = true;
-        this.unblockDate = LocalDateTime.now();
+        this.unblockDate = now;
+    }
+
+    public void unblock() {
+        unblock(LocalDateTime.now());
     }
 }

@@ -16,6 +16,7 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+    private final Clock clock;
 
     @Override
     public Optional<ActivePartyroomDto> getActivePartyroomByUserId(UserId userId) {
@@ -160,7 +162,7 @@ public class PartyroomRepositoryImpl implements PartyroomRepositoryCustom {
 
         return queryFactory.select(qPartyroomData)
                 .from(qPartyroomData)
-                .where(qPartyroomData.updatedAt.before(LocalDateTime.now().minusDays(days)))
+                .where(qPartyroomData.updatedAt.before(LocalDateTime.now(clock).minusDays(days)))
                 .fetch();
     }
 }

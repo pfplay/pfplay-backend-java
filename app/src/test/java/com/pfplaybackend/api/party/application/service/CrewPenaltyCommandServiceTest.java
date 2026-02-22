@@ -18,6 +18,7 @@ import com.pfplaybackend.api.party.domain.value.LinkDomain;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewPenaltyHistoryRepository;
+import com.pfplaybackend.api.party.application.port.out.ChatPenaltyCachePort;
 import com.pfplaybackend.api.party.application.dto.command.PunishPenaltyCommand;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,9 +29,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,14 +47,18 @@ class CrewPenaltyCommandServiceTest {
     @Mock PartyroomAggregatePort aggregatePort;
     @Mock PartyroomAccessCommandService partyroomAccessCommandService;
     @Mock CrewPenaltyHistoryRepository crewPenaltyHistoryRepository;
-    @Mock RedisTemplate<String, Object> redisTemplate;
+    @Mock ChatPenaltyCachePort chatPenaltyCachePort;
     @Mock PartyroomQueryService partyroomQueryService;
+    @Mock Clock clock;
     @InjectMocks CrewPenaltyCommandService crewPenaltyCommandService;
 
     private UserId userId;
 
     @BeforeEach
     void setUp() {
+        lenient().when(clock.instant()).thenReturn(Instant.parse("2025-01-01T00:00:00Z"));
+        lenient().when(clock.getZone()).thenReturn(ZoneId.of("UTC"));
+        lenient().when(clock.millis()).thenReturn(1735689600000L);
         userId = new UserId(1L);
         AuthContext authContext = mock(AuthContext.class);
         lenient().when(authContext.getUserId()).thenReturn(userId);
@@ -92,14 +98,11 @@ class CrewPenaltyCommandServiceTest {
 
         PunishPenaltyCommand command = new PunishPenaltyCommand(20L, PenaltyType.CHAT_BAN_30_SECONDS, "Spam");
 
-        ValueOperations<String, Object> valueOps = mock(ValueOperations.class);
-        when(redisTemplate.opsForValue()).thenReturn(valueOps);
-
         // when
         crewPenaltyCommandService.addPenalty(partyroomId, command);
 
         // then
-        verify(valueOps).set(eq("PENALTY:CHAT_BAN:20"), eq(30), any(java.time.Duration.class));
+        verify(chatPenaltyCachePort).recordChatBan(20L, 30);
         verify(eventPublisher).publishEvent(any(CrewPenalizedEvent.class));
         verify(crewPenaltyHistoryRepository, never()).save(any());
     }

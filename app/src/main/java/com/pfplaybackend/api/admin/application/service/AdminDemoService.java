@@ -15,7 +15,7 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessCommandService;
-import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
+import com.pfplaybackend.api.party.application.port.out.PlaybackControlPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
 import com.pfplaybackend.api.party.domain.entity.data.DjQueueData;
@@ -42,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +67,8 @@ public class AdminDemoService {
     private final AdminPlaylistPort adminPlaylistPort;
     private final AdminPartyroomPort adminPartyroomPort;
     private final PartyroomAccessCommandService partyroomAccessCommandService;
-    private final PlaybackCommandService playbackCommandService;
+    private final PlaybackControlPort playbackControlPort;
+    private final Clock clock;
 
     private static final int TOTAL_MEMBERS = 400;
     private static final int SPECIAL_MEMBERS = 13;  // 1 main stage DJ + 12 general room hosts
@@ -76,7 +78,7 @@ public class AdminDemoService {
 
     @Transactional
     public DemoEnvironmentResult initializeDemoEnvironment(InitializeDemoCommand command) {
-        long startTime = System.currentTimeMillis();
+        long startTime = clock.millis();
 
         log.info("Starting demo environment initialization...");
 
@@ -114,7 +116,7 @@ public class AdminDemoService {
             djsRegistered = registerDjsInQueues(mainStage, generalRooms, specialMembers);
         }
 
-        long executionTime = System.currentTimeMillis() - startTime;
+        long executionTime = clock.millis() - startTime;
 
         log.info("Demo environment initialized successfully in {}ms", executionTime);
         log.info("Created: {} members, {} general partyrooms, {} DJs",
@@ -321,7 +323,7 @@ public class AdminDemoService {
 
         // Start playback if this is the first DJ
         if (isPostActivationProcessingRequired) {
-            playbackCommandService.start(loadedPartyroom);
+            playbackControlPort.startPlayback(loadedPartyroom);
             log.info("Started playback for partyroom: partyroomId={}, djUserId={}",
                     partyroom.getPartyroomId().getId(), userId.getUid());
         }

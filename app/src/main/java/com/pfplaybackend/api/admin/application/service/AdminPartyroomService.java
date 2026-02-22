@@ -30,8 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.annotation.PreDestroy;
-
+import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,22 +52,8 @@ public class AdminPartyroomService {
     private final AdminUserService adminUserService;
     private final PlaybackQueryService playbackQueryService;
     private final ReactionSimulationService reactionSimulationService;
-
-    // ExecutorService for async reaction simulation
-    private final ExecutorService reactionExecutor = Executors.newFixedThreadPool(10);
-
-    @PreDestroy
-    void shutdownExecutor() {
-        reactionExecutor.shutdown();
-        try {
-            if (!reactionExecutor.awaitTermination(10, TimeUnit.SECONDS)) {
-                reactionExecutor.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            reactionExecutor.shutdownNow();
-            Thread.currentThread().interrupt();
-        }
-    }
+    private final Clock clock;
+    private final ExecutorService reactionSimulationExecutor;
 
     @Transactional
     public AdminPartyroomResult createPartyroomWithHost(AdminCreatePartyroomCommand command) {
@@ -95,7 +80,7 @@ public class AdminPartyroomService {
 
     @Transactional
     public BulkPreviewResult createBulkPreviewEnvironment(BulkPreviewCommand command) {
-        long startTime = System.currentTimeMillis();
+        long startTime = clock.millis();
 
         List<BulkPreviewResult.PartyroomSummary> partyroomSummaries = new ArrayList<>();
         int totalVirtualMembers = 0;
@@ -151,7 +136,7 @@ public class AdminPartyroomService {
                     virtualMembers.size());
         }
 
-        long executionTime = System.currentTimeMillis() - startTime;
+        long executionTime = clock.millis() - startTime;
 
         log.info("Bulk preview environment created: {} partyrooms, {} virtual members, {}ms",
                 command.partyroomCount(), totalVirtualMembers, executionTime);
@@ -261,7 +246,7 @@ public class AdminPartyroomService {
                         ReactionType.LIKE,
                         delayMs
                 );
-            }, reactionExecutor);
+            }, reactionSimulationExecutor);
             reactionFutures.add(future);
         }
 
@@ -282,7 +267,7 @@ public class AdminPartyroomService {
                         ReactionType.GRAB,
                         delayMs
                 );
-            }, reactionExecutor);
+            }, reactionSimulationExecutor);
             reactionFutures.add(future);
         }
 

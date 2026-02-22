@@ -1,19 +1,17 @@
 package com.pfplaybackend.api.party.adapter.in.listener;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pfplaybackend.api.party.application.port.out.ExpirationTaskPort;
 import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackDurationWaitDto;
 import lombok.AllArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @AllArgsConstructor
 public class PlaybackDurationWaitTopicListener implements MessageListener {
 
-    private RedisTemplate<String, Object> redisTemplate;
-    private ObjectMapper objectMapper;
+    private ExpirationTaskPort expirationTaskPort;
     private DistributedLockExecutor distributedLockExecutor;
     private PlaybackCommandService playbackCommandService;
 
@@ -22,11 +20,10 @@ public class PlaybackDurationWaitTopicListener implements MessageListener {
         String expiredKey = message.toString();
         if(expiredKey.startsWith("TASK:WAIT")) {
             String taskId = expiredKey.split(":")[2];
-            String argsKey = "WAIT:ARGS:" + taskId;
-            PlaybackDurationWaitDto deserialized = objectMapper.convertValue(redisTemplate.opsForValue().get(argsKey), PlaybackDurationWaitDto.class);
+            PlaybackDurationWaitDto deserialized = expirationTaskPort.getTaskArgs(taskId, PlaybackDurationWaitDto.class);
             String suffixId = deserialized.userId().getUid().toString();
             distributedLockExecutor.performTaskWithLock(suffixId, () -> {
-                redisTemplate.delete(argsKey);
+                expirationTaskPort.clearTaskArgs(taskId);
                 playbackCommandService.complete(deserialized.partyroomId(), deserialized.userId());
                 return null;
             });

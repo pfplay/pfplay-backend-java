@@ -12,6 +12,7 @@ import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.enums.DjChangeType;
 import com.pfplaybackend.api.party.domain.event.CrewAccessedEvent;
 import com.pfplaybackend.api.party.domain.event.DjQueueChangedEvent;
+import com.pfplaybackend.api.party.application.port.out.PlaybackControlPort;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.specification.PartyroomEntrySpecification;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -36,7 +37,7 @@ public class PartyroomAccessCommandService {
     private final PartyroomAggregatePort aggregatePort;
     private final PartyroomAggregateService partyroomAggregateService;
     private final PartyroomQueryService partyroomQueryService;
-    private final PlaybackCommandService playbackCommandService;
+    private final PlaybackControlPort playbackControlPort;
 
     @Transactional
     public CrewData tryEnter(PartyroomId partyroomId) {
@@ -155,7 +156,7 @@ public class PartyroomAccessCommandService {
             eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.DEQUEUE_EXIT, crewId));
         }
         if (wasCurrentDj) {
-            playbackCommandService.skipBySystem(partyroom.getPartyroomId());
+            playbackControlPort.skipPlayback(partyroom.getPartyroomId());
         }
     }
 }

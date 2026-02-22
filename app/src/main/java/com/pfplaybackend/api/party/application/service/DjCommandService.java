@@ -3,6 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.party.application.port.out.PlaybackControlPort;
 import com.pfplaybackend.api.party.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.DjData;
@@ -31,7 +32,7 @@ import java.util.List;
 public class DjCommandService {
 
     private final PartyroomAggregatePort aggregatePort;
-    private final PlaybackCommandService playbackCommandService;
+    private final PlaybackControlPort playbackControlPort;
     private final PlaylistQueryPort playlistQueryPort;
     private final ApplicationEventPublisher eventPublisher;
     private final PartyroomAggregateService partyroomAggregateService;
@@ -68,7 +69,7 @@ public class DjCommandService {
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.ENQUEUE, crewId));
 
         if(isPostActivationProcessingRequired) {
-            playbackCommandService.start(partyroom);
+            playbackControlPort.startPlayback(partyroom);
         }
     }
 
@@ -86,7 +87,7 @@ public class DjCommandService {
 
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.DEQUEUE, crewId));
         if (wasCurrentDj) {
-            playbackCommandService.skipBySystem(partyroomId);
+            playbackControlPort.skipPlayback(partyroomId);
         }
     }
 
@@ -110,7 +111,7 @@ public class DjCommandService {
 
         eventPublisher.publishEvent(new DjQueueChangedEvent(partyroom.getPartyroomId(), DjChangeType.DEQUEUE_ADMIN, targetDj.getCrewId()));
         if (wasCurrentDj) {
-            playbackCommandService.skipBySystem(partyroomId);
+            playbackControlPort.skipPlayback(partyroomId);
         }
     }
 

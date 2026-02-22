@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -28,6 +29,7 @@ public class AuthService {
     private final MemberSignService memberSignService;
     private final JwtService jwtService;
     private final StateStorePort stateStorePort;
+    private final Clock clock;
 
     @Transactional
     public AuthResult processOAuthLogin(OAuthLoginCommand command) {
@@ -62,7 +64,7 @@ public class AuthService {
             ));
 
             // 5. Build response
-            return new AuthResult(accessToken, "Cookie", jwtService.getAccessTokenExpiration(), LocalDateTime.now());
+            return new AuthResult(accessToken, "Cookie", jwtService.getAccessTokenExpiration(), LocalDateTime.now(clock));
 
         } catch (Exception e) {
             log.error("OAuth login failed: {}", e.getMessage(), e);

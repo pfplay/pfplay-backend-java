@@ -14,15 +14,15 @@ import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewPenaltyHistoryRepository;
+import com.pfplaybackend.api.party.application.port.out.ChatPenaltyCachePort;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.application.dto.command.PunishPenaltyCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Service
@@ -33,8 +33,9 @@ public class CrewPenaltyCommandService {
     private final PartyroomAggregatePort aggregatePort;
     private final PartyroomAccessCommandService partyroomAccessCommandService;
     private final CrewPenaltyHistoryRepository crewPenaltyHistoryRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final ChatPenaltyCachePort chatPenaltyCachePort;
     private final PartyroomQueryService partyroomQueryService;
+    private final Clock clock;
 
     @Transactional
     public void addPenalty(PartyroomId partyroomId, PunishPenaltyCommand command) {
@@ -70,7 +71,7 @@ public class CrewPenaltyCommandService {
                     .punishedCrewId(punishedCrewId)
                     .punisherCrewId(new CrewId(punisherCrew.getId()))
                     .penaltyReason(command.detail())
-                    .penaltyDate(LocalDateTime.now())
+                    .penaltyDate(LocalDateTime.now(clock))
                     .penaltyType(command.penaltyType())
                     .released(false)
                     .build();
@@ -79,8 +80,7 @@ public class CrewPenaltyCommandService {
     }
 
     private void recordInShortTime(Long crewIdValue) {
-        String key = "PENALTY:CHAT_BAN:" + crewIdValue;
-        redisTemplate.opsForValue().set(key, 30, Duration.ofSeconds(30));
+        chatPenaltyCachePort.recordChatBan(crewIdValue, 30);
     }
 
     public void releaseCrewPenalty(PartyroomId partyroomId, Long penaltyId) {
@@ -100,7 +100,7 @@ public class CrewPenaltyCommandService {
         aggregatePort.saveCrew(crew);
 
         // 2. Update history
-        historyData.release(new CrewId(releaserCrewForValidation.getId()));
+        historyData.release(new CrewId(releaserCrewForValidation.getId()), LocalDateTime.now(clock));
         crewPenaltyHistoryRepository.save(historyData);
     }
 }
