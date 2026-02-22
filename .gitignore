@@ -42,3 +42,6 @@ api/*.env
 !.env.example
 api/src/main/resources/private_key.pem
 api/src/main/resources/public_key.pem
+
+# Claude Code
+.claude/
