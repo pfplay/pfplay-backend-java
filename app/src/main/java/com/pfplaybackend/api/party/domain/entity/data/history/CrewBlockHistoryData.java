@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.party.domain.entity.data.history;
 
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

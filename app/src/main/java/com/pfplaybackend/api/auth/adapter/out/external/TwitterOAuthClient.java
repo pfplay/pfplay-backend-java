@@ -1,14 +1,13 @@
 package com.pfplaybackend.api.auth.adapter.out.external;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
 import com.pfplaybackend.api.auth.application.dto.oauth.OAuthTokenDto;
 import com.pfplaybackend.api.auth.application.dto.oauth.OAuthUserProfileDto;
-import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
 import com.pfplaybackend.api.common.exception.OAuthException;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;

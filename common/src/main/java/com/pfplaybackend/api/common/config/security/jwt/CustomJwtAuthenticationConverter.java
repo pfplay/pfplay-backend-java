@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.common.config.security.jwt;
 
 import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.converter.Converter;

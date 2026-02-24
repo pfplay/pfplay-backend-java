@@ -1,10 +1,11 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import jakarta.persistence.*;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;

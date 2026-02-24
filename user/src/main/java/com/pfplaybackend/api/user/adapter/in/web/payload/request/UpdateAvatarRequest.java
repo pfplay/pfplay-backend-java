@@ -5,11 +5,7 @@ import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,18 +18,18 @@ public class UpdateAvatarRequest {
 
     @NotNull(message = "avatarCompositionType은 필수입니다.")
     @JsonProperty("avatarCompositionType")
-    @Schema(description = "아바타 구성 타입", example = "BODY_WITH_FACE", required = true)
+    @Schema(description = "아바타 구성 타입", example = "BODY_WITH_FACE", requiredMode = Schema.RequiredMode.REQUIRED)
     private AvatarCompositionType avatarCompositionType;
 
     @NotNull(message = "body 정보는 필수입니다.")
     @Valid
     @JsonProperty("body")
-    @Schema(description = "아바타 Body 정보", required = true)
+    @Schema(description = "아바타 Body 정보", requiredMode = Schema.RequiredMode.REQUIRED)
     private AvatarBody body;
 
     @Valid
     @JsonProperty("face")
-    @Schema(description = "아바타 Face 정보 (BODY_WITH_FACE 타입일 때만 필요)", required = false)
+    @Schema(description = "아바타 Face 정보 (BODY_WITH_FACE 타입일 때만 필요)")
     private AvatarFace face;
 
     @Data
@@ -48,7 +44,7 @@ public class UpdateAvatarRequest {
         @JsonProperty("uri")
         @Schema(description = "Body 이미지 URI",
                 example = "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_001.png?alt=media",
-                required = true)
+                requiredMode = Schema.RequiredMode.REQUIRED)
         private String uri;
     }
 
@@ -60,20 +56,20 @@ public class UpdateAvatarRequest {
 
         @NotNull(message = "face.sourceType은 필수입니다.")
         @JsonProperty("sourceType")
-        @Schema(description = "Face 리소스 타입", example = "INTERNAL_IMAGE", required = true)
+        @Schema(description = "Face 리소스 타입", example = "INTERNAL_IMAGE", requiredMode = Schema.RequiredMode.REQUIRED)
         private FaceSourceType sourceType;
 
         @NotBlank(message = "face.uri는 필수입니다.")
         @JsonProperty("uri")
         @Schema(description = "Face 이미지 URI",
                 example = "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_face%2Fava_face_001.png?alt=media",
-                required = true)
+                requiredMode = Schema.RequiredMode.REQUIRED)
         private String uri;
 
         @NotNull(message = "face.transform은 필수입니다.")
         @Valid
         @JsonProperty("transform")
-        @Schema(description = "Face 변형 정보", required = true)
+        @Schema(description = "Face 변형 정보", requiredMode = Schema.RequiredMode.REQUIRED)
         private FaceTransform transform;
     }
 
@@ -85,19 +81,19 @@ public class UpdateAvatarRequest {
 
         @NotNull(message = "transform.offsetX는 필수입니다.")
         @JsonProperty("offsetX")
-        @Schema(description = "X축 오프셋", example = "12.5", required = true)
+        @Schema(description = "X축 오프셋", example = "12.5", requiredMode = Schema.RequiredMode.REQUIRED)
         private Double offsetX;
 
         @NotNull(message = "transform.offsetY는 필수입니다.")
         @JsonProperty("offsetY")
-        @Schema(description = "Y축 오프셋", example = "-8.0", required = true)
+        @Schema(description = "Y축 오프셋", example = "-8.0", requiredMode = Schema.RequiredMode.REQUIRED)
         private Double offsetY;
 
         @NotNull(message = "transform.scale은 필수입니다.")
         @DecimalMin(value = "0.0", message = "scale은 0 이상이어야 합니다.")
         @DecimalMax(value = "200.0", message = "scale은 200 이하여야 합니다.")
         @JsonProperty("scale")
-        @Schema(description = "크기 비율 (%)", example = "85.0", minimum = "0", maximum = "200", required = true)
+        @Schema(description = "크기 비율 (%)", example = "85.0", minimum = "0", maximum = "200", requiredMode = Schema.RequiredMode.REQUIRED)
         private Double scale;
     }
 }

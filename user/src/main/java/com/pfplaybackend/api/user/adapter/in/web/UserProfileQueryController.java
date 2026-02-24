@@ -1,14 +1,16 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.user.adapter.in.web.payload.response.QueryMyProfileSummaryResponse;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
 import com.pfplaybackend.api.user.application.service.UserProfileQueryService;
-import com.pfplaybackend.api.user.adapter.in.web.payload.response.QueryMyProfileSummaryResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "User Profile API")
 @RequestMapping("/api/v1/users")

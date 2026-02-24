@@ -5,14 +5,16 @@ import com.pfplaybackend.api.common.config.security.enums.AccessLevel;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "User Sign API")
 @RestController

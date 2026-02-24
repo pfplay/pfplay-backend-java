@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.playlist.adapter.in.web.search;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.playlist.application.service.search.MusicSearchService;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MusicSearchRequest;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.response.QueryMusicSearchResponse;
+import com.pfplaybackend.api.playlist.application.service.search.MusicSearchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,12 +1,11 @@
 package com.pfplaybackend.api.user.application.service;
 
+import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;

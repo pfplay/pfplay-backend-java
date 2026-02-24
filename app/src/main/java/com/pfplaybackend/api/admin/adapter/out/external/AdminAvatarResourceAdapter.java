@@ -1,6 +1,8 @@
 package com.pfplaybackend.api.admin.adapter.out.external;
 
 import com.pfplaybackend.api.admin.application.port.out.AdminAvatarResourcePort;
+import com.pfplaybackend.api.user.adapter.out.persistence.AvatarBodyResourceRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.AvatarFaceResourceRepository;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
 import com.pfplaybackend.api.user.application.service.AvatarResourceQueryService;
@@ -10,8 +12,6 @@ import com.pfplaybackend.api.user.domain.entity.data.AvatarFaceResourceData;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
 import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
-import com.pfplaybackend.api.user.adapter.out.persistence.AvatarBodyResourceRepository;
-import com.pfplaybackend.api.user.adapter.out.persistence.AvatarFaceResourceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

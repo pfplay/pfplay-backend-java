@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.application.service.lock;
 
 import com.pfplaybackend.api.common.config.redis.lock.RedisLockService;
-import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.util.function.Supplier;
 public class DistributedLockExecutor {
 
     private final RedisLockService redisLockService;
-    private final PlaybackCommandService playbackCommandService;
 
     private static final String LOCK_PREFIX = "lock";
 

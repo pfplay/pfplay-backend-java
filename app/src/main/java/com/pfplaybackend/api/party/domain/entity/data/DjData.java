@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

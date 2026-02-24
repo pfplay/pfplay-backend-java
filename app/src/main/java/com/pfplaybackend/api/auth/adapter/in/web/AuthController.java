@@ -1,15 +1,15 @@
 package com.pfplaybackend.api.auth.adapter.in.web;
 
-import com.pfplaybackend.api.auth.application.service.AuthService;
-import com.pfplaybackend.api.auth.application.service.LogoutService;
-import com.pfplaybackend.api.auth.application.service.OAuthUrlService;
-import com.pfplaybackend.api.auth.adapter.in.web.payload.response.LoginOAuthResponse;
-import com.pfplaybackend.api.auth.adapter.in.web.payload.request.LoginOAuthRequest;
 import com.pfplaybackend.api.auth.adapter.in.web.payload.request.GenerateOAuthUrlRequest;
+import com.pfplaybackend.api.auth.adapter.in.web.payload.request.LoginOAuthRequest;
 import com.pfplaybackend.api.auth.adapter.in.web.payload.response.GenerateOAuthUrlResponse;
+import com.pfplaybackend.api.auth.adapter.in.web.payload.response.LoginOAuthResponse;
 import com.pfplaybackend.api.auth.application.dto.command.OAuthLoginCommand;
 import com.pfplaybackend.api.auth.application.dto.result.AuthResult;
 import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
+import com.pfplaybackend.api.auth.application.service.AuthService;
+import com.pfplaybackend.api.auth.application.service.LogoutService;
+import com.pfplaybackend.api.auth.application.service.OAuthUrlService;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController

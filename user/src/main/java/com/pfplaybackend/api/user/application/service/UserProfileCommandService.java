@@ -1,11 +1,11 @@
 package com.pfplaybackend.api.user.application.service;
 
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.domain.value.Nickname;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
-import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
+import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
+import com.pfplaybackend.api.user.domain.value.Nickname;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

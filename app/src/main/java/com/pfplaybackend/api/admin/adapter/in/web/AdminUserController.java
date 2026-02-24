@@ -1,13 +1,13 @@
 package com.pfplaybackend.api.admin.adapter.in.web;
 
-import com.pfplaybackend.api.admin.application.service.AdminUserService;
-import com.pfplaybackend.api.admin.adapter.in.web.payload.request.UpdateVirtualMemberAvatarRequest;
 import com.pfplaybackend.api.admin.adapter.in.web.payload.request.CreateVirtualMemberRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.request.UpdateVirtualMemberAvatarRequest;
 import com.pfplaybackend.api.admin.adapter.in.web.payload.response.QueryVirtualMemberResponse;
+import com.pfplaybackend.api.admin.application.service.AdminUserService;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

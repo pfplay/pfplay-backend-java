@@ -1,24 +1,24 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
+import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackReactionHistoryRepository;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
-import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.exception.ReactionException;
+import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
 import com.pfplaybackend.api.party.domain.service.PlaybackReactionDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackReactionHistoryRepository;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.Optional;

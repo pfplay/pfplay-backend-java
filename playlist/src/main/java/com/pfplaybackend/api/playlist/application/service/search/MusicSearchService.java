@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.playlist.application.service.search;
 
 import com.pfplaybackend.api.playlist.application.dto.search.SearchResultDto;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +11,7 @@ public class MusicSearchService {
     private final YoutubeSearchService youtubeSearchService;
 
     public SearchResultDto getSearchList(String q) {
-        SearchResultDto searchMusicResult =  youtubeSearchService.searchByWord(q, 10);
+        SearchResultDto searchMusicResult = youtubeSearchService.searchByWord(q, 10);
         return searchMusicResult;
     }
 }

@@ -1,12 +1,9 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
-import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
-import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.user.domain.value.AvatarSetting;
-import com.pfplaybackend.api.user.domain.value.Bio;
-import com.pfplaybackend.api.user.domain.value.Nickname;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
 import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
 import lombok.Builder;

@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.playlist.adapter.out.persistence;
 
 import com.pfplaybackend.api.common.domain.value.PlaylistId;
-import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.adapter.out.persistence.custom.TrackRepositoryCustom;
+import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,8 +13,11 @@ import java.util.Optional;
 public interface TrackRepository extends JpaRepository<TrackData, Long>, TrackRepositoryCustom {
 
     Optional<TrackData> findByPlaylistIdAndLinkId(PlaylistId playlistId, String linkId);
+
     TrackData findFirstByLinkId(String linkId);
+
     Optional<TrackData> findByIdAndPlaylistId(Long id, PlaylistId playlistId);
+
     boolean existsByPlaylistId(PlaylistId playlistId);
 
     @Modifying

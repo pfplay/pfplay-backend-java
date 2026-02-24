@@ -1,14 +1,11 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
-import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
+import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
+import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.user.domain.value.ActivitySummary;
-import com.pfplaybackend.api.user.domain.value.ProfileSummary;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.domain.value.*;
 import jakarta.persistence.*;
 import lombok.Builder;

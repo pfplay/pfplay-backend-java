@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

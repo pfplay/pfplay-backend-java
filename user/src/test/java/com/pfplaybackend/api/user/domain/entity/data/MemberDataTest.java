@@ -1,10 +1,11 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
-import com.pfplaybackend.api.user.domain.value.*;
+import com.pfplaybackend.api.user.domain.value.Nickname;
+import com.pfplaybackend.api.user.domain.value.WalletAddress;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

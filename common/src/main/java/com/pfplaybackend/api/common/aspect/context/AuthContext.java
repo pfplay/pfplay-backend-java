@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.common.aspect.context;
 
 import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

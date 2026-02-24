@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.common.config.security.jwt;
 
 import com.pfplaybackend.api.common.config.security.jwt.properties.JwtProperties;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

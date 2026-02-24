@@ -1,7 +1,10 @@
 package com.pfplaybackend.api.common.entity;
 
 import com.pfplaybackend.api.common.domain.event.DomainEvent;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;

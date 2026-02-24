@@ -1,13 +1,13 @@
 package com.pfplaybackend.api.playlist.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
+import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MoveTrackRequest;
+import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdateTrackOrderRequest;
 import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
 import com.pfplaybackend.api.playlist.application.dto.command.MoveTrackCommand;
 import com.pfplaybackend.api.playlist.application.dto.command.UpdateTrackOrderCommand;
 import com.pfplaybackend.api.playlist.application.service.TrackCommandService;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.AddTrackRequest;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.MoveTrackRequest;
-import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdateTrackOrderRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -50,6 +50,7 @@ public class TrackCommandController {
 
     /**
      * 드래그&드롭으로 순서 변경
+     *
      * @return
      */
     @PutMapping("{playlistId}/tracks/{trackId}")

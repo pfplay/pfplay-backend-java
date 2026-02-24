@@ -2,8 +2,8 @@ package com.pfplaybackend.api.auth.application.service;
 
 import com.pfplaybackend.api.auth.application.port.out.PartyCleanupPort;
 import com.pfplaybackend.api.common.config.security.jwt.CustomJwtAuthenticationToken;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,11 +1,9 @@
 package com.pfplaybackend.api.playlist.adapter.in.web.payload.response;
 
-import com.pfplaybackend.api.playlist.application.dto.search.SearchResultRawDto;
 import com.pfplaybackend.api.playlist.application.dto.search.SearchResultDto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 

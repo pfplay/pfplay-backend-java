@@ -2,11 +2,8 @@ package com.pfplaybackend.api.user.domain.value;
 
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.domain.enums.FaceSourceType;
-import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
-import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Getter;

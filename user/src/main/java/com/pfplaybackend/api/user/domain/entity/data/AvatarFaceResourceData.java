@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.user.domain.entity.data;
 
-import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

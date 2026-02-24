@@ -2,7 +2,10 @@ package com.pfplaybackend.api.user.application.dto.shared;
 
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
 @Data
 @Getter

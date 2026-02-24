@@ -1,22 +1,22 @@
 package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.domain.value.AvatarSetting;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
-import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
-import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
-import com.pfplaybackend.api.user.domain.value.ProfileSummary;
-import com.pfplaybackend.api.user.domain.entity.data.UserAccountData;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.UserProfileRepository;
-import org.springframework.transaction.annotation.Transactional;
+import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
+import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
+import com.pfplaybackend.api.user.domain.entity.data.UserAccountData;
+import com.pfplaybackend.api.user.domain.value.AvatarSetting;
+import com.pfplaybackend.api.user.domain.value.ProfileSummary;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;

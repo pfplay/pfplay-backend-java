@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
+import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.ApplyPenaltyRequest;
 import com.pfplaybackend.api.party.application.dto.command.PunishPenaltyCommand;
 import com.pfplaybackend.api.party.application.service.CrewPenaltyCommandService;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.ApplyPenaltyRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

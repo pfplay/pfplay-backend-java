@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.user.adapter.out.persistence;
 
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

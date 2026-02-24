@@ -1,15 +1,14 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

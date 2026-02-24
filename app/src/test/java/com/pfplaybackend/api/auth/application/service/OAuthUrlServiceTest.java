@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.auth.application.service;
 
-import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
-import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
-import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
+import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
+import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
+import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.common.exception.http.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)

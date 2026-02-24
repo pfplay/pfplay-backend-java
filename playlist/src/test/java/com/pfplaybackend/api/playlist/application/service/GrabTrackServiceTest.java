@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.domain.value.Duration;
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
@@ -8,7 +9,6 @@ import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,15 +24,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GrabTrackServiceTest {
 
-    @Mock PlaylistAggregatePort aggregatePort;
-    @Mock TrackCommandService trackCommandService;
+    @Mock
+    PlaylistAggregatePort aggregatePort;
+    @Mock
+    TrackCommandService trackCommandService;
 
-    @InjectMocks GrabTrackService grabTrackService;
+    @InjectMocks
+    GrabTrackService grabTrackService;
 
     private final UserId userId = new UserId(1L);
     private final String linkId = "abc123";

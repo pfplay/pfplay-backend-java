@@ -1,12 +1,12 @@
 package com.pfplaybackend.api.party.domain.service;
 
-import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.party.domain.entity.data.history.PlaybackReactionHistoryData;
 import com.pfplaybackend.api.party.domain.enums.MotionType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
+import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

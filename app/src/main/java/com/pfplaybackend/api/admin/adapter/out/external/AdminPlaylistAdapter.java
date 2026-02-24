@@ -2,12 +2,12 @@ package com.pfplaybackend.api.admin.adapter.out.external;
 
 import com.pfplaybackend.api.admin.application.port.out.AdminPlaylistPort;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
+import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.PlaylistRepository;
-import com.pfplaybackend.api.playlist.adapter.out.persistence.TrackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

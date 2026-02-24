@@ -1,5 +1,8 @@
 package com.pfplaybackend.api.user.application.service;
 
+import com.pfplaybackend.api.user.adapter.out.persistence.AvatarBodyResourceRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.AvatarFaceResourceRepository;
+import com.pfplaybackend.api.user.adapter.out.persistence.AvatarIconResourceRepository;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarIconDto;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarBodyResourceData;
 import com.pfplaybackend.api.user.domain.entity.data.AvatarFaceResourceData;
@@ -8,9 +11,6 @@ import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import com.pfplaybackend.api.user.domain.enums.PairType;
 import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
 import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
-import com.pfplaybackend.api.user.adapter.out.persistence.AvatarBodyResourceRepository;
-import com.pfplaybackend.api.user.adapter.out.persistence.AvatarFaceResourceRepository;
-import com.pfplaybackend.api.user.adapter.out.persistence.AvatarIconResourceRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
+import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
 import com.pfplaybackend.api.party.application.dto.command.AdjustGradeCommand;
 import com.pfplaybackend.api.party.application.service.CrewGradeCommandService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

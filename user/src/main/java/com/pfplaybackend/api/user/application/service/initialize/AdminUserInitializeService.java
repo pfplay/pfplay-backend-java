@@ -1,21 +1,24 @@
 package com.pfplaybackend.api.user.application.service.initialize;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
+import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.service.AvatarResourceQueryService;
 import com.pfplaybackend.api.user.application.service.UserActivityCommandService;
 import com.pfplaybackend.api.user.application.service.UserAvatarCommandService;
 import com.pfplaybackend.api.user.application.service.UserProfileCommandService;
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.entity.data.ActivityData;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
-import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.user.domain.value.*;
-import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
-import org.springframework.transaction.annotation.Transactional;
+import com.pfplaybackend.api.user.domain.value.AvatarBodyUri;
+import com.pfplaybackend.api.user.domain.value.AvatarFaceUri;
+import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
+import com.pfplaybackend.api.user.domain.value.WalletAddress;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 

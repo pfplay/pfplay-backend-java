@@ -1,9 +1,9 @@
 package com.pfplaybackend.api.playlist.domain.entity.data;
 
 import com.pfplaybackend.api.common.domain.annotation.AggregateRoot;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,7 +45,8 @@ public class PlaylistData extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PlaylistType type;
 
-    protected PlaylistData() { }
+    protected PlaylistData() {
+    }
 
     @Builder
     public PlaylistData(Long id, UserId ownerId, Integer orderNumber, String name, PlaylistType type) {

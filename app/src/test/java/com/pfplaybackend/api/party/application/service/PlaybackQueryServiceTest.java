@@ -1,14 +1,14 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
+import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackHistoryDto;
 import com.pfplaybackend.api.party.application.port.out.PartyroomQueryPort;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackAggregationRepository;
-import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PlaybackQueryServiceTest {

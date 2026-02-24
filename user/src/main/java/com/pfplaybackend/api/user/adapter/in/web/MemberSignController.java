@@ -1,13 +1,15 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
-import com.pfplaybackend.api.user.application.service.MemberSignService;
 import com.pfplaybackend.api.user.adapter.in.web.payload.request.MemberSignRequest;
 import com.pfplaybackend.api.user.application.dto.command.SignMemberCommand;
+import com.pfplaybackend.api.user.application.service.MemberSignService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Tag(name = "User Sign API")
 @RequestMapping("/api/v1/users")

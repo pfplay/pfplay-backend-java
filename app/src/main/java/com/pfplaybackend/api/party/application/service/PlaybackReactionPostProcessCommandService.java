@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
-import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.party.application.port.out.PlaylistCommandPort;
 import com.pfplaybackend.api.party.application.port.out.UserActivityPort;
 import com.pfplaybackend.api.party.domain.entity.data.PlaybackAggregationData;
@@ -11,15 +11,13 @@ import com.pfplaybackend.api.party.domain.enums.MotionType;
 import com.pfplaybackend.api.party.domain.enums.ReactionType;
 import com.pfplaybackend.api.party.domain.event.ReactionAggregationChangedEvent;
 import com.pfplaybackend.api.party.domain.event.ReactionMotionChangedEvent;
+import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

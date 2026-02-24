@@ -1,18 +1,17 @@
 package com.pfplaybackend.api.party.domain.entity.data;
 
-import com.pfplaybackend.api.common.entity.BaseEntity;
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.DurationConverter;
-import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import java.time.Instant;
+import com.pfplaybackend.api.common.entity.BaseEntity;
+import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import jakarta.persistence.*;
-import jakarta.persistence.Index;
-import jakarta.persistence.Table;
 import lombok.Builder;
 import lombok.Getter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+
+import java.time.Instant;
 
 @Getter
 @DynamicInsert

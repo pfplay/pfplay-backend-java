@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.adapter.out.persistence;
 
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewPenaltyHistoryData;
-import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import org.springframework.data.jpa.repository.JpaRepository;
 

@@ -13,7 +13,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
@@ -25,11 +26,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PlaylistCommandControllerTest {
 
     @EnableMethodSecurity
-    static class TestMethodSecurityConfig {}
+    static class TestMethodSecurityConfig {
+    }
 
-    @Autowired MockMvc mockMvc;
-    @MockBean PlaylistCommandService playlistCommandService;
-    @MockBean JwtDecoder jwtDecoder;
+    @Autowired
+    MockMvc mockMvc;
+    @MockBean
+    PlaylistCommandService playlistCommandService;
+    @MockBean
+    JwtDecoder jwtDecoder;
 
     @Test
     @DisplayName("create — 201 Created")

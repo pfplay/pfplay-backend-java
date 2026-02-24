@@ -1,8 +1,10 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
-import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
+import com.pfplaybackend.api.party.application.dto.command.AddBlockCommand;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.entity.data.history.CrewBlockHistoryData;
@@ -10,8 +12,6 @@ import com.pfplaybackend.api.party.domain.exception.BlockException;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.port.PartyroomAggregatePort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
-import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
-import com.pfplaybackend.api.party.application.dto.command.AddBlockCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

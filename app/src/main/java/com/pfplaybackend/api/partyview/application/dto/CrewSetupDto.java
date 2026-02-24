@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.partyview.application.dto;
 
+import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
-import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
 
 public record CrewSetupDto(

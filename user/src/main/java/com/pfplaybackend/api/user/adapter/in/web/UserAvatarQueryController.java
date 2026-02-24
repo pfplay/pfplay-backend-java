@@ -1,15 +1,17 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
+import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.user.adapter.in.web.api.UserAvatarApi;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.application.service.UserAvatarQueryService;
-import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.user.adapter.in.web.api.UserAvatarApi;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 

@@ -1,9 +1,8 @@
 package com.pfplaybackend.api.user.application.service;
 
-import com.pfplaybackend.api.user.application.service.UserProfileCommandService;
-import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
-import com.pfplaybackend.api.user.domain.entity.data.GuestData;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
+import com.pfplaybackend.api.user.domain.entity.data.GuestData;
+import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

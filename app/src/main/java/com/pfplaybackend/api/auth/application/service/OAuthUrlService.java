@@ -1,10 +1,10 @@
 package com.pfplaybackend.api.auth.application.service;
 
-import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
+import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
 import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
+import com.pfplaybackend.api.auth.application.port.out.StateStorePort;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.auth.domain.exception.AuthException;
-import com.pfplaybackend.api.auth.adapter.out.external.config.OAuth2Properties;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -2,6 +2,7 @@ package com.pfplaybackend.api.user.application.service;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.domain.value.UserId;
+import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
 import com.pfplaybackend.api.user.application.dto.command.SignMemberCommand;
 import com.pfplaybackend.api.user.application.port.out.OAuth2RedirectPort;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
@@ -10,14 +11,13 @@ import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import com.pfplaybackend.api.user.domain.entity.data.ProfileData;
 import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import com.pfplaybackend.api.user.domain.event.MemberRegisteredEvent;
-import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
-import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.Map;
 import java.util.Optional;

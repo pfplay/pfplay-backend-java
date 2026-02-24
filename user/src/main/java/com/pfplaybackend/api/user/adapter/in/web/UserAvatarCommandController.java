@@ -1,16 +1,19 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
-import com.pfplaybackend.api.user.application.validation.AvatarRequestValidator;
+import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.adapter.in.web.payload.request.UpdateAvatarRequest;
 import com.pfplaybackend.api.user.application.dto.command.SetAvatarCommand;
 import com.pfplaybackend.api.user.application.service.UserAvatarCommandService;
-import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.user.application.validation.AvatarRequestValidator;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "User Profile API")
 @RequestMapping("/api/v1/users")

@@ -1,8 +1,8 @@
 package com.pfplaybackend.api.bootstrap.adapter;
 
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.user.application.port.out.PlaylistSetupPort;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

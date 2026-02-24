@@ -1,14 +1,14 @@
 package com.pfplaybackend.api.playlist.application.service;
 
+import com.pfplaybackend.api.common.domain.value.PlaylistId;
+import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
+import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
 import com.pfplaybackend.api.playlist.domain.port.PlaylistAggregatePort;
-import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
-import com.pfplaybackend.api.common.domain.value.PlaylistId;
-import com.pfplaybackend.api.common.domain.value.UserId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ public class GrabTrackService {
         PlaylistData playlistData = aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST);
         // LinkId cannot be duplicated.
         Optional<TrackData> optional = aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(playlistData.getId()), linkId);
-        if(optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
+        if (optional.isPresent()) throw ExceptionCreator.create(TrackException.DUPLICATE_TRACK_IN_PLAYLIST);
 
         AddTrackCommand command = new AddTrackCommand(
                 targetTrackData.getName(),

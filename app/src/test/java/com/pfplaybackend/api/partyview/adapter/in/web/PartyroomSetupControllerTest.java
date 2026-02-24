@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.partyview.adapter.in.web;
 
-import com.pfplaybackend.api.partyview.application.dto.CrewSetupDto;
 import com.pfplaybackend.api.partyview.application.dto.DisplayDto;
 import com.pfplaybackend.api.partyview.application.dto.result.PartyroomSetupResult;
 import com.pfplaybackend.api.partyview.application.service.PartyroomSetupQueryService;
