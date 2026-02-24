@@ -38,13 +38,13 @@ class GrabTrackServiceTest {
     @InjectMocks
     GrabTrackService grabTrackService;
 
-    private final UserId userId = new UserId(1L);
-    private final String linkId = "abc123";
+    private static final UserId USER_ID = new UserId(1L);
+    private static final String LINK_ID = "abc123";
 
     private TrackData createTrackData() {
         return TrackData.builder()
                 .name("Test Song")
-                .linkId(linkId)
+                .linkId(LINK_ID)
                 .duration(Duration.fromString("3:30"))
                 .thumbnailImage("https://img.example.com/thumb.jpg")
                 .build();
@@ -52,7 +52,7 @@ class GrabTrackServiceTest {
 
     private PlaylistData createGrablist() {
         return PlaylistData.builder()
-                .id(100L).ownerId(userId).orderNumber(0).name("Grab").type(PlaylistType.GRABLIST).build();
+                .id(100L).ownerId(USER_ID).orderNumber(0).name("Grab").type(PlaylistType.GRABLIST).build();
     }
 
     @Test
@@ -62,12 +62,12 @@ class GrabTrackServiceTest {
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();
 
-        when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
-        when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), linkId)).thenReturn(Optional.empty());
+        when(aggregatePort.findFirstTrackByLink(LINK_ID)).thenReturn(track);
+        when(aggregatePort.findPlaylistByOwnerAndType(USER_ID, PlaylistType.GRABLIST)).thenReturn(grablist);
+        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), LINK_ID)).thenReturn(Optional.empty());
 
         // when
-        grabTrackService.grabTrack(userId, linkId);
+        grabTrackService.grabTrack(USER_ID, LINK_ID);
 
         // then
         verify(trackCommandService).addTrackInPlaylist(eq(grablist.getId()), any(AddTrackCommand.class));
@@ -77,27 +77,27 @@ class GrabTrackServiceTest {
     @DisplayName("grabTrack — 존재하지 않는 트랙으로 그랩 시 NotFoundException이 발생한다")
     void grabTrackTrackNotFound() {
         // given
-        when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(null);
+        when(aggregatePort.findFirstTrackByLink(LINK_ID)).thenReturn(null);
 
         // when & then
-        assertThatThrownBy(() -> grabTrackService.grabTrack(userId, linkId))
+        assertThatThrownBy(() -> grabTrackService.grabTrack(USER_ID, LINK_ID))
                 .isInstanceOf(NotFoundException.class);
     }
 
     @Test
-    @DisplayName("grabTrack — GRABLIST에 이미 동일한 linkId가 있으면 ConflictException이 발생한다")
+    @DisplayName("grabTrack — GRABLIST에 이미 동일한 LINK_ID가 있으면 ConflictException이 발생한다")
     void grabTrackDuplicateTrack() {
         // given
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();
 
-        when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
-        when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), linkId))
+        when(aggregatePort.findFirstTrackByLink(LINK_ID)).thenReturn(track);
+        when(aggregatePort.findPlaylistByOwnerAndType(USER_ID, PlaylistType.GRABLIST)).thenReturn(grablist);
+        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), LINK_ID))
                 .thenReturn(Optional.of(track));
 
         // when & then
-        assertThatThrownBy(() -> grabTrackService.grabTrack(userId, linkId))
+        assertThatThrownBy(() -> grabTrackService.grabTrack(USER_ID, LINK_ID))
                 .isInstanceOf(ConflictException.class);
     }
 
@@ -108,20 +108,20 @@ class GrabTrackServiceTest {
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();
 
-        when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(track);
-        when(aggregatePort.findPlaylistByOwnerAndType(userId, PlaylistType.GRABLIST)).thenReturn(grablist);
-        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), linkId)).thenReturn(Optional.empty());
+        when(aggregatePort.findFirstTrackByLink(LINK_ID)).thenReturn(track);
+        when(aggregatePort.findPlaylistByOwnerAndType(USER_ID, PlaylistType.GRABLIST)).thenReturn(grablist);
+        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(grablist.getId()), LINK_ID)).thenReturn(Optional.empty());
 
         ArgumentCaptor<AddTrackCommand> captor = ArgumentCaptor.forClass(AddTrackCommand.class);
 
         // when
-        grabTrackService.grabTrack(userId, linkId);
+        grabTrackService.grabTrack(USER_ID, LINK_ID);
 
         // then
         verify(trackCommandService).addTrackInPlaylist(eq(grablist.getId()), captor.capture());
         AddTrackCommand command = captor.getValue();
         assertThat(command.name()).isEqualTo("Test Song");
-        assertThat(command.linkId()).isEqualTo(linkId);
+        assertThat(command.linkId()).isEqualTo(LINK_ID);
         assertThat(command.thumbnailImage()).isEqualTo("https://img.example.com/thumb.jpg");
     }
 }

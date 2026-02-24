@@ -19,18 +19,18 @@ import java.nio.charset.StandardCharsets;
 public class PytubeSearchService implements YoutubeSearchService {
 
     @Value("${service-api.pytube.uri}")
-    private String BASE_URI;
+    private String baseUri;
     @Value("${service-api.pytube.api-key}")
-    private String API_KEY;
+    private String apiKey;
     @Value("${service-api.pytube.api-secret}")
-    private String API_SECRET;
+    private String apiSecret;
 
     private final RestTemplate restTemplate;
 
     @Override
     public SearchResultDto searchByWord(String query, int rows) {
         String prefix = "/api/v1/video/search";
-        String url = BASE_URI + prefix;
+        String url = baseUri + prefix;
 
         URI uri = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("query", query)
@@ -40,8 +40,8 @@ public class PytubeSearchService implements YoutubeSearchService {
                 .toUri();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("API_KEY", API_KEY);
-        headers.set("API_SECRET", API_SECRET);
+        headers.set("API_KEY", apiKey);
+        headers.set("API_SECRET", apiSecret);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<SearchResultDto> response = restTemplate.exchange(

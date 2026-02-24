@@ -30,7 +30,6 @@ public class UserAvatarQueryController implements UserAvatarApi {
         return ResponseEntity.ok().body(ApiCommonResponse.success(avatarBodies));
     }
 
-    // TODO 1개 이상의 Face 가 제공될 수 있는지 여부에 따라서 확장(개선) 필요
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     @GetMapping("/me/profile/avatar/faces")
     public ResponseEntity<ApiCommonResponse<List<AvatarFaceDto>>> getMyDefaultAvatarFaces() {

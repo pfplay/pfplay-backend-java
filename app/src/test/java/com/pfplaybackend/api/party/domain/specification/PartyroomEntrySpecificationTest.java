@@ -33,15 +33,17 @@ class PartyroomEntrySpecificationTest {
     @DisplayName("정상 입장 — 예외 없음")
     void validEntry() {
         PartyroomData partyroom = activePartyroom();
+        Optional<CrewData> noExistingCrew = Optional.empty();
         assertThatNoException().isThrownBy(() ->
-                spec.validate(partyroom, 10, Optional.empty()));
+                spec.validate(partyroom, 10, noExistingCrew));
     }
 
     @Test
     @DisplayName("종료된 파티룸 입장 — ALREADY_TERMINATED")
     void terminatedRoom() {
         PartyroomData partyroom = terminatedPartyroom();
-        assertThatThrownBy(() -> spec.validate(partyroom, 10, Optional.empty()))
+        Optional<CrewData> noExistingCrew = Optional.empty();
+        assertThatThrownBy(() -> spec.validate(partyroom, 10, noExistingCrew))
                 .isInstanceOf(ForbiddenException.class);
     }
 
@@ -49,7 +51,8 @@ class PartyroomEntrySpecificationTest {
     @DisplayName("정원 초과 — EXCEEDED_LIMIT")
     void exceededCapacity() {
         PartyroomData partyroom = activePartyroom();
-        assertThatThrownBy(() -> spec.validate(partyroom, 50, Optional.empty()))
+        Optional<CrewData> noExistingCrew = Optional.empty();
+        assertThatThrownBy(() -> spec.validate(partyroom, 50, noExistingCrew))
                 .isInstanceOf(ForbiddenException.class);
     }
 
