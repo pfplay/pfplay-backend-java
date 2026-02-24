@@ -10,17 +10,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class DurationTest {
 
+    private static final String DURATION_3_45 = "3:45";
+    private static final String DURATION_1_23_45 = "1:23:45";
+
     @Test
     @DisplayName("MM:SS 포맷에서 Duration 생성")
     void fromStringMmss() {
-        Duration duration = Duration.fromString("3:45");
+        Duration duration = Duration.fromString(DURATION_3_45);
         assertThat(duration.toSeconds()).isEqualTo(225L);
     }
 
     @Test
     @DisplayName("H:MM:SS 포맷에서 Duration 생성")
     void fromStringHmmss() {
-        Duration duration = Duration.fromString("1:23:45");
+        Duration duration = Duration.fromString(DURATION_1_23_45);
         assertThat(duration.toSeconds()).isEqualTo(5025L);
     }
 
@@ -34,15 +37,15 @@ class DurationTest {
     @Test
     @DisplayName("toDisplayString은 원래 포맷으로 복원")
     void toDisplayStringMmss() {
-        Duration duration = Duration.fromString("3:45");
-        assertThat(duration.toDisplayString()).isEqualTo("3:45");
+        Duration duration = Duration.fromString(DURATION_3_45);
+        assertThat(duration.toDisplayString()).isEqualTo(DURATION_3_45);
     }
 
     @Test
     @DisplayName("toDisplayString은 시간 포맷을 보존")
     void toDisplayStringHmmss() {
-        Duration duration = Duration.fromString("1:23:45");
-        assertThat(duration.toDisplayString()).isEqualTo("1:23:45");
+        Duration duration = Duration.fromString(DURATION_1_23_45);
+        assertThat(duration.toDisplayString()).isEqualTo(DURATION_1_23_45);
     }
 
     @Test
@@ -87,8 +90,8 @@ class DurationTest {
     @Test
     @DisplayName("equals와 hashCode 동작")
     void equalsAndHashCode() {
-        Duration d1 = Duration.fromString("3:45");
-        Duration d2 = Duration.fromString("3:45");
+        Duration d1 = Duration.fromString(DURATION_3_45);
+        Duration d2 = Duration.fromString(DURATION_3_45);
         Duration d3 = Duration.fromString("4:00");
 
         assertThat(d1).isEqualTo(d2);

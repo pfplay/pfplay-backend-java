@@ -22,6 +22,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OAuthUrlServiceTest {
 
+    private static final String GOOGLE = "google";
+    private static final String TEST_STATE = "test-state";
+    private static final String TEST_VERIFIER = "test-verifier";
+    private static final String TWITTER = "twitter";
+
     @Mock private OAuth2Properties oAuth2Properties;
     @Mock private StateStorePort stateStorePort;
 
@@ -43,15 +48,15 @@ class OAuthUrlServiceTest {
     @DisplayName("generateAuthUrl - StateStore를 통해 state를 생성해야 한다")
     void generateAuthUrlShouldUseStateStore() {
         // given
-        when(oAuth2Properties.getProviders()).thenReturn(Map.of("google", googleConfig));
-        when(stateStorePort.generateAndStoreState("google")).thenReturn("test-state");
+        when(oAuth2Properties.getProviders()).thenReturn(Map.of(GOOGLE, googleConfig));
+        when(stateStorePort.generateAndStoreState(GOOGLE)).thenReturn(TEST_STATE);
 
         // when
-        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, "test-verifier");
+        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, TEST_VERIFIER);
 
         // then
-        verify(stateStorePort, times(1)).generateAndStoreState("google");
-        assertThat(result.state()).isEqualTo("test-state");
+        verify(stateStorePort, times(1)).generateAndStoreState(GOOGLE);
+        assertThat(result.state()).isEqualTo(TEST_STATE);
         assertThat(result.authUrl()).contains("state=test-state");
     }
 
@@ -59,13 +64,13 @@ class OAuthUrlServiceTest {
     @DisplayName("validateAndConsumeState - StateStore를 통해 검증해야 한다")
     void validateAndConsumeStateShouldDelegateToStateStore() {
         // given
-        when(stateStorePort.validateAndConsumeState("test-state", "google")).thenReturn(true);
+        when(stateStorePort.validateAndConsumeState(TEST_STATE, GOOGLE)).thenReturn(true);
 
         // when
-        boolean result = oAuthUrlService.validateAndConsumeState("test-state", OAuthProvider.GOOGLE, "verifier");
+        boolean result = oAuthUrlService.validateAndConsumeState(TEST_STATE, OAuthProvider.GOOGLE, "verifier");
 
         // then
-        verify(stateStorePort, times(1)).validateAndConsumeState("test-state", "google");
+        verify(stateStorePort, times(1)).validateAndConsumeState(TEST_STATE, GOOGLE);
         assertThat(result).isTrue();
     }
 
@@ -73,7 +78,7 @@ class OAuthUrlServiceTest {
     @DisplayName("validateAndConsumeState - 잘못된 state는 false를 반환해야 한다")
     void validateAndConsumeStateShouldReturnFalseWhenInvalid() {
         // given
-        when(stateStorePort.validateAndConsumeState("invalid-state", "google")).thenReturn(false);
+        when(stateStorePort.validateAndConsumeState("invalid-state", GOOGLE)).thenReturn(false);
 
         // when
         boolean result = oAuthUrlService.validateAndConsumeState("invalid-state", OAuthProvider.GOOGLE, "verifier");
@@ -92,11 +97,11 @@ class OAuthUrlServiceTest {
         twitterConfig.setAuthorizationUri("https://twitter.com/i/oauth2/authorize");
         twitterConfig.setScopes(java.util.List.of("tweet.read", "users.read"));
 
-        when(oAuth2Properties.getProviders()).thenReturn(Map.of("twitter", twitterConfig));
-        when(stateStorePort.generateAndStoreState("twitter")).thenReturn("twitter-state");
+        when(oAuth2Properties.getProviders()).thenReturn(Map.of(TWITTER, twitterConfig));
+        when(stateStorePort.generateAndStoreState(TWITTER)).thenReturn("twitter-state");
 
         // when
-        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.TWITTER, "test-verifier");
+        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.TWITTER, TEST_VERIFIER);
 
         // then
         assertThat(result.authUrl()).contains("https://twitter.com/i/oauth2/authorize");
@@ -104,7 +109,7 @@ class OAuthUrlServiceTest {
         assertThat(result.authUrl()).contains("state=twitter-state");
         assertThat(result.authUrl()).contains("code_challenge=");
         assertThat(result.authUrl()).contains("code_challenge_method=S256");
-        assertThat(result.provider()).isEqualTo("twitter");
+        assertThat(result.provider()).isEqualTo(TWITTER);
     }
 
     @Test
@@ -114,11 +119,11 @@ class OAuthUrlServiceTest {
         googleConfig.setAccessType("offline");
         googleConfig.setPrompt("consent");
 
-        when(oAuth2Properties.getProviders()).thenReturn(Map.of("google", googleConfig));
-        when(stateStorePort.generateAndStoreState("google")).thenReturn("google-state");
+        when(oAuth2Properties.getProviders()).thenReturn(Map.of(GOOGLE, googleConfig));
+        when(stateStorePort.generateAndStoreState(GOOGLE)).thenReturn("google-state");
 
         // when
-        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, "test-verifier");
+        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, TEST_VERIFIER);
 
         // then
         assertThat(result.authUrl()).contains("access_type=offline");
@@ -132,11 +137,11 @@ class OAuthUrlServiceTest {
         googleConfig.setAccessType(null);
         googleConfig.setPrompt(null);
 
-        when(oAuth2Properties.getProviders()).thenReturn(Map.of("google", googleConfig));
-        when(stateStorePort.generateAndStoreState("google")).thenReturn("google-state");
+        when(oAuth2Properties.getProviders()).thenReturn(Map.of(GOOGLE, googleConfig));
+        when(stateStorePort.generateAndStoreState(GOOGLE)).thenReturn("google-state");
 
         // when
-        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, "test-verifier");
+        OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, TEST_VERIFIER);
 
         // then
         assertThat(result.authUrl()).doesNotContain("access_type=");

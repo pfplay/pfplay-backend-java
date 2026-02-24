@@ -23,7 +23,7 @@ public class AvatarBodyDto {
     private final int combinePositionX;
     private final int combinePositionY;
 
-    static public AvatarBodyDto create(AvatarBodyResourceData avatarBodyResource) {
+    public static AvatarBodyDto create(AvatarBodyResourceData avatarBodyResource) {
         return AvatarBodyDto.builder()
                 .id(avatarBodyResource.getId())
                 .name(avatarBodyResource.getName())

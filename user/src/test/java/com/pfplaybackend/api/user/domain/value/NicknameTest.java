@@ -8,11 +8,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class NicknameTest {
 
+    private static final String PLAYER1 = "Player1";
+
     @Test
     @DisplayName("유효한 닉네임 생성")
     void validNickname() {
-        Nickname nickname = new Nickname("Player1");
-        assertThat(nickname.value()).isEqualTo("Player1");
+        Nickname nickname = new Nickname(PLAYER1);
+        assertThat(nickname.value()).isEqualTo(PLAYER1);
     }
 
     @Test
@@ -54,8 +56,8 @@ class NicknameTest {
     @Test
     @DisplayName("record equals 동작")
     void equalsAndHashCode() {
-        Nickname n1 = new Nickname("Player1");
-        Nickname n2 = new Nickname("Player1");
+        Nickname n1 = new Nickname(PLAYER1);
+        Nickname n2 = new Nickname(PLAYER1);
         Nickname n3 = new Nickname("Player2");
 
         assertThat(n1).isEqualTo(n2);

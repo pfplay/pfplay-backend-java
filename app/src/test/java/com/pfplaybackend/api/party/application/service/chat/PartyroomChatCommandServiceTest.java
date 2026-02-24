@@ -32,6 +32,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class PartyroomChatCommandServiceTest {
 
+    private static final String HELLO_MESSAGE = "Hello!";
+
     @Mock ChatPenaltyCachePort chatPenaltyCachePort;
     @Mock RedisMessagePublisher messagePublisher;
     @Mock SessionCachePort sessionCachePort;
@@ -62,7 +64,7 @@ class PartyroomChatCommandServiceTest {
         when(chatPenaltyCachePort.isChatBanned(5L)).thenReturn(false);
 
         // when
-        partyroomChatCommandService.sendMessage(sessionId, "Hello!");
+        partyroomChatCommandService.sendMessage(sessionId, HELLO_MESSAGE);
 
         // then
         verify(messagePublisher).publish(eq(MessageTopic.CHAT.topic()), any(ChatMessageDto.class));
@@ -75,7 +77,7 @@ class PartyroomChatCommandServiceTest {
         when(sessionCachePort.getSessionCache("unknown")).thenReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> partyroomChatCommandService.sendMessage("unknown", "Hello!"))
+        assertThatThrownBy(() -> partyroomChatCommandService.sendMessage("unknown", HELLO_MESSAGE))
                 .isInstanceOf(NotFoundException.class);
     }
 
@@ -94,7 +96,7 @@ class PartyroomChatCommandServiceTest {
         when(chatPenaltyCachePort.isChatBanned(5L)).thenReturn(true);
 
         // when
-        partyroomChatCommandService.sendMessage(sessionId, "Hello!");
+        partyroomChatCommandService.sendMessage(sessionId, HELLO_MESSAGE);
 
         // then
         verify(messagePublisher, never()).publish(any(), any());

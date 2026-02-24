@@ -9,7 +9,7 @@ import org.springframework.web.socket.messaging.SessionConnectEvent;
 
 @Component
 public class ConnectionEventListener implements ApplicationListener<SessionConnectEvent> {
-    private final static Logger logger = LoggerFactory.getLogger(ConnectionEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConnectionEventListener.class);
 
     @Override
     public void onApplicationEvent(SessionConnectEvent event) {

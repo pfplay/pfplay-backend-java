@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.user.domain.value;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
@@ -7,12 +8,13 @@ import lombok.Getter;
 @Getter
 public class AvatarBodyUri {
 
-    private String avatarBodyUri;
+    @Column(name = "avatar_body_uri")
+    private String value;
 
     public AvatarBodyUri() {
-        this.avatarBodyUri = "";
+        this.value = "";
     }
-    public AvatarBodyUri(String avatarBodyUri) {
-        this.avatarBodyUri = avatarBodyUri;
+    public AvatarBodyUri(String value) {
+        this.value = value;
     }
 }

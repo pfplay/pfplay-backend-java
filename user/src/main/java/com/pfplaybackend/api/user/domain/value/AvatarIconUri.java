@@ -1,17 +1,20 @@
 package com.pfplaybackend.api.user.domain.value;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
 @Embeddable
 @Getter
 public class AvatarIconUri {
-    private String avatarIconUri;
+
+    @Column(name = "avatar_icon_uri")
+    private String value;
 
     public AvatarIconUri() {
-        this.avatarIconUri = "";
+        this.value = "";
     }
-    public AvatarIconUri(String avatarIconUri) {
-        this.avatarIconUri = avatarIconUri;
+    public AvatarIconUri(String value) {
+        this.value = value;
     }
 }

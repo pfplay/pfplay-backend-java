@@ -63,7 +63,7 @@ public class CookieUtil {
         cookieBuilder.append("; Max-Age=").append(maxAge);
         cookieBuilder.append("; HttpOnly");
 
-        if (cookieConfig.getSecure()) {
+        if (cookieConfig.isSecure()) {
             cookieBuilder.append("; Secure");
         }
 
@@ -84,7 +84,7 @@ public class CookieUtil {
         cookieBuilder.append("; Max-Age=0");
         cookieBuilder.append("; HttpOnly");
 
-        if (cookieConfig.getSecure()) {
+        if (cookieConfig.isSecure()) {
             cookieBuilder.append("; Secure");
         }
 

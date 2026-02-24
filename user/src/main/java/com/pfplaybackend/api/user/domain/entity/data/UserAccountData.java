@@ -56,16 +56,16 @@ public abstract class UserAccountData extends BaseEntity {
         return new ProfileSummary(
                 bio != null ? bio.getNicknameValue() : null,
                 bio != null ? bio.getIntroduction() : null,
-                avatar.getAvatarBodyUri().getAvatarBodyUri(),
+                avatar.getAvatarBodyUri().getValue(),
                 avatar.getAvatarCompositionType(),
                 avatar.getCombinePositionX(),
                 avatar.getCombinePositionY(),
                 avatar.getOffsetX(),
                 avatar.getOffsetY(),
                 avatar.getScale(),
-                avatar.getAvatarFaceUri().getAvatarFaceUri(),
-                avatar.getAvatarIconUri().getAvatarIconUri(),
-                this.profileData.getWalletAddress().getWalletAddress(),
+                avatar.getAvatarFaceUri().getValue(),
+                avatar.getAvatarIconUri().getValue(),
+                this.profileData.getWalletAddress().getValue(),
                 activitySummaries
         );
     }

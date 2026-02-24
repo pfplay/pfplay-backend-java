@@ -101,8 +101,8 @@ class AdminProfileServiceTest {
         assertThat(profile.getAvatarSetting().getAvatarCompositionType()).isEqualTo(AvatarCompositionType.BODY_WITH_FACE);
         assertThat(profile.getAvatarSetting().getFaceSourceType()).isEqualTo(FaceSourceType.NFT_URI);
         // NFT face URI becomes the icon URI
-        assertThat(profile.getAvatarSetting().getAvatarIconUri().getAvatarIconUri())
-                .isEqualTo(nftFaceUri.getAvatarFaceUri());
+        assertThat(profile.getAvatarSetting().getAvatarIconUri().getValue())
+                .isEqualTo(nftFaceUri.getValue());
     }
 
     @Test
@@ -125,7 +125,7 @@ class AdminProfileServiceTest {
         // then
         assertThat(profile.getAvatarSetting().getAvatarCompositionType()).isEqualTo(AvatarCompositionType.BODY_WITH_FACE);
         assertThat(profile.getAvatarSetting().getFaceSourceType()).isEqualTo(FaceSourceType.INTERNAL_IMAGE);
-        assertThat(profile.getAvatarSetting().getAvatarIconUri().getAvatarIconUri())
+        assertThat(profile.getAvatarSetting().getAvatarIconUri().getValue())
                 .isEqualTo("icon_face_001.png");
     }
 

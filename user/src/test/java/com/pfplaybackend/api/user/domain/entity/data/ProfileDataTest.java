@@ -62,7 +62,7 @@ class ProfileDataTest {
         profile.updateAvatarBody(new AvatarBodyUri("new-body"), 100, 200);
 
         // then
-        assertThat(profile.getAvatarSetting().getAvatarBodyUri().getAvatarBodyUri()).isEqualTo("new-body");
+        assertThat(profile.getAvatarSetting().getAvatarBodyUri().getValue()).isEqualTo("new-body");
         assertThat(profile.getAvatarSetting().getCombinePositionX()).isEqualTo(100);
         assertThat(profile.getAvatarSetting().getCombinePositionY()).isEqualTo(200);
     }
@@ -84,7 +84,7 @@ class ProfileDataTest {
         profile.updateAvatarIcon(new AvatarIconUri("new-icon"));
 
         // then
-        assertThat(profile.getAvatarSetting().getAvatarIconUri().getAvatarIconUri()).isEqualTo("new-icon");
+        assertThat(profile.getAvatarSetting().getAvatarIconUri().getValue()).isEqualTo("new-icon");
     }
 
     @Test
@@ -100,6 +100,6 @@ class ProfileDataTest {
         profile.updateWalletAddress(new WalletAddress("0xABC123"));
 
         // then
-        assertThat(profile.getWalletAddress().getWalletAddress()).isEqualTo("0xABC123");
+        assertThat(profile.getWalletAddress().getValue()).isEqualTo("0xABC123");
     }
 }

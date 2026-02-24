@@ -18,6 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TrackCommandController.class)
 class TrackCommandControllerTest {
 
+    private static final String ROLE_MEMBER = "ROLE_MEMBER";
+
     @Autowired
     MockMvc mockMvc;
 
@@ -42,7 +44,7 @@ class TrackCommandControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/v1/playlists/1/tracks")
-                        .with(jwt().authorities(() -> "ROLE_MEMBER"))
+                        .with(jwt().authorities(() -> ROLE_MEMBER))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
@@ -75,7 +77,7 @@ class TrackCommandControllerTest {
     void deleteTrackAuthenticatedReturns202() throws Exception {
         // when & then
         mockMvc.perform(delete("/api/v1/playlists/1/tracks/10")
-                        .with(jwt().authorities(() -> "ROLE_MEMBER"))
+                        .with(jwt().authorities(() -> ROLE_MEMBER))
                         .with(csrf()))
                 .andExpect(status().isAccepted());
     }
@@ -90,7 +92,7 @@ class TrackCommandControllerTest {
 
         // when & then
         mockMvc.perform(put("/api/v1/playlists/1/tracks/5")
-                        .with(jwt().authorities(() -> "ROLE_MEMBER"))
+                        .with(jwt().authorities(() -> ROLE_MEMBER))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))

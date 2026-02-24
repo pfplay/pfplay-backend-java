@@ -25,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(PlaylistCommandControllerTest.TestMethodSecurityConfig.class)
 class PlaylistCommandControllerTest {
 
+    private static final String ROLE_MEMBER = "ROLE_MEMBER";
+
     @EnableMethodSecurity
     static class TestMethodSecurityConfig {
     }
@@ -50,7 +52,7 @@ class PlaylistCommandControllerTest {
 
         // when & then
         mockMvc.perform(post("/api/v1/playlists")
-                        .with(jwt().authorities(() -> "ROLE_MEMBER"))
+                        .with(jwt().authorities(() -> ROLE_MEMBER))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
@@ -67,7 +69,7 @@ class PlaylistCommandControllerTest {
                 """;
 
         mockMvc.perform(delete("/api/v1/playlists")
-                        .with(jwt().authorities(() -> "ROLE_MEMBER"))
+                        .with(jwt().authorities(() -> ROLE_MEMBER))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
@@ -88,7 +90,7 @@ class PlaylistCommandControllerTest {
 
         // when & then
         mockMvc.perform(patch("/api/v1/playlists/1")
-                        .with(jwt().authorities(() -> "ROLE_MEMBER"))
+                        .with(jwt().authorities(() -> ROLE_MEMBER))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))

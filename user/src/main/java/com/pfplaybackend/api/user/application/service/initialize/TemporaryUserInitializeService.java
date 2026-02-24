@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.user.application.service.initialize;
 
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
-import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.adapter.out.persistence.GuestRepository;
 import com.pfplaybackend.api.user.adapter.out.persistence.MemberRepository;
@@ -29,7 +28,6 @@ public class TemporaryUserInitializeService {
     private final UserProfileCommandService userProfileCommandService;
     private final UserActivityCommandService userActivityCommandService;
     private final PlaylistSetupPort playlistSetupPort;
-    private final JwtService jwtService;
 
     private static final long GUEST_FIXED_ID = 1000000000000001L;
     private static final long ASSOCIATE_MEMBER_FIXED_ID = 1000000000000002L;

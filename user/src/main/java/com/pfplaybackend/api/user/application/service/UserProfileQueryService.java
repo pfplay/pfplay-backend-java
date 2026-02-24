@@ -98,9 +98,9 @@ public class UserProfileQueryService {
         return new ProfileSettingDto(
                 profileData.getNicknameValue(),
                 avatar.getAvatarCompositionType(),
-                avatar.getAvatarBodyUri().getAvatarBodyUri(),
-                avatar.getAvatarFaceUri().getAvatarFaceUri(),
-                avatar.getAvatarIconUri().getAvatarIconUri(),
+                avatar.getAvatarBodyUri().getValue(),
+                avatar.getAvatarFaceUri().getValue(),
+                avatar.getAvatarIconUri().getValue(),
                 avatar.getCombinePositionX(),
                 avatar.getCombinePositionY(),
                 avatar.getOffsetX(),

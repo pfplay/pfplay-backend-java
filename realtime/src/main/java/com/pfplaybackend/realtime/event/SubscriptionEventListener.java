@@ -15,7 +15,7 @@ import java.security.Principal;
 @Component
 @RequiredArgsConstructor
 public class SubscriptionEventListener implements ApplicationListener<SessionSubscribeEvent> {
-    private final static Logger logger = LoggerFactory.getLogger(SubscriptionEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(SubscriptionEventListener.class);
     private final SessionCachePort sessionCachePort;
 
     @Override

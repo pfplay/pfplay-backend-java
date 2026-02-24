@@ -15,7 +15,7 @@ import java.security.Principal;
 @Component
 @RequiredArgsConstructor
 public class UnsubscriptionEventListener implements ApplicationListener<SessionUnsubscribeEvent> {
-    private final static Logger logger = LoggerFactory.getLogger(UnsubscriptionEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(UnsubscriptionEventListener.class);
     private final SessionCachePort sessionCachePort;
 
     @Override

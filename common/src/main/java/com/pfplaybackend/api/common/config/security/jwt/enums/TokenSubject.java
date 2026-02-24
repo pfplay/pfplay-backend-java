@@ -8,5 +8,5 @@ import lombok.RequiredArgsConstructor;
 public enum TokenSubject {
     ACCESS_TOKEN_SUBJECT("AccessToken");
 
-    final private String value;
+    private final String value;
 }

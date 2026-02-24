@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserProfileCommandServiceTest {
 
+    private static final String DEFAULT_BODY = "default-body";
+
     @Mock UserAvatarQueryService userAvatarQueryService;
     @InjectMocks UserProfileCommandService userProfileCommandService;
 
@@ -29,13 +31,13 @@ class UserProfileCommandServiceTest {
         // given
         UserId userId = new UserId(1L);
         AvatarBodyResourceData defaultBody = AvatarBodyResourceData.builder()
-                .id(1L).name("default").resourceUri("default-body")
+                .id(1L).name("default").resourceUri(DEFAULT_BODY)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(true).isDefaultSetting(true)
                 .combinePositionX(50).combinePositionY(100)
                 .build();
         when(userAvatarQueryService.getDefaultAvatarBodyResourceData()).thenReturn(defaultBody);
-        when(userAvatarQueryService.getDefaultAvatarBodyUri()).thenReturn(new AvatarBodyUri("default-body"));
+        when(userAvatarQueryService.getDefaultAvatarBodyUri()).thenReturn(new AvatarBodyUri(DEFAULT_BODY));
         when(userAvatarQueryService.getDefaultAvatarFaceUri()).thenReturn(new AvatarFaceUri("default-face"));
         when(userAvatarQueryService.getDefaultAvatarIconUri()).thenReturn(new AvatarIconUri("default-icon"));
 
@@ -45,7 +47,7 @@ class UserProfileCommandServiceTest {
         // then
         assertThat(profile.getUserId()).isEqualTo(userId);
         assertThat(profile.getNicknameValue()).startsWith("Guest_");
-        assertThat(profile.getAvatarSetting().getAvatarBodyUri().getAvatarBodyUri()).isEqualTo("default-body");
+        assertThat(profile.getAvatarSetting().getAvatarBodyUri().getValue()).isEqualTo(DEFAULT_BODY);
     }
 
     @Test

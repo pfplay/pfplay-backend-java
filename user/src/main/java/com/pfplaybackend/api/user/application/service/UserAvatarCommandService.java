@@ -87,7 +87,7 @@ public class UserAvatarCommandService {
             AvatarIconDto avatarIconDto = avatarResourceQueryService.findPairAvatarIconByFaceUri(faceUri);
             return new AvatarIconUri(avatarIconDto.resourceUri());
         } else {
-            return new AvatarIconUri(faceUri.getAvatarFaceUri());
+            return new AvatarIconUri(faceUri.getValue());
         }
     }
 }

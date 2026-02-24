@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CrewGradeCommandController {
 
-    final private CrewGradeCommandService crewGradeCommandService;
+    private final CrewGradeCommandService crewGradeCommandService;
 
     /**
      * 특정 크루의 (해당 파티룸 내에서의) 등급을 조정한다.

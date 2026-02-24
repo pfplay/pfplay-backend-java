@@ -8,17 +8,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class BioTest {
 
+    private static final String PLAYER1 = "Player1";
+
     @Test
     @DisplayName("닉네임과 소개글로 Bio 생성")
     void createWithNicknameAndIntroduction() {
         // given
-        Nickname nickname = new Nickname("Player1");
+        Nickname nickname = new Nickname(PLAYER1);
 
         // when
         Bio bio = new Bio(nickname, "Hello world");
 
         // then
-        assertThat(bio.getNicknameValue()).isEqualTo("Player1");
+        assertThat(bio.getNicknameValue()).isEqualTo(PLAYER1);
         assertThat(bio.getIntroduction()).isEqualTo("Hello world");
     }
 
@@ -36,10 +38,10 @@ class BioTest {
     @DisplayName("introduction이 null이어도 Bio 생성 가능")
     void createWithNullIntroduction() {
         // given / when
-        Bio bio = new Bio(new Nickname("Player1"), null);
+        Bio bio = new Bio(new Nickname(PLAYER1), null);
 
         // then
-        assertThat(bio.getNicknameValue()).isEqualTo("Player1");
+        assertThat(bio.getNicknameValue()).isEqualTo(PLAYER1);
         assertThat(bio.getIntroduction()).isNull();
     }
 

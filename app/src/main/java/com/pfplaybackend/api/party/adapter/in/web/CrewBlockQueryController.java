@@ -18,7 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CrewBlockQueryController {
 
-    final private CrewBlockQueryService crewBlockQueryService;
+    private final CrewBlockQueryService crewBlockQueryService;
 
     @GetMapping("/me/blocks")
     public ResponseEntity<ApiCommonResponse<List<BlockedCrewResult>>> getBlockCrews()  {

@@ -23,6 +23,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(UserProfileQueryController.class)
 class UserProfileQueryControllerTest {
 
+    private static final String SUMMARY_ENDPOINT = "/api/v1/users/me/profile/summary";
+
     @Autowired
     MockMvc mockMvc;
 
@@ -47,7 +49,7 @@ class UserProfileQueryControllerTest {
         when(userProfileQueryService.getMyProfileSummary()).thenReturn(dto);
 
         // when & then
-        mockMvc.perform(get("/api/v1/users/me/profile/summary")
+        mockMvc.perform(get(SUMMARY_ENDPOINT)
                         .with(jwt().authorities(() -> "ROLE_MEMBER")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nickname").value("TestNick"))
@@ -68,7 +70,7 @@ class UserProfileQueryControllerTest {
         when(userProfileQueryService.getMyProfileSummary()).thenReturn(dto);
 
         // when & then
-        mockMvc.perform(get("/api/v1/users/me/profile/summary")
+        mockMvc.perform(get(SUMMARY_ENDPOINT)
                         .with(jwt().authorities(() -> "ROLE_GUEST")))
                 .andExpect(status().isOk());
     }
@@ -77,7 +79,7 @@ class UserProfileQueryControllerTest {
     @DisplayName("GET /me/profile/summary — 미인증이면 401을 반환한다")
     void getMyProfileSummaryUnauthenticatedReturns401() throws Exception {
         // when & then
-        mockMvc.perform(get("/api/v1/users/me/profile/summary"))
+        mockMvc.perform(get(SUMMARY_ENDPOINT))
                 .andExpect(status().isUnauthorized());
     }
 }

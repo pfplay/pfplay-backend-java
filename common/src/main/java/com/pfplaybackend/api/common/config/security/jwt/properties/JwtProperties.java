@@ -22,7 +22,7 @@ public class JwtProperties {
         private String path = "/";
         private Integer accessTokenExpirySeconds = 86400;
         private Integer refreshTokenExpirySeconds = 604800;
-        private Boolean secure = true;
+        private boolean secure = true;
         private String sameSite = "Lax";
     }
 }

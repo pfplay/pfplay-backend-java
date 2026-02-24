@@ -71,11 +71,11 @@ public class AdminProfileService {
         AvatarCompositionType compositionType;
         FaceSourceType faceSourceType;
 
-        if (finalFaceUri.getAvatarFaceUri() != null && finalFaceUri.getAvatarFaceUri().contains("ava_nft_tmp")) {
+        if (finalFaceUri.getValue() != null && finalFaceUri.getValue().contains("ava_nft_tmp")) {
             // NFT face pattern detected -> BODY_WITH_FACE
             compositionType = AvatarCompositionType.BODY_WITH_FACE;
             faceSourceType = FaceSourceType.NFT_URI;
-        } else if (finalFaceUri.getAvatarFaceUri() == null || finalFaceUri.getAvatarFaceUri().isEmpty()) {
+        } else if (finalFaceUri.getValue() == null || finalFaceUri.getValue().isEmpty()) {
             // Empty face URI -> SINGLE_BODY
             compositionType = AvatarCompositionType.SINGLE_BODY;
             faceSourceType = FaceSourceType.INTERNAL_IMAGE;
@@ -92,7 +92,7 @@ public class AdminProfileService {
             iconUri = adminAvatarResourcePort.findAvatarIconPairWithSingleBody(avatarBodyDto);
         } else if (faceSourceType == FaceSourceType.NFT_URI) {
             // BODY_WITH_FACE with NFT: NFT face URI becomes icon URI
-            iconUri = new AvatarIconUri(finalFaceUri.getAvatarFaceUri());
+            iconUri = new AvatarIconUri(finalFaceUri.getValue());
         } else {
             // BODY_WITH_FACE with INTERNAL_IMAGE: Use face-paired icon
             iconUri = new AvatarIconUri(

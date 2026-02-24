@@ -12,6 +12,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class CookieUtilTest {
 
+    private static final String SET_COOKIE_HEADER = "Set-Cookie";
+    private static final String SECURE = "Secure";
+
     private CookieUtil cookieUtil;
     private JwtProperties jwtProperties;
 
@@ -34,13 +37,13 @@ class CookieUtilTest {
         cookieUtil.deleteAccessTokenCookie(response);
 
         // then
-        Collection<String> setCookieHeaders = response.getHeaders("Set-Cookie");
+        Collection<String> setCookieHeaders = response.getHeaders(SET_COOKIE_HEADER);
         assertThat(setCookieHeaders).isNotEmpty();
 
         String header = setCookieHeaders.iterator().next();
         assertThat(header).contains("Max-Age=0");
         assertThat(header).contains("SameSite=None");
-        assertThat(header).contains("Secure");
+        assertThat(header).contains(SECURE);
         assertThat(header).contains("HttpOnly");
         assertThat(header).contains("Path=/");
     }
@@ -57,15 +60,15 @@ class CookieUtilTest {
         cookieUtil.deleteAccessTokenCookie(deleteResponse);
 
         // then
-        String addHeader = addResponse.getHeaders("Set-Cookie").iterator().next();
-        String deleteHeader = deleteResponse.getHeaders("Set-Cookie").iterator().next();
+        String addHeader = addResponse.getHeaders(SET_COOKIE_HEADER).iterator().next();
+        String deleteHeader = deleteResponse.getHeaders(SET_COOKIE_HEADER).iterator().next();
 
         // 두 헤더 모두 SameSite 속성을 포함해야 한다
         assertThat(addHeader).contains("SameSite=");
         assertThat(deleteHeader).contains("SameSite=");
 
         // 두 헤더 모두 Secure 속성을 포함해야 한다
-        assertThat(addHeader).contains("Secure");
-        assertThat(deleteHeader).contains("Secure");
+        assertThat(addHeader).contains(SECURE);
+        assertThat(deleteHeader).contains(SECURE);
     }
 }

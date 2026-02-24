@@ -16,16 +16,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MemberDataTest {
 
+    private static final String TEST_EMAIL = "test@email.com";
+
     @Test
     @DisplayName("create — 팩토리 메서드로 생성 시 AM 권한 등급과 프로필 미업데이트 상태이다")
     void createDefaultState() {
         // when
-        MemberData member = MemberData.create("test@email.com", ProviderType.GOOGLE);
+        MemberData member = MemberData.create(TEST_EMAIL, ProviderType.GOOGLE);
 
         // then
         assertThat(member.getAuthorityTier()).isEqualTo(AuthorityTier.AM);
         assertThat(member.isProfileUpdated()).isFalse();
-        assertThat(member.getEmail()).isEqualTo("test@email.com");
+        assertThat(member.getEmail()).isEqualTo(TEST_EMAIL);
         assertThat(member.getProviderType()).isEqualTo(ProviderType.GOOGLE);
         assertThat(member.getUserId()).isNotNull();
     }
@@ -49,7 +51,7 @@ class MemberDataTest {
     @DisplayName("updateProfileBio — 프로필 바이오 업데이트 시 isProfileUpdated가 true가 된다")
     void updateProfileBio() {
         // given
-        MemberData member = MemberData.create("test@email.com", ProviderType.GOOGLE);
+        MemberData member = MemberData.create(TEST_EMAIL, ProviderType.GOOGLE);
         ProfileData profile = ProfileData.builder()
                 .userId(member.getUserId())
                 .nickname(new Nickname("OldNick"))
@@ -67,7 +69,7 @@ class MemberDataTest {
     @DisplayName("updateWalletAddress — 지갑 주소 설정 시 권한이 FM으로 승격된다")
     void updateWalletAddressUpgradesAuthority() {
         // given
-        MemberData member = MemberData.create("test@email.com", ProviderType.GOOGLE);
+        MemberData member = MemberData.create(TEST_EMAIL, ProviderType.GOOGLE);
         ProfileData profile = ProfileData.builder()
                 .userId(member.getUserId())
                 .nickname(new Nickname("Nick"))
@@ -85,7 +87,7 @@ class MemberDataTest {
     @DisplayName("updateDjScore — DJ 점수 업데이트 시 ActivityData의 score가 변경된다")
     void updateDjScore() {
         // given
-        MemberData member = MemberData.create("test@email.com", ProviderType.GOOGLE);
+        MemberData member = MemberData.create(TEST_EMAIL, ProviderType.GOOGLE);
         Map<ActivityType, ActivityData> activityMap = new HashMap<>();
         activityMap.put(ActivityType.DJ_PNT, ActivityData.create(member.getUserId(), ActivityType.DJ_PNT, 10));
         member.initializeActivityMap(activityMap);
@@ -101,7 +103,7 @@ class MemberDataTest {
     @DisplayName("isGuest — Member는 항상 false를 반환한다")
     void isGuestReturnsFalse() {
         // given
-        MemberData member = MemberData.create("test@email.com", ProviderType.GOOGLE);
+        MemberData member = MemberData.create(TEST_EMAIL, ProviderType.GOOGLE);
 
         // then
         assertThat(member.isGuest()).isFalse();

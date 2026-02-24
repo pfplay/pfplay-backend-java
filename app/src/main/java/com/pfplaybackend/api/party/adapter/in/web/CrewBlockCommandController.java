@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CrewBlockCommandController {
 
-    final private CrewBlockCommandService crewBlockCommandService;
+    private final CrewBlockCommandService crewBlockCommandService;
 
     @PostMapping("/me/blocks")
     public ResponseEntity<ApiCommonResponse<Void>> blockOtherCrew(@RequestBody AddBlockRequest request)  {

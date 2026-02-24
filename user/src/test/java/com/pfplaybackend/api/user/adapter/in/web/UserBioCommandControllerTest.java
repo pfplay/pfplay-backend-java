@@ -21,6 +21,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(UserBioCommandControllerTest.TestMethodSecurityConfig.class)
 class UserBioCommandControllerTest {
 
+    private static final String BIO_ENDPOINT = "/api/v1/users/me/profile/bio";
+
     @EnableMethodSecurity
     static class TestMethodSecurityConfig {}
 
@@ -42,7 +44,7 @@ class UserBioCommandControllerTest {
                 """;
 
         // when & then
-        mockMvc.perform(put("/api/v1/users/me/profile/bio")
+        mockMvc.perform(put(BIO_ENDPOINT)
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
@@ -59,7 +61,7 @@ class UserBioCommandControllerTest {
                 """;
 
         // when & then
-        mockMvc.perform(put("/api/v1/users/me/profile/bio")
+        mockMvc.perform(put(BIO_ENDPOINT)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
@@ -75,7 +77,7 @@ class UserBioCommandControllerTest {
                 """;
 
         // when & then
-        mockMvc.perform(put("/api/v1/users/me/profile/bio")
+        mockMvc.perform(put(BIO_ENDPOINT)
                         .with(jwt().authorities(() -> "ROLE_GUEST"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)

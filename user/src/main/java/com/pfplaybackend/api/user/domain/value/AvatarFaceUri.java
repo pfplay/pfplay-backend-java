@@ -1,18 +1,21 @@
 package com.pfplaybackend.api.user.domain.value;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
 @Embeddable
 @Getter
 public class AvatarFaceUri {
-    private String avatarFaceUri;
+
+    @Column(name = "avatar_face_uri")
+    private String value;
 
     public AvatarFaceUri() {
-        this.avatarFaceUri = "";
+        this.value = "";
     }
 
-    public AvatarFaceUri(String avatarFaceUri) {
-        this.avatarFaceUri = avatarFaceUri;
+    public AvatarFaceUri(String value) {
+        this.value = value;
     }
 }

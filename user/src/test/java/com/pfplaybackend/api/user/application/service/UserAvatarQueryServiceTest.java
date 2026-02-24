@@ -33,6 +33,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserAvatarQueryServiceTest {
 
+    private static final String BODY1 = "body1";
+
     @Mock MemberRepository memberRepository;
     @Mock UserAvatarDomainService userAvatarDomainService;
     @Mock AvatarResourceQueryService avatarResourceQueryService;
@@ -59,7 +61,7 @@ class UserAvatarQueryServiceTest {
         AvatarBodyUri result = userAvatarQueryService.getDefaultAvatarBodyUri();
 
         // then
-        assertThat(result.getAvatarBodyUri()).isEqualTo("default-body-uri");
+        assertThat(result.getValue()).isEqualTo("default-body-uri");
     }
 
     @Test
@@ -68,7 +70,7 @@ class UserAvatarQueryServiceTest {
         // given
         ThreadLocalContext.setContext(new AuthContext(new UserId(1L), AuthorityTier.GT));
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(1L).name("body1").resourceUri("body-uri")
+                .id(1L).name(BODY1).resourceUri("body-uri")
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(true).isDefaultSetting(true).isAvailable(true)
                 .combinePositionX(0).combinePositionY(0)
@@ -80,7 +82,7 @@ class UserAvatarQueryServiceTest {
 
         // then
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getName()).isEqualTo("body1");
+        assertThat(result.get(0).getName()).isEqualTo(BODY1);
     }
 
     @Test
@@ -91,7 +93,7 @@ class UserAvatarQueryServiceTest {
         ThreadLocalContext.setContext(new AuthContext(userId, AuthorityTier.FM));
 
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(1L).name("body1").resourceUri("body-uri")
+                .id(1L).name(BODY1).resourceUri("body-uri")
                 .obtainableType(ObtainmentType.DJ_PNT).obtainableScore(100)
                 .isCombinable(true).isDefaultSetting(false).isAvailable(false)
                 .combinePositionX(0).combinePositionY(0)

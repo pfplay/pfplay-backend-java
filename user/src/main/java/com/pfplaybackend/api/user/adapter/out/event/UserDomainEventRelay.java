@@ -27,9 +27,9 @@ public class UserDomainEventRelay {
         ProfileChangedEvent message = new ProfileChangedEvent(
                 profile.getUserId(),
                 profile.getNicknameValue(),
-                avatar.getAvatarFaceUri().getAvatarFaceUri(),
-                avatar.getAvatarBodyUri().getAvatarBodyUri(),
-                avatar.getAvatarIconUri().getAvatarIconUri(),
+                avatar.getAvatarFaceUri().getValue(),
+                avatar.getAvatarBodyUri().getValue(),
+                avatar.getAvatarIconUri().getValue(),
                 avatar.getAvatarCompositionType(),
                 avatar.getCombinePositionX(),
                 avatar.getCombinePositionY(),

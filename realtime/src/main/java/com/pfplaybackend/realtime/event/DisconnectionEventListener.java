@@ -13,7 +13,7 @@ import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 @Component
 @RequiredArgsConstructor
 public class DisconnectionEventListener implements ApplicationListener<SessionDisconnectEvent> {
-    private final static Logger logger = LoggerFactory.getLogger(DisconnectionEventListener.class);
+    private static final Logger logger = LoggerFactory.getLogger(DisconnectionEventListener.class);
     private final SessionCachePort sessionCachePort;
 
     @Override

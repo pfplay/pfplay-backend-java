@@ -11,5 +11,5 @@ public enum TokenClaim {
     ACCESS_LEVEL("access_level"),
     AUTHORITY_TIER("authority_tier");
 
-    final private String value;
+    private final String value;
 }

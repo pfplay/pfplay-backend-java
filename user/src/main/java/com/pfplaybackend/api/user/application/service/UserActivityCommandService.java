@@ -31,12 +31,4 @@ public class UserActivityCommandService {
         memberData.updateDjScore(point);
         memberRepository.save(memberData);
     }
-
-    public void updateRefererLinkScore(UserId userId) {
-
-    }
-
-    public void updatePartyroomActivationScore(UserId userId) {
-
-    }
 }

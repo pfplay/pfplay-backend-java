@@ -29,6 +29,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class MemberSignServiceTest {
 
+    private static final String GOOGLE = "google";
+    private static final String CALLBACK_PATH = "/callback";
+
     @Mock OAuth2RedirectPort oauth2RedirectPort;
     @Mock MemberRepository memberRepository;
     @Mock UserProfileCommandService userProfileCommandService;
@@ -88,15 +91,15 @@ class MemberSignServiceTest {
     void getOAuth2RedirectUriSuccess() {
         // given
         String expectedUri = "https://accounts.google.com/o/oauth2/v2/auth?...";
-        when(oauth2RedirectPort.getRedirectUri("google", "/callback")).thenReturn(expectedUri);
+        when(oauth2RedirectPort.getRedirectUri(GOOGLE, CALLBACK_PATH)).thenReturn(expectedUri);
 
-        SignMemberCommand command = new SignMemberCommand("google");
+        SignMemberCommand command = new SignMemberCommand(GOOGLE);
 
         // when
-        String result = memberSignService.getOAuth2RedirectUri(command, "/callback");
+        String result = memberSignService.getOAuth2RedirectUri(command, CALLBACK_PATH);
 
         // then
         assertThat(result).isEqualTo(expectedUri);
-        verify(oauth2RedirectPort).getRedirectUri("google", "/callback");
+        verify(oauth2RedirectPort).getRedirectUri(GOOGLE, CALLBACK_PATH);
     }
 }

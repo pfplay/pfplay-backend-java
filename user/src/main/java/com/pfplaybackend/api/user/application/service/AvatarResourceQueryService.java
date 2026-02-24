@@ -47,12 +47,12 @@ public class AvatarResourceQueryService {
     }
 
     public AvatarBodyDto findAvatarBodyByUri(AvatarBodyUri uri) {
-        AvatarBodyResourceData avatarBodyResourceData = avatarBodyResourceRepository.findOneAvatarResourceByResourceUri(uri.getAvatarBodyUri());
+        AvatarBodyResourceData avatarBodyResourceData = avatarBodyResourceRepository.findOneAvatarResourceByResourceUri(uri.getValue());
         return AvatarBodyDto.create(avatarBodyResourceData);
     }
 
     public AvatarIconDto findPairAvatarIconByFaceUri(AvatarFaceUri uri) {
-        AvatarFaceResourceData avatarFaceResourceData = avatarFaceResourceRepository.findOneAvatarResourceByResourceUri(uri.getAvatarFaceUri());
+        AvatarFaceResourceData avatarFaceResourceData = avatarFaceResourceRepository.findOneAvatarResourceByResourceUri(uri.getValue());
         String avatarFaceName = avatarFaceResourceData.getName();
         String iconName = "ava_icon_" + avatarFaceName.split("_", 2)[1];
         AvatarIconResourceData avatarIconResourceData = avatarIconResourceRepository.findByNameAndPairType(iconName, PairType.FACE);
@@ -65,7 +65,7 @@ public class AvatarResourceQueryService {
     }
 
     public AvatarIconDto findPairAvatarIconByBodyUri(AvatarBodyUri uri) {
-        AvatarBodyResourceData avatarBodyResourceData = avatarBodyResourceRepository.findOneAvatarResourceByResourceUri(uri.getAvatarBodyUri());
+        AvatarBodyResourceData avatarBodyResourceData = avatarBodyResourceRepository.findOneAvatarResourceByResourceUri(uri.getValue());
         String avatarBodyName = avatarBodyResourceData.getName();
         String iconName = "ava_icon_" + avatarBodyName.split("_", 2)[1];
         AvatarIconResourceData avatarIconResourceData = avatarIconResourceRepository.findByNameAndPairType(iconName, PairType.BODY);
@@ -78,6 +78,6 @@ public class AvatarResourceQueryService {
     }
 
     public boolean isBasicFaceUri(AvatarFaceUri avatarFaceUri) {
-        return avatarFaceResourceRepository.findByResourceUri(avatarFaceUri.getAvatarFaceUri()).isPresent();
+        return avatarFaceResourceRepository.findByResourceUri(avatarFaceUri.getValue()).isPresent();
     }
 }

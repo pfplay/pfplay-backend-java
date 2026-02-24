@@ -10,14 +10,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AvatarSettingTest {
 
+    private static final String BODY_PNG = "body.png";
+    private static final String FACE_PNG = "face.png";
+    private static final String ICON_PNG = "icon.png";
+
     private AvatarSetting avatarSetting;
 
     @BeforeEach
     void setUp() {
         avatarSetting = new AvatarSetting(
-                new AvatarBodyUri("body.png"),
-                new AvatarFaceUri("face.png"),
-                new AvatarIconUri("icon.png"),
+                new AvatarBodyUri(BODY_PNG),
+                new AvatarFaceUri(FACE_PNG),
+                new AvatarIconUri(ICON_PNG),
                 AvatarCompositionType.BODY_WITH_FACE,
                 FaceSourceType.INTERNAL_IMAGE,
                 100, 200,
@@ -28,9 +32,9 @@ class AvatarSettingTest {
     @Test
     @DisplayName("생성 시 모든 필드가 올바르게 설정됨")
     void createAllFieldsSet() {
-        assertThat(avatarSetting.getAvatarBodyUri().getAvatarBodyUri()).isEqualTo("body.png");
-        assertThat(avatarSetting.getAvatarFaceUri().getAvatarFaceUri()).isEqualTo("face.png");
-        assertThat(avatarSetting.getAvatarIconUri().getAvatarIconUri()).isEqualTo("icon.png");
+        assertThat(avatarSetting.getAvatarBodyUri().getValue()).isEqualTo(BODY_PNG);
+        assertThat(avatarSetting.getAvatarFaceUri().getValue()).isEqualTo(FACE_PNG);
+        assertThat(avatarSetting.getAvatarIconUri().getValue()).isEqualTo(ICON_PNG);
         assertThat(avatarSetting.getAvatarCompositionType()).isEqualTo(AvatarCompositionType.BODY_WITH_FACE);
         assertThat(avatarSetting.getFaceSourceType()).isEqualTo(FaceSourceType.INTERNAL_IMAGE);
         assertThat(avatarSetting.getCombinePositionX()).isEqualTo(100);
@@ -47,11 +51,11 @@ class AvatarSettingTest {
         avatarSetting.updateBody(new AvatarBodyUri("new-body.png"), 300, 400);
 
         // then
-        assertThat(avatarSetting.getAvatarBodyUri().getAvatarBodyUri()).isEqualTo("new-body.png");
+        assertThat(avatarSetting.getAvatarBodyUri().getValue()).isEqualTo("new-body.png");
         assertThat(avatarSetting.getCombinePositionX()).isEqualTo(300);
         assertThat(avatarSetting.getCombinePositionY()).isEqualTo(400);
         // face, icon은 변경되지 않음
-        assertThat(avatarSetting.getAvatarFaceUri().getAvatarFaceUri()).isEqualTo("face.png");
+        assertThat(avatarSetting.getAvatarFaceUri().getValue()).isEqualTo(FACE_PNG);
     }
 
     @Test
@@ -62,7 +66,7 @@ class AvatarSettingTest {
 
         // then
         assertThat(avatarSetting.getAvatarCompositionType()).isEqualTo(AvatarCompositionType.SINGLE_BODY);
-        assertThat(avatarSetting.getAvatarFaceUri().getAvatarFaceUri()).isEmpty();
+        assertThat(avatarSetting.getAvatarFaceUri().getValue()).isEmpty();
     }
 
     @Test
@@ -82,7 +86,7 @@ class AvatarSettingTest {
         // then
         assertThat(avatarSetting.getAvatarCompositionType()).isEqualTo(AvatarCompositionType.BODY_WITH_FACE);
         assertThat(avatarSetting.getFaceSourceType()).isEqualTo(FaceSourceType.NFT_URI);
-        assertThat(avatarSetting.getAvatarFaceUri().getAvatarFaceUri()).isEqualTo("custom-face.png");
+        assertThat(avatarSetting.getAvatarFaceUri().getValue()).isEqualTo("custom-face.png");
         assertThat(avatarSetting.getOffsetX()).isEqualTo(1.5);
         assertThat(avatarSetting.getOffsetY()).isEqualTo(2.5);
         assertThat(avatarSetting.getScale()).isEqualTo(3.0);
@@ -95,8 +99,8 @@ class AvatarSettingTest {
         avatarSetting.updateIcon(new AvatarIconUri("new-icon.png"));
 
         // then
-        assertThat(avatarSetting.getAvatarIconUri().getAvatarIconUri()).isEqualTo("new-icon.png");
-        assertThat(avatarSetting.getAvatarBodyUri().getAvatarBodyUri()).isEqualTo("body.png");
+        assertThat(avatarSetting.getAvatarIconUri().getValue()).isEqualTo("new-icon.png");
+        assertThat(avatarSetting.getAvatarBodyUri().getValue()).isEqualTo(BODY_PNG);
     }
 
     @Test
@@ -113,9 +117,9 @@ class AvatarSettingTest {
         empty.applyDefaults();
 
         // then
-        assertThat(empty.getAvatarBodyUri().getAvatarBodyUri()).isEmpty();
-        assertThat(empty.getAvatarFaceUri().getAvatarFaceUri()).isEmpty();
-        assertThat(empty.getAvatarIconUri().getAvatarIconUri()).isEmpty();
+        assertThat(empty.getAvatarBodyUri().getValue()).isEmpty();
+        assertThat(empty.getAvatarFaceUri().getValue()).isEmpty();
+        assertThat(empty.getAvatarIconUri().getValue()).isEmpty();
     }
 
     @Test
@@ -125,8 +129,8 @@ class AvatarSettingTest {
         avatarSetting.applyDefaults();
 
         // then
-        assertThat(avatarSetting.getAvatarBodyUri().getAvatarBodyUri()).isEqualTo("body.png");
-        assertThat(avatarSetting.getAvatarFaceUri().getAvatarFaceUri()).isEqualTo("face.png");
-        assertThat(avatarSetting.getAvatarIconUri().getAvatarIconUri()).isEqualTo("icon.png");
+        assertThat(avatarSetting.getAvatarBodyUri().getValue()).isEqualTo(BODY_PNG);
+        assertThat(avatarSetting.getAvatarFaceUri().getValue()).isEqualTo(FACE_PNG);
+        assertThat(avatarSetting.getAvatarIconUri().getValue()).isEqualTo(ICON_PNG);
     }
 }

@@ -39,6 +39,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserAvatarCommandServiceTest {
 
+    private static final String BODY_01 = "body_01";
+    private static final String ICON_URI_01 = "icon_uri_01";
+    private static final String ICON_01 = "icon_01";
+    private static final String PREMIUM_BODY = "premium_body";
+
     @Mock MemberRepository memberRepository;
     @Mock AvatarResourceQueryService avatarResourceQueryService;
     @Mock ApplicationEventPublisher eventPublisher;
@@ -66,21 +71,21 @@ class UserAvatarCommandServiceTest {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.SINGLE_BODY,
-                new SetAvatarCommand.AvatarBodySpec("body_01"),
+                new SetAvatarCommand.AvatarBodySpec(BODY_01),
                 null);
 
         MemberData member = mock(MemberData.class);
         when(memberRepository.findByUserId(userId)).thenReturn(Optional.of(member));
 
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(1L).name("Body1").resourceUri("body_01")
+                .id(1L).name("Body1").resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(false).isDefaultSetting(true).isAvailable(true)
                 .combinePositionX(10).combinePositionY(20).build();
         when(avatarResourceQueryService.findAvatarBodyByUri(any(AvatarBodyUri.class)))
                 .thenReturn(bodyDto);
 
-        AvatarIconDto iconDto = new AvatarIconDto(1L, "icon_01", "icon_uri_01", true);
+        AvatarIconDto iconDto = new AvatarIconDto(1L, ICON_01, ICON_URI_01, true);
         when(avatarResourceQueryService.findPairAvatarIconByBodyUri(any(AvatarBodyUri.class)))
                 .thenReturn(iconDto);
 
@@ -101,7 +106,7 @@ class UserAvatarCommandServiceTest {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.BODY_WITH_FACE,
-                new SetAvatarCommand.AvatarBodySpec("body_01"),
+                new SetAvatarCommand.AvatarBodySpec(BODY_01),
                 new SetAvatarCommand.AvatarFaceSpec("face_01", FaceSourceType.INTERNAL_IMAGE,
                         new SetAvatarCommand.AvatarTransformSpec(1.0, 2.0, 0.5)));
 
@@ -109,14 +114,14 @@ class UserAvatarCommandServiceTest {
         when(memberRepository.findByUserId(userId)).thenReturn(Optional.of(member));
 
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(1L).name("Body1").resourceUri("body_01")
+                .id(1L).name("Body1").resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(true).isDefaultSetting(false).isAvailable(true)
                 .combinePositionX(10).combinePositionY(20).build();
         when(avatarResourceQueryService.findAvatarBodyByUri(any(AvatarBodyUri.class)))
                 .thenReturn(bodyDto);
 
-        AvatarIconDto iconDto = new AvatarIconDto(1L, "icon_01", "icon_uri_01", true);
+        AvatarIconDto iconDto = new AvatarIconDto(1L, ICON_01, ICON_URI_01, true);
         when(avatarResourceQueryService.findPairAvatarIconByFaceUri(any(AvatarFaceUri.class)))
                 .thenReturn(iconDto);
 
@@ -137,7 +142,7 @@ class UserAvatarCommandServiceTest {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.SINGLE_BODY,
-                new SetAvatarCommand.AvatarBodySpec("premium_body"),
+                new SetAvatarCommand.AvatarBodySpec(PREMIUM_BODY),
                 null);
 
         ActivityData djActivity = ActivityData.create(userId, ActivityType.DJ_PNT, 100);
@@ -146,7 +151,7 @@ class UserAvatarCommandServiceTest {
         when(memberRepository.findByUserId(userId)).thenReturn(Optional.of(member));
 
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(2L).name("Premium").resourceUri("premium_body")
+                .id(2L).name("Premium").resourceUri(PREMIUM_BODY)
                 .obtainableType(ObtainmentType.DJ_PNT).obtainableScore(50)
                 .isCombinable(false).isDefaultSetting(false).isAvailable(false)
                 .combinePositionX(0).combinePositionY(0).build();
@@ -170,7 +175,7 @@ class UserAvatarCommandServiceTest {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.SINGLE_BODY,
-                new SetAvatarCommand.AvatarBodySpec("premium_body"),
+                new SetAvatarCommand.AvatarBodySpec(PREMIUM_BODY),
                 null);
 
         ActivityData djActivity = ActivityData.create(userId, ActivityType.DJ_PNT, 10);
@@ -179,7 +184,7 @@ class UserAvatarCommandServiceTest {
         when(memberRepository.findByUserId(userId)).thenReturn(Optional.of(member));
 
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(2L).name("Premium").resourceUri("premium_body")
+                .id(2L).name("Premium").resourceUri(PREMIUM_BODY)
                 .obtainableType(ObtainmentType.DJ_PNT).obtainableScore(50)
                 .isCombinable(false).isDefaultSetting(false).isAvailable(false)
                 .combinePositionX(0).combinePositionY(0).build();
@@ -199,11 +204,11 @@ class UserAvatarCommandServiceTest {
     void findAvatarIconPairWithSingleBodyReturnsPairIcon() {
         // given
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(1L).name("Body1").resourceUri("body_01")
+                .id(1L).name("Body1").resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(false).isDefaultSetting(true).isAvailable(true)
                 .combinePositionX(0).combinePositionY(0).build();
-        AvatarIconDto iconDto = new AvatarIconDto(1L, "icon_01", "icon_uri_01", true);
+        AvatarIconDto iconDto = new AvatarIconDto(1L, ICON_01, ICON_URI_01, true);
         when(avatarResourceQueryService.findPairAvatarIconByBodyUri(any(AvatarBodyUri.class)))
                 .thenReturn(iconDto);
 
@@ -211,7 +216,7 @@ class UserAvatarCommandServiceTest {
         AvatarIconUri result = userAvatarCommandService.findAvatarIconPairWithSingleBody(bodyDto);
 
         // then
-        assertThat(result.getAvatarIconUri()).isEqualTo("icon_uri_01");
+        assertThat(result.getValue()).isEqualTo(ICON_URI_01);
     }
 
     // ── findAvatarIconByFaceSourceType ──
@@ -221,14 +226,14 @@ class UserAvatarCommandServiceTest {
     void findAvatarIconByFaceSourceTypeInternalImageReturnsPairIcon() {
         // given
         AvatarFaceUri faceUri = new AvatarFaceUri("ava_face_01");
-        AvatarIconDto iconDto = new AvatarIconDto(1L, "ava_icon_01", "icon_uri_01", true);
+        AvatarIconDto iconDto = new AvatarIconDto(1L, "ava_icon_01", ICON_URI_01, true);
         when(avatarResourceQueryService.findPairAvatarIconByFaceUri(any(AvatarFaceUri.class))).thenReturn(iconDto);
 
         // when
         AvatarIconUri result = userAvatarCommandService.findAvatarIconByFaceSourceType(faceUri, FaceSourceType.INTERNAL_IMAGE);
 
         // then
-        assertThat(result.getAvatarIconUri()).isEqualTo("icon_uri_01");
+        assertThat(result.getValue()).isEqualTo(ICON_URI_01);
     }
 
     @Test
@@ -241,6 +246,6 @@ class UserAvatarCommandServiceTest {
         AvatarIconUri result = userAvatarCommandService.findAvatarIconByFaceSourceType(faceUri, FaceSourceType.NFT_URI);
 
         // then
-        assertThat(result.getAvatarIconUri()).isEqualTo("https://nft.example.com/image.png");
+        assertThat(result.getValue()).isEqualTo("https://nft.example.com/image.png");
     }
 }
