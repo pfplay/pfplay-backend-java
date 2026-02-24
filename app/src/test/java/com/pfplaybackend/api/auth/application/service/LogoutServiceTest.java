@@ -35,7 +35,7 @@ class LogoutServiceTest {
 
     @Test
     @DisplayName("인증된 사용자는 partyCleanupPort.exitActivePartyroomIfPresent가 호출된다")
-    void exitActivePartyroomIfPresent_shouldCallPort_whenAuthenticated() {
+    void exitActivePartyroomIfPresentShouldCallPortWhenAuthenticated() {
         // given
         UserId userId = new UserId();
         setAuthentication(userId);
@@ -49,7 +49,7 @@ class LogoutServiceTest {
 
     @Test
     @DisplayName("인증되지 않은 사용자는 아무 작업도 수행하지 않아야 한다")
-    void exitActivePartyroomIfPresent_shouldDoNothing_whenNotAuthenticated() {
+    void exitActivePartyroomIfPresentShouldDoNothingWhenNotAuthenticated() {
         // given — no authentication set
 
         // when

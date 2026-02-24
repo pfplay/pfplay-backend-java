@@ -30,7 +30,7 @@ class PartyroomSetupControllerTest {
 
     @Test
     @DisplayName("getSetupInfo — 200 OK")
-    void getSetupInfo_returns200() throws Exception {
+    void getSetupInfoReturns200() throws Exception {
         // given
         PartyroomSetupResult result = new PartyroomSetupResult(List.of(), mock(DisplayDto.class));
         when(partyroomSetupQueryService.getSetupInfo(any())).thenReturn(result);
@@ -43,7 +43,7 @@ class PartyroomSetupControllerTest {
 
     @Test
     @DisplayName("getSetupInfo — 인증 없으면 401")
-    void getSetupInfo_unauthenticated_returns401() throws Exception {
+    void getSetupInfoUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(get("/api/v1/partyrooms/1/setup"))
                 .andExpect(status().isUnauthorized());
     }

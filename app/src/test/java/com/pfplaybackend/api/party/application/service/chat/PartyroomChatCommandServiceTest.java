@@ -52,7 +52,7 @@ class PartyroomChatCommandServiceTest {
 
     @Test
     @DisplayName("유효한 세션으로 메시지를 전송하면 Redis에 publish된다")
-    void sendMessage_validSession_publishesToRedis() {
+    void sendMessageValidSessionPublishesToRedis() {
         // given
         String sessionId = "session-1";
         Map<String, Object> sessionMap = new HashMap<>();
@@ -73,7 +73,7 @@ class PartyroomChatCommandServiceTest {
 
     @Test
     @DisplayName("세션 캐시가 없으면 예외가 발생한다")
-    void sendMessage_noSession_throwsException() {
+    void sendMessageNoSessionThrowsException() {
         // given
         when(sessionCachePort.getSessionCache("unknown")).thenReturn(Optional.empty());
 
@@ -84,7 +84,7 @@ class PartyroomChatCommandServiceTest {
 
     @Test
     @DisplayName("채팅 밴 상태이면 메시지가 publish되지 않는다")
-    void sendMessage_chatBanned_doesNotPublish() {
+    void sendMessageChatBannedDoesNotPublish() {
         // given
         String sessionId = "session-1";
         Map<String, Object> sessionMap = new HashMap<>();
@@ -105,7 +105,7 @@ class PartyroomChatCommandServiceTest {
 
     @Test
     @DisplayName("isPossibleChat — 채팅 밴 키가 없으면 true를 반환한다")
-    void isPossibleChat_noBanKey_returnsTrue() {
+    void isPossibleChatNoBanKeyReturnsTrue() {
         // given
         when(chatPenaltyCachePort.isChatBanned(5L)).thenReturn(false);
 
@@ -115,7 +115,7 @@ class PartyroomChatCommandServiceTest {
 
     @Test
     @DisplayName("isPossibleChat — 채팅 밴 키가 있으면 false를 반환한다")
-    void isPossibleChat_banKeyExists_returnsFalse() {
+    void isPossibleChatBanKeyExistsReturnsFalse() {
         // given
         when(chatPenaltyCachePort.isChatBanned(5L)).thenReturn(true);
 

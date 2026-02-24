@@ -28,7 +28,7 @@ class PartyroomAccessCommandControllerTest {
 
     @Test
     @DisplayName("enterPartyroom — 200 OK")
-    void enterPartyroom_returns200() throws Exception {
+    void enterPartyroomReturns200() throws Exception {
         // given
         CrewData crew = mock(CrewData.class);
         when(crew.getId()).thenReturn(1L);
@@ -44,7 +44,7 @@ class PartyroomAccessCommandControllerTest {
 
     @Test
     @DisplayName("exitPartyroom — 200 OK")
-    void exitPartyroom_returns200() throws Exception {
+    void exitPartyroomReturns200() throws Exception {
         mockMvc.perform(post("/api/v1/partyrooms/1/exit")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
@@ -53,7 +53,7 @@ class PartyroomAccessCommandControllerTest {
 
     @Test
     @DisplayName("enterPartyroom — 인증 없으면 401")
-    void enterPartyroom_unauthenticated_returns401() throws Exception {
+    void enterPartyroomUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(post("/api/v1/partyrooms/1/enter")
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());

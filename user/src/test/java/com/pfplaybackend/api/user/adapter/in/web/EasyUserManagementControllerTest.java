@@ -34,7 +34,7 @@ class EasyUserManagementControllerTest {
 
     @Test
     @DisplayName("createAssociateMember — 200 OK")
-    void createAssociateMember_returns200() throws Exception {
+    void createAssociateMemberReturns200() throws Exception {
         // given
         MemberData member = mock(MemberData.class);
         when(member.getUserId()).thenReturn(new UserId(1L));
@@ -52,7 +52,7 @@ class EasyUserManagementControllerTest {
 
     @Test
     @DisplayName("createFullMember — 200 OK")
-    void createFullMember_returns200() throws Exception {
+    void createFullMemberReturns200() throws Exception {
         // given
         MemberData member = mock(MemberData.class);
         when(member.getUserId()).thenReturn(new UserId(1L));

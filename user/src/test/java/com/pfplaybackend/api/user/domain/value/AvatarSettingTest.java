@@ -30,7 +30,7 @@ class AvatarSettingTest {
 
     @Test
     @DisplayName("생성 시 모든 필드가 올바르게 설정됨")
-    void create_allFieldsSet() {
+    void createAllFieldsSet() {
         assertThat(avatarSetting.getAvatarBodyUri().getAvatarBodyUri()).isEqualTo("body.png");
         assertThat(avatarSetting.getAvatarFaceUri().getAvatarFaceUri()).isEqualTo("face.png");
         assertThat(avatarSetting.getAvatarIconUri().getAvatarIconUri()).isEqualTo("icon.png");
@@ -45,7 +45,7 @@ class AvatarSettingTest {
 
     @Test
     @DisplayName("updateBody 호출 시 body URI와 position 변경")
-    void updateBody_changesBodyAndPosition() {
+    void updateBodyChangesBodyAndPosition() {
         // when
         avatarSetting.updateBody(new AvatarBodyUri("new-body.png"), 300, 400);
 
@@ -59,7 +59,7 @@ class AvatarSettingTest {
 
     @Test
     @DisplayName("updateFaceSingleBody 호출 시 compositionType이 SINGLE_BODY로 변경")
-    void updateFaceSingleBody_changesCompositionType() {
+    void updateFaceSingleBodyChangesCompositionType() {
         // when
         avatarSetting.updateFaceSingleBody(new AvatarFaceUri(""));
 
@@ -70,7 +70,7 @@ class AvatarSettingTest {
 
     @Test
     @DisplayName("updateFaceWithTransform 호출 시 compositionType과 transform 값 변경")
-    void updateFaceWithTransform_changesAllTransformFields() {
+    void updateFaceWithTransformChangesAllTransformFields() {
         // given
         avatarSetting.updateFaceSingleBody(new AvatarFaceUri(""));
         assertThat(avatarSetting.getAvatarCompositionType()).isEqualTo(AvatarCompositionType.SINGLE_BODY);
@@ -93,7 +93,7 @@ class AvatarSettingTest {
 
     @Test
     @DisplayName("updateIcon 호출 시 icon URI만 변경")
-    void updateIcon_changesOnlyIcon() {
+    void updateIconChangesOnlyIcon() {
         // when
         avatarSetting.updateIcon(new AvatarIconUri("new-icon.png"));
 
@@ -104,7 +104,7 @@ class AvatarSettingTest {
 
     @Test
     @DisplayName("applyDefaults는 null인 URI만 빈 문자열로 초기화")
-    void applyDefaults_onlyFillsNullUris() {
+    void applyDefaultsOnlyFillsNullUris() {
         // given
         AvatarSetting empty = new AvatarSetting(
                 null, null, null,
@@ -123,7 +123,7 @@ class AvatarSettingTest {
 
     @Test
     @DisplayName("applyDefaults는 이미 설정된 URI를 덮어쓰지 않음")
-    void applyDefaults_doesNotOverwriteExistingValues() {
+    void applyDefaultsDoesNotOverwriteExistingValues() {
         // when
         avatarSetting.applyDefaults();
 

@@ -30,7 +30,7 @@ class CrewProfileChangeEventHandlerTest {
 
     @Test
     @DisplayName("preCheck — 활성 파티룸이 있으면 CrewProfileChangedCommand를 반환한다")
-    void preCheck_activePartyroom_returnsCommand() {
+    void preCheckActivePartyroomReturnsCommand() {
         // given
         CrewProfilePreCheckCommand command = new CrewProfilePreCheckCommand(
                 userId, "nickname", "faceUri", "bodyUri", "iconUri",
@@ -52,7 +52,7 @@ class CrewProfileChangeEventHandlerTest {
 
     @Test
     @DisplayName("preCheck — 활성 파티룸이 없으면 empty를 반환한다")
-    void preCheck_noActivePartyroom_returnsEmpty() {
+    void preCheckNoActivePartyroomReturnsEmpty() {
         // given
         CrewProfilePreCheckCommand command = new CrewProfilePreCheckCommand(
                 userId, "nickname", "faceUri", "bodyUri", "iconUri",

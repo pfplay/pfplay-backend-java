@@ -64,7 +64,7 @@ class CrewBlockCommandServiceTest {
 
     @Test
     @DisplayName("addBlock — 정상적으로 크루를 차단하고 이력을 저장한다")
-    void addBlock_success() {
+    void addBlockSuccess() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(1L, false, 10L, false, null, null);
         when(partyroomQueryService.getMyActivePartyroomOrThrow(userId)).thenReturn(activeDto);
@@ -97,7 +97,7 @@ class CrewBlockCommandServiceTest {
 
     @Test
     @DisplayName("addBlock — 이미 차단된 크루를 다시 차단하면 BadRequestException이 발생한다")
-    void addBlock_alreadyBlocked() {
+    void addBlockAlreadyBlocked() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(1L, false, 10L, false, null, null);
         when(partyroomQueryService.getMyActivePartyroomOrThrow(userId)).thenReturn(activeDto);
@@ -120,7 +120,7 @@ class CrewBlockCommandServiceTest {
 
     @Test
     @DisplayName("removeBlock — 정상적으로 차단을 해제하고 이력을 업데이트한다")
-    void removeBlock_success() {
+    void removeBlockSuccess() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(1L, false, 10L, false, null, null);
         when(partyroomQueryService.getMyActivePartyroomOrThrow(userId)).thenReturn(activeDto);
@@ -142,7 +142,7 @@ class CrewBlockCommandServiceTest {
 
     @Test
     @DisplayName("removeBlock — 차단 이력이 없으면 NotFoundException이 발생한다")
-    void removeBlock_notFound() {
+    void removeBlockNotFound() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(1L, false, 10L, false, null, null);
         when(partyroomQueryService.getMyActivePartyroomOrThrow(userId)).thenReturn(activeDto);

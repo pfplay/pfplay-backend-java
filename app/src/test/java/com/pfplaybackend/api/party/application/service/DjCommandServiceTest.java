@@ -67,7 +67,7 @@ class DjCommandServiceTest {
 
     @Test
     @DisplayName("enqueueDj — 큐가 닫혀있으면 예외가 발생한다")
-    void enqueueDj_queueClosed_throws() {
+    void enqueueDjQueueClosedThrows() {
         // given
         PartyroomData partyroom = PartyroomData.builder()
                 .id(partyroomId.getId()).partyroomId(partyroomId).build();
@@ -90,7 +90,7 @@ class DjCommandServiceTest {
 
     @Test
     @DisplayName("enqueueDj — 이미 등록된 DJ이면 예외가 발생한다")
-    void enqueueDj_alreadyRegistered_throws() {
+    void enqueueDjAlreadyRegisteredThrows() {
         // given
         PartyroomData partyroom = PartyroomData.builder()
                 .id(partyroomId.getId()).partyroomId(partyroomId).build();
@@ -114,7 +114,7 @@ class DjCommandServiceTest {
 
     @Test
     @DisplayName("enqueueDj — 빈 플레이리스트이면 예외가 발생한다")
-    void enqueueDj_emptyPlaylist_throws() {
+    void enqueueDjEmptyPlaylistThrows() {
         // given
         PartyroomData partyroom = PartyroomData.builder()
                 .id(partyroomId.getId()).partyroomId(partyroomId).build();
@@ -138,7 +138,7 @@ class DjCommandServiceTest {
 
     @Test
     @DisplayName("enqueueDj — 첫 번째 DJ 등록 시 재생이 시작된다")
-    void enqueueDj_firstDj_startsPlayback() {
+    void enqueueDjFirstDjStartsPlayback() {
         // given
         PartyroomData partyroom = PartyroomData.builder()
                 .id(partyroomId.getId()).partyroomId(partyroomId).build();
@@ -166,7 +166,7 @@ class DjCommandServiceTest {
 
     @Test
     @DisplayName("dequeueDj — 현재 DJ가 아니면 skipBySystem이 호출되지 않는다")
-    void dequeueDj_notCurrentDj_noSkip() {
+    void dequeueDjNotCurrentDjNoSkip() {
         // given
         PartyroomData partyroom = PartyroomData.builder()
                 .id(partyroomId.getId()).partyroomId(partyroomId).build();

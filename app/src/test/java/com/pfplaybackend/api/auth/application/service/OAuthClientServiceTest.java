@@ -25,7 +25,7 @@ class OAuthClientServiceTest {
 
     @Test
     @DisplayName("exchangeCodeForToken — GOOGLE이면 GoogleClient에 위임한다")
-    void exchangeCodeForToken_delegatesToGoogle() {
+    void exchangeCodeForTokenDelegatesToGoogle() {
         // given
         OAuthTokenDto expectedToken = new OAuthTokenDto("access", "Bearer", 3600, "refresh", "openid");
         when(googleOAuthClient.exchangeCodeForToken("code123", "verifier")).thenReturn(expectedToken);
@@ -40,7 +40,7 @@ class OAuthClientServiceTest {
 
     @Test
     @DisplayName("exchangeCodeForToken — TWITTER이면 TwitterClient에 위임한다")
-    void exchangeCodeForToken_delegatesToTwitter() {
+    void exchangeCodeForTokenDelegatesToTwitter() {
         // given
         OAuthTokenDto expectedToken = new OAuthTokenDto("tw-access", "Bearer", 7200, "tw-refresh", "tweet.read");
         when(twitterOAuthClient.exchangeCodeForToken("twCode", "twVerifier")).thenReturn(expectedToken);
@@ -55,7 +55,7 @@ class OAuthClientServiceTest {
 
     @Test
     @DisplayName("getUserProfile — 올바른 클라이언트에 위임한다")
-    void getUserProfile_delegatesToCorrectClient() {
+    void getUserProfileDelegatesToCorrectClient() {
         // given
         OAuthUserProfileDto expectedProfile = new OAuthUserProfileDto("gid123", "test@gmail.com", "Test User", "pic.jpg");
         when(googleOAuthClient.getUserProfile("gToken")).thenReturn(expectedProfile);

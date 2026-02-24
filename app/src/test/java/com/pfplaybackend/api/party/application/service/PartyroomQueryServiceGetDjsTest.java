@@ -55,7 +55,7 @@ class PartyroomQueryServiceGetDjsTest {
 
     @Test
     @DisplayName("getDjs - isQueued가 false인 DJ는 결과에서 제외되어야 한다")
-    void getDjs_shouldExcludeDequeuedDjs() {
+    void getDjsShouldExcludeDequeuedDjs() {
         // given
         UserId user1 = new UserId();
         UserId user3 = new UserId();
@@ -84,7 +84,7 @@ class PartyroomQueryServiceGetDjsTest {
 
     @Test
     @DisplayName("getDjs - orderNumber 기준으로 오름차순 정렬되어야 한다")
-    void getDjs_shouldSortByOrderNumberAscending() {
+    void getDjsShouldSortByOrderNumberAscending() {
         // given
         UserId user1 = new UserId();
         UserId user2 = new UserId();
@@ -118,7 +118,7 @@ class PartyroomQueryServiceGetDjsTest {
 
     @Test
     @DisplayName("getDjs - 모든 DJ가 dequeued이면 빈 리스트를 반환해야 한다")
-    void getDjs_shouldReturnEmptyList_whenAllDjsDequeued() {
+    void getDjsShouldReturnEmptyListWhenAllDjsDequeued() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         when(aggregatePort.findDjsOrdered(partyroomId))

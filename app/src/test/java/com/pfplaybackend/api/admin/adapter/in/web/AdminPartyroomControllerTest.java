@@ -36,7 +36,7 @@ class AdminPartyroomControllerTest {
 
     @Test
     @DisplayName("createPartyroom — FM 권한이면 201 Created")
-    void createPartyroom_withFmAuthority_returns201() throws Exception {
+    void createPartyroomWithFmAuthorityReturns201() throws Exception {
         // given
         String body = """
                 {"hostUserId": "100", "title": "Test Room", "introduction": "Hello", "linkDomain": "testdomain01", "playbackTimeLimit": 5}""";
@@ -55,7 +55,7 @@ class AdminPartyroomControllerTest {
 
     @Test
     @DisplayName("createPartyroom — 인증 없으면 401")
-    void createPartyroom_unauthenticated_returns401() throws Exception {
+    void createPartyroomUnauthenticatedReturns401() throws Exception {
         // given
         String body = """
                 {"hostUserId": "100", "title": "Test Room", "introduction": "Hello", "linkDomain": "testdomain01", "playbackTimeLimit": 5}""";
@@ -70,7 +70,7 @@ class AdminPartyroomControllerTest {
 
     @Test
     @DisplayName("createBulkPreviewEnvironment — FM 권한이면 201 Created")
-    void createBulkPreviewEnvironment_withFmAuthority_returns201() throws Exception {
+    void createBulkPreviewEnvironmentWithFmAuthorityReturns201() throws Exception {
         // given
         String body = """
                 {"partyroomCount": 5, "usersPerRoom": 5, "titlePrefix": "Room", "introduction": "Hello", "linkDomainPrefix": "demo", "playbackTimeLimit": 5}""";
@@ -89,7 +89,7 @@ class AdminPartyroomControllerTest {
 
     @Test
     @DisplayName("createBulkPreviewEnvironment — 인증 없으면 401")
-    void createBulkPreviewEnvironment_unauthenticated_returns401() throws Exception {
+    void createBulkPreviewEnvironmentUnauthenticatedReturns401() throws Exception {
         // given
         String body = """
                 {"partyroomCount": 5, "usersPerRoom": 5, "titlePrefix": "Room", "introduction": "Hello", "linkDomainPrefix": "demo", "playbackTimeLimit": 5}""";

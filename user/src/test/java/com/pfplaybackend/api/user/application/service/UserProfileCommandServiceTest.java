@@ -30,7 +30,7 @@ class UserProfileCommandServiceTest {
 
     @Test
     @DisplayName("createProfileDataForGuest — 게스트 프로필이 기본 아바타로 생성된다")
-    void createProfileDataForGuest_createsWithDefaultAvatar() {
+    void createProfileDataForGuestCreatesWithDefaultAvatar() {
         // given
         UserId userId = new UserId(1L);
         AvatarBodyResourceData defaultBody = AvatarBodyResourceData.builder()
@@ -55,7 +55,7 @@ class UserProfileCommandServiceTest {
 
     @Test
     @DisplayName("createProfileDataForMember — 멤버 프로필이 생성된다")
-    void createProfileDataForMember_createsMinimalProfile() {
+    void createProfileDataForMemberCreatesMinimalProfile() {
         // given
         UserId userId = new UserId(1L);
 

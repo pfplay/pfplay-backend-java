@@ -29,7 +29,7 @@ class TrackCommandControllerTest {
 
     @Test
     @DisplayName("POST /{playlistId}/tracks — MEMBER 권한이면 201을 반환한다")
-    void addTrack_member_returns201() throws Exception {
+    void addTrackMemberReturns201() throws Exception {
         // given
         String body = """
                 {
@@ -51,7 +51,7 @@ class TrackCommandControllerTest {
 
     @Test
     @DisplayName("POST /{playlistId}/tracks — 미인증이면 401을 반환한다")
-    void addTrack_unauthenticated_returns401() throws Exception {
+    void addTrackUnauthenticatedReturns401() throws Exception {
         // given
         String body = """
                 {
@@ -72,7 +72,7 @@ class TrackCommandControllerTest {
 
     @Test
     @DisplayName("DELETE /{playlistId}/tracks/{trackId} — 인증되면 202를 반환한다")
-    void deleteTrack_authenticated_returns202() throws Exception {
+    void deleteTrackAuthenticatedReturns202() throws Exception {
         // when & then
         mockMvc.perform(delete("/api/v1/playlists/1/tracks/10")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
@@ -82,7 +82,7 @@ class TrackCommandControllerTest {
 
     @Test
     @DisplayName("PUT /{playlistId}/tracks/{trackId} — 인증 + 순서 변경 요청이면 202를 반환한다")
-    void updateTrackOrder_authenticated_returns202() throws Exception {
+    void updateTrackOrderAuthenticatedReturns202() throws Exception {
         // given
         String body = """
                 {"nextOrderNumber": 3}

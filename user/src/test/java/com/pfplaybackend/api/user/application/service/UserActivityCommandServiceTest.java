@@ -23,7 +23,7 @@ class UserActivityCommandServiceTest {
 
     @Test
     @DisplayName("createUserActivities — 모든 ActivityType에 대해 활동 데이터를 생성한다")
-    void createUserActivities_createsAllActivityTypes() {
+    void createUserActivitiesCreatesAllActivityTypes() {
         // given
         UserId userId = new UserId(1L);
 

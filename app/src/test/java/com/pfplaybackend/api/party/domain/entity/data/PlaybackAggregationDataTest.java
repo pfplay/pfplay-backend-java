@@ -10,7 +10,7 @@ class PlaybackAggregationDataTest {
 
     @Test
     @DisplayName("createFor — 팩토리 메서드로 생성 시 모든 카운트가 0으로 초기화된다")
-    void createFor_defaultZero() {
+    void createForDefaultZero() {
         // when
         PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(new PlaybackId(1L));
 
@@ -23,7 +23,7 @@ class PlaybackAggregationDataTest {
 
     @Test
     @DisplayName("updateAggregation — 양수 델타로 카운트가 증가한다")
-    void updateAggregation_positiveDelta() {
+    void updateAggregationPositiveDelta() {
         // given
         PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(new PlaybackId(1L));
 
@@ -38,7 +38,7 @@ class PlaybackAggregationDataTest {
 
     @Test
     @DisplayName("updateAggregation — 음수 델타로 카운트가 감소한다")
-    void updateAggregation_negativeDelta() {
+    void updateAggregationNegativeDelta() {
         // given
         PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(new PlaybackId(1L));
         aggregation.updateAggregation(5, 3, 2);
@@ -54,7 +54,7 @@ class PlaybackAggregationDataTest {
 
     @Test
     @DisplayName("updateAggregation — 누적 호출 시 카운트가 합산된다")
-    void updateAggregation_accumulates() {
+    void updateAggregationAccumulates() {
         // given
         PlaybackAggregationData aggregation = PlaybackAggregationData.createFor(new PlaybackId(1L));
 

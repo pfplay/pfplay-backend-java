@@ -28,7 +28,7 @@ class PlaybackReactionCommandControllerTest {
 
     @Test
     @DisplayName("reactToPlayback — 200 OK")
-    void reactToPlayback_returns200() throws Exception {
+    void reactToPlaybackReturns200() throws Exception {
         // given
         String body = """
                 {
@@ -49,7 +49,7 @@ class PlaybackReactionCommandControllerTest {
 
     @Test
     @DisplayName("reactToPlayback — 인증 없으면 401")
-    void reactToPlayback_unauthenticated_returns401() throws Exception {
+    void reactToPlaybackUnauthenticatedReturns401() throws Exception {
         String body = """
                 {
                     "reactionType": "LIKE"

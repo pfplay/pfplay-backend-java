@@ -13,7 +13,7 @@ class DjQueueDataTest {
 
     @Test
     @DisplayName("createFor — 팩토리 메서드로 생성 시 열린 상태로 초기화된다")
-    void createFor_defaultOpen() {
+    void createForDefaultOpen() {
         // when
         DjQueueData queue = DjQueueData.createFor(new PartyroomId(1L));
 
@@ -51,7 +51,7 @@ class DjQueueDataTest {
 
     @Test
     @DisplayName("validateOpen — 열린 상태에서 검증 시 예외가 발생하지 않는다")
-    void validateOpen_open_noException() {
+    void validateOpenOpenNoException() {
         // given
         DjQueueData queue = DjQueueData.createFor(new PartyroomId(1L));
 
@@ -61,7 +61,7 @@ class DjQueueDataTest {
 
     @Test
     @DisplayName("validateOpen — 닫힌 상태에서 검증 시 예외가 발생한다")
-    void validateOpen_closed_throws() {
+    void validateOpenClosedThrows() {
         // given
         DjQueueData queue = DjQueueData.createFor(new PartyroomId(1L));
         queue.close();

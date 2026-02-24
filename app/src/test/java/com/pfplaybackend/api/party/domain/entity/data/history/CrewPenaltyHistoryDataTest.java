@@ -14,7 +14,7 @@ class CrewPenaltyHistoryDataTest {
 
     @Test
     @DisplayName("release — released 상태와 releaserCrewId가 설정된다")
-    void release_setsReleasedStateAndReleaserInfo() {
+    void releaseSetsReleasedStateAndReleaserInfo() {
         // given
         CrewPenaltyHistoryData penalty = CrewPenaltyHistoryData.builder()
                 .partyroomId(new PartyroomId(1L))
@@ -38,7 +38,7 @@ class CrewPenaltyHistoryDataTest {
 
     @Test
     @DisplayName("release — 이미 released된 상태에서 다시 release하면 상태가 유지된다")
-    void release_idempotentWhenAlreadyReleased() {
+    void releaseIdempotentWhenAlreadyReleased() {
         // given
         CrewPenaltyHistoryData penalty = CrewPenaltyHistoryData.builder()
                 .partyroomId(new PartyroomId(1L))

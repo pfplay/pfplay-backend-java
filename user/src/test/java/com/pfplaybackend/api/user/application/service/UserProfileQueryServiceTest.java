@@ -73,7 +73,7 @@ class UserProfileQueryServiceTest {
 
     @Test
     @DisplayName("getUsersProfileSetting — 다수 사용자의 프로필 설정 정보를 일괄 조회한다")
-    void getUsersProfileSetting_multipleUsers() {
+    void getUsersProfileSettingMultipleUsers() {
         // given
         UserId user2 = new UserId(2L);
         ProfileData profile1 = createProfileData(userId, "User1");
@@ -93,7 +93,7 @@ class UserProfileQueryServiceTest {
 
     @Test
     @DisplayName("getUsersProfileSetting — 빈 사용자 목록에 대해 빈 맵을 반환한다")
-    void getUsersProfileSetting_emptyList() {
+    void getUsersProfileSettingEmptyList() {
         // given
         when(userProfileRepository.findAllByUserIdIn(List.of())).thenReturn(List.of());
 
@@ -108,7 +108,7 @@ class UserProfileQueryServiceTest {
 
     @Test
     @DisplayName("getMyProfileSummary — Member 사용자의 프로필 요약을 반환한다")
-    void getMyProfileSummary_member() {
+    void getMyProfileSummaryMember() {
         // given
         MemberData member = MemberData.createWithFixedUserId(userId, "test@email.com", ProviderType.GOOGLE);
         ProfileData profile = createProfileData(userId, "MemberNick");
@@ -127,7 +127,7 @@ class UserProfileQueryServiceTest {
 
     @Test
     @DisplayName("getMyProfileSummary — Guest 사용자의 프로필 요약을 반환한다")
-    void getMyProfileSummary_guest() {
+    void getMyProfileSummaryGuest() {
         // given — Guest 경로를 타도록 AuthorityTier.GT 설정
         AuthContext guestContext = mock(AuthContext.class);
         when(guestContext.getUserId()).thenReturn(userId);

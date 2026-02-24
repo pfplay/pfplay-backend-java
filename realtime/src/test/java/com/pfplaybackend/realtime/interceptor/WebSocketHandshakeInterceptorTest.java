@@ -40,7 +40,7 @@ class WebSocketHandshakeInterceptorTest {
 
     @Test
     @DisplayName("유효한 토큰이면 userId를 attributes에 저장한다")
-    void beforeHandshake_validToken_extractsUserId() throws Exception {
+    void beforeHandshakeValidTokenExtractsUserId() throws Exception {
         // given
         HttpServletRequest servletRequest = mock(HttpServletRequest.class);
         ServletServerHttpRequest request = new ServletServerHttpRequest(servletRequest);
@@ -58,7 +58,7 @@ class WebSocketHandshakeInterceptorTest {
 
     @Test
     @DisplayName("유효하지 않은 토큰이면 AuthenticationServiceException을 던진다")
-    void beforeHandshake_invalidToken_throwsAuthenticationServiceException() {
+    void beforeHandshakeInvalidTokenThrowsAuthenticationServiceException() {
         // given
         HttpServletRequest servletRequest = mock(HttpServletRequest.class);
         ServletServerHttpRequest request = new ServletServerHttpRequest(servletRequest);
@@ -74,7 +74,7 @@ class WebSocketHandshakeInterceptorTest {
 
     @Test
     @DisplayName("비-Servlet 요청이면 추출 없이 true를 반환한다")
-    void beforeHandshake_nonServletRequest_returnsTrueWithoutExtraction() throws Exception {
+    void beforeHandshakeNonServletRequestReturnsTrueWithoutExtraction() throws Exception {
         // given
         ServerHttpRequest request = mock(ServerHttpRequest.class);
         Map<String, Object> attributes = new HashMap<>();
@@ -90,7 +90,7 @@ class WebSocketHandshakeInterceptorTest {
 
     @Test
     @DisplayName("afterHandshake가 예외 없이 실행된다")
-    void afterHandshake_logsWithoutError() {
+    void afterHandshakeLogsWithoutError() {
         // given
         ServerHttpRequest request = mock(ServerHttpRequest.class);
 

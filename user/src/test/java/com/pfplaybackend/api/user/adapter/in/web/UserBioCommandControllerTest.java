@@ -35,7 +35,7 @@ class UserBioCommandControllerTest {
 
     @Test
     @DisplayName("PUT /me/profile/bio — MEMBER 권한 + 유효한 요청이면 200을 반환한다")
-    void setMyBio_member_returns200() throws Exception {
+    void setMyBioMemberReturns200() throws Exception {
         // given
         String body = """
                 {"nickname": "NewNick", "introduction": "Hello World"}
@@ -52,7 +52,7 @@ class UserBioCommandControllerTest {
 
     @Test
     @DisplayName("PUT /me/profile/bio — 미인증이면 401을 반환한다")
-    void setMyBio_unauthenticated_returns401() throws Exception {
+    void setMyBioUnauthenticatedReturns401() throws Exception {
         // given
         String body = """
                 {"nickname": "NewNick", "introduction": "Hello"}
@@ -68,7 +68,7 @@ class UserBioCommandControllerTest {
 
     @Test
     @DisplayName("PUT /me/profile/bio — GUEST 권한이면 403을 반환한다")
-    void setMyBio_guest_returns403() throws Exception {
+    void setMyBioGuestReturns403() throws Exception {
         // given
         String body = """
                 {"nickname": "NewNick", "introduction": "Hello"}

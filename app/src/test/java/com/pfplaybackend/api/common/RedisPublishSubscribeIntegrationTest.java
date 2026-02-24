@@ -36,7 +36,7 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("발행된 메시지를 구독자가 정상적으로 수신한다")
-    void publish_subscribe_receivesMessage() throws InterruptedException {
+    void publishSubscribeReceivesMessage() throws InterruptedException {
         // given
         String topic = "test:pubsub:single";
         String message = "hello-redis";
@@ -61,7 +61,7 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("여러 구독자가 동시에 메시지를 수신한다 (fan-out)")
-    void publish_multipleSubscribers_allReceive() throws InterruptedException {
+    void publishMultipleSubscribersAllReceive() throws InterruptedException {
         // given
         String topic = "test:pubsub:fanout";
         String message = "broadcast-message";
@@ -92,7 +92,7 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("JSON 직렬화된 객체를 역직렬화하여 수신한다")
-    void publish_serializedObject_deserializesCorrectly() throws InterruptedException {
+    void publishSerializedObjectDeserializesCorrectly() throws InterruptedException {
         // given
         String topic = "test:pubsub:object";
         Map<String, Object> payload = Map.of("type", "TEST_EVENT", "value", 42);
@@ -118,7 +118,7 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("구독자가 없어도 발행이 블로킹되지 않는다")
-    void publish_noSubscriber_doesNotBlock() {
+    void publishNoSubscriberDoesNotBlock() {
         // given
         String topic = "test:pubsub:nosub";
         String message = "orphan-message";

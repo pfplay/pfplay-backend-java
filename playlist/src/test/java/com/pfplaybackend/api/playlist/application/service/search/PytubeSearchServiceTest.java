@@ -36,7 +36,7 @@ class PytubeSearchServiceTest {
 
     @Test
     @DisplayName("searchByWord — null/blank/zero duration 항목을 필터링한다")
-    void searchByWord_filtersInvalidDuration() {
+    void searchByWordFiltersInvalidDuration() {
         // given
         setBaseConfig();
         List<SearchResultRawDto> rawList = List.of(
@@ -59,7 +59,7 @@ class PytubeSearchServiceTest {
 
     @Test
     @DisplayName("searchByWord — 유효한 결과만 반환한다")
-    void searchByWord_returnsOnlyValidResults() {
+    void searchByWordReturnsOnlyValidResults() {
         // given
         setBaseConfig();
         List<SearchResultRawDto> rawList = List.of(
@@ -81,7 +81,7 @@ class PytubeSearchServiceTest {
 
     @Test
     @DisplayName("searchByWord — 빈 응답이면 빈 리스트를 반환한다")
-    void searchByWord_returnsEmptyListWhenNoData() {
+    void searchByWordReturnsEmptyListWhenNoData() {
         // given
         setBaseConfig();
         SearchResultDto mockResult = new SearchResultDto("ok", List.of());

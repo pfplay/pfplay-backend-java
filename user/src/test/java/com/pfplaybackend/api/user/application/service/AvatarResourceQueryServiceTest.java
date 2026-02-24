@@ -33,7 +33,7 @@ class AvatarResourceQueryServiceTest {
 
     @Test
     @DisplayName("findPairAvatarIconByFaceUri — 이름 기반으로 아이콘 URI를 생성한다")
-    void findPairAvatarIconByFaceUri_generatesIconName() {
+    void findPairAvatarIconByFaceUriGeneratesIconName() {
         // given
         AvatarFaceUri faceUri = new AvatarFaceUri("face_uri_01");
         AvatarFaceResourceData faceData = AvatarFaceResourceData.builder()
@@ -56,7 +56,7 @@ class AvatarResourceQueryServiceTest {
 
     @Test
     @DisplayName("findPairAvatarIconByBodyUri — 바디 URI 기반으로 아이콘 URI를 생성한다")
-    void findPairAvatarIconByBodyUri_generatesIconName() {
+    void findPairAvatarIconByBodyUriGeneratesIconName() {
         // given
         AvatarBodyUri bodyUri = new AvatarBodyUri("body_uri_01");
         AvatarBodyResourceData bodyData = AvatarBodyResourceData.builder()
@@ -83,7 +83,7 @@ class AvatarResourceQueryServiceTest {
 
     @Test
     @DisplayName("isBasicFaceUri — 기본 얼굴 URI를 올바르게 판별한다")
-    void isBasicFaceUri_returnsCorrectly() {
+    void isBasicFaceUriReturnsCorrectly() {
         // given
         AvatarFaceUri basicFace = new AvatarFaceUri("basic_face_uri");
         AvatarFaceUri customFace = new AvatarFaceUri("custom_nft_uri");
@@ -101,7 +101,7 @@ class AvatarResourceQueryServiceTest {
 
     @Test
     @DisplayName("getDefaultSettingResourceAvatarBody — 기본 바디를 반환한다")
-    void getDefaultSettingResourceAvatarBody_returnsDefault() {
+    void getDefaultSettingResourceAvatarBodyReturnsDefault() {
         // given
         AvatarBodyResourceData defaultBody = AvatarBodyResourceData.builder()
                 .id(1L).name("default").resourceUri("default-body-uri")

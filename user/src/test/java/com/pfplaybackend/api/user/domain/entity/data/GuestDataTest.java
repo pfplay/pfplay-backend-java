@@ -11,7 +11,7 @@ class GuestDataTest {
 
     @Test
     @DisplayName("create — GT 권한으로 생성된다")
-    void create_setsGuestAuthority() {
+    void createSetsGuestAuthority() {
         // when
         GuestData guest = GuestData.create();
 
@@ -23,7 +23,7 @@ class GuestDataTest {
 
     @Test
     @DisplayName("createWithFixedUserId — 지정된 UserId로 생성된다")
-    void createWithFixedUserId_setsGivenUserIdAndAgent() {
+    void createWithFixedUserIdSetsGivenUserIdAndAgent() {
         // given
         UserId fixedId = new UserId(999L);
 
@@ -38,7 +38,7 @@ class GuestDataTest {
 
     @Test
     @DisplayName("initiateProfile — 프로필이 설정되고 isProfileUpdated가 true가 된다")
-    void initiateProfile_setsProfileAndFlag() {
+    void initiateProfileSetsProfileAndFlag() {
         // given
         GuestData guest = GuestData.create();
         ProfileData profile = ProfileData.builder()
@@ -55,7 +55,7 @@ class GuestDataTest {
 
     @Test
     @DisplayName("isGuest — true를 반환한다")
-    void isGuest_returnsTrue() {
+    void isGuestReturnsTrue() {
         // when
         GuestData guest = GuestData.create();
 

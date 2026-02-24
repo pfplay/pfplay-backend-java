@@ -24,7 +24,7 @@ class CookieBearerTokenResolverTest {
 
     @Test
     @DisplayName("resolve — 쿠키에 토큰이 있으면 반환한다")
-    void resolve_returnsTokenFromCookie() {
+    void resolveReturnsTokenFromCookie() {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(new Cookie("access_token", "test-jwt-token"));
@@ -38,7 +38,7 @@ class CookieBearerTokenResolverTest {
 
     @Test
     @DisplayName("resolve — 쿠키에 토큰이 없으면 null을 반환한다")
-    void resolve_returnsNullWhenNoCookies() {
+    void resolveReturnsNullWhenNoCookies() {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
 
@@ -51,7 +51,7 @@ class CookieBearerTokenResolverTest {
 
     @Test
     @DisplayName("resolve — 다른 이름의 쿠키만 있으면 null을 반환한다")
-    void resolve_returnsNullWhenWrongCookieName() {
+    void resolveReturnsNullWhenWrongCookieName() {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(new Cookie("other_cookie", "some-value"));

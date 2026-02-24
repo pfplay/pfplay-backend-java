@@ -14,28 +14,28 @@ class CrewDataGradeTest {
 
     @Test
     @DisplayName("isBelowGrade — LISTENER는 MODERATOR보다 낮음")
-    void isBelowGrade_true() {
+    void isBelowGradeTrue() {
         CrewData crew = crewWithGrade(GradeType.LISTENER);
         assertThat(crew.isBelowGrade(GradeType.MODERATOR)).isTrue();
     }
 
     @Test
     @DisplayName("isBelowGrade — MODERATOR는 MODERATOR보다 낮지 않음")
-    void isBelowGrade_false_equal() {
+    void isBelowGradeFalseEqual() {
         CrewData crew = crewWithGrade(GradeType.MODERATOR);
         assertThat(crew.isBelowGrade(GradeType.MODERATOR)).isFalse();
     }
 
     @Test
     @DisplayName("isBelowGrade — HOST는 MODERATOR보다 낮지 않음")
-    void isBelowGrade_false_higher() {
+    void isBelowGradeFalseHigher() {
         CrewData crew = crewWithGrade(GradeType.HOST);
         assertThat(crew.isBelowGrade(GradeType.MODERATOR)).isFalse();
     }
 
     @Test
     @DisplayName("isGradeHigherThan — HOST > LISTENER")
-    void isGradeHigherThan_true() {
+    void isGradeHigherThanTrue() {
         CrewData host = crewWithGrade(GradeType.HOST);
         CrewData listener = crewWithGrade(GradeType.LISTENER);
         assertThat(host.isGradeHigherThan(listener)).isTrue();
@@ -43,7 +43,7 @@ class CrewDataGradeTest {
 
     @Test
     @DisplayName("isGradeHigherThan — LISTENER vs MODERATOR")
-    void isGradeHigherThan_false() {
+    void isGradeHigherThanFalse() {
         CrewData listener = crewWithGrade(GradeType.LISTENER);
         CrewData moderator = crewWithGrade(GradeType.MODERATOR);
         assertThat(listener.isGradeHigherThan(moderator)).isFalse();
@@ -51,7 +51,7 @@ class CrewDataGradeTest {
 
     @Test
     @DisplayName("isGradeHigherThan — 같은 등급")
-    void isGradeHigherThan_equal() {
+    void isGradeHigherThanEqual() {
         CrewData mod1 = crewWithGrade(GradeType.MODERATOR);
         CrewData mod2 = crewWithGrade(GradeType.MODERATOR);
         assertThat(mod1.isGradeHigherThan(mod2)).isFalse();

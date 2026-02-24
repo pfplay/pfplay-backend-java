@@ -21,7 +21,7 @@ class PartyroomNoticeCommandControllerTest {
 
     @Test
     @DisplayName("registerNotice — 200 OK")
-    void registerNotice_returns200() throws Exception {
+    void registerNoticeReturns200() throws Exception {
         mockMvc.perform(put("/api/v1/partyrooms/1/notice")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
@@ -30,7 +30,7 @@ class PartyroomNoticeCommandControllerTest {
 
     @Test
     @DisplayName("registerNotice — 인증 없으면 401")
-    void registerNotice_unauthenticated_returns401() throws Exception {
+    void registerNoticeUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(put("/api/v1/partyrooms/1/notice")
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());

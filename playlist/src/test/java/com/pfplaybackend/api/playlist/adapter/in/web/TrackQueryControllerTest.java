@@ -35,7 +35,7 @@ class TrackQueryControllerTest {
 
     @Test
     @DisplayName("getAllTracks — ROLE_MEMBER이면 200 OK")
-    void getAllTracks_member_returns200() throws Exception {
+    void getAllTracksMemberReturns200() throws Exception {
         // given
         Page<PlaylistTrackDto> page = new PageImpl<>(List.of(
                 new PlaylistTrackDto(1L, "abc123", "Test Track", 1, "03:30", "https://example.com/thumb.jpg")
@@ -53,7 +53,7 @@ class TrackQueryControllerTest {
 
     @Test
     @DisplayName("getAllTracks — 인증 없으면 401")
-    void getAllTracks_unauthenticated_returns401() throws Exception {
+    void getAllTracksUnauthenticatedReturns401() throws Exception {
         // when & then
         mockMvc.perform(get("/api/v1/playlists/1/tracks")
                         .param("pageNumber", "0")

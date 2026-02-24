@@ -24,21 +24,15 @@ public class CrewGradeHistoryData extends BaseEntity {
     private Long id;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "partyroom_id")),
-    })
+    @AttributeOverride(name = "id", column = @Column(name = "partyroom_id"))
     private PartyroomId partyroomId;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "adjuster_crew_id")),
-    })
+    @AttributeOverride(name = "id", column = @Column(name = "adjuster_crew_id"))
     private CrewId adjusterCrewId;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "adjusted_crew_id")),
-    })
+    @AttributeOverride(name = "id", column = @Column(name = "adjusted_crew_id"))
     private CrewId adjustedCrewId;
 
     @Enumerated(EnumType.STRING)

@@ -24,7 +24,7 @@ class PlaybackReactionQueryServiceTest {
 
     @Test
     @DisplayName("findPrevHistoryData — 이력이 있으면 Optional에 감싸서 반환한다")
-    void findPrevHistoryData_returnsHistoryWhenExists() {
+    void findPrevHistoryDataReturnsHistoryWhenExists() {
         // given
         PlaybackId playbackId = new PlaybackId(1L);
         UserId userId = new UserId(10L);
@@ -43,7 +43,7 @@ class PlaybackReactionQueryServiceTest {
 
     @Test
     @DisplayName("findPrevHistoryData — 이력이 없으면 Optional.empty를 반환한다")
-    void findPrevHistoryData_returnsEmptyWhenNotExists() {
+    void findPrevHistoryDataReturnsEmptyWhenNotExists() {
         // given
         PlaybackId playbackId = new PlaybackId(1L);
         UserId userId = new UserId(10L);

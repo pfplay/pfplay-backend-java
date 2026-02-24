@@ -45,7 +45,7 @@ class PartyroomDjQueueTest {
 
     @Test
     @DisplayName("tryRemoveInDjQueue - 제거 후 남은 DJ 순서가 빈틈 없이 재배정되어야 한다")
-    void tryRemoveInDjQueue_shouldReassignOrderWithoutGaps() {
+    void tryRemoveInDjQueueShouldReassignOrderWithoutGaps() {
         // given: DJ 3명 (order 1, 2, 3) 중 2번 DJ 제거
         DjData dj1 = createDj(1L, 1);
         DjData dj2 = createDj(2L, 2);
@@ -67,7 +67,7 @@ class PartyroomDjQueueTest {
 
     @Test
     @DisplayName("tryRemoveInDjQueue - 1번(현재) DJ 제거 시 나머지 순서 재배정")
-    void tryRemoveInDjQueue_removeCurrentDj_shouldReassignCorrectly() {
+    void tryRemoveInDjQueueRemoveCurrentDjShouldReassignCorrectly() {
         // given
         DjData dj1 = createDj(1L, 1);
         DjData dj2 = createDj(2L, 2);
@@ -89,7 +89,7 @@ class PartyroomDjQueueTest {
 
     @Test
     @DisplayName("isCurrentDj - 재생 활성 상태에서 orderNumber 1인 DJ가 현재 DJ")
-    void isCurrentDj_shouldReturnTrue_whenPlaybackActivatedAndOrder1() {
+    void isCurrentDjShouldReturnTrueWhenPlaybackActivatedAndOrder1() {
         // given
         DjData dj1 = createDj(1L, 1);
         DjData dj2 = createDj(2L, 2);
@@ -104,7 +104,7 @@ class PartyroomDjQueueTest {
 
     @Test
     @DisplayName("isCurrentDj - 재생 비활성 상태에서는 항상 false")
-    void isCurrentDj_shouldReturnFalse_whenPlaybackNotActivated() {
+    void isCurrentDjShouldReturnFalseWhenPlaybackNotActivated() {
         // given
         DjData dj1 = createDj(1L, 1);
 

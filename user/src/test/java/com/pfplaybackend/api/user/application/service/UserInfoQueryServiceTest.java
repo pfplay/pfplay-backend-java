@@ -47,7 +47,7 @@ class UserInfoQueryServiceTest {
 
     @Test
     @DisplayName("getMyInfo — 사용자 정보를 정상 반환한다")
-    void getMyInfo_success() {
+    void getMyInfoSuccess() {
         // given
         UserAccountData user = mock(UserAccountData.class);
         when(user.getUserId()).thenReturn(userId);
@@ -71,7 +71,7 @@ class UserInfoQueryServiceTest {
 
     @Test
     @DisplayName("getMyInfo — 사용자가 없으면 UnauthorizedException이 발생한다")
-    void getMyInfo_userNotFound() {
+    void getMyInfoUserNotFound() {
         // given
         when(userAccountRepository.findByUserId(userId)).thenReturn(Optional.empty());
 

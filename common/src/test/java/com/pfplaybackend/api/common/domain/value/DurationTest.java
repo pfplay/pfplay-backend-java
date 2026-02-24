@@ -12,35 +12,35 @@ class DurationTest {
 
     @Test
     @DisplayName("MM:SS 포맷에서 Duration 생성")
-    void fromString_mmss() {
+    void fromStringMmss() {
         Duration duration = Duration.fromString("3:45");
         assertThat(duration.toSeconds()).isEqualTo(225L);
     }
 
     @Test
     @DisplayName("H:MM:SS 포맷에서 Duration 생성")
-    void fromString_hmmss() {
+    void fromStringHmmss() {
         Duration duration = Duration.fromString("1:23:45");
         assertThat(duration.toSeconds()).isEqualTo(5025L);
     }
 
     @Test
     @DisplayName("0:00 포맷도 유효")
-    void fromString_zero() {
+    void fromStringZero() {
         Duration duration = Duration.fromString("0:00");
         assertThat(duration.toSeconds()).isEqualTo(0L);
     }
 
     @Test
     @DisplayName("toDisplayString은 원래 포맷으로 복원")
-    void toDisplayString_mmss() {
+    void toDisplayStringMmss() {
         Duration duration = Duration.fromString("3:45");
         assertThat(duration.toDisplayString()).isEqualTo("3:45");
     }
 
     @Test
     @DisplayName("toDisplayString은 시간 포맷을 보존")
-    void toDisplayString_hmmss() {
+    void toDisplayStringHmmss() {
         Duration duration = Duration.fromString("1:23:45");
         assertThat(duration.toDisplayString()).isEqualTo("1:23:45");
     }
@@ -65,21 +65,21 @@ class DurationTest {
 
     @Test
     @DisplayName("잘못된 포맷은 예외 발생")
-    void fromString_invalidFormat() {
+    void fromStringInvalidFormat() {
         assertThatThrownBy(() -> Duration.fromString("invalid"))
                 .isInstanceOf(DateTimeParseException.class);
     }
 
     @Test
     @DisplayName("null 입력은 예외 발생")
-    void fromString_null() {
+    void fromStringNull() {
         assertThatThrownBy(() -> Duration.fromString(null))
                 .isInstanceOf(DateTimeParseException.class);
     }
 
     @Test
     @DisplayName("음수 초는 예외 발생")
-    void ofSeconds_negative() {
+    void ofSecondsNegative() {
         assertThatThrownBy(() -> Duration.ofSeconds(-1))
                 .isInstanceOf(IllegalArgumentException.class);
     }

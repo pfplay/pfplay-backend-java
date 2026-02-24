@@ -30,7 +30,7 @@ class AvatarResourceInitializeServiceTest {
 
     @Test
     @DisplayName("addAvatarBodies — 기존 리소스가 없으면 새로 생성한다")
-    void addAvatarBodies_createsNew() {
+    void addAvatarBodiesCreatesNew() {
         // given
         when(avatarBodyResourceRepository.findByName(anyString())).thenReturn(Optional.empty());
 
@@ -43,7 +43,7 @@ class AvatarResourceInitializeServiceTest {
 
     @Test
     @DisplayName("addAvatarBodies — 기존 리소스가 있으면 업데이트한다")
-    void addAvatarBodies_updatesExisting() {
+    void addAvatarBodiesUpdatesExisting() {
         // given
         AvatarBodyResourceData existing = mock(AvatarBodyResourceData.class);
         when(avatarBodyResourceRepository.findByName(anyString())).thenReturn(Optional.of(existing));
@@ -58,7 +58,7 @@ class AvatarResourceInitializeServiceTest {
 
     @Test
     @DisplayName("addAvatarFaces — 페이스 리소스를 저장한다")
-    void addAvatarFaces_savesFaceResource() {
+    void addAvatarFacesSavesFaceResource() {
         // given — no preconditions needed
 
         // when
@@ -70,7 +70,7 @@ class AvatarResourceInitializeServiceTest {
 
     @Test
     @DisplayName("addAvatarIcons — 아이콘 리소스를 저장한다")
-    void addAvatarIcons_savesIconResources() {
+    void addAvatarIconsSavesIconResources() {
         // given — no preconditions needed
 
         // when

@@ -50,7 +50,7 @@ class AuthServiceTest {
 
     @Test
     @DisplayName("Google OAuth 로그인 성공 시 JWT 토큰을 포함한 AuthResult를 반환한다")
-    void processOAuthLogin_google_success() {
+    void processOAuthLoginGoogleSuccess() {
         // given
         OAuthLoginCommand command = new OAuthLoginCommand("google", "auth-code", "verifier");
 
@@ -85,7 +85,7 @@ class AuthServiceTest {
 
     @Test
     @DisplayName("OAuth 토큰 교환 실패 시 AuthenticationException이 발생한다")
-    void processOAuthLogin_tokenExchangeFails_throwsException() {
+    void processOAuthLoginTokenExchangeFailsThrowsException() {
         // given
         OAuthLoginCommand command = new OAuthLoginCommand("google", "bad-code", "verifier");
         when(oAuthClientService.exchangeCodeForToken(OAuthProvider.GOOGLE, "bad-code", "verifier"))
@@ -99,7 +99,7 @@ class AuthServiceTest {
 
     @Test
     @DisplayName("validateToken은 JwtService에 위임한다")
-    void validateToken_delegatesToJwtService() {
+    void validateTokenDelegatesToJwtService() {
         // given
         when(jwtService.validateAccessToken("valid-token")).thenReturn(true);
         when(jwtService.validateAccessToken("invalid-token")).thenReturn(false);

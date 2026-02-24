@@ -44,7 +44,7 @@ class AdminProfileServiceTest {
 
     @Test
     @DisplayName("createProfileForVirtualMember — 기본 파라미터로 호출 시 Virtual_ 접두사 닉네임이 생성된다")
-    void createProfileForVirtualMember_defaultParams() {
+    void createProfileForVirtualMemberDefaultParams() {
         // given
         UserId userId = new UserId(100L);
         AvatarBodyDto bodyDto = createDefaultBodyDto();
@@ -64,7 +64,7 @@ class AdminProfileServiceTest {
 
     @Test
     @DisplayName("createProfileForVirtualMember — 커스텀 닉네임이 제공되면 그대로 사용한다")
-    void createProfileForVirtualMember_customNickname() {
+    void createProfileForVirtualMemberCustomNickname() {
         // given
         UserId userId = new UserId(101L);
         String customNickname = "TestUser";
@@ -84,7 +84,7 @@ class AdminProfileServiceTest {
 
     @Test
     @DisplayName("createProfileForVirtualMember — NFT face URI 패턴 감지 시 BODY_WITH_FACE + NFT_URI로 설정된다")
-    void createProfileForVirtualMember_nftFaceUri() {
+    void createProfileForVirtualMemberNftFaceUri() {
         // given
         UserId userId = new UserId(102L);
         AvatarBodyUri bodyUri = new AvatarBodyUri(DEFAULT_BODY_URI);
@@ -107,7 +107,7 @@ class AdminProfileServiceTest {
 
     @Test
     @DisplayName("createProfileForVirtualMember — 내부 face URI 패턴 감지 시 BODY_WITH_FACE + INTERNAL_IMAGE로 설정된다")
-    void createProfileForVirtualMember_internalFaceUri() {
+    void createProfileForVirtualMemberInternalFaceUri() {
         // given
         UserId userId = new UserId(103L);
         AvatarBodyUri bodyUri = new AvatarBodyUri(DEFAULT_BODY_URI);
@@ -131,7 +131,7 @@ class AdminProfileServiceTest {
 
     @Test
     @DisplayName("createProfileForVirtualMember — 기본값으로 introduction 빈문자열, scale 1.0, offset 0이 설정된다")
-    void createProfileForVirtualMember_defaultValues() {
+    void createProfileForVirtualMemberDefaultValues() {
         // given
         UserId userId = new UserId(104L);
         AvatarBodyDto bodyDto = createDefaultBodyDto();
@@ -152,7 +152,7 @@ class AdminProfileServiceTest {
 
     @Test
     @DisplayName("createProfileForVirtualMember — SINGLE_BODY 타입은 body 쌍 아이콘을 사용한다")
-    void createProfileForVirtualMember_singleBodyUsesBodyPairedIcon() {
+    void createProfileForVirtualMemberSingleBodyUsesBodyPairedIcon() {
         // given
         UserId userId = new UserId(105L);
         AvatarBodyDto bodyDto = createDefaultBodyDto();

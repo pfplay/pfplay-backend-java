@@ -25,7 +25,7 @@ class MusicSearchServiceTest {
 
     @Test
     @DisplayName("getSearchList — 검색 결과를 정상 반환한다")
-    void getSearchList_returnsResults() {
+    void getSearchListReturnsResults() {
         // given
         SearchResultDto result = new SearchResultDto("success", List.of(
                 new SearchResultRawDto("vid1", "Title 1", "url1", "3:30", "thumb1"),
@@ -44,7 +44,7 @@ class MusicSearchServiceTest {
 
     @Test
     @DisplayName("getSearchList — 빈 검색 결과를 반환한다")
-    void getSearchList_returnsEmpty() {
+    void getSearchListReturnsEmpty() {
         // given
         SearchResultDto result = new SearchResultDto("success", List.of());
         when(youtubeSearchService.searchByWord("empty", 10)).thenReturn(result);

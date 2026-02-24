@@ -12,7 +12,7 @@ class PlaybackDataTest {
 
     @Test
     @DisplayName("create — 팩토리 메서드가 모든 필드를 올바르게 설정한다")
-    void create_setsAllFields() {
+    void createSetsAllFields() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         UserId userId = new UserId(10L);
@@ -34,7 +34,7 @@ class PlaybackDataTest {
 
     @Test
     @DisplayName("create — endTime이 Duration 기반으로 계산된다")
-    void create_calculatesEndTimeFromDuration() {
+    void createCalculatesEndTimeFromDuration() {
         // given
         long beforeEpoch = System.currentTimeMillis();
 

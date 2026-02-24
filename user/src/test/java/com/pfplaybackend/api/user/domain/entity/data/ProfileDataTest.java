@@ -13,7 +13,7 @@ class ProfileDataTest {
 
     @Test
     @DisplayName("updateBio — Bio가 없으면 새로 생성한다")
-    void updateBio_createNewBioWhenNull() {
+    void updateBioCreateNewBioWhenNull() {
         // given
         ProfileData profile = ProfileData.builder()
                 .userId(new UserId(1L))
@@ -29,7 +29,7 @@ class ProfileDataTest {
 
     @Test
     @DisplayName("updateBio — 기존 Bio가 있으면 업데이트한다")
-    void updateBio_updateExistingBio() {
+    void updateBioUpdateExistingBio() {
         // given
         ProfileData profile = ProfileData.builder()
                 .userId(new UserId(1L))
@@ -47,7 +47,7 @@ class ProfileDataTest {
 
     @Test
     @DisplayName("updateAvatarBody — 아바타 바디와 좌표가 설정된다")
-    void updateAvatarBody_setsBodyAndCoordinates() {
+    void updateAvatarBodySetsBodyAndCoordinates() {
         // given
         ProfileData profile = ProfileData.builder()
                 .userId(new UserId(1L))
@@ -69,7 +69,7 @@ class ProfileDataTest {
 
     @Test
     @DisplayName("updateAvatarIcon — 아이콘 URI가 설정된다")
-    void updateAvatarIcon_setsIconUri() {
+    void updateAvatarIconSetsIconUri() {
         // given
         ProfileData profile = ProfileData.builder()
                 .userId(new UserId(1L))
@@ -89,7 +89,7 @@ class ProfileDataTest {
 
     @Test
     @DisplayName("updateWalletAddress — 지갑 주소가 설정된다")
-    void updateWalletAddress_setsNewAddress() {
+    void updateWalletAddressSetsNewAddress() {
         // given
         ProfileData profile = ProfileData.builder()
                 .userId(new UserId(1L))

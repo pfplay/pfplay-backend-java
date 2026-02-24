@@ -17,7 +17,7 @@ class SessionCacheIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Redis 컨테이너에 값을 저장하고 조회할 수 있다")
-    void redis_setAndGet() {
+    void redisSetAndGet() {
         // given
         String key = "test:session:user1";
         String value = "session-data-123";
@@ -35,7 +35,7 @@ class SessionCacheIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("Redis TTL 설정이 올바르게 동작한다")
-    void redis_setWithTtl() {
+    void redisSetWithTtl() {
         // given
         String key = "test:session:ttl";
         String value = "expiring-data";

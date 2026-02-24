@@ -67,7 +67,7 @@ class DjCommandServiceDjQueueChangeTest {
 
     @Test
     @DisplayName("enqueueDj - DJ 등록 후 DJ_QUEUE_CHANGE 이벤트가 발행되어야 한다")
-    void enqueueDj_shouldPublishDjQueueChangeEvent() {
+    void enqueueDjShouldPublishDjQueueChangeEvent() {
         // given
         PlaylistId playlistId = new PlaylistId(10L);
 
@@ -104,7 +104,7 @@ class DjCommandServiceDjQueueChangeTest {
 
     @Test
     @DisplayName("dequeueDj(자진) - 대기 DJ 삭제 후 DJ_QUEUE_CHANGE 이벤트가 발행되어야 한다")
-    void dequeueDjSelf_shouldPublishDjQueueChangeEvent() {
+    void dequeueDjSelfShouldPublishDjQueueChangeEvent() {
         // given
         CrewData crew = CrewData.builder()
                 .id(1L)
@@ -137,7 +137,7 @@ class DjCommandServiceDjQueueChangeTest {
 
     @Test
     @DisplayName("dequeueDj(자진) - 현재 DJ 삭제 시 DJ_QUEUE_CHANGE 이벤트 발행 후 skipBySystem 호출")
-    void dequeueDjSelf_currentDj_shouldPublishEventThenSkip() {
+    void dequeueDjSelfCurrentDjShouldPublishEventThenSkip() {
         // given
         CrewData crew = CrewData.builder()
                 .id(1L)
@@ -169,7 +169,7 @@ class DjCommandServiceDjQueueChangeTest {
 
     @Test
     @DisplayName("dequeueDj(관리자) - DJ 삭제 후 DJ_QUEUE_CHANGE 이벤트가 발행되어야 한다")
-    void dequeueDjByAdmin_shouldPublishDjQueueChangeEvent() {
+    void dequeueDjByAdminShouldPublishDjQueueChangeEvent() {
         // given — setUp()에서 설정된 userId를 관리자로 사용
         UserId adminUserId = userId;
 

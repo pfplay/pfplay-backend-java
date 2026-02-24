@@ -29,21 +29,15 @@ public class DjData extends BaseEntity {
     private Long id;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "partyroom_id", nullable = false)),
-    })
+    @AttributeOverride(name = "id", column = @Column(name = "partyroom_id", nullable = false))
     private PartyroomId partyroomId;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "crew_id")),
-    })
+    @AttributeOverride(name = "id", column = @Column(name = "crew_id"))
     private CrewId crewId;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "playlist_id")),
-    })
+    @AttributeOverride(name = "id", column = @Column(name = "playlist_id"))
     private PlaylistId playlistId;
 
     private int orderNumber;

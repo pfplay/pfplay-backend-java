@@ -18,7 +18,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("기본 상태(F,F,F) → NONE, score=0")
-        void resolve_base() {
+        void resolveBase() {
             ResolvedReaction result = ReactionStateResolver.resolve(new ReactionState(false, false, false));
             assertThat(result.getMotionType()).isEqualTo(MotionType.NONE);
             assertThat(result.getScore()).isZero();
@@ -26,7 +26,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("좋아요 상태(T,F,F) → DANCE_TYPE_1, score=1")
-        void resolve_liked() {
+        void resolveLiked() {
             ResolvedReaction result = ReactionStateResolver.resolve(new ReactionState(true, false, false));
             assertThat(result.getMotionType()).isEqualTo(MotionType.DANCE_TYPE_1);
             assertThat(result.getScore()).isEqualTo(1);
@@ -34,7 +34,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("좋아요+그랩 상태(T,F,T) → DANCE_TYPE_2, score=3")
-        void resolve_likedAndGrabbed() {
+        void resolveLikedAndGrabbed() {
             ResolvedReaction result = ReactionStateResolver.resolve(new ReactionState(true, false, true));
             assertThat(result.getMotionType()).isEqualTo(MotionType.DANCE_TYPE_2);
             assertThat(result.getScore()).isEqualTo(3);
@@ -42,7 +42,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("싫어요 상태(F,T,F) → NONE, score=0")
-        void resolve_disliked() {
+        void resolveDisliked() {
             ResolvedReaction result = ReactionStateResolver.resolve(new ReactionState(false, true, false));
             assertThat(result.getMotionType()).isEqualTo(MotionType.NONE);
             assertThat(result.getScore()).isZero();
@@ -50,7 +50,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("싫어요+그랩 상태(F,T,T) → NONE, score=2")
-        void resolve_dislikedAndGrabbed() {
+        void resolveDislikedAndGrabbed() {
             ResolvedReaction result = ReactionStateResolver.resolve(new ReactionState(false, true, true));
             assertThat(result.getMotionType()).isEqualTo(MotionType.NONE);
             assertThat(result.getScore()).isEqualTo(2);
@@ -65,7 +65,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("기본 상태에서 LIKE → (T,F,F)")
-        void base_like() {
+        void baseLike() {
             ReactionState result = ReactionStateResolver.getCombinedReactionState(
                     new ReactionState(false, false, false), ReactionType.LIKE);
             assertThat(result).isEqualTo(new ReactionState(true, false, false));
@@ -73,7 +73,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("기본 상태에서 DISLIKE → (F,T,F)")
-        void base_dislike() {
+        void baseDislike() {
             ReactionState result = ReactionStateResolver.getCombinedReactionState(
                     new ReactionState(false, false, false), ReactionType.DISLIKE);
             assertThat(result).isEqualTo(new ReactionState(false, true, false));
@@ -81,7 +81,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("기본 상태에서 GRAB → (T,F,T)")
-        void base_grab() {
+        void baseGrab() {
             ReactionState result = ReactionStateResolver.getCombinedReactionState(
                     new ReactionState(false, false, false), ReactionType.GRAB);
             assertThat(result).isEqualTo(new ReactionState(true, false, true));
@@ -89,7 +89,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("좋아요 상태에서 DISLIKE → (F,T,F)")
-        void liked_dislike() {
+        void likedDislike() {
             ReactionState result = ReactionStateResolver.getCombinedReactionState(
                     new ReactionState(true, false, false), ReactionType.DISLIKE);
             assertThat(result).isEqualTo(new ReactionState(false, true, false));
@@ -97,7 +97,7 @@ class ReactionStateResolverTest {
 
         @Test
         @DisplayName("싫어요 상태에서 GRAB → (T,F,T)")
-        void disliked_grab() {
+        void dislikedGrab() {
             ReactionState result = ReactionStateResolver.getCombinedReactionState(
                     new ReactionState(false, true, false), ReactionType.GRAB);
             assertThat(result).isEqualTo(new ReactionState(true, false, true));

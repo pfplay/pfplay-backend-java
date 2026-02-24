@@ -37,7 +37,7 @@ class PlaybackQueryServiceTest {
 
     @Test
     @DisplayName("getPlaybackById — 재생 데이터를 ID로 조회한다")
-    void getPlaybackById_success() {
+    void getPlaybackByIdSuccess() {
         // given
         PlaybackId playbackId = new PlaybackId(1L);
         PlaybackData playback = mock(PlaybackData.class);
@@ -52,7 +52,7 @@ class PlaybackQueryServiceTest {
 
     @Test
     @DisplayName("getPlaybackById — 존재하지 않으면 예외가 발생한다")
-    void getPlaybackById_notFound() {
+    void getPlaybackByIdNotFound() {
         // given
         PlaybackId playbackId = new PlaybackId(999L);
         when(playbackRepository.findById(999L)).thenReturn(Optional.empty());
@@ -64,7 +64,7 @@ class PlaybackQueryServiceTest {
 
     @Test
     @DisplayName("getRecentPlaybackHistory — 재생 이력이 없으면 빈 리스트를 반환한다")
-    void getRecentPlaybackHistory_empty() {
+    void getRecentPlaybackHistoryEmpty() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         when(partyroomQueryPort.getRecentPlaybackHistory(partyroomId)).thenReturn(Collections.emptyList());
@@ -78,7 +78,7 @@ class PlaybackQueryServiceTest {
 
     @Test
     @DisplayName("getRecentPlaybackHistory — 재생 이력이 있으면 프로필 정보와 함께 반환한다")
-    void getRecentPlaybackHistory_withHistory() {
+    void getRecentPlaybackHistoryWithHistory() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         UserId userId1 = new UserId(1L);

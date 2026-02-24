@@ -64,8 +64,16 @@ public class AvatarResourceInitializeService {
             data.updateResource(resourceUri, obtainableType, obtainableScore, isCombinable, isDefaultSetting, x, y);
             avatarBodyResourceRepository.save(data);
         } else {
-            AvatarBodyResourceData avatarBodyResourceData = AvatarBodyResourceData.create(name, resourceUri, obtainableType, obtainableScore,
-                    isCombinable, isDefaultSetting, x, y);
+            AvatarBodyResourceData avatarBodyResourceData = AvatarBodyResourceData.builder()
+                    .name(name)
+                    .resourceUri(resourceUri)
+                    .obtainableType(obtainableType)
+                    .obtainableScore(obtainableScore)
+                    .isCombinable(isCombinable)
+                    .isDefaultSetting(isDefaultSetting)
+                    .combinePositionX(x)
+                    .combinePositionY(y)
+                    .build();
             avatarBodyResourceRepository.save(avatarBodyResourceData);
         }
     }

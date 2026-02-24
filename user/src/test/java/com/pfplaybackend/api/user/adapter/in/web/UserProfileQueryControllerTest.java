@@ -34,7 +34,7 @@ class UserProfileQueryControllerTest {
 
     @Test
     @DisplayName("GET /me/profile/summary — MEMBER 권한이면 200과 프로필 JSON을 반환한다")
-    void getMyProfileSummary_member_returns200() throws Exception {
+    void getMyProfileSummaryMemberReturns200() throws Exception {
         // given
         ProfileSummaryDto dto = new ProfileSummaryDto(
                 "TestNick", "Hello", "body.png",
@@ -57,7 +57,7 @@ class UserProfileQueryControllerTest {
 
     @Test
     @DisplayName("GET /me/profile/summary — GUEST 권한이면 200을 반환한다")
-    void getMyProfileSummary_guest_returns200() throws Exception {
+    void getMyProfileSummaryGuestReturns200() throws Exception {
         // given
         ProfileSummaryDto dto = new ProfileSummaryDto(
                 "GuestNick", "", "body.png",
@@ -75,7 +75,7 @@ class UserProfileQueryControllerTest {
 
     @Test
     @DisplayName("GET /me/profile/summary — 미인증이면 401을 반환한다")
-    void getMyProfileSummary_unauthenticated_returns401() throws Exception {
+    void getMyProfileSummaryUnauthenticatedReturns401() throws Exception {
         // when & then
         mockMvc.perform(get("/api/v1/users/me/profile/summary"))
                 .andExpect(status().isUnauthorized());

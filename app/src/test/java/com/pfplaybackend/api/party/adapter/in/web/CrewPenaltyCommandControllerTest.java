@@ -25,7 +25,7 @@ class CrewPenaltyCommandControllerTest {
 
     @Test
     @DisplayName("imposeCrewPenalty — 202 Accepted")
-    void imposeCrewPenalty_returns202() throws Exception {
+    void imposeCrewPenaltyReturns202() throws Exception {
         // given
         String body = """
                 {"crewId": 1, "penaltyType": "ONE_TIME_EXPULSION", "detail": "Disruptive behavior"}
@@ -42,7 +42,7 @@ class CrewPenaltyCommandControllerTest {
 
     @Test
     @DisplayName("releaseCrewPenalty — 202 Accepted")
-    void releaseCrewPenalty_returns202() throws Exception {
+    void releaseCrewPenaltyReturns202() throws Exception {
         mockMvc.perform(delete("/api/v1/partyrooms/1/penalties/100")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
@@ -51,7 +51,7 @@ class CrewPenaltyCommandControllerTest {
 
     @Test
     @DisplayName("imposeCrewPenalty — 인증 없으면 401")
-    void imposeCrewPenalty_unauthenticated_returns401() throws Exception {
+    void imposeCrewPenaltyUnauthenticatedReturns401() throws Exception {
         String body = """
                 {"crewId": 1, "penaltyType": "ONE_TIME_EXPULSION", "detail": "Disruptive behavior"}
                 """;

@@ -6,7 +6,9 @@ import com.pfplaybackend.api.common.exception.http.BadRequestException;
 import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.playlist.application.dto.PlaybackTrackDto;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
+import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
 import com.pfplaybackend.api.playlist.application.port.out.PlaylistQueryPort;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
 import com.pfplaybackend.api.playlist.domain.entity.data.TrackData;
@@ -27,9 +29,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -70,7 +77,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 추가 성공 — save 호출 및 orderNumber 정확")
-    void addTrackInPlaylist_success() {
+    void addTrackInPlaylistSuccess() {
         // given
         Long playlistId = 1L;
         PlaylistData playlistData = PlaylistData.builder()
@@ -94,7 +101,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 추가 실패 — 플레이리스트가 존재하지 않으면 NotFoundException")
-    void addTrackInPlaylist_playlistNotFound() {
+    void addTrackInPlaylistPlaylistNotFound() {
         // given
         Long playlistId = 999L;
         AddTrackCommand command = new AddTrackCommand("song", "linkId1", "03:00", "thumb.jpg");
@@ -107,7 +114,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 추가 실패 — 중복 트랙이면 ConflictException")
-    void addTrackInPlaylist_duplicateTrack() {
+    void addTrackInPlaylistDuplicateTrack() {
         // given
         Long playlistId = 1L;
         PlaylistData playlistData = PlaylistData.builder()
@@ -127,7 +134,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 추가 실패 — 15개 초과 시 ConflictException")
-    void addTrackInPlaylist_exceededLimit() {
+    void addTrackInPlaylistExceededLimit() {
         // given
         Long playlistId = 1L;
         PlaylistData playlistData = PlaylistData.builder()
@@ -149,7 +156,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 삭제 성공 — shiftUpTrackOrderByDelete 및 deleteTrack 호출")
-    void deleteTrackInPlaylist_success() {
+    void deleteTrackInPlaylistSuccess() {
         // given
         Long playlistId = 1L;
         Long trackId = 10L;
@@ -172,7 +179,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 삭제 실패 — 트랙이 존재하지 않으면 NotFoundException")
-    void deleteTrackInPlaylist_trackNotFound() {
+    void deleteTrackInPlaylistTrackNotFound() {
         // given
         Long playlistId = 1L;
         Long trackId = 999L;
@@ -191,7 +198,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 이동 성공 — shiftUpTrackOrderByDelete 호출 및 playlistId·orderNumber 변경")
-    void moveTrackToPlaylist_success() {
+    void moveTrackToPlaylistSuccess() {
         // given
         Long sourcePlaylistId = 1L;
         Long targetPlaylistId = 2L;
@@ -227,7 +234,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 이동 실패 — 소스 플레이리스트가 존재하지 않으면 NotFoundException")
-    void moveTrackToPlaylist_sourceNotFound() {
+    void moveTrackToPlaylistSourceNotFound() {
         // given
         Long sourcePlaylistId = 999L;
         Long trackId = 10L;
@@ -242,7 +249,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 이동 실패 — 타겟 플레이리스트가 존재하지 않으면 NotFoundException")
-    void moveTrackToPlaylist_targetNotFound() {
+    void moveTrackToPlaylistTargetNotFound() {
         // given
         Long sourcePlaylistId = 1L;
         Long targetPlaylistId = 999L;
@@ -263,7 +270,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 이동 실패 — 타겟에 중복 트랙이면 ConflictException")
-    void moveTrackToPlaylist_duplicateInTarget() {
+    void moveTrackToPlaylistDuplicateInTarget() {
         // given
         Long sourcePlaylistId = 1L;
         Long targetPlaylistId = 2L;
@@ -294,7 +301,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 이동 실패 — 타겟 15개 초과 시 ConflictException")
-    void moveTrackToPlaylist_exceededLimit() {
+    void moveTrackToPlaylistExceededLimit() {
         // given
         Long sourcePlaylistId = 1L;
         Long targetPlaylistId = 2L;
@@ -327,7 +334,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 순서 변경 성공 — 위에서 아래로 이동 시 shiftUpTrackOrderByDnD 호출")
-    void updateTrackOrderInPlaylist_moveDown() {
+    void updateTrackOrderInPlaylistMoveDown() {
         // given
         Long playlistId = 1L;
         Long trackId = 10L;
@@ -354,7 +361,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 순서 변경 성공 — 아래에서 위로 이동 시 shiftDownTrackOrderByDnD 호출")
-    void updateTrackOrderInPlaylist_moveUp() {
+    void updateTrackOrderInPlaylistMoveUp() {
         // given
         Long playlistId = 1L;
         Long trackId = 10L;
@@ -381,7 +388,7 @@ class TrackCommandServiceTest {
 
     @Test
     @DisplayName("트랙 순서 변경 실패 — 잘못된 순서 값이면 BadRequestException")
-    void updateTrackOrderInPlaylist_invalidOrder() {
+    void updateTrackOrderInPlaylistInvalidOrder() {
         // given
         Long playlistId = 1L;
         Long trackId = 10L;
@@ -402,5 +409,129 @@ class TrackCommandServiceTest {
         // when & then
         assertThatThrownBy(() -> trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command))
                 .isInstanceOf(BadRequestException.class);
+    }
+
+    // ========== getFirstTrack ==========
+
+    @Test
+    @DisplayName("getFirstTrack — 첫 번째 트랙을 PlaybackTrackDto로 반환하고 순서를 회전시킨다")
+    void getFirstTrackReturnsFirstTrackAndRotates() {
+        // given
+        Long playlistId = 1L;
+        PlaylistTrackDto trackDto = new PlaylistTrackDto(10L, "linkId1", "Song A", 1, "3:30", "thumb.jpg");
+
+        @SuppressWarnings("unchecked")
+        Page<PlaylistTrackDto> page = mock(Page.class);
+        when(page.getContent()).thenReturn(List.of(trackDto));
+        when(page.getTotalElements()).thenReturn(3L);
+
+        when(queryPort.getTracksWithPagination(eq(new PlaylistId(playlistId)), any(Pageable.class)))
+                .thenReturn(page);
+
+        // when
+        PlaybackTrackDto result = trackCommandService.getFirstTrack(playlistId);
+
+        // then
+        assertThat(result.linkId()).isEqualTo("linkId1");
+        assertThat(result.name()).isEqualTo("Song A");
+        assertThat(result.thumbnailImage()).isEqualTo("thumb.jpg");
+        assertThat(result.duration()).isEqualTo("3:30");
+        assertThat(result.orderNumber()).isEqualTo(1);
+        verify(aggregatePort).rotateTrackOrder(playlistId, 3L);
+    }
+
+    // ========== 추가 예외 케이스 ==========
+
+    @Test
+    @DisplayName("트랙 추가 성공 — musicCount가 0이면 orderNumber가 1이다")
+    void addTrackInPlaylistEmptyPlaylistOrderNumberIsOne() {
+        // given
+        Long playlistId = 1L;
+        PlaylistData playlistData = PlaylistData.builder()
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
+
+        AddTrackCommand command = new AddTrackCommand("song", "linkId1", "03:00", "thumb.jpg");
+
+        when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
+        when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(playlistId), "linkId1")).thenReturn(Optional.empty());
+        when(playlistQueryService.getPlaylist(playlistId))
+                .thenReturn(new PlaylistSummaryDto(playlistId, "test", 0, PlaylistType.PLAYLIST, 0L));
+
+        // when
+        trackCommandService.addTrackInPlaylist(playlistId, command);
+
+        // then
+        verify(aggregatePort).saveTrack(argThat(track -> track.getOrderNumber() == 1));
+    }
+
+    @Test
+    @DisplayName("트랙 순서 변경 실패 — 플레이리스트가 존재하지 않으면 NotFoundException")
+    void updateTrackOrderInPlaylistPlaylistNotFoundThrows() {
+        // given
+        Long playlistId = 999L;
+        Long trackId = 10L;
+        UpdateTrackOrderCommand command = new UpdateTrackOrderCommand(2);
+
+        when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("트랙 순서 변경 실패 — 트랙이 존재하지 않으면 NotFoundException")
+    void updateTrackOrderInPlaylistTrackNotFoundThrows() {
+        // given
+        Long playlistId = 1L;
+        Long trackId = 999L;
+        PlaylistData playlistData = PlaylistData.builder()
+                .id(playlistId).ownerId(userId).name("test").type(PlaylistType.PLAYLIST).orderNumber(0).build();
+        UpdateTrackOrderCommand command = new UpdateTrackOrderCommand(2);
+
+        when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlistData));
+        when(aggregatePort.findTrackByIdAndPlaylist(trackId, new PlaylistId(playlistId))).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("트랙 이동 실패 — 소스에서 트랙을 찾을 수 없으면 NotFoundException")
+    void moveTrackToPlaylistTrackNotFoundInSourceThrows() {
+        // given
+        Long sourcePlaylistId = 1L;
+        Long targetPlaylistId = 2L;
+        Long trackId = 999L;
+
+        PlaylistData sourcePlaylist = PlaylistData.builder()
+                .id(sourcePlaylistId).ownerId(userId).name("source").type(PlaylistType.PLAYLIST).orderNumber(0).build();
+        PlaylistData targetPlaylist = PlaylistData.builder()
+                .id(targetPlaylistId).ownerId(userId).name("target").type(PlaylistType.PLAYLIST).orderNumber(1).build();
+
+        MoveTrackCommand command = new MoveTrackCommand(targetPlaylistId);
+
+        when(aggregatePort.findPlaylistByIdAndOwner(sourcePlaylistId, userId)).thenReturn(Optional.of(sourcePlaylist));
+        when(aggregatePort.findPlaylistByIdAndOwner(targetPlaylistId, userId)).thenReturn(Optional.of(targetPlaylist));
+        when(aggregatePort.findTrackByIdAndPlaylist(trackId, new PlaylistId(sourcePlaylistId))).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> trackCommandService.moveTrackToPlaylist(sourcePlaylistId, trackId, command))
+                .isInstanceOf(NotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("트랙 삭제 실패 — 플레이리스트가 존재하지 않으면 NotFoundException")
+    void deleteTrackInPlaylistPlaylistNotFoundThrows() {
+        // given
+        Long playlistId = 999L;
+        Long trackId = 10L;
+
+        when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> trackCommandService.deleteTrackInPlaylist(playlistId, trackId))
+                .isInstanceOf(NotFoundException.class);
     }
 }

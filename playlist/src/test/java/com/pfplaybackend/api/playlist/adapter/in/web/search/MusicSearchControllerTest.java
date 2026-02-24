@@ -33,7 +33,7 @@ class MusicSearchControllerTest {
 
     @Test
     @DisplayName("getSearchList — ROLE_MEMBER이면 200 OK")
-    void getSearchList_member_returns200() throws Exception {
+    void getSearchListMemberReturns200() throws Exception {
         // given
         SearchResultDto searchResult = new SearchResultDto("success", List.of());
         when(musicSearchService.getSearchList("test")).thenReturn(searchResult);
@@ -48,7 +48,7 @@ class MusicSearchControllerTest {
 
     @Test
     @DisplayName("getSearchList — 인증 없으면 401")
-    void getSearchList_unauthenticated_returns401() throws Exception {
+    void getSearchListUnauthenticatedReturns401() throws Exception {
         // when & then
         mockMvc.perform(get("/api/v1/music-search")
                         .param("q", "test")

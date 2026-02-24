@@ -38,7 +38,7 @@ class CrewPenaltyQueryServiceTest {
 
     @Test
     @DisplayName("getPenalties — 활성 패널티를 크루/프로필 정보와 함께 반환한다")
-    void getPenalties_returnsPenaltiesWithProfile() {
+    void getPenaltiesReturnsPenaltiesWithProfile() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         UserId punishedUserId = new UserId(20L);
@@ -78,7 +78,7 @@ class CrewPenaltyQueryServiceTest {
 
     @Test
     @DisplayName("getPenalties — 패널티가 없으면 빈 리스트를 반환한다")
-    void getPenalties_returnsEmptyListWhenNoPenalties() {
+    void getPenaltiesReturnsEmptyListWhenNoPenalties() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         when(crewPenaltyHistoryRepository.findAllByPartyroomIdAndReleasedIsFalse(partyroomId))

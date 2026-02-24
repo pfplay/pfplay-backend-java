@@ -15,7 +15,7 @@ class DomainEventTest {
 
     @Test
     @DisplayName("DomainEvent — eventId가 자동 생성된다")
-    void domainEvent_hasEventId() {
+    void domainEventHasEventId() {
         // given
         DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
 
@@ -25,7 +25,7 @@ class DomainEventTest {
 
     @Test
     @DisplayName("DomainEvent — occurredAt이 자동 설정된다")
-    void domainEvent_hasOccurredAt() {
+    void domainEventHasOccurredAt() {
         // given
         DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
 
@@ -35,7 +35,7 @@ class DomainEventTest {
 
     @Test
     @DisplayName("DomainEvent — eventType이 클래스 이름으로 설정된다")
-    void domainEvent_hasEventType() {
+    void domainEventHasEventType() {
         // given
         DomainEvent event = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
 
@@ -45,7 +45,7 @@ class DomainEventTest {
 
     @Test
     @DisplayName("DomainEvent — 서로 다른 이벤트 인스턴스는 서로 다른 eventId를 갖는다")
-    void domainEvent_uniqueEventId() {
+    void domainEventUniqueEventId() {
         // given
         DomainEvent event1 = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
         DomainEvent event2 = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
@@ -56,7 +56,7 @@ class DomainEventTest {
 
     @Test
     @DisplayName("getAggregateId — partyroomId를 문자열로 반환한다")
-    void getAggregateId_returnsPartyroomIdAsString() {
+    void getAggregateIdReturnsPartyroomIdAsString() {
         // given
         DomainEvent event = new PartyroomClosedEvent(new PartyroomId(42L), new UserId(1L), "Test Room");
 
@@ -66,7 +66,7 @@ class DomainEventTest {
 
     @Test
     @DisplayName("eventType — 이벤트 클래스마다 다른 이름이 설정된다")
-    void eventType_variesByClass() {
+    void eventTypeVariesByClass() {
         // given
         DomainEvent closed = new PartyroomClosedEvent(new PartyroomId(1L), new UserId(1L), "Test Room");
         DomainEvent deactivated = new PlaybackDeactivatedEvent(new PartyroomId(1L), new PlaybackId(10L), new CrewId(5L));

@@ -30,9 +30,7 @@ public class ProfileData extends BaseEntity {
     private Long id;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "uid", column = @Column(name = "user_id")),
-    })
+    @AttributeOverride(name = "uid", column = @Column(name = "user_id"))
     private UserId userId;
 
     @Embedded

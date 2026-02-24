@@ -50,7 +50,7 @@ class PartyroomAccessQueryControllerTest {
 
     @Test
     @DisplayName("enterPartyroomByLinkAddress — 인증된 사용자이면 200 OK")
-    void enterPartyroomByLinkAddress_authenticated_returns200() throws Exception {
+    void enterPartyroomByLinkAddressAuthenticatedReturns200() throws Exception {
         // given
         when(partyroomAccessQueryService.getRedirectUri("test-link")).thenReturn(Map.of("partyroomId", 1L));
 
@@ -62,7 +62,7 @@ class PartyroomAccessQueryControllerTest {
 
     @Test
     @DisplayName("enterPartyroomByLinkAddress — 미인증 사용자도 200 OK")
-    void enterPartyroomByLinkAddress_anonymous_returns200() throws Exception {
+    void enterPartyroomByLinkAddressAnonymousReturns200() throws Exception {
         // given
         when(guestAuthPort.getOrCreateGuestToken()).thenReturn("guest-token");
         when(partyroomAccessQueryService.getRedirectUri("test-link")).thenReturn(Map.of("partyroomId", 1L));

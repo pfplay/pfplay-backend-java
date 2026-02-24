@@ -53,7 +53,7 @@ class PartyroomLifecycleIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("createGeneralPartyRoom — 파티룸, 재생 상태, DJ 큐가 모두 DB에 저장된다")
-    void createGeneralPartyRoom_savesAllAggregateEntities() {
+    void createGeneralPartyRoomSavesAllAggregateEntities() {
         // given
         CreatePartyroomCommand command = new CreatePartyroomCommand(
                 "라이프사이클 테스트", "통합 테스트 파티룸", "lifecycle", 10);

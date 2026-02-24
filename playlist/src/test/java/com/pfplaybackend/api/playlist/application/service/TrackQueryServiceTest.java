@@ -55,7 +55,7 @@ class TrackQueryServiceTest {
 
     @Test
     @DisplayName("getTracks — 플레이리스트 소유 확인 후 트랙 페이지를 반환한다")
-    void getTracks_success() {
+    void getTracksSuccess() {
         // given
         Long playlistId = 1L;
         PlaylistData playlist = PlaylistData.builder()
@@ -81,7 +81,7 @@ class TrackQueryServiceTest {
 
     @Test
     @DisplayName("getTracks — 존재하지 않는 플레이리스트에 대해 NotFoundException이 발생한다")
-    void getTracks_notFound() {
+    void getTracksNotFound() {
         // given
         Long playlistId = 999L;
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.empty());
@@ -93,7 +93,7 @@ class TrackQueryServiceTest {
 
     @Test
     @DisplayName("isEmptyPlaylist — 트랙이 없으면 true를 반환한다")
-    void isEmptyPlaylist_true() {
+    void isEmptyPlaylistTrue() {
         // given
         when(aggregatePort.hasTracksByPlaylist(new PlaylistId(1L))).thenReturn(false);
 
@@ -103,7 +103,7 @@ class TrackQueryServiceTest {
 
     @Test
     @DisplayName("isEmptyPlaylist — 트랙이 있으면 false를 반환한다")
-    void isEmptyPlaylist_false() {
+    void isEmptyPlaylistFalse() {
         // given
         when(aggregatePort.hasTracksByPlaylist(new PlaylistId(1L))).thenReturn(true);
 

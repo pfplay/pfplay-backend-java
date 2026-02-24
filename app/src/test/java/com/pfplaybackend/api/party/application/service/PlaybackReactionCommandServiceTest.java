@@ -64,7 +64,7 @@ class PlaybackReactionCommandServiceTest {
 
     @Test
     @DisplayName("LIKE 반응 시 정상적으로 후처리가 호출되고 결과가 반환된다")
-    void reactToCurrentPlayback_like_success() {
+    void reactToCurrentPlaybackLikeSuccess() {
         // given
         ActivePartyroomDto activePartyroom = new ActivePartyroomDto(
                 partyroomId.getId(), false, 5L, true, playbackId, new CrewId(5L));
@@ -100,7 +100,7 @@ class PlaybackReactionCommandServiceTest {
 
     @Test
     @DisplayName("게스트 사용자가 GRAB 반응 시 예외가 발생한다")
-    void reactToCurrentPlayback_guestGrab_throwsException() {
+    void reactToCurrentPlaybackGuestGrabThrowsException() {
         // given
         AuthContext guestContext = mock(AuthContext.class);
         lenient().when(guestContext.getUserId()).thenReturn(userId);
@@ -114,7 +114,7 @@ class PlaybackReactionCommandServiceTest {
 
     @Test
     @DisplayName("기존 반응 이력이 있으면 해당 이력을 기반으로 상태를 결정한다")
-    void reactToCurrentPlayback_withExistingHistory() {
+    void reactToCurrentPlaybackWithExistingHistory() {
         // given
         ActivePartyroomDto activePartyroom = new ActivePartyroomDto(
                 partyroomId.getId(), false, 5L, true, playbackId, new CrewId(5L));

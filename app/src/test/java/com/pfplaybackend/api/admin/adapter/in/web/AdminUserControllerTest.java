@@ -43,7 +43,7 @@ class AdminUserControllerTest {
 
     @Test
     @DisplayName("createVirtualMember — FM 권한이면 201 Created")
-    void createVirtualMember_withFmAuthority_returns201() throws Exception {
+    void createVirtualMemberWithFmAuthorityReturns201() throws Exception {
         // given
         String body = """
                 {"nickname": "TestUser", "avatarBodyUri": "https://example.com/body.png"}""";
@@ -62,7 +62,7 @@ class AdminUserControllerTest {
 
     @Test
     @DisplayName("createVirtualMember — 인증 없으면 401")
-    void createVirtualMember_unauthenticated_returns401() throws Exception {
+    void createVirtualMemberUnauthenticatedReturns401() throws Exception {
         // given
         String body = """
                 {"nickname": "TestUser", "avatarBodyUri": "https://example.com/body.png"}""";
@@ -77,7 +77,7 @@ class AdminUserControllerTest {
 
     @Test
     @DisplayName("getVirtualMember — FM 권한이면 200 OK")
-    void getVirtualMember_withFmAuthority_returns200() throws Exception {
+    void getVirtualMemberWithFmAuthorityReturns200() throws Exception {
         // given
         MemberData member = mockMemberData();
         when(adminUserService.getVirtualMember(any())).thenReturn(member);
@@ -90,7 +90,7 @@ class AdminUserControllerTest {
 
     @Test
     @DisplayName("deleteVirtualMember — FM 권한이면 204 No Content")
-    void deleteVirtualMember_withFmAuthority_returns204() throws Exception {
+    void deleteVirtualMemberWithFmAuthorityReturns204() throws Exception {
         // when & then
         mockMvc.perform(delete("/api/v1/admin/users/virtual/1")
                         .with(jwt().authorities(() -> "FM"))

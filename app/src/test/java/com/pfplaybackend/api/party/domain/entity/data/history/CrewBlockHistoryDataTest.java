@@ -14,7 +14,7 @@ class CrewBlockHistoryDataTest {
 
     @Test
     @DisplayName("unblock()으로 차단을 해제하면 unblocked=true, unblockDate가 설정된다")
-    void unblock_setsUnblockedAndDate() {
+    void unblockSetsUnblockedAndDate() {
         // given
         LocalDateTime beforeUnblock = LocalDateTime.now();
         CrewBlockHistoryData historyData = CrewBlockHistoryData.builder()

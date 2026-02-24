@@ -28,7 +28,7 @@ class PartyroomAccessQueryServiceTest {
 
     @Test
     @DisplayName("getRedirectUri — 링크 도메인으로 파티룸 ID를 조회한다")
-    void getRedirectUri_returnsPartyroomId() {
+    void getRedirectUriReturnsPartyroomId() {
         // given
         String linkDomain = "test-link";
         PartyroomData partyroomData = PartyroomData.builder()

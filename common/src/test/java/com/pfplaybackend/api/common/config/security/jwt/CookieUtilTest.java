@@ -27,7 +27,7 @@ class CookieUtilTest {
 
     @Test
     @DisplayName("deleteCookie - Set-Cookie 헤더에 SameSite, Secure 속성이 포함되어야 한다")
-    void deleteCookie_shouldIncludeSameSiteAndSecure() {
+    void deleteCookieShouldIncludeSameSiteAndSecure() {
         // given
         MockHttpServletResponse response = new MockHttpServletResponse();
 
@@ -48,7 +48,7 @@ class CookieUtilTest {
 
     @Test
     @DisplayName("deleteCookie - addCookie와 동일한 속성 형식을 사용해야 한다")
-    void deleteCookie_shouldMatchAddCookieFormat() {
+    void deleteCookieShouldMatchAddCookieFormat() {
         // given
         MockHttpServletResponse addResponse = new MockHttpServletResponse();
         MockHttpServletResponse deleteResponse = new MockHttpServletResponse();

@@ -10,7 +10,7 @@ class AvatarBodyResourceDataTest {
 
     @Test
     @DisplayName("updateResource - 좌표 및 속성이 정상 갱신되어야 한다")
-    void updateResource_shouldUpdateAllFields() {
+    void updateResourceShouldUpdateAllFields() {
         // given
         AvatarBodyResourceData data = AvatarBodyResourceData.builder()
                 .name("ava_body_basic_001")
@@ -36,7 +36,7 @@ class AvatarBodyResourceDataTest {
 
     @Test
     @DisplayName("updateResource - 좌표만 변경되는 경우에도 정상 동작")
-    void updateResource_shouldUpdatePositionsOnly() {
+    void updateResourceShouldUpdatePositionsOnly() {
         // given
         AvatarBodyResourceData data = AvatarBodyResourceData.builder()
                 .name("ava_body_djing_003")

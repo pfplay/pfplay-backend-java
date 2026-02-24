@@ -29,9 +29,7 @@ public class TrackData extends BaseEntity {
     private Long id;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "playlist_id", nullable = false))
-    })
+    @AttributeOverride(name = "id", column = @Column(name = "playlist_id", nullable = false))
     private PlaylistId playlistId;
 
     @Comment("플레이리스트의 곡 순서")

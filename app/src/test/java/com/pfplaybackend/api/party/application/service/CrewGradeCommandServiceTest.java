@@ -64,7 +64,7 @@ class CrewGradeCommandServiceTest {
 
     @Test
     @DisplayName("updateGrade — 정상적인 등급 변경 시 크루의 등급이 업데이트되고 이벤트가 발행된다")
-    void updateGrade_success() {
+    void updateGradeSuccess() {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).build();
         UserId adjustedUserId = new UserId(2L);
@@ -91,7 +91,7 @@ class CrewGradeCommandServiceTest {
 
     @Test
     @DisplayName("updateGrade — 파티룸이 존재하지 않으면 예외가 발생한다")
-    void updateGrade_roomNotFound() {
+    void updateGradeRoomNotFound() {
         // given
         when(partyroomQueryService.getPartyroomById(partyroomId))
                 .thenThrow(new NotFoundException("PTR-001", "Can not find Partyroom"));
@@ -104,7 +104,7 @@ class CrewGradeCommandServiceTest {
 
     @Test
     @DisplayName("updateGrade — GradeAdjustmentSpecification 검증 실패 시 예외가 발생한다")
-    void updateGrade_specValidationFails() {
+    void updateGradeSpecValidationFails() {
         // given — adjuster가 CLUBBER인데 MODERATOR로 변경 시도 (권한 부족)
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).build();
         UserId adjustedUserId = new UserId(2L);

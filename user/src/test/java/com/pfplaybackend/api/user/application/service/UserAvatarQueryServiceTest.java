@@ -44,7 +44,7 @@ class UserAvatarQueryServiceTest {
 
     @Test
     @DisplayName("getDefaultAvatarBodyUri — 기본 바디 URI를 반환한다")
-    void getDefaultAvatarBodyUri_returnsDefaultUri() {
+    void getDefaultAvatarBodyUriReturnsDefaultUri() {
         // given
         AvatarBodyResourceData defaultBody = AvatarBodyResourceData.builder()
                 .id(1L).name("default").resourceUri("default-body-uri")
@@ -63,7 +63,7 @@ class UserAvatarQueryServiceTest {
 
     @Test
     @DisplayName("findMyAvatarBodies — GT면 바디 리스트를 그대로 반환한다")
-    void findMyAvatarBodies_guestReturnsAllBodies() {
+    void findMyAvatarBodiesGuestReturnsAllBodies() {
         // given
         ThreadLocalContext.setContext(new AuthContext(new UserId(1L), AuthorityTier.GT));
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
@@ -84,7 +84,7 @@ class UserAvatarQueryServiceTest {
 
     @Test
     @DisplayName("findMyAvatarBodies — FM이면 활동 점수에 따라 가용 바디를 필터링한다")
-    void findMyAvatarBodies_memberFiltersAvailability() {
+    void findMyAvatarBodiesMemberFiltersAvailability() {
         // given
         UserId userId = new UserId(1L);
         ThreadLocalContext.setContext(new AuthContext(userId, AuthorityTier.FM));

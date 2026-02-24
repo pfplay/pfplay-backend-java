@@ -66,7 +66,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("createGeneralPartyRoom — 정상 생성 시 파티룸, 재생 상태, DJ 큐 상태를 저장한다")
-    void createGeneralPartyRoom_success() {
+    void createGeneralPartyRoomSuccess() {
         // given
         CreatePartyroomCommand command = new CreatePartyroomCommand("My Room", "Intro", "mylink", 10);
         when(aggregatePort.findActiveHostRoom(userId)).thenReturn(Optional.empty());
@@ -92,7 +92,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("createGeneralPartyRoom — 이미 호스트인 파티룸이 있으면 예외가 발생한다")
-    void createGeneralPartyRoom_alreadyHost() {
+    void createGeneralPartyRoomAlreadyHost() {
         // given
         CreatePartyroomCommand command = new CreatePartyroomCommand("My Room", "Intro", "mylink", 10);
         PartyroomData existing = PartyroomData.builder().id(99L).hostId(userId).build();
@@ -105,7 +105,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("createGeneralPartyRoom — linkDomain이 비어있으면 자동 생성된다")
-    void createGeneralPartyRoom_autoGeneratesLinkDomain() {
+    void createGeneralPartyRoomAutoGeneratesLinkDomain() {
         // given
         CreatePartyroomCommand command = new CreatePartyroomCommand("My Room", "Intro", "", 10);
         when(aggregatePort.findActiveHostRoom(userId)).thenReturn(Optional.empty());
@@ -133,7 +133,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("updatePartyroom — 호스트가 파티룸 정보를 수정한다")
-    void updatePartyroom_success() {
+    void updatePartyroomSuccess() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         PartyroomData partyroom = PartyroomData.builder()
@@ -155,7 +155,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("updatePartyroom — 파티룸이 존재하지 않으면 NotFoundException이 발생한다")
-    void updatePartyroom_notFound() {
+    void updatePartyroomNotFound() {
         // given
         PartyroomId partyroomId = new PartyroomId(999L);
         when(aggregatePort.findPartyroomById(999L)).thenReturn(Optional.empty());
@@ -171,7 +171,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("deletePartyRoom — FM 권한 사용자가 파티룸을 삭제하면 terminate 후 이벤트가 발행된다")
-    void deletePartyRoom_success() {
+    void deletePartyRoomSuccess() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         PartyroomData partyroom = PartyroomData.builder()
@@ -192,7 +192,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("deletePartyRoom — FM이 아닌 사용자는 파티룸을 삭제할 수 없다")
-    void deletePartyRoom_restrictedAuthority() {
+    void deletePartyRoomRestrictedAuthority() {
         // given
         AuthContext authContext = mock(AuthContext.class);
         when(authContext.getAuthorityTier()).thenReturn(AuthorityTier.AM);
@@ -209,7 +209,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("deleteUnusedPartyroom — 미사용 파티룸을 일괄 종료하고 이벤트를 발행한다")
-    void deleteUnusedPartyroom_success() {
+    void deleteUnusedPartyroomSuccess() {
         // given
         PartyroomData p1 = PartyroomData.builder()
                 .id(1L).partyroomId(new PartyroomId(1L)).hostId(userId).stageType(StageType.GENERAL)
@@ -235,7 +235,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("deleteUnusedPartyroom — 미사용 파티룸이 없으면 아무 작업도 하지 않는다")
-    void deleteUnusedPartyroom_empty() {
+    void deleteUnusedPartyroomEmpty() {
         // given
         when(aggregatePort.findAllUnusedPartyroomDataByDay(30)).thenReturn(Collections.emptyList());
 
@@ -251,7 +251,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("updateDjQueueStatus — 호스트가 DJ 큐를 닫을 수 있다")
-    void updateDjQueueStatus_close() {
+    void updateDjQueueStatusClose() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         PartyroomData partyroom = PartyroomData.builder()
@@ -276,7 +276,7 @@ class PartyroomCommandServiceTest {
 
     @Test
     @DisplayName("updateDjQueueStatus — 호스트가 DJ 큐를 열 수 있다")
-    void updateDjQueueStatus_open() {
+    void updateDjQueueStatusOpen() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         PartyroomData partyroom = PartyroomData.builder()

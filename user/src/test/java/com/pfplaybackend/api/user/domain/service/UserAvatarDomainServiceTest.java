@@ -24,7 +24,7 @@ class UserAvatarDomainServiceTest {
 
     @Test
     @DisplayName("isAvailableBody — BASIC 타입 아바타는 항상 사용 가능하다")
-    void isAvailableBody_basic_alwaysTrue() {
+    void isAvailableBodyBasicAlwaysTrue() {
         // given
         Map<ActivityType, ActivityData> activityMap = createActivityMap(ActivityType.DJ_PNT, 0);
 
@@ -37,7 +37,7 @@ class UserAvatarDomainServiceTest {
 
     @Test
     @DisplayName("isAvailableBody — DJ_PNT 타입이고 점수가 충분하면 사용 가능하다")
-    void isAvailableBody_djPnt_sufficient() {
+    void isAvailableBodyDjPntSufficient() {
         // given
         Map<ActivityType, ActivityData> activityMap = createActivityMap(ActivityType.DJ_PNT, 100);
 
@@ -50,7 +50,7 @@ class UserAvatarDomainServiceTest {
 
     @Test
     @DisplayName("isAvailableBody — DJ_PNT 타입이고 점수가 부족하면 사용 불가능하다")
-    void isAvailableBody_djPnt_insufficient() {
+    void isAvailableBodyDjPntInsufficient() {
         // given
         Map<ActivityType, ActivityData> activityMap = createActivityMap(ActivityType.DJ_PNT, 30);
 
@@ -63,7 +63,7 @@ class UserAvatarDomainServiceTest {
 
     @Test
     @DisplayName("isAvailableBody — 점수가 정확히 같으면 사용 가능하다")
-    void isAvailableBody_exactScore_boundary() {
+    void isAvailableBodyExactScoreBoundary() {
         // given
         Map<ActivityType, ActivityData> activityMap = createActivityMap(ActivityType.DJ_PNT, 50);
 
@@ -76,7 +76,7 @@ class UserAvatarDomainServiceTest {
 
     @Test
     @DisplayName("isAvailableBody — ROOM_ACT 타입이고 점수가 부족하면 사용 불가능하다")
-    void isAvailableBody_roomAct_insufficient() {
+    void isAvailableBodyRoomActInsufficient() {
         // given
         Map<ActivityType, ActivityData> activityMap = createActivityMap(ActivityType.ROOM_ACT, 50);
 

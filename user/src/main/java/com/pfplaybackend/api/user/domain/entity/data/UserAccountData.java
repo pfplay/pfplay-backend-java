@@ -23,9 +23,7 @@ import java.time.LocalDateTime;
 public abstract class UserAccountData extends BaseEntity {
 
     @EmbeddedId
-    @AttributeOverrides({
-            @AttributeOverride(name = "uid", column = @Column(name = "user_id")),
-    })
+    @AttributeOverride(name = "uid", column = @Column(name = "user_id"))
     protected UserId userId;
 
     @Column(nullable = false)

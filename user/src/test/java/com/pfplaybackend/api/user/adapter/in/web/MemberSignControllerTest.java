@@ -26,7 +26,7 @@ class MemberSignControllerTest {
 
     @Test
     @DisplayName("memberSign — 유효한 요청이면 3xx 리다이렉트를 반환한다")
-    void memberSign_validRequest_returns3xx() throws Exception {
+    void memberSignValidRequestReturns3xx() throws Exception {
         // given
         when(memberSignService.getOAuth2RedirectUri(any(), eq("oauth-redirect")))
                 .thenReturn("redirect:https://accounts.google.com/o/oauth2/auth");
@@ -41,7 +41,7 @@ class MemberSignControllerTest {
 
     @Test
     @DisplayName("memberSign — oauth2Provider 없으면 400 Bad Request")
-    void memberSign_missingProvider_returns400() throws Exception {
+    void memberSignMissingProviderReturns400() throws Exception {
         // when & then
         mockMvc.perform(get("/api/v1/users/members/sign")
                         .with(jwt())

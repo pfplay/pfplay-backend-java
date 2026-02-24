@@ -39,7 +39,7 @@ class MemberSignServiceTest {
 
     @Test
     @DisplayName("getMemberOrCreate — 기존 회원이 있으면 그대로 반환한다")
-    void getMemberOrCreate_existingMember() {
+    void getMemberOrCreateExistingMember() {
         // given
         String email = "test@example.com";
         MemberData existing = mock(MemberData.class);
@@ -57,7 +57,7 @@ class MemberSignServiceTest {
 
     @Test
     @DisplayName("getMemberOrCreate — 신규 회원이면 프로필, 활동, 플레이리스트를 초기화하고 저장한다")
-    void getMemberOrCreate_newMember() {
+    void getMemberOrCreateNewMember() {
         // given
         String email = "new@example.com";
         when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
@@ -85,7 +85,7 @@ class MemberSignServiceTest {
 
     @Test
     @DisplayName("getOAuth2RedirectUri — OAuth2 리다이렉트 URI를 반환한다")
-    void getOAuth2RedirectUri_success() {
+    void getOAuth2RedirectUriSuccess() {
         // given
         String expectedUri = "https://accounts.google.com/o/oauth2/v2/auth?...";
         when(oauth2RedirectPort.getRedirectUri("google", "/callback")).thenReturn(expectedUri);

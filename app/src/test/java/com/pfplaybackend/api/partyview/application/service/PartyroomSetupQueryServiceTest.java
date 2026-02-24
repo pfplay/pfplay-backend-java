@@ -72,7 +72,7 @@ class PartyroomSetupQueryServiceTest {
 
     @Test
     @DisplayName("getSetupInfo — 활성 재생이 있을 때 DisplayDto에 재생 정보가 포함된다")
-    void getSetupInfo_activePlayback() {
+    void getSetupInfoActivePlayback() {
         // given
         UserId djUserId = new UserId(2L);
         PlaybackId playbackId = new PlaybackId(100L);
@@ -115,7 +115,7 @@ class PartyroomSetupQueryServiceTest {
 
     @Test
     @DisplayName("getSetupInfo — 비활성 재생일 때 DisplayDto의 재생/리액션/DJ 정보가 null이다")
-    void getSetupInfo_inactivePlayback() {
+    void getSetupInfoInactivePlayback() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, false, null, null);
         CrewData crew = CrewData.builder().id(1L).userId(userId).gradeType(GradeType.CLUBBER).build();
@@ -137,7 +137,7 @@ class PartyroomSetupQueryServiceTest {
 
     @Test
     @DisplayName("getSetupInfo — 활성 크루 목록이 프로필 설정 정보와 함께 반환된다")
-    void getSetupInfo_crewsWithProfileSettings() {
+    void getSetupInfoCrewsWithProfileSettings() {
         // given
         UserId user2 = new UserId(2L);
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, false, null, null);
@@ -164,7 +164,7 @@ class PartyroomSetupQueryServiceTest {
 
     @Test
     @DisplayName("getSetupInfo — 활성 파티룸이 없으면 예외가 발생한다")
-    void getSetupInfo_noActiveRoom_throws() {
+    void getSetupInfoNoActiveRoomThrows() {
         // given
         when(partyroomQueryService.getActiveCrews(partyroomId)).thenReturn(List.of());
         when(userProfileQueryPort.getUsersProfileSetting(any()))

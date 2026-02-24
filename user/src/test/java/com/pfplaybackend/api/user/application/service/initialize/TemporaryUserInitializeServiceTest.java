@@ -38,7 +38,7 @@ class TemporaryUserInitializeServiceTest {
 
     @Test
     @DisplayName("addGuest — 게스트가 정상 생성된다")
-    void addGuest_success() {
+    void addGuestSuccess() {
         // given
         UserId userId = new UserId(1000000000000001L);
         ProfileData profile = mock(ProfileData.class);
@@ -54,7 +54,7 @@ class TemporaryUserInitializeServiceTest {
 
     @Test
     @DisplayName("addAssociateMember — AM 회원이 정상 생성된다")
-    void addAssociateMember_success() {
+    void addAssociateMemberSuccess() {
         // given
         UserId userId = new UserId(1000000000000002L);
         ProfileData profile = mock(ProfileData.class);
@@ -73,7 +73,7 @@ class TemporaryUserInitializeServiceTest {
 
     @Test
     @DisplayName("upgradeMember — 회원이 FM으로 업그레이드된다")
-    void upgradeMember_success() {
+    void upgradeMemberSuccess() {
         // given
         MemberData member = mock(MemberData.class);
 

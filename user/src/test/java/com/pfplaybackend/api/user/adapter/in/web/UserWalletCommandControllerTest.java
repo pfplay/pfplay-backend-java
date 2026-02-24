@@ -40,7 +40,7 @@ class UserWalletCommandControllerTest {
 
     @Test
     @DisplayName("updateMyWallet — ROLE_MEMBER이면 200 OK")
-    void updateMyWallet_member_returns200() throws Exception {
+    void updateMyWalletMemberReturns200() throws Exception {
         // given
         MemberData member = mock(MemberData.class);
         when(member.getUserId()).thenReturn(new UserId(1L));
@@ -63,7 +63,7 @@ class UserWalletCommandControllerTest {
 
     @Test
     @DisplayName("updateMyWallet — 인증 없으면 401")
-    void updateMyWallet_unauthenticated_returns401() throws Exception {
+    void updateMyWalletUnauthenticatedReturns401() throws Exception {
         // given
         String body = """
                 {"walletAddress": "0x1234567890abcdef"}""";

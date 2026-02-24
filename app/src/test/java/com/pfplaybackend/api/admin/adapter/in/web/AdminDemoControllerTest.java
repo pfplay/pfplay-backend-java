@@ -44,7 +44,7 @@ class AdminDemoControllerTest {
 
     @Test
     @DisplayName("getDemoEnvironmentStatus — 200 OK")
-    void getDemoEnvironmentStatus_returns200() throws Exception {
+    void getDemoEnvironmentStatusReturns200() throws Exception {
         // given
         DemoStatusResult result = new DemoStatusResult(true, 400L, 12L);
         when(adminDemoService.getDemoEnvironmentStatus()).thenReturn(result);
@@ -60,7 +60,7 @@ class AdminDemoControllerTest {
 
     @Test
     @DisplayName("getPartyrooms — FM 권한이면 200 OK")
-    void getPartyrooms_withFmAuthority_returns200() throws Exception {
+    void getPartyroomsWithFmAuthorityReturns200() throws Exception {
         // given
         AdminPartyroomListResult result = new AdminPartyroomListResult(List.of());
         when(adminDemoService.getPartyrooms()).thenReturn(result);
@@ -74,7 +74,7 @@ class AdminDemoControllerTest {
 
     @Test
     @DisplayName("getPartyrooms — 인증 없으면 401")
-    void getPartyrooms_unauthenticated_returns401() throws Exception {
+    void getPartyroomsUnauthenticatedReturns401() throws Exception {
         // when & then
         mockMvc.perform(get("/api/v1/admin/demo/partyrooms"))
                 .andExpect(status().isUnauthorized());
@@ -82,7 +82,7 @@ class AdminDemoControllerTest {
 
     @Test
     @DisplayName("initializeDemoEnvironment — FM 권한이면 201 Created")
-    void initializeDemoEnvironment_withFmAuthority_returns201() throws Exception {
+    void initializeDemoEnvironmentWithFmAuthorityReturns201() throws Exception {
         // given
         String body = """
                 {"playbackTimeLimit": 5, "titlePrefix": "Room", "introduction": "Hello", "registerDjs": true}""";
@@ -103,7 +103,7 @@ class AdminDemoControllerTest {
 
     @Test
     @DisplayName("simulateReactions — FM 권한이면 200 OK")
-    void simulateReactions_withFmAuthority_returns200() throws Exception {
+    void simulateReactionsWithFmAuthorityReturns200() throws Exception {
         // given
         String body = """
                 {"reactionCount": 5}""";

@@ -12,7 +12,7 @@ class CrewDataTest {
 
     @Test
     @DisplayName("create — 팩토리 메서드로 생성 시 활성 상태이고 밴 상태가 아니다")
-    void create_activeAndNotBanned() {
+    void createActiveAndNotBanned() {
         // given
         UserId userId = new UserId(10L);
 
@@ -28,7 +28,7 @@ class CrewDataTest {
 
     @Test
     @DisplayName("create — 팩토리 메서드로 생성 시 partyroomId가 설정된다")
-    void create_partyroomIdAssigned() {
+    void createPartyroomIdAssigned() {
         // when
         CrewData crew = CrewData.create(new PartyroomId(99L), new UserId(10L), GradeType.CLUBBER);
 

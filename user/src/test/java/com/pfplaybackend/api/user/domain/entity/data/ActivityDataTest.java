@@ -12,7 +12,7 @@ class ActivityDataTest {
 
     @Test
     @DisplayName("create — 팩토리 메서드가 올바르게 생성한다")
-    void create_setsAllFields() {
+    void createSetsAllFields() {
         // given
         UserId userId = new UserId(1L);
 
@@ -27,7 +27,7 @@ class ActivityDataTest {
 
     @Test
     @DisplayName("addScore — 점수가 누적된다")
-    void addScore_accumulatesScore() {
+    void addScoreAccumulatesScore() {
         // given
         ActivityData activity = ActivityData.create(new UserId(1L), ActivityType.DJ_PNT, 50);
 

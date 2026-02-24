@@ -16,7 +16,7 @@ class PartyroomPlaybackDataTest {
 
     @Test
     @DisplayName("createFor — 생성 시 비활성 상태로 초기화된다")
-    void createFor_defaultState() {
+    void createForDefaultState() {
         // when
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(new PartyroomId(1L));
 
@@ -80,7 +80,7 @@ class PartyroomPlaybackDataTest {
 
     @Test
     @DisplayName("isCurrentDj — 현재 DJ crewId와 일치하면 true를 반환한다")
-    void isCurrentDj_matching() {
+    void isCurrentDjMatching() {
         // given
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(new PartyroomId(1L));
         CrewId crewId = new CrewId(5L);
@@ -92,7 +92,7 @@ class PartyroomPlaybackDataTest {
 
     @Test
     @DisplayName("isCurrentDj — 현재 DJ crewId와 불일치하면 false를 반환한다")
-    void isCurrentDj_notMatching() {
+    void isCurrentDjNotMatching() {
         // given
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(new PartyroomId(1L));
         playbackState.activate(new PlaybackId(10L), new CrewId(5L));
@@ -103,7 +103,7 @@ class PartyroomPlaybackDataTest {
 
     @Test
     @DisplayName("isCurrentDj — currentDjCrewId가 null이면 false를 반환한다")
-    void isCurrentDj_nullCrewId() {
+    void isCurrentDjNullCrewId() {
         // given
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(new PartyroomId(1L));
 
@@ -113,7 +113,7 @@ class PartyroomPlaybackDataTest {
 
     @Test
     @DisplayName("deactivate — 비활성화 시 PlaybackDeactivatedEvent가 도메인 이벤트로 등록된다")
-    void deactivate_registersPlaybackDeactivatedEvent() {
+    void deactivateRegistersPlaybackDeactivatedEvent() {
         // given
         PartyroomPlaybackData playbackState = PartyroomPlaybackData.createFor(new PartyroomId(1L));
         playbackState.activate(new PlaybackId(10L), new CrewId(5L));

@@ -24,7 +24,7 @@ class MusicSearchRequestTest {
 
     @Test
     @DisplayName("platform이 null이어도 유효성 검사를 통과해야 한다")
-    void shouldPassValidation_whenPlatformIsNull() {
+    void shouldPassValidationWhenPlatformIsNull() {
         // given
         MusicSearchRequest request = new MusicSearchRequest("test query", null);
 
@@ -37,7 +37,7 @@ class MusicSearchRequestTest {
 
     @Test
     @DisplayName("q가 null이면 유효성 검사에 실패해야 한다")
-    void shouldFailValidation_whenQIsNull() {
+    void shouldFailValidationWhenQIsNull() {
         // given
         MusicSearchRequest request = new MusicSearchRequest(null, null);
 

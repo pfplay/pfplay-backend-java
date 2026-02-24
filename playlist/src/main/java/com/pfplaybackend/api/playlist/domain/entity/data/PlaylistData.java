@@ -30,9 +30,7 @@ public class PlaylistData extends BaseEntity {
     private Long id;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "uid", column = @Column(name = "owner_id")),
-    })
+    @AttributeOverride(name = "uid", column = @Column(name = "owner_id"))
     private UserId ownerId;
 
     @Comment("플레이리스트 순서")

@@ -29,7 +29,7 @@ class PartyroomQueryControllerTest {
 
     @Test
     @DisplayName("getPartyrooms — 200 OK + 파티룸 목록 반환")
-    void getPartyrooms_returns200() throws Exception {
+    void getPartyroomsReturns200() throws Exception {
         // given
         when(partyroomQueryService.getAllPartyrooms()).thenReturn(List.of());
         when(partyroomQueryService.getPrimariesAvatarSettings(any())).thenReturn(Map.of());
@@ -42,7 +42,7 @@ class PartyroomQueryControllerTest {
 
     @Test
     @DisplayName("getPartyroomSummaryInfo — 200 OK")
-    void getPartyroomSummaryInfo_returns200() throws Exception {
+    void getPartyroomSummaryInfoReturns200() throws Exception {
         // given
         when(partyroomQueryService.getSummaryInfo(any())).thenReturn(null);
 
@@ -54,7 +54,7 @@ class PartyroomQueryControllerTest {
 
     @Test
     @DisplayName("getDjQueueInfo — 200 OK")
-    void getDjQueueInfo_returns200() throws Exception {
+    void getDjQueueInfoReturns200() throws Exception {
         // given
         when(partyroomQueryService.getDjQueueInfo(any())).thenReturn(
                 new DjQueueInfoResult(false, QueueStatus.OPEN, false, null, List.of()));

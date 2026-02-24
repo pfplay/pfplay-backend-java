@@ -38,7 +38,7 @@ class AdminUserInitializeServiceTest {
 
     @Test
     @DisplayName("addAdminUser — 관리자 계정이 정상 생성된다")
-    void addAdminUser_success() {
+    void addAdminUserSuccess() {
         // given
         ProfileData profile = mock(ProfileData.class);
         Map<ActivityType, ActivityData> activityMap = Map.of();
@@ -66,7 +66,7 @@ class AdminUserInitializeServiceTest {
 
     @Test
     @DisplayName("addAdminUser — 관리자 UserId가 고정값이다")
-    void addAdminUser_fixedUserId() {
+    void addAdminUserFixedUserId() {
         // given
         ProfileData profile = mock(ProfileData.class);
         Map<ActivityType, ActivityData> activityMap = Map.of();

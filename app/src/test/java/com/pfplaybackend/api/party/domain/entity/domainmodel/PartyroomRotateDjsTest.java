@@ -45,7 +45,7 @@ class PartyroomRotateDjsTest {
 
     @Test
     @DisplayName("rotateDjs - DJ 순서가 실제로 변경되어야 한다")
-    void rotateDjs_shouldActuallyUpdateOrderNumbers() {
+    void rotateDjsShouldActuallyUpdateOrderNumbers() {
         // given
         DjData dj1 = createDj(1L, 1);
         DjData dj2 = createDj(2L, 2);
@@ -67,7 +67,7 @@ class PartyroomRotateDjsTest {
 
     @Test
     @DisplayName("rotateDjs - DJ가 1명일 때 순서 유지")
-    void rotateDjs_singleDj_shouldKeepOrder() {
+    void rotateDjsSingleDjShouldKeepOrder() {
         // given
         DjData dj1 = createDj(1L, 1);
 

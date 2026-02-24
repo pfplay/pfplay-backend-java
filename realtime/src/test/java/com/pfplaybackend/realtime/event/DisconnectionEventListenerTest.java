@@ -28,7 +28,7 @@ class DisconnectionEventListenerTest {
 
     @Test
     @DisplayName("정상 종료(1000) 시 세션 캐시를 삭제한다")
-    void onApplicationEvent_normalClose_deletesSessionCache() {
+    void onApplicationEventNormalCloseDeletesSessionCache() {
         // given
         String sessionId = "session-normal";
         SessionDisconnectEvent event = createDisconnectEvent(sessionId, CloseStatus.NORMAL);
@@ -42,7 +42,7 @@ class DisconnectionEventListenerTest {
 
     @Test
     @DisplayName("비정상 종료(1006) 시에도 세션 캐시를 삭제한다")
-    void onApplicationEvent_abnormalClose_deletesSessionCache() {
+    void onApplicationEventAbnormalCloseDeletesSessionCache() {
         // given
         String sessionId = "session-abnormal";
         CloseStatus abnormalClose = new CloseStatus(1006, "Abnormal closure");

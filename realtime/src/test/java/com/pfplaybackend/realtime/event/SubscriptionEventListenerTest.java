@@ -32,7 +32,7 @@ class SubscriptionEventListenerTest {
 
     @Test
     @DisplayName("유효한 Principal이면 세션 캐시에 저장한다")
-    void onApplicationEvent_validPrincipal_savesSessionCache() {
+    void onApplicationEventValidPrincipalSavesSessionCache() {
         // given
         String sessionId = "session-abc";
         String userId = "user-123";
@@ -57,7 +57,7 @@ class SubscriptionEventListenerTest {
 
     @Test
     @DisplayName("Principal이 null이면 AuthenticationServiceException을 던진다")
-    void onApplicationEvent_nullPrincipal_throwsException() {
+    void onApplicationEventNullPrincipalThrowsException() {
         // given
         StompHeaderAccessor accessor = StompHeaderAccessor.create(StompCommand.SUBSCRIBE);
         accessor.setSessionId("session-xyz");

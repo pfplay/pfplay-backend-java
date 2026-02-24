@@ -17,7 +17,7 @@ class MemberDataTest {
 
     @Test
     @DisplayName("create — 팩토리 메서드로 생성 시 AM 권한 등급과 프로필 미업데이트 상태이다")
-    void create_defaultState() {
+    void createDefaultState() {
         // when
         MemberData member = MemberData.create("test@email.com", ProviderType.GOOGLE);
 
@@ -64,7 +64,7 @@ class MemberDataTest {
 
     @Test
     @DisplayName("updateWalletAddress — 지갑 주소 설정 시 권한이 FM으로 승격된다")
-    void updateWalletAddress_upgradesAuthority() {
+    void updateWalletAddressUpgradesAuthority() {
         // given
         MemberData member = MemberData.create("test@email.com", ProviderType.GOOGLE);
         ProfileData profile = ProfileData.builder()
@@ -98,7 +98,7 @@ class MemberDataTest {
 
     @Test
     @DisplayName("isGuest — Member는 항상 false를 반환한다")
-    void isGuest_returnsFalse() {
+    void isGuestReturnsFalse() {
         // given
         MemberData member = MemberData.create("test@email.com", ProviderType.GOOGLE);
 

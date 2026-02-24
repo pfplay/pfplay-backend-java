@@ -19,7 +19,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("handleBadRequestException — 400 상태코드를 반환한다")
-    void handleBadRequestException_returns400() {
+    void handleBadRequestExceptionReturns400() {
         // given
         BadRequestException ex = new BadRequestException("ERR-001", "Bad request");
 
@@ -36,7 +36,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("handleUnauthorizedException — 401 상태코드를 반환한다")
-    void handleUnauthorizedException_returns401() {
+    void handleUnauthorizedExceptionReturns401() {
         // given
         UnauthorizedException ex = new UnauthorizedException("ERR-002", "Unauthorized");
 
@@ -53,7 +53,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("handleForbiddenException — 403 상태코드를 반환한다")
-    void handleForbiddenException_returns403() {
+    void handleForbiddenExceptionReturns403() {
         // given
         ForbiddenException ex = new ForbiddenException("ERR-003", "Forbidden");
 
@@ -70,7 +70,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("handleNotFoundException — 404 상태코드를 반환한다")
-    void handleNotFoundException_returns404() {
+    void handleNotFoundExceptionReturns404() {
         // given
         NotFoundException ex = new NotFoundException("ERR-004", "Not found");
 
@@ -87,7 +87,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("handleConflictException — 409 상태코드를 반환한다")
-    void handleConflictException_returns409() {
+    void handleConflictExceptionReturns409() {
         // given
         ConflictException ex = new ConflictException("ERR-005", "Conflict");
 
@@ -104,7 +104,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     @DisplayName("handleAccessDeniedException — 403 상태코드를 반환한다")
-    void handleAccessDeniedException_returns403() {
+    void handleAccessDeniedExceptionReturns403() {
         // given
         AccessDeniedException ex = new AccessDeniedException("Access denied");
 

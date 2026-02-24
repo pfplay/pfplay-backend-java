@@ -32,7 +32,7 @@ class UserAvatarCommandControllerTest {
 
     @Test
     @DisplayName("setMyAvatar — 200 OK")
-    void setMyAvatar_returns200() throws Exception {
+    void setMyAvatarReturns200() throws Exception {
         String body = """
                 {
                     "avatarCompositionType": "SINGLE_BODY",
@@ -52,7 +52,7 @@ class UserAvatarCommandControllerTest {
 
     @Test
     @DisplayName("setMyAvatar — 인증 없으면 401")
-    void setMyAvatar_unauthenticated_returns401() throws Exception {
+    void setMyAvatarUnauthenticatedReturns401() throws Exception {
         String body = """
                 {
                     "avatarCompositionType": "SINGLE_BODY",

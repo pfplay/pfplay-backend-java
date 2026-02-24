@@ -56,7 +56,7 @@ class PlaylistCommandServiceTest {
 
     @Test
     @DisplayName("플레이리스트 생성 성공 — save 호출")
-    void createPlaylist_success() {
+    void createPlaylistSuccess() {
         // given
         String playlistName = "My Playlist";
         when(aggregatePort.findPlaylistsByOwnerAndType(userId, PlaylistType.PLAYLIST))
@@ -76,7 +76,7 @@ class PlaylistCommandServiceTest {
 
     @Test
     @DisplayName("플레이리스트 생성 실패 — 제약 위반 시 예외 전파")
-    void createPlaylist_exceedConstraints() {
+    void createPlaylistExceedConstraints() {
         // given
         String playlistName = "My Playlist";
         List<PlaylistData> existingPlaylists = Collections.nCopies(10,
@@ -93,7 +93,7 @@ class PlaylistCommandServiceTest {
 
     @Test
     @DisplayName("플레이리스트 이름 변경 성공 — 반환된 이름 검증")
-    void renamePlaylist_success() {
+    void renamePlaylistSuccess() {
         // given
         Long playlistId = 1L;
         String newName = "Renamed Playlist";
@@ -115,7 +115,7 @@ class PlaylistCommandServiceTest {
 
     @Test
     @DisplayName("플레이리스트 이름 변경 실패 — 미존재 시 NotFoundException")
-    void renamePlaylist_notFound() {
+    void renamePlaylistNotFound() {
         // given
         Long playlistId = 999L;
         when(aggregatePort.findPlaylistByIdAndOwnerAndType(playlistId, userId, PlaylistType.PLAYLIST))
@@ -130,7 +130,7 @@ class PlaylistCommandServiceTest {
 
     @Test
     @DisplayName("플레이리스트 삭제 성공 — deletePlaylistsByIds 호출")
-    void deletePlaylist_success() {
+    void deletePlaylistSuccess() {
         // given
         List<Long> playlistIds = List.of(1L, 2L);
 
@@ -149,7 +149,7 @@ class PlaylistCommandServiceTest {
 
     @Test
     @DisplayName("플레이리스트 삭제 실패 — 소유하지 않은 ID 포함 시 NotFoundException")
-    void deletePlaylist_notOwned() {
+    void deletePlaylistNotOwned() {
         // given
         List<Long> playlistIds = List.of(1L, 999L);
 

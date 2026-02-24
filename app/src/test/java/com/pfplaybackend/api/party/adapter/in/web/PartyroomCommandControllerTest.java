@@ -32,7 +32,7 @@ class PartyroomCommandControllerTest {
 
     @Test
     @DisplayName("createPartyroom — 200 OK + 서비스 호출")
-    void createPartyroom_returns200() throws Exception {
+    void createPartyroomReturns200() throws Exception {
         // given
         String body = """
                 {
@@ -61,7 +61,7 @@ class PartyroomCommandControllerTest {
 
     @Test
     @DisplayName("deletePartyroom — 204 No Content")
-    void deletePartyroom_returns204() throws Exception {
+    void deletePartyroomReturns204() throws Exception {
         mockMvc.perform(delete("/api/v1/partyrooms/1")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
@@ -70,7 +70,7 @@ class PartyroomCommandControllerTest {
 
     @Test
     @DisplayName("createPartyroom — 인증 없으면 401")
-    void createPartyroom_unauthenticated_returns401() throws Exception {
+    void createPartyroomUnauthenticatedReturns401() throws Exception {
         String body = """
                 {
                     "title": "Test Room",

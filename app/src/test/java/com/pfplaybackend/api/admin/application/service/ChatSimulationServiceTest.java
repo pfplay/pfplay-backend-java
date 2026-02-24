@@ -85,7 +85,7 @@ class ChatSimulationServiceTest {
 
     @Test
     @DisplayName("startChatSimulation \u2014 \uc2dc\ubbac\ub808\uc774\uc158\uc774 \uc2dc\uc791\ub418\uba74 \ud65c\uc131 \uc0c1\ud0dc\uac00 \ub41c\ub2e4")
-    void startChatSimulation_becomesActive() {
+    void startChatSimulationBecomesActive() {
         // given
         Long partyroomId = 1L;
         List<CrewData> crewList = createCrewList(3);
@@ -100,7 +100,7 @@ class ChatSimulationServiceTest {
 
     @Test
     @DisplayName("stopChatSimulation \u2014 \uc2dc\ubbac\ub808\uc774\uc158 \uc911\uc9c0 \ud6c4 \ube44\ud65c\uc131 \uc0c1\ud0dc\uac00 \ub41c\ub2e4")
-    void stopChatSimulation_becomesInactive() {
+    void stopChatSimulationBecomesInactive() {
         // given
         Long partyroomId = 2L;
         List<CrewData> crewList = createCrewList(3);
@@ -116,7 +116,7 @@ class ChatSimulationServiceTest {
 
     @Test
     @DisplayName("startChatSimulation \u2014 \uc774\ubbf8 \uc2e4\ud589 \uc911\uc774\uba74 \uc911\ubcf5 \uc2dc\uc791\ub418\uc9c0 \uc54a\ub294\ub2e4")
-    void startChatSimulation_alreadyRunning_doesNotDuplicate() {
+    void startChatSimulationAlreadyRunningDoesNotDuplicate() {
         // given
         Long partyroomId = 3L;
         List<CrewData> crewList = createCrewList(3);
@@ -132,7 +132,7 @@ class ChatSimulationServiceTest {
 
     @Test
     @DisplayName("startChatSimulation \u2014 \ud06c\ub8e8\uac00 \uc5c6\uc73c\uba74 \uc608\uc678\uac00 \ubc1c\uc0dd\ud55c\ub2e4")
-    void startChatSimulation_noCrew_throws() {
+    void startChatSimulationNoCrewThrows() {
         // given
         Long partyroomId = 4L;
         when(adminPartyroomPort.findActiveCrewByPartyroom(new PartyroomId(partyroomId)))
@@ -145,7 +145,7 @@ class ChatSimulationServiceTest {
 
     @Test
     @DisplayName("getActiveSimulations \u2014 \ud65c\uc131 \uc2dc\ubbac\ub808\uc774\uc158 \ubaa9\ub85d\uc744 \ubc18\ud658\ud55c\ub2e4")
-    void getActiveSimulations_returnsList() {
+    void getActiveSimulationsReturnsList() {
         // given
         Long partyroomId1 = 5L;
         Long partyroomId2 = 6L;

@@ -90,7 +90,7 @@ class AdminDemoServiceTest {
 
     @Test
     @DisplayName("getDemoEnvironmentStatus \u2014 \uac00\uc0c1 \uba64\ubc84\uac00 \uc788\uc73c\uba74 initialized=true\ub97c \ubc18\ud658\ud55c\ub2e4")
-    void getDemoEnvironmentStatus_initialized_true() {
+    void getDemoEnvironmentStatusInitializedTrue() {
         // given
         when(adminMemberPort.countMembersByProviderType(ProviderType.ADMIN)).thenReturn(10L);
         PartyroomData generalRoom = createPartyroom(2L, StageType.GENERAL, "General Room", false);
@@ -107,7 +107,7 @@ class AdminDemoServiceTest {
 
     @Test
     @DisplayName("getDemoEnvironmentStatus \u2014 \uac00\uc0c1 \uba64\ubc84\uac00 \uc5c6\uc73c\uba74 initialized=false\ub97c \ubc18\ud658\ud55c\ub2e4")
-    void getDemoEnvironmentStatus_initialized_false() {
+    void getDemoEnvironmentStatusInitializedFalse() {
         // given
         when(adminMemberPort.countMembersByProviderType(ProviderType.ADMIN)).thenReturn(0L);
         when(adminPartyroomPort.findAllPartyrooms()).thenReturn(Collections.emptyList());
@@ -123,7 +123,7 @@ class AdminDemoServiceTest {
 
     @Test
     @DisplayName("getPartyrooms \u2014 \ud65c\uc131 \ud30c\ud2f0\ub8f8 \ubaa9\ub85d\uc744 \ubc18\ud658\ud55c\ub2e4")
-    void getPartyrooms_returnsActiveOnly() {
+    void getPartyroomsReturnsActiveOnly() {
         // given
         PartyroomData terminatedRoom = createPartyroom(1L, StageType.GENERAL, "Terminated Room", true);
         PartyroomData activeRoom = createPartyroom(2L, StageType.GENERAL, "Active Room", false);
@@ -147,7 +147,7 @@ class AdminDemoServiceTest {
 
     @Test
     @DisplayName("initializeDemoEnvironment \u2014 \uc544\ubc14\ud0c0 \ub9ac\uc18c\uc2a4\uac00 \uc5c6\uc73c\uba74 \uc608\uc678\uac00 \ubc1c\uc0dd\ud55c\ub2e4")
-    void initializeDemoEnvironment_noAvatarResources_throws() {
+    void initializeDemoEnvironmentNoAvatarResourcesThrows() {
         // given
         PartyroomData mainStage = createPartyroom(1L, StageType.MAIN, "Main Stage", false);
         when(adminPartyroomPort.findAllPartyrooms()).thenReturn(List.of(mainStage));

@@ -31,7 +31,7 @@ class DjCommandControllerTest {
 
     @Test
     @DisplayName("enqueueDj — 200 OK")
-    void enqueueDj_returns200() throws Exception {
+    void enqueueDjReturns200() throws Exception {
         String body = """
                 {
                     "playlistId": 1
@@ -48,7 +48,7 @@ class DjCommandControllerTest {
 
     @Test
     @DisplayName("dequeueDj — 200 OK")
-    void dequeueDj_returns200() throws Exception {
+    void dequeueDjReturns200() throws Exception {
         mockMvc.perform(delete("/api/v1/partyrooms/1/djs/me")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
@@ -57,7 +57,7 @@ class DjCommandControllerTest {
 
     @Test
     @DisplayName("enqueueDj — 인증 없으면 401")
-    void enqueueDj_unauthenticated_returns401() throws Exception {
+    void enqueueDjUnauthenticatedReturns401() throws Exception {
         String body = """
                 {
                     "playlistId": 1

@@ -10,7 +10,7 @@ class BioTest {
 
     @Test
     @DisplayName("닉네임과 소개글로 Bio 생성")
-    void create_withNicknameAndIntroduction() {
+    void createWithNicknameAndIntroduction() {
         // given
         Nickname nickname = new Nickname("Player1");
 
@@ -24,7 +24,7 @@ class BioTest {
 
     @Test
     @DisplayName("nickname이 null이면 getNicknameValue는 null 반환")
-    void getNicknameValue_whenNicknameIsNull_returnsNull() {
+    void getNicknameValueWhenNicknameIsNullReturnsNull() {
         // given
         Bio bio = new Bio(null, "intro");
 
@@ -34,7 +34,7 @@ class BioTest {
 
     @Test
     @DisplayName("introduction이 null이어도 Bio 생성 가능")
-    void create_withNullIntroduction() {
+    void createWithNullIntroduction() {
         // given / when
         Bio bio = new Bio(new Nickname("Player1"), null);
 
@@ -45,7 +45,7 @@ class BioTest {
 
     @Test
     @DisplayName("update 호출 시 닉네임과 소개글 변경")
-    void update_changesNicknameAndIntroduction() {
+    void updateChangesNicknameAndIntroduction() {
         // given
         Bio bio = new Bio(new Nickname("OldName"), "old intro");
 
@@ -59,7 +59,7 @@ class BioTest {
 
     @Test
     @DisplayName("update 시 유효하지 않은 닉네임은 예외 발생")
-    void update_withInvalidNickname_throwsException() {
+    void updateWithInvalidNicknameThrowsException() {
         // given
         Bio bio = new Bio(new Nickname("ValidName"), "intro");
 

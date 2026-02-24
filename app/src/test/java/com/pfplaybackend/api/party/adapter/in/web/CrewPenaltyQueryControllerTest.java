@@ -26,7 +26,7 @@ class CrewPenaltyQueryControllerTest {
 
     @Test
     @DisplayName("getAllPenalties — 200 OK")
-    void getAllPenalties_returns200() throws Exception {
+    void getAllPenaltiesReturns200() throws Exception {
         // given
         when(crewPenaltyQueryService.getPenalties(any())).thenReturn(List.of());
 
@@ -38,7 +38,7 @@ class CrewPenaltyQueryControllerTest {
 
     @Test
     @DisplayName("getAllPenalties — 인증 없으면 401")
-    void getAllPenalties_unauthenticated_returns401() throws Exception {
+    void getAllPenaltiesUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(get("/api/v1/partyrooms/1/penalties"))
                 .andExpect(status().isUnauthorized());
     }

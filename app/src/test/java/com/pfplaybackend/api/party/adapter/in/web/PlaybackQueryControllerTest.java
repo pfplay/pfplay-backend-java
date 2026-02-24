@@ -26,7 +26,7 @@ class PlaybackQueryControllerTest {
 
     @Test
     @DisplayName("playBackHistory — 200 OK")
-    void playBackHistory_returns200() throws Exception {
+    void playBackHistoryReturns200() throws Exception {
         // given
         when(playbackQueryService.getRecentPlaybackHistory(any())).thenReturn(List.of());
 
@@ -38,7 +38,7 @@ class PlaybackQueryControllerTest {
 
     @Test
     @DisplayName("playBackHistory — 인증 없으면 401")
-    void playBackHistory_unauthenticated_returns401() throws Exception {
+    void playBackHistoryUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(get("/api/v1/partyrooms/1/playbacks/histories"))
                 .andExpect(status().isUnauthorized());
     }

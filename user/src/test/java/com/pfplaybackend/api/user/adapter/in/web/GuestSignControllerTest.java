@@ -31,7 +31,7 @@ class GuestSignControllerTest {
 
     @Test
     @DisplayName("createGuest — 200 OK + 쿠키 설정")
-    void createGuest_returns200() throws Exception {
+    void createGuestReturns200() throws Exception {
         // given
         GuestData guest = GuestData.createWithFixedUserId(new UserId(1L), "test-agent");
         when(guestSignService.getGuestOrCreate()).thenReturn(guest);

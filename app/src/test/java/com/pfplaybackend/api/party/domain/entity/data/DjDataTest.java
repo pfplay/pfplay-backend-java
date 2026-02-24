@@ -12,7 +12,7 @@ class DjDataTest {
 
     @Test
     @DisplayName("create — 팩토리 메서드가 모든 필드를 설정한다")
-    void create_setsAllFields() {
+    void createSetsAllFields() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         PlaylistId playlistId = new PlaylistId(10L);
@@ -30,7 +30,7 @@ class DjDataTest {
 
     @Test
     @DisplayName("updateOrderNumber — 순서가 업데이트된다")
-    void updateOrderNumber_updatesOrder() {
+    void updateOrderNumberUpdatesOrder() {
         // given
         DjData dj = DjData.create(new PartyroomId(1L), new PlaylistId(10L), new CrewId(20L), 1);
 

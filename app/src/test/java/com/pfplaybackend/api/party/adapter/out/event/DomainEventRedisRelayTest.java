@@ -49,7 +49,7 @@ class DomainEventRedisRelayTest {
 
     @Test
     @DisplayName("on(CrewAccessedEvent) — ENTER 시 프로필 포함 메시지가 발행된다")
-    void onCrewAccessedEvent_enter_publishesWithProfile() {
+    void onCrewAccessedEventEnterPublishesWithProfile() {
         // given
         CrewAccessedEvent event = new CrewAccessedEvent(partyroomId, crewId, userId, AccessType.ENTER);
         CrewData crew = CrewData.builder()
@@ -73,7 +73,7 @@ class DomainEventRedisRelayTest {
 
     @Test
     @DisplayName("on(CrewAccessedEvent) — EXIT 시 crewId만 포함된 메시지가 발행된다")
-    void onCrewAccessedEvent_exit_publishesWithCrewIdOnly() {
+    void onCrewAccessedEventExitPublishesWithCrewIdOnly() {
         // given
         CrewAccessedEvent event = new CrewAccessedEvent(partyroomId, crewId, userId, AccessType.EXIT);
 
@@ -87,7 +87,7 @@ class DomainEventRedisRelayTest {
 
     @Test
     @DisplayName("on(DjQueueChangedEvent) — DJ 큐 변경 메시지가 발행된다")
-    void onDjQueueChangedEvent_publishesMessage() {
+    void onDjQueueChangedEventPublishesMessage() {
         // given
         DjQueueChangedEvent event = new DjQueueChangedEvent(partyroomId, DjChangeType.ENQUEUE, crewId);
         List<DjWithProfileDto> djs = List.of(new DjWithProfileDto(crewId.getId(), 1, "DJ1", "icon1"));
@@ -102,7 +102,7 @@ class DomainEventRedisRelayTest {
 
     @Test
     @DisplayName("on(PlaybackStartedEvent) — 재생 시작 메시지가 발행된다")
-    void onPlaybackStartedEvent_publishesMessage() {
+    void onPlaybackStartedEventPublishesMessage() {
         // given
         PlaybackSnapshot snapshot = new PlaybackSnapshot(1L, "linkId", "Song", "3:30", "thumb.jpg", 9999L);
         PlaybackStartedEvent event = new PlaybackStartedEvent(partyroomId, crewId, snapshot);
@@ -116,7 +116,7 @@ class DomainEventRedisRelayTest {
 
     @Test
     @DisplayName("on(PlaybackDeactivatedEvent) — 비활성화 메시지가 발행된다")
-    void onPlaybackDeactivatedEvent_publishesMessage() {
+    void onPlaybackDeactivatedEventPublishesMessage() {
         // given
         PlaybackDeactivatedEvent event = new PlaybackDeactivatedEvent(partyroomId, new PlaybackId(1L), crewId);
 
@@ -129,7 +129,7 @@ class DomainEventRedisRelayTest {
 
     @Test
     @DisplayName("on(CrewGradeChangedEvent) — 등급 변경 메시지가 발행된다")
-    void onCrewGradeChangedEvent_publishesMessage() {
+    void onCrewGradeChangedEventPublishesMessage() {
         // given
         CrewId adjusterCrewId = new CrewId(10L);
         CrewId adjustedCrewId = new CrewId(20L);
@@ -146,7 +146,7 @@ class DomainEventRedisRelayTest {
 
     @Test
     @DisplayName("on(CrewPenalizedEvent) — 제재 메시지가 발행된다")
-    void onCrewPenalizedEvent_publishesMessage() {
+    void onCrewPenalizedEventPublishesMessage() {
         // given
         CrewId punisherCrewId = new CrewId(10L);
         CrewId punishedCrewId = new CrewId(20L);
@@ -163,7 +163,7 @@ class DomainEventRedisRelayTest {
 
     @Test
     @DisplayName("on(PartyroomClosedEvent) — 파티룸 종료 메시지가 발행된다")
-    void onPartyroomClosedEvent_publishesMessage() {
+    void onPartyroomClosedEventPublishesMessage() {
         // given
         PartyroomClosedEvent event = new PartyroomClosedEvent(partyroomId, userId, "Test Room");
 

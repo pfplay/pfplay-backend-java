@@ -35,7 +35,7 @@ class UserInfoQueryControllerTest {
 
     @Test
     @DisplayName("getMyInfo — ROLE_MEMBER이면 200 OK")
-    void getMyInfo_member_returns200() throws Exception {
+    void getMyInfoMemberReturns200() throws Exception {
         // given
         MyInfoResult result = new MyInfoResult("uid-123", "test@gmail.com", AuthorityTier.FM, true, LocalDate.of(2024, 1, 1));
         when(userInfoService.getMyInfo()).thenReturn(result);
@@ -48,7 +48,7 @@ class UserInfoQueryControllerTest {
 
     @Test
     @DisplayName("getMyInfo — ROLE_GUEST이면 200 OK")
-    void getMyInfo_guest_returns200() throws Exception {
+    void getMyInfoGuestReturns200() throws Exception {
         // given
         MyInfoResult result = new MyInfoResult("uid-123", "test@gmail.com", AuthorityTier.FM, true, LocalDate.of(2024, 1, 1));
         when(userInfoService.getMyInfo()).thenReturn(result);
@@ -61,7 +61,7 @@ class UserInfoQueryControllerTest {
 
     @Test
     @DisplayName("getMyInfo — 인증 없으면 401")
-    void getMyInfo_unauthenticated_returns401() throws Exception {
+    void getMyInfoUnauthenticatedReturns401() throws Exception {
         // when & then
         mockMvc.perform(get("/api/v1/users/me/info"))
                 .andExpect(status().isUnauthorized());

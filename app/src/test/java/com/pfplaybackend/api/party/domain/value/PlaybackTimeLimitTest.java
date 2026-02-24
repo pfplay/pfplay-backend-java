@@ -40,7 +40,7 @@ class PlaybackTimeLimitTest {
 
     @Test
     @DisplayName("exceedsDuration — 제한 초과 감지")
-    void exceedsDuration_exceeds() {
+    void exceedsDurationExceeds() {
         PlaybackTimeLimit limit = PlaybackTimeLimit.ofMinutes(5);
         Duration longDuration = Duration.fromString("6:00"); // 360초 > 300초
         assertThat(limit.exceedsDuration(longDuration)).isTrue();
@@ -48,7 +48,7 @@ class PlaybackTimeLimitTest {
 
     @Test
     @DisplayName("exceedsDuration — 제한 이내")
-    void exceedsDuration_within() {
+    void exceedsDurationWithin() {
         PlaybackTimeLimit limit = PlaybackTimeLimit.ofMinutes(5);
         Duration shortDuration = Duration.fromString("4:30"); // 270초 < 300초
         assertThat(limit.exceedsDuration(shortDuration)).isFalse();
@@ -56,7 +56,7 @@ class PlaybackTimeLimitTest {
 
     @Test
     @DisplayName("exceedsDuration — 정확히 같은 길이")
-    void exceedsDuration_exact() {
+    void exceedsDurationExact() {
         PlaybackTimeLimit limit = PlaybackTimeLimit.ofMinutes(5);
         Duration exactDuration = Duration.fromString("5:00"); // 300초 == 300초
         assertThat(limit.exceedsDuration(exactDuration)).isFalse();

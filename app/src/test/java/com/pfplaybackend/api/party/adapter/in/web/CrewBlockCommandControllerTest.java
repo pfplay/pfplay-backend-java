@@ -25,7 +25,7 @@ class CrewBlockCommandControllerTest {
 
     @Test
     @DisplayName("blockOtherCrew — 200 OK")
-    void blockOtherCrew_returns200() throws Exception {
+    void blockOtherCrewReturns200() throws Exception {
         String body = """
                 {
                     "crewId": 10
@@ -42,7 +42,7 @@ class CrewBlockCommandControllerTest {
 
     @Test
     @DisplayName("unblockOther — 200 OK")
-    void unblockOther_returns200() throws Exception {
+    void unblockOtherReturns200() throws Exception {
         mockMvc.perform(delete("/api/v1/crews/me/blocks/100")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))

@@ -30,16 +30,12 @@ public class PlaybackData extends BaseEntity {
     private Long id;
 
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "partyroom_id")),
-    })
+    @AttributeOverride(name = "id", column = @Column(name = "partyroom_id"))
     private PartyroomId partyroomId;
 
     // 프로필 정보를 역추적 하기 위한 '사용자 식별자'
     @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "uid", column = @Column(name = "user_id")),
-    })
+    @AttributeOverride(name = "uid", column = @Column(name = "user_id"))
     private UserId userId;
 
     // 음악 이름 정보

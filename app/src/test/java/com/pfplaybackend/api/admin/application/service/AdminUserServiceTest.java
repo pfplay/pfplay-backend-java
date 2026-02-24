@@ -76,7 +76,7 @@ class AdminUserServiceTest {
 
     @Test
     @DisplayName("createVirtualMember — 성공 시 ADMIN 프로바이더로 생성되고 FM으로 업그레이드된다")
-    void createVirtualMember_success() {
+    void createVirtualMemberSuccess() {
         // given
         ProfileData dummyProfile = createDummyProfile(new UserId(1L));
         Map<ActivityType, ActivityData> activityMap = new HashMap<>();
@@ -99,7 +99,7 @@ class AdminUserServiceTest {
 
     @Test
     @DisplayName("createVirtualMember — 생성된 이메일은 virtual_*@pfplay.system 형식이다")
-    void createVirtualMember_emailFormat() {
+    void createVirtualMemberEmailFormat() {
         // given
         ProfileData dummyProfile = createDummyProfile(new UserId(1L));
         Map<ActivityType, ActivityData> activityMap = new HashMap<>();
@@ -123,7 +123,7 @@ class AdminUserServiceTest {
 
     @Test
     @DisplayName("updateVirtualMemberAvatar — 가상 회원의 아바타 업데이트가 성공한다")
-    void updateVirtualMemberAvatar_success() {
+    void updateVirtualMemberAvatarSuccess() {
         // given
         UserId userId = new UserId(200L);
         MemberData virtualMember = createVirtualMemberData(userId);
@@ -150,7 +150,7 @@ class AdminUserServiceTest {
 
     @Test
     @DisplayName("updateVirtualMemberAvatar — 비가상 회원 아바타 업데이트 시 ForbiddenException이 발생한다")
-    void updateVirtualMemberAvatar_nonVirtual_throws() {
+    void updateVirtualMemberAvatarNonVirtualThrows() {
         // given
         UserId userId = new UserId(201L);
         MemberData googleMember = createGoogleMemberData(userId);
@@ -165,7 +165,7 @@ class AdminUserServiceTest {
 
     @Test
     @DisplayName("deleteVirtualMember — 가상 회원 삭제가 성공한다")
-    void deleteVirtualMember_success() {
+    void deleteVirtualMemberSuccess() {
         // given
         UserId userId = new UserId(300L);
         MemberData virtualMember = createVirtualMemberData(userId);
@@ -181,7 +181,7 @@ class AdminUserServiceTest {
 
     @Test
     @DisplayName("deleteVirtualMember — 비가상 회원 삭제 시 ForbiddenException이 발생한다")
-    void deleteVirtualMember_nonVirtual_throws() {
+    void deleteVirtualMemberNonVirtualThrows() {
         // given
         UserId userId = new UserId(301L);
         MemberData googleMember = createGoogleMemberData(userId);
@@ -195,7 +195,7 @@ class AdminUserServiceTest {
 
     @Test
     @DisplayName("getVirtualMember — 존재하지 않는 userId로 조회 시 NotFoundException이 발생한다")
-    void getVirtualMember_notFound_throws() {
+    void getVirtualMemberNotFoundThrows() {
         // given
         UserId userId = new UserId(999L);
 

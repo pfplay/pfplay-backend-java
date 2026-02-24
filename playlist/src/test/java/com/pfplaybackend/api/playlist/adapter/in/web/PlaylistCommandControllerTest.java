@@ -33,7 +33,7 @@ class PlaylistCommandControllerTest {
 
     @Test
     @DisplayName("create — 201 Created")
-    void create_returns201() throws Exception {
+    void createReturns201() throws Exception {
         // given
         String body = """
                 {
@@ -54,7 +54,7 @@ class PlaylistCommandControllerTest {
 
     @Test
     @DisplayName("deletePlaylist — 200 OK")
-    void deletePlaylist_returns200() throws Exception {
+    void deletePlaylistReturns200() throws Exception {
         String body = """
                 {
                     "playlistIds": [1, 2]
@@ -71,7 +71,7 @@ class PlaylistCommandControllerTest {
 
     @Test
     @DisplayName("modifyPlaylistName — 200 OK")
-    void modifyPlaylistName_returns200() throws Exception {
+    void modifyPlaylistNameReturns200() throws Exception {
         // given
         String body = """
                 {

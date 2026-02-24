@@ -1,5 +1,7 @@
 package com.pfplaybackend.api.auth.adapter.in.web;
 
+import com.pfplaybackend.api.auth.application.dto.command.OAuthLoginCommand;
+import com.pfplaybackend.api.auth.application.dto.result.AuthResult;
 import com.pfplaybackend.api.auth.application.dto.result.OAuthUrlResult;
 import com.pfplaybackend.api.auth.application.service.AuthService;
 import com.pfplaybackend.api.auth.application.service.LogoutService;
@@ -15,9 +17,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,7 +40,7 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("generateOAuthUrl — 200 OK + URL 반환")
-    void generateOAuthUrl_returns200() throws Exception {
+    void generateOAuthUrlReturns200() throws Exception {
         // given
         String codeVerifier = "a".repeat(43);
         String body = """
@@ -59,10 +64,153 @@ class AuthControllerTest {
 
     @Test
     @DisplayName("logout — 200 OK")
-    void logout_returns200() throws Exception {
+    void logoutReturns200() throws Exception {
         mockMvc.perform(post("/api/v1/auth/logout")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
                 .andExpect(status().isOk());
+    }
+
+    // ── oauthCallback ──
+
+    @Test
+    @DisplayName("oauthCallback — state 검증 성공 시 200 OK + 쿠키 설정")
+    void oauthCallbackValidStateReturns200() throws Exception {
+        // given
+        String codeVerifier = "a".repeat(43);
+        String body = """
+                {
+                    "provider": "google",
+                    "code": "auth-code-123",
+                    "codeVerifier": "%s",
+                    "state": "valid-state"
+                }
+                """.formatted(codeVerifier);
+
+        when(oAuthUrlService.validateAndConsumeState(eq("valid-state"), any(OAuthProvider.class), anyString()))
+                .thenReturn(true);
+        when(authService.processOAuthLogin(any(OAuthLoginCommand.class)))
+                .thenReturn(new AuthResult("access-token", "Cookie", 3600L, LocalDateTime.now()));
+
+        // when & then
+        mockMvc.perform(post("/api/v1/auth/oauth/callback")
+                        .with(jwt())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("Authentication successful"));
+
+        verify(cookieUtil).addAccessTokenCookie(any(), eq("access-token"));
+    }
+
+    @Test
+    @DisplayName("oauthCallback — state 검증 실패 시 400 Bad Request")
+    void oauthCallbackInvalidStateReturns400() throws Exception {
+        // given
+        String codeVerifier = "a".repeat(43);
+        String body = """
+                {
+                    "provider": "google",
+                    "code": "auth-code-123",
+                    "codeVerifier": "%s",
+                    "state": "invalid-state"
+                }
+                """.formatted(codeVerifier);
+
+        when(oAuthUrlService.validateAndConsumeState(eq("invalid-state"), any(OAuthProvider.class), anyString()))
+                .thenReturn(false);
+
+        // when & then
+        mockMvc.perform(post("/api/v1/auth/oauth/callback")
+                        .with(jwt())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    @DisplayName("oauthCallback — state가 null이면 검증을 건너뛰고 로그인 처리")
+    void oauthCallbackNullStateSkipsValidation() throws Exception {
+        // given
+        String codeVerifier = "a".repeat(43);
+        String body = """
+                {
+                    "provider": "google",
+                    "code": "auth-code-123",
+                    "codeVerifier": "%s"
+                }
+                """.formatted(codeVerifier);
+
+        when(authService.processOAuthLogin(any(OAuthLoginCommand.class)))
+                .thenReturn(new AuthResult("access-token", "Cookie", 3600L, LocalDateTime.now()));
+
+        // when & then
+        mockMvc.perform(post("/api/v1/auth/oauth/callback")
+                        .with(jwt())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true));
+
+        verify(oAuthUrlService, never()).validateAndConsumeState(anyString(), any(), anyString());
+    }
+
+    @Test
+    @DisplayName("oauthCallback — 서버 오류 발생 시 500 반환")
+    void oauthCallbackServerErrorReturns500() throws Exception {
+        // given
+        String codeVerifier = "a".repeat(43);
+        String body = """
+                {
+                    "provider": "google",
+                    "code": "auth-code-123",
+                    "codeVerifier": "%s"
+                }
+                """.formatted(codeVerifier);
+
+        when(authService.processOAuthLogin(any(OAuthLoginCommand.class)))
+                .thenThrow(new RuntimeException("Unexpected error"));
+
+        // when & then
+        mockMvc.perform(post("/api/v1/auth/oauth/callback")
+                        .with(jwt())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.message").value("Authentication failed"));
+    }
+
+    // ── generateOAuthUrl — 추가 에러 케이스 ──
+
+    @Test
+    @DisplayName("generateOAuthUrl — 서버 오류 발생 시 500 반환")
+    void generateOAuthUrlServerErrorReturns500() throws Exception {
+        // given
+        String codeVerifier = "a".repeat(43);
+        String body = """
+                {
+                    "provider": "google",
+                    "codeVerifier": "%s"
+                }
+                """.formatted(codeVerifier);
+
+        when(oAuthUrlService.generateAuthUrl(any(OAuthProvider.class), anyString()))
+                .thenThrow(new RuntimeException("Unexpected error"));
+
+        // when & then
+        mockMvc.perform(post("/api/v1/auth/oauth/url")
+                        .with(jwt())
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false));
     }
 }

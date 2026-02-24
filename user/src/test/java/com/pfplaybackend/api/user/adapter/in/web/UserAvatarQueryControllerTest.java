@@ -32,7 +32,7 @@ class UserAvatarQueryControllerTest {
 
     @Test
     @DisplayName("getMyAllAvatarBodies — 200 OK")
-    void getMyAllAvatarBodies_returns200() throws Exception {
+    void getMyAllAvatarBodiesReturns200() throws Exception {
         // given
         when(userAvatarQueryService.findMyAvatarBodies()).thenReturn(List.of());
 
@@ -44,7 +44,7 @@ class UserAvatarQueryControllerTest {
 
     @Test
     @DisplayName("getMyDefaultAvatarFaces — 200 OK")
-    void getMyDefaultAvatarFaces_returns200() throws Exception {
+    void getMyDefaultAvatarFacesReturns200() throws Exception {
         // given
         when(userAvatarQueryService.findMyAvatarFaces()).thenReturn(
                 List.of(new AvatarFaceDto(1L, "face1", "face-uri", true)));

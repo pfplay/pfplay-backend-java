@@ -40,7 +40,7 @@ class RedisSessionCacheAdapterTest {
 
     @Test
     @DisplayName("saveSessionCache — 파티룸 구독 시 세션이 저장된다")
-    void saveSessionCache_partyroomSubscription_savesSession() {
+    void saveSessionCachePartyroomSubscriptionSavesSession() {
         // given
         String sessionId = "session-123";
         String userIdStr = "1";
@@ -60,7 +60,7 @@ class RedisSessionCacheAdapterTest {
 
     @Test
     @DisplayName("saveSessionCache — 활성 파티룸이 없으면 예외가 발생한다")
-    void saveSessionCache_noActivePartyroom_throws() {
+    void saveSessionCacheNoActivePartyroomThrows() {
         // given
         String sessionId = "session-123";
         String userIdStr = "1";
@@ -76,7 +76,7 @@ class RedisSessionCacheAdapterTest {
 
     @Test
     @DisplayName("deleteSessionCache — 세션이 삭제된다")
-    void deleteSessionCache_deletesFromRedis() {
+    void deleteSessionCacheDeletesFromRedis() {
         // given
         String sessionId = "session-123";
 
@@ -89,7 +89,7 @@ class RedisSessionCacheAdapterTest {
 
     @Test
     @DisplayName("getSessionCache — 세션이 있으면 반환한다")
-    void getSessionCache_exists_returnsPresent() {
+    void getSessionCacheExistsReturnsPresent() {
         // given
         String sessionId = "session-123";
         Object cached = new Object();
@@ -104,7 +104,7 @@ class RedisSessionCacheAdapterTest {
 
     @Test
     @DisplayName("getSessionCache — 세션이 없으면 empty를 반환한다")
-    void getSessionCache_notExists_returnsEmpty() {
+    void getSessionCacheNotExistsReturnsEmpty() {
         // given
         String sessionId = "session-123";
         when(valueOperations.get(sessionId)).thenReturn(null);

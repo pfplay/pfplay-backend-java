@@ -12,7 +12,7 @@ class TrackDataTest {
 
     @Test
     @DisplayName("reorder()로 트랙 순서를 변경할 수 있다")
-    void reorder_changesOrderNumber() {
+    void reorderChangesOrderNumber() {
         // given
         TrackData track = TrackData.builder()
                 .playlistId(new PlaylistId(1L))
@@ -32,7 +32,7 @@ class TrackDataTest {
 
     @Test
     @DisplayName("moveToPlaylist()로 트랙을 다른 플레이리스트로 이동할 수 있다")
-    void moveToPlaylist_changesPlaylistAndOrder() {
+    void moveToPlaylistChangesPlaylistAndOrder() {
         // given
         TrackData track = TrackData.builder()
                 .playlistId(new PlaylistId(1L))

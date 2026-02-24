@@ -85,7 +85,7 @@ class PlaybackCommandServiceTest {
 
     @Test
     @DisplayName("complete — 완료 시 DJ 점수가 1 증가한다")
-    void complete_updatesDjScore() {
+    void completeUpdatesDjScore() {
         // given — tryProceed에서 DJ가 없으면 deactivate
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
@@ -100,7 +100,7 @@ class PlaybackCommandServiceTest {
 
     @Test
     @DisplayName("complete — 대기열에 DJ가 없으면 재생이 비활성화된다")
-    void complete_noDjs_deactivates() {
+    void completeNoDjsDeactivates() {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
@@ -115,7 +115,7 @@ class PlaybackCommandServiceTest {
 
     @Test
     @DisplayName("skipByManager — MODERATOR 이상 등급이면 스킵이 실행된다")
-    void skipByManager_moderator_succeeds() {
+    void skipByManagerModeratorSucceeds() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, true, new PlaybackId(1L), new CrewId(1L));
         CrewData adjuster = CrewData.builder()
@@ -137,7 +137,7 @@ class PlaybackCommandServiceTest {
 
     @Test
     @DisplayName("skipByManager — MODERATOR 미만 등급이면 예외가 발생한다")
-    void skipByManager_belowModerator_throws() {
+    void skipByManagerBelowModeratorThrows() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(partyroomId.getId(), false, 1L, true, new PlaybackId(1L), new CrewId(1L));
         CrewData adjuster = CrewData.builder()
@@ -153,7 +153,7 @@ class PlaybackCommandServiceTest {
 
     @Test
     @DisplayName("skipPlayback — 스케줄 태스크를 취소하고 tryProceed를 실행한다")
-    void skipPlayback_cancelsTaskAndProceeds() {
+    void skipPlaybackCancelsTaskAndProceeds() {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
@@ -169,7 +169,7 @@ class PlaybackCommandServiceTest {
 
     @Test
     @DisplayName("complete — 대기열에 DJ가 있으면 재생이 시작된다")
-    void complete_hasDjs_startsPlayback() {
+    void completeHasDjsStartsPlayback() {
         // given
         PartyroomData partyroom = PartyroomData.builder()
                 .id(partyroomId.getId()).partyroomId(partyroomId)
@@ -213,7 +213,7 @@ class PlaybackCommandServiceTest {
 
     @Test
     @DisplayName("updatePlaybackAggregation — 어그리게이션이 정상 업데이트된다")
-    void updatePlaybackAggregation_updatesSuccessfully() {
+    void updatePlaybackAggregationUpdatesSuccessfully() {
         // given
         PlaybackAggregationData aggregation = mock(PlaybackAggregationData.class);
         PlaybackId playbackId = new PlaybackId(1L);

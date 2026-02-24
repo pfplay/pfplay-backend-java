@@ -23,7 +23,7 @@ class PlaybackCommandControllerTest {
 
     @Test
     @DisplayName("playBackSkip — 200 OK")
-    void playBackSkip_returns200() throws Exception {
+    void playBackSkipReturns200() throws Exception {
         mockMvc.perform(post("/api/v1/partyrooms/1/playbacks/skip")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
@@ -32,7 +32,7 @@ class PlaybackCommandControllerTest {
 
     @Test
     @DisplayName("playBackSkip — 인증 없으면 401")
-    void playBackSkip_unauthenticated_returns401() throws Exception {
+    void playBackSkipUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(post("/api/v1/partyrooms/1/playbacks/skip")
                         .with(csrf()))
                 .andExpect(status().isUnauthorized());

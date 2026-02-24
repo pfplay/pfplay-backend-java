@@ -31,7 +31,7 @@ class PartyroomNoticeQueryServiceTest {
 
     @Test
     @DisplayName("getNotice — 파티룸의 공지사항을 반환한다")
-    void getNotice_success() {
+    void getNoticeSuccess() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         PartyroomData partyroom = PartyroomData.builder()
@@ -51,7 +51,7 @@ class PartyroomNoticeQueryServiceTest {
 
     @Test
     @DisplayName("getNotice — 존재하지 않는 파티룸이면 NotFoundException이 발생한다")
-    void getNotice_notFound() {
+    void getNoticeNotFound() {
         // given
         PartyroomId partyroomId = new PartyroomId(999L);
         when(aggregatePort.findPartyroomById(999L)).thenReturn(Optional.empty());

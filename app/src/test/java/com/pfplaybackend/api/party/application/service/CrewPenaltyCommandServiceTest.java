@@ -82,7 +82,7 @@ class CrewPenaltyCommandServiceTest {
 
     @Test
     @DisplayName("addPenalty — CHAT_BAN_30_SECONDS 페널티 시 Redis에 기록하고 이벤트를 발행한다")
-    void addPenalty_chatBan() {
+    void addPenaltyChatBan() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         PartyroomData partyroom = createPartyroom();
@@ -109,7 +109,7 @@ class CrewPenaltyCommandServiceTest {
 
     @Test
     @DisplayName("addPenalty — PERMANENT_EXPULSION 페널티 시 퇴장 처리하고 이력을 저장한다")
-    void addPenalty_permanentExpulsion() {
+    void addPenaltyPermanentExpulsion() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         PartyroomData partyroom = createPartyroom();
@@ -136,7 +136,7 @@ class CrewPenaltyCommandServiceTest {
 
     @Test
     @DisplayName("addPenalty — MODERATOR 미만 등급의 처벌자는 페널티를 부과할 수 없다")
-    void addPenalty_gradeInsufficient() {
+    void addPenaltyGradeInsufficient() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(createPartyroom());
@@ -160,7 +160,7 @@ class CrewPenaltyCommandServiceTest {
 
     @Test
     @DisplayName("releaseCrewPenalty — 정상적으로 페널티를 해제하고 크루 밴을 풀고 이력을 업데이트한다")
-    void releaseCrewPenalty_success() {
+    void releaseCrewPenaltySuccess() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(createPartyroom());
@@ -193,7 +193,7 @@ class CrewPenaltyCommandServiceTest {
 
     @Test
     @DisplayName("releaseCrewPenalty — MODERATOR 미만 등급은 페널티를 해제할 수 없다")
-    void releaseCrewPenalty_gradeInsufficient() {
+    void releaseCrewPenaltyGradeInsufficient() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(createPartyroom());
@@ -209,7 +209,7 @@ class CrewPenaltyCommandServiceTest {
 
     @Test
     @DisplayName("releaseCrewPenalty — 페널티 이력이 존재하지 않으면 NotFoundException이 발생한다")
-    void releaseCrewPenalty_historyNotFound() {
+    void releaseCrewPenaltyHistoryNotFound() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(createPartyroom());

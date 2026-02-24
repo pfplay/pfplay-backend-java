@@ -9,7 +9,7 @@ class PlaybackDtoTest {
 
     @Test
     @DisplayName("withEndTime 팩토리로 생성 시 endTime이 설정되어야 한다")
-    void withEndTime_shouldSetEndTime() {
+    void withEndTimeShouldSetEndTime() {
         // when
         PlaybackDto dto = PlaybackDto.withEndTime(1L, "linkId", "name", "3:45", "thumb.jpg", 123456789L);
 

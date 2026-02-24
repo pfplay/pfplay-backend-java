@@ -24,7 +24,7 @@ class GuestSignServiceTest {
 
     @Test
     @DisplayName("getGuestOrCreate — 게스트를 생성하고 프로필을 초기화한 뒤 저장한다")
-    void getGuestOrCreate_success() {
+    void getGuestOrCreateSuccess() {
         // given
         ProfileData profile = mock(ProfileData.class);
         when(userProfileCommandService.createProfileDataForGuest(any())).thenReturn(profile);
@@ -42,7 +42,7 @@ class GuestSignServiceTest {
 
     @Test
     @DisplayName("getGuestOrCreate — 생성된 게스트에 프로필이 할당된다")
-    void getGuestOrCreate_profileInitialized() {
+    void getGuestOrCreateProfileInitialized() {
         // given
         ProfileData profile = mock(ProfileData.class);
         when(userProfileCommandService.createProfileDataForGuest(any())).thenReturn(profile);

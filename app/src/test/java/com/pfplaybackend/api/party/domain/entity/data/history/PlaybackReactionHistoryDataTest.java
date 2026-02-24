@@ -13,7 +13,7 @@ class PlaybackReactionHistoryDataTest {
 
     @Test
     @DisplayName("생성자 — 초기 상태는 모두 false다")
-    void constructor_allReactionsFalseByDefault() {
+    void constructorAllReactionsFalseByDefault() {
         // when
         PlaybackReactionHistoryData history = new PlaybackReactionHistoryData(
                 new UserId(1L), new PlaybackId(100L)
@@ -27,7 +27,7 @@ class PlaybackReactionHistoryDataTest {
 
     @Test
     @DisplayName("applyReactionState — ReactionState가 올바르게 적용된다")
-    void applyReactionState_appliesCorrectly() {
+    void applyReactionStateAppliesCorrectly() {
         // given
         PlaybackReactionHistoryData history = new PlaybackReactionHistoryData(
                 new UserId(1L), new PlaybackId(100L)
@@ -45,7 +45,7 @@ class PlaybackReactionHistoryDataTest {
 
     @Test
     @DisplayName("applyReactionState — this를 반환한다")
-    void applyReactionState_returnsThis() {
+    void applyReactionStateReturnsThis() {
         // given
         PlaybackReactionHistoryData history = new PlaybackReactionHistoryData(
                 new UserId(1L), new PlaybackId(100L)

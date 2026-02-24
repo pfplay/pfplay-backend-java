@@ -85,7 +85,7 @@ class AdminPartyroomServiceTest {
 
     @Test
     @DisplayName("createPartyroomWithHost — 성공 시 파티룸 생성 후 호스트가 입장한다")
-    void createPartyroomWithHost_success() {
+    void createPartyroomWithHostSuccess() {
         // given
         AdminCreatePartyroomCommand command = new AdminCreatePartyroomCommand(
                 "100", "Test Room", "Welcome", "testdomain01", 5);
@@ -105,7 +105,7 @@ class AdminPartyroomServiceTest {
 
     @Test
     @DisplayName("createPartyroomWithHost — linkDomain이 null이면 12자 자동 생성된다")
-    void createPartyroomWithHost_autoLinkDomain() {
+    void createPartyroomWithHostAutoLinkDomain() {
         // given
         AdminCreatePartyroomCommand command = new AdminCreatePartyroomCommand(
                 "100", "Auto Link Room", null, null, 5);
@@ -138,7 +138,7 @@ class AdminPartyroomServiceTest {
 
     @Test
     @DisplayName("createPartyroomWithHost — 숫자가 아닌 userId 전달 시 BadRequestException이 발생한다")
-    void createPartyroomWithHost_invalidUserId_throws() {
+    void createPartyroomWithHostInvalidUserIdThrows() {
         // given
         AdminCreatePartyroomCommand command = new AdminCreatePartyroomCommand(
                 "not-a-number", "Room", null, "domain123456", 5);
@@ -150,7 +150,7 @@ class AdminPartyroomServiceTest {
 
     @Test
     @DisplayName("simulateReactions — 활성 재생이 없으면 NotFoundException이 발생한다")
-    void simulateReactions_noActivePlayback_throws() {
+    void simulateReactionsNoActivePlaybackThrows() {
         // given
         Long partyroomId = 999L;
         PartyroomData partyroom = createTestPartyroom("Room", "linkdomain00");

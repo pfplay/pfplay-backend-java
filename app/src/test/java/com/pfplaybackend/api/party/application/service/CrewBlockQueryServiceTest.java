@@ -44,7 +44,7 @@ class CrewBlockQueryServiceTest {
 
     @Test
     @DisplayName("getBlocks — 차단 목록과 프로필 정보를 함께 반환한다")
-    void getBlocks_returnsBlockedCrewsWithProfile() {
+    void getBlocksReturnsBlockedCrewsWithProfile() {
         // given
         UserId userId = new UserId(1L);
         ThreadLocalContext.setContext(new AuthContext(userId, AuthorityTier.FM));
@@ -79,7 +79,7 @@ class CrewBlockQueryServiceTest {
 
     @Test
     @DisplayName("getBlocks — 차단 목록이 비어있으면 빈 리스트를 반환한다")
-    void getBlocks_returnsEmptyListWhenNoBlocks() {
+    void getBlocksReturnsEmptyListWhenNoBlocks() {
         // given
         UserId userId = new UserId(1L);
         ThreadLocalContext.setContext(new AuthContext(userId, AuthorityTier.FM));

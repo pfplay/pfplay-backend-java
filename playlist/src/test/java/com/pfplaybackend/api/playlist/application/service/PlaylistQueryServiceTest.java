@@ -44,7 +44,7 @@ class PlaylistQueryServiceTest {
 
     @Test
     @DisplayName("getPlaylists — 사용자의 전체 플레이리스트 목록을 반환한다")
-    void getPlaylists_success() {
+    void getPlaylistsSuccess() {
         // given
         List<PlaylistSummaryDto> expected = List.of(
                 new PlaylistSummaryDto(1L, "My Playlist", 1, PlaylistType.PLAYLIST, 5L),
@@ -63,7 +63,7 @@ class PlaylistQueryServiceTest {
 
     @Test
     @DisplayName("getPlaylists — 플레이리스트가 없으면 빈 목록을 반환한다")
-    void getPlaylists_empty() {
+    void getPlaylistsEmpty() {
         // given
         when(queryPort.findAllByUserId(userId)).thenReturn(Collections.emptyList());
 
@@ -76,7 +76,7 @@ class PlaylistQueryServiceTest {
 
     @Test
     @DisplayName("getPlaylist — 특정 플레이리스트를 ID로 조회한다")
-    void getPlaylist_success() {
+    void getPlaylistSuccess() {
         // given
         Long playlistId = 1L;
         PlaylistSummaryDto expected = new PlaylistSummaryDto(playlistId, "My Playlist", 0, PlaylistType.PLAYLIST, 10L);

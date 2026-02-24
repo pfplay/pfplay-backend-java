@@ -24,7 +24,7 @@ class PartyroomNoticeQueryControllerTest {
 
     @Test
     @DisplayName("getNotice — 200 OK")
-    void getNotice_returns200() throws Exception {
+    void getNoticeReturns200() throws Exception {
         // given
         when(partyroomNoticeQueryService.getNotice(any())).thenReturn("Welcome!");
 
@@ -36,7 +36,7 @@ class PartyroomNoticeQueryControllerTest {
 
     @Test
     @DisplayName("getNotice — 인증 없으면 401")
-    void getNotice_unauthenticated_returns401() throws Exception {
+    void getNoticeUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(get("/api/v1/partyrooms/1/notice"))
                 .andExpect(status().isUnauthorized());
     }

@@ -32,7 +32,7 @@ class CrewQueryControllerTest {
 
     @Test
     @DisplayName("getOtherProfileSummary — ROLE_MEMBER이면 200 OK")
-    void getOtherProfileSummary_member_returns200() throws Exception {
+    void getOtherProfileSummaryMemberReturns200() throws Exception {
         // given
         CrewProfileSummaryResult result = new CrewProfileSummaryResult(
                 1L, "nickname", "intro", "body-uri", 0, 0, "face-uri", List.of());
@@ -46,7 +46,7 @@ class CrewQueryControllerTest {
 
     @Test
     @DisplayName("getOtherProfileSummary — ROLE_GUEST이면 200 OK")
-    void getOtherProfileSummary_guest_returns200() throws Exception {
+    void getOtherProfileSummaryGuestReturns200() throws Exception {
         // given
         CrewProfileSummaryResult result = new CrewProfileSummaryResult(
                 1L, "nickname", "intro", "body-uri", 0, 0, "face-uri", List.of());
@@ -60,7 +60,7 @@ class CrewQueryControllerTest {
 
     @Test
     @DisplayName("getOtherProfileSummary — 인증 없으면 401")
-    void getOtherProfileSummary_unauthenticated_returns401() throws Exception {
+    void getOtherProfileSummaryUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(get("/api/v1/crews/1/profile/summary"))
                 .andExpect(status().isUnauthorized());
     }

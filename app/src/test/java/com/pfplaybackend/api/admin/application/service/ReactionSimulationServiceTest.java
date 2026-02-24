@@ -81,7 +81,7 @@ class ReactionSimulationServiceTest {
 
     @Test
     @DisplayName("simulateReaction \u2014 \uc0c8 \ub9ac\uc561\uc158 \ud788\uc2a4\ud1a0\ub9ac \uc0dd\uc131 \uc2dc \uc800\uc7a5\uc774 \ud638\ucd9c\ub41c\ub2e4")
-    void simulateReaction_newHistory_savesCalled() {
+    void simulateReactionNewHistorySavesCalled() {
         // given
         UserId userId = new UserId(1L);
         CrewId crewId = new CrewId(10L);
@@ -103,7 +103,7 @@ class ReactionSimulationServiceTest {
 
     @Test
     @DisplayName("simulateReaction \u2014 DJ \uc810\uc218 \ubcc0\uacbd \uc2dc userActivityPort\uac00 \ud638\ucd9c\ub41c\ub2e4")
-    void simulateReaction_djScoreChanged_updatesActivity() {
+    void simulateReactionDjScoreChangedUpdatesActivity() {
         // given
         UserId userId = new UserId(2L);
         CrewId crewId = new CrewId(20L);
@@ -125,7 +125,7 @@ class ReactionSimulationServiceTest {
 
     @Test
     @DisplayName("simulateReaction \u2014 \uc5b4\uadf8\ub9ac\uac8c\uc774\uc158 \ubcc0\uacbd \uc2dc updatePlaybackAggregation\uc774 \ud638\ucd9c\ub41c\ub2e4")
-    void simulateReaction_aggregationChanged_updatesAggregation() {
+    void simulateReactionAggregationChangedUpdatesAggregation() {
         // given
         UserId userId = new UserId(3L);
         CrewId crewId = new CrewId(30L);

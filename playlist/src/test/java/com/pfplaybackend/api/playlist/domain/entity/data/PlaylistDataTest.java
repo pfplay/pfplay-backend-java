@@ -11,7 +11,7 @@ class PlaylistDataTest {
 
     @Test
     @DisplayName("create — 팩토리 메서드로 생성 시 모든 필드가 올바르게 설정된다")
-    void create_playlist() {
+    void createPlaylist() {
         // given
         UserId ownerId = new UserId(100L);
         String name = "My Playlist";
@@ -29,7 +29,7 @@ class PlaylistDataTest {
 
     @Test
     @DisplayName("create — GRABLIST 타입으로 생성할 수 있다")
-    void create_grablist() {
+    void createGrablist() {
         // given
         UserId ownerId = new UserId(200L);
 

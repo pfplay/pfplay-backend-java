@@ -25,7 +25,7 @@ class PartyroomDataTest {
 
     @Test
     @DisplayName("create — 팩토리 메서드로 생성 시 기본 상태가 올바르게 초기화된다")
-    void create_defaultState() {
+    void createDefaultState() {
         // when
         PartyroomData partyroom = createPartyroom();
 
@@ -38,7 +38,7 @@ class PartyroomDataTest {
 
     @Test
     @DisplayName("validateHost — 호스트가 아닌 사용자로 검증 시 예외가 발생한다")
-    void validateHost_notHost_throws() {
+    void validateHostNotHostThrows() {
         // given
         PartyroomData partyroom = createPartyroom();
         UserId otherUser = new UserId(999L);
@@ -50,7 +50,7 @@ class PartyroomDataTest {
 
     @Test
     @DisplayName("validateHost — 호스트 본인으로 검증 시 예외가 발생하지 않는다")
-    void validateHost_host_noException() {
+    void validateHostHostNoException() {
         // given
         PartyroomData partyroom = createPartyroom();
         UserId hostId = partyroom.getHostId();
@@ -61,7 +61,7 @@ class PartyroomDataTest {
 
     @Test
     @DisplayName("validateNotTerminated — 이미 종료된 파티룸 검증 시 예외가 발생한다")
-    void validateNotTerminated_terminated_throws() {
+    void validateNotTerminatedTerminatedThrows() {
         // given
         PartyroomData partyroom = createPartyroom();
         partyroom.terminate();
@@ -86,7 +86,7 @@ class PartyroomDataTest {
 
     @Test
     @DisplayName("terminate — 종료 시 PartyroomClosedEvent가 도메인 이벤트로 등록된다")
-    void terminate_registersPartyroomClosedEvent() {
+    void terminateRegistersPartyroomClosedEvent() {
         // given
         PartyroomData partyroom = createPartyroom();
 
@@ -104,7 +104,7 @@ class PartyroomDataTest {
 
     @Test
     @DisplayName("pollDomainEvents — 호출 후 이벤트 목록이 비워진다")
-    void pollDomainEvents_clearsAfterPoll() {
+    void pollDomainEventsClearsAfterPoll() {
         // given
         PartyroomData partyroom = createPartyroom();
         partyroom.terminate();

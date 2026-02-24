@@ -9,7 +9,7 @@ public abstract class AbstractHTTPException extends RuntimeException {
     private final String errorCode;
     private final String message;
 
-    public AbstractHTTPException(HttpStatus status, String errorCode, String message) {
+    protected AbstractHTTPException(HttpStatus status, String errorCode, String message) {
         super(message);
         this.status = status;
         this.errorCode = errorCode;

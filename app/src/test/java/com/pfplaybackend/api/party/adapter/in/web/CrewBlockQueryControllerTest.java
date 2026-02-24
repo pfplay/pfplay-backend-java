@@ -25,7 +25,7 @@ class CrewBlockQueryControllerTest {
 
     @Test
     @DisplayName("getBlockCrews — 200 OK")
-    void getBlockCrews_returns200() throws Exception {
+    void getBlockCrewsReturns200() throws Exception {
         // given
         when(crewBlockQueryService.getBlocks()).thenReturn(List.of());
 
@@ -37,7 +37,7 @@ class CrewBlockQueryControllerTest {
 
     @Test
     @DisplayName("getBlockCrews — 인증 없으면 401")
-    void getBlockCrews_unauthenticated_returns401() throws Exception {
+    void getBlockCrewsUnauthenticatedReturns401() throws Exception {
         mockMvc.perform(get("/api/v1/crews/me/blocks"))
                 .andExpect(status().isUnauthorized());
     }

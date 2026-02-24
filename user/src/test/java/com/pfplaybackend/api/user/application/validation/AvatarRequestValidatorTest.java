@@ -21,7 +21,7 @@ class AvatarRequestValidatorTest {
 
     @Test
     @DisplayName("validate — SINGLE_BODY 타입에서 face가 있으면 ValidationException이 발생한다")
-    void validate_singleBodyWithFace_throwsException() {
+    void validateSingleBodyWithFaceThrowsException() {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.SINGLE_BODY,
@@ -40,7 +40,7 @@ class AvatarRequestValidatorTest {
 
     @Test
     @DisplayName("validate — BODY_WITH_FACE 타입에서 face가 없으면 ValidationException이 발생한다")
-    void validate_bodyWithFaceWithoutFace_throwsException() {
+    void validateBodyWithFaceWithoutFaceThrowsException() {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.BODY_WITH_FACE,
@@ -55,7 +55,7 @@ class AvatarRequestValidatorTest {
 
     @Test
     @DisplayName("validate — 유효하지 않은 body URI이면 ValidationException이 발생한다")
-    void validate_invalidBodyUri_throwsException() {
+    void validateInvalidBodyUriThrowsException() {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.SINGLE_BODY,
@@ -70,7 +70,7 @@ class AvatarRequestValidatorTest {
 
     @Test
     @DisplayName("validate — scale이 200을 초과하면 ValidationException이 발생한다")
-    void validate_scaleExceeds200_throwsException() {
+    void validateScaleExceeds200ThrowsException() {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.BODY_WITH_FACE,
@@ -89,7 +89,7 @@ class AvatarRequestValidatorTest {
 
     @Test
     @DisplayName("validate — 유효한 SINGLE_BODY 요청이면 예외가 발생하지 않는다")
-    void validate_validSingleBody_noException() {
+    void validateValidSingleBodyNoException() {
         // given
         SetAvatarCommand command = new SetAvatarCommand(
                 AvatarCompositionType.SINGLE_BODY,

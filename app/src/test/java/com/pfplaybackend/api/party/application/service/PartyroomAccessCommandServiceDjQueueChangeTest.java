@@ -73,7 +73,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
 
     @Test
     @DisplayName("exit - DJ 대기열에 있던 사용자가 퇴장하면 DJ_QUEUE_CHANGE 이벤트가 발행되어야 한다")
-    void exit_userInDjQueue_shouldPublishDjQueueChangeEvent() {
+    void exitUserInDjQueueShouldPublishDjQueueChangeEvent() {
         // given
         CrewData crew = CrewData.builder()
                 .id(1L)
@@ -108,7 +108,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
 
     @Test
     @DisplayName("exit - DJ 대기열에 없던 사용자가 퇴장하면 DJ_QUEUE_CHANGE 이벤트가 발행되지 않아야 한다")
-    void exit_userNotInDjQueue_shouldNotPublishDjQueueChangeEvent() {
+    void exitUserNotInDjQueueShouldNotPublishDjQueueChangeEvent() {
         // given
         CrewData crew = CrewData.builder()
                 .id(1L)
@@ -139,7 +139,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
 
     @Test
     @DisplayName("expel - DJ 대기열에 있던 사용자가 강퇴되면 DJ_QUEUE_CHANGE 이벤트가 발행되어야 한다")
-    void expel_userInDjQueue_shouldPublishDjQueueChangeEvent() {
+    void expelUserInDjQueueShouldPublishDjQueueChangeEvent() {
         // given
         UserId targetUserId = new UserId();
 
@@ -174,7 +174,7 @@ class PartyroomAccessCommandServiceDjQueueChangeTest {
 
     @Test
     @DisplayName("expel - DJ 대기열에 없던 사용자가 강퇴되면 DJ_QUEUE_CHANGE 이벤트가 발행되지 않아야 한다")
-    void expel_userNotInDjQueue_shouldNotPublishDjQueueChangeEvent() {
+    void expelUserNotInDjQueueShouldNotPublishDjQueueChangeEvent() {
         // given
         UserId targetUserId = new UserId();
 

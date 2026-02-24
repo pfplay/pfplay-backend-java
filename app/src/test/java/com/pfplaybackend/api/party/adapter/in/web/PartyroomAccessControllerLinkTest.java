@@ -15,7 +15,7 @@ class PartyroomAccessControllerLinkTest {
 
     @Test
     @DisplayName("anonymousUser는 비인증 사용자로 판별되어야 한다")
-    void anonymousUser_shouldBeIdentifiedAsUnauthenticated() {
+    void anonymousUserShouldBeIdentifiedAsUnauthenticated() {
         // given
         Authentication auth = new AnonymousAuthenticationToken(
                 "key", "anonymousUser",
@@ -30,7 +30,7 @@ class PartyroomAccessControllerLinkTest {
 
     @Test
     @DisplayName("인증된 사용자는 정상 인증으로 판별되어야 한다")
-    void authenticatedUser_shouldBeIdentifiedAsAuthenticated() {
+    void authenticatedUserShouldBeIdentifiedAsAuthenticated() {
         // given
         Authentication auth = new UsernamePasswordAuthenticationToken(
                 "user-id", null,

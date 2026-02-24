@@ -33,7 +33,7 @@ class PlaylistQueryControllerTest {
 
     @Test
     @DisplayName("GET /playlists — MEMBER 권한이면 200과 플레이리스트 배열을 반환한다")
-    void getPlaylists_member_returns200() throws Exception {
+    void getPlaylistsMemberReturns200() throws Exception {
         // given
         List<PlaylistSummaryDto> playlists = List.of(
                 new PlaylistSummaryDto(1L, "My Playlist", 1, PlaylistType.PLAYLIST, 5L),
@@ -52,7 +52,7 @@ class PlaylistQueryControllerTest {
 
     @Test
     @DisplayName("GET /playlists — 미인증이면 401을 반환한다")
-    void getPlaylists_unauthenticated_returns401() throws Exception {
+    void getPlaylistsUnauthenticatedReturns401() throws Exception {
         // when & then
         mockMvc.perform(get("/api/v1/playlists"))
                 .andExpect(status().isUnauthorized());

@@ -26,7 +26,7 @@ class CrewGradeCommandControllerTest {
 
     @Test
     @DisplayName("updateCrewGrade — 204 No Content")
-    void updateCrewGrade_returns204() throws Exception {
+    void updateCrewGradeReturns204() throws Exception {
         // given
         String body = """
                 {"gradeType": "MODERATOR"}
@@ -45,7 +45,7 @@ class CrewGradeCommandControllerTest {
 
     @Test
     @DisplayName("updateCrewGrade — 인증 없으면 401")
-    void updateCrewGrade_unauthenticated_returns401() throws Exception {
+    void updateCrewGradeUnauthenticatedReturns401() throws Exception {
         String body = """
                 {"gradeType": "MODERATOR"}
                 """;

@@ -69,7 +69,7 @@ class PartyroomAccessCommandServiceTest {
 
     @Test
     @DisplayName("같은 룸 재진입 시 publishAccessChangedEvent가 호출되어야 한다")
-    void tryEnter_sameRoomReEntry_shouldPublishAccessEvent() {
+    void tryEnterSameRoomReEntryShouldPublishAccessEvent() {
         // given
         CrewData crew = CrewData.builder()
                 .id(10L)
@@ -102,7 +102,7 @@ class PartyroomAccessCommandServiceTest {
 
     @Test
     @DisplayName("다른 룸이 active일 때 ACTIVE_ANOTHER_ROOM 예외 대신 exit이 호출되어야 한다")
-    void tryEnter_anotherRoomActive_shouldAutoExitInsteadOfException() {
+    void tryEnterAnotherRoomActiveShouldAutoExitInsteadOfException() {
         // given
         PartyroomId newRoomId = new PartyroomId(2L);
         PartyroomId oldRoomId = new PartyroomId(1L);

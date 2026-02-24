@@ -53,7 +53,7 @@ class GrabTrackServiceTest {
 
     @Test
     @DisplayName("grabTrack — 정상 그랩 시 트랙이 GRABLIST에 추가된다")
-    void grabTrack_success() {
+    void grabTrackSuccess() {
         // given
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();
@@ -71,7 +71,7 @@ class GrabTrackServiceTest {
 
     @Test
     @DisplayName("grabTrack — 존재하지 않는 트랙으로 그랩 시 NotFoundException이 발생한다")
-    void grabTrack_trackNotFound() {
+    void grabTrackTrackNotFound() {
         // given
         when(aggregatePort.findFirstTrackByLink(linkId)).thenReturn(null);
 
@@ -82,7 +82,7 @@ class GrabTrackServiceTest {
 
     @Test
     @DisplayName("grabTrack — GRABLIST에 이미 동일한 linkId가 있으면 ConflictException이 발생한다")
-    void grabTrack_duplicateTrack() {
+    void grabTrackDuplicateTrack() {
         // given
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();
@@ -99,7 +99,7 @@ class GrabTrackServiceTest {
 
     @Test
     @DisplayName("grabTrack — 정상 그랩 시 원본 트랙의 메타데이터가 복사된다")
-    void grabTrack_copiesMetadata() {
+    void grabTrackCopiesMetadata() {
         // given
         TrackData track = createTrackData();
         PlaylistData grablist = createGrablist();

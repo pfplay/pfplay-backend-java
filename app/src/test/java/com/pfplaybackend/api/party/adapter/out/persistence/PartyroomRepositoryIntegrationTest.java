@@ -23,7 +23,7 @@ class PartyroomRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("PartyroomData 저장 후 조회 시 JPA 매핑이 올바르게 동작한다")
-    void save_and_findById() {
+    void saveAndFindById() {
         // given
         UserId hostId = new UserId(100L);
         PartyroomData partyroom = PartyroomData.create(
@@ -51,7 +51,7 @@ class PartyroomRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("findActiveHostRoom — 종료되지 않은 호스트의 파티룸을 조회한다")
-    void findActiveHostRoom_returnsActiveRoom() {
+    void findActiveHostRoomReturnsActiveRoom() {
         // given
         UserId hostId = new UserId(200L);
         PartyroomData partyroom = PartyroomData.create(
@@ -72,7 +72,7 @@ class PartyroomRepositoryIntegrationTest extends AbstractIntegrationTest {
 
     @Test
     @DisplayName("findActiveHostRoom — 종료된 파티룸은 조회되지 않는다")
-    void findActiveHostRoom_excludesTerminated() {
+    void findActiveHostRoomExcludesTerminated() {
         // given
         UserId hostId = new UserId(300L);
         PartyroomData partyroom = PartyroomData.create(

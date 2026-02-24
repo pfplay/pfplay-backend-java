@@ -47,7 +47,7 @@ class PartyroomQueryServiceIsRegisteredTest {
 
     @Test
     @DisplayName("DJ 대기열에 등록되어 있으면 true 반환")
-    void isAlreadyRegistered_shouldReturnTrue_whenUserIsRegistered() {
+    void isAlreadyRegisteredShouldReturnTrueWhenUserIsRegistered() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         CrewData crew = CrewData.builder().id(5L).userId(myUserId).build();
@@ -65,7 +65,7 @@ class PartyroomQueryServiceIsRegisteredTest {
 
     @Test
     @DisplayName("DJ 대기열에 등록되어 있지 않으면 false 반환")
-    void isAlreadyRegistered_shouldReturnFalse_whenUserIsNotRegistered() {
+    void isAlreadyRegisteredShouldReturnFalseWhenUserIsNotRegistered() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         CrewData crew = CrewData.builder().id(5L).userId(myUserId).build();
@@ -83,7 +83,7 @@ class PartyroomQueryServiceIsRegisteredTest {
 
     @Test
     @DisplayName("크루가 없으면 false 반환")
-    void isAlreadyRegistered_shouldReturnFalse_whenCrewNotFound() {
+    void isAlreadyRegisteredShouldReturnFalseWhenCrewNotFound() {
         // given
         PartyroomId partyroomId = new PartyroomId(1L);
         when(aggregatePort.findCrew(partyroomId, myUserId))

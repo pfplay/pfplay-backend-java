@@ -47,7 +47,7 @@ class UserBioCommandServiceTest {
 
     @Test
     @DisplayName("updateMyBio — 바이오 업데이트 후 프로필 변경 이벤트를 발행한다")
-    void updateMyBio_success() {
+    void updateMyBioSuccess() {
         // given
         MemberData member = mock(MemberData.class);
         when(memberRepository.findByUserId(userId)).thenReturn(Optional.of(member));
@@ -64,7 +64,7 @@ class UserBioCommandServiceTest {
 
     @Test
     @DisplayName("updateMyBio — 회원을 찾을 수 없으면 NoSuchElementException이 발생한다")
-    void updateMyBio_memberNotFound() {
+    void updateMyBioMemberNotFound() {
         // given
         when(memberRepository.findByUserId(userId)).thenReturn(Optional.empty());
         UpdateBioCommand command = new UpdateBioCommand("Nick", "Bio");

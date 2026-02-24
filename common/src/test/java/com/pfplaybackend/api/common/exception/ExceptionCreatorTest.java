@@ -15,7 +15,7 @@ class ExceptionCreatorTest {
 
     @Test
     @DisplayName("create — BAD_REQUEST ErrorType이면 BadRequestException을 생성한다")
-    void create_badRequest() {
+    void createBadRequest() {
         // given
         DomainException domainException = mock(DomainException.class);
         when(domainException.getErrorType()).thenReturn(ErrorType.BAD_REQUEST);
@@ -33,7 +33,7 @@ class ExceptionCreatorTest {
 
     @Test
     @DisplayName("create — NOT_FOUND ErrorType이면 NotFoundException을 생성한다")
-    void create_notFound() {
+    void createNotFound() {
         // given
         DomainException domainException = mock(DomainException.class);
         when(domainException.getErrorType()).thenReturn(ErrorType.NOT_FOUND);
@@ -51,7 +51,7 @@ class ExceptionCreatorTest {
 
     @Test
     @DisplayName("create — FORBIDDEN ErrorType이면 ForbiddenException을 생성한다")
-    void create_forbidden() {
+    void createForbidden() {
         // given
         DomainException domainException = mock(DomainException.class);
         when(domainException.getErrorType()).thenReturn(ErrorType.FORBIDDEN);
@@ -69,7 +69,7 @@ class ExceptionCreatorTest {
 
     @Test
     @DisplayName("create — UNAUTHORIZED ErrorType이면 UnauthorizedException을 생성한다")
-    void create_unauthorized() {
+    void createUnauthorized() {
         // given
         DomainException domainException = mock(DomainException.class);
         when(domainException.getErrorType()).thenReturn(ErrorType.UNAUTHORIZED);
@@ -87,7 +87,7 @@ class ExceptionCreatorTest {
 
     @Test
     @DisplayName("create — CONFLICT ErrorType이면 ConflictException을 생성한다")
-    void create_conflict() {
+    void createConflict() {
         // given
         DomainException domainException = mock(DomainException.class);
         when(domainException.getErrorType()).thenReturn(ErrorType.CONFLICT);

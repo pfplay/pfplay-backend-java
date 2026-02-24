@@ -33,10 +33,11 @@ public class AvatarBodyResourceData {
     @Column(nullable = false)
     private boolean isDefaultSetting;
 
-    private int combinePositionX;;
+    private int combinePositionX;
     private int combinePositionY;
 
-    public AvatarBodyResourceData() {}
+    public AvatarBodyResourceData() {
+    }
 
     @Builder
     public AvatarBodyResourceData(Long id, String name, String resourceUri,
@@ -64,18 +65,4 @@ public class AvatarBodyResourceData {
         this.combinePositionY = combinePositionY;
     }
 
-    public static AvatarBodyResourceData create(String name, String resourceUri, ObtainmentType obtainableType,
-                                                   int obtainableScore, boolean isCombinable, boolean isDefaultSetting,
-                                                   int combinePositionX, int combinePositionY) {
-        return AvatarBodyResourceData.builder()
-                .name(name)
-                .resourceUri(resourceUri)
-                .obtainableType(obtainableType)
-                .obtainableScore(obtainableScore)
-                .isCombinable(isCombinable)
-                .isDefaultSetting(isDefaultSetting)
-                .combinePositionX(combinePositionX)
-                .combinePositionY(combinePositionY)
-                .build();
-    }
 }
