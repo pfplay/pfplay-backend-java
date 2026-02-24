@@ -29,9 +29,9 @@ class PytubeSearchServiceTest {
     @InjectMocks PytubeSearchService pytubeSearchService;
 
     void setBaseConfig() {
-        ReflectionTestUtils.setField(pytubeSearchService, "BASE_URI", "http://localhost:8080");
-        ReflectionTestUtils.setField(pytubeSearchService, "API_KEY", "test-key");
-        ReflectionTestUtils.setField(pytubeSearchService, "API_SECRET", "test-secret");
+        ReflectionTestUtils.setField(pytubeSearchService, "baseUri", "http://localhost:8080");
+        ReflectionTestUtils.setField(pytubeSearchService, "apiKey", "test-key");
+        ReflectionTestUtils.setField(pytubeSearchService, "apiSecret", "test-secret");
     }
 
     @Test
