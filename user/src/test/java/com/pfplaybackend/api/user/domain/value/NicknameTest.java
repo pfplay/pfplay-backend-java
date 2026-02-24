@@ -60,8 +60,8 @@ class NicknameTest {
         Nickname n2 = new Nickname(PLAYER1);
         Nickname n3 = new Nickname("Player2");
 
-        assertThat(n1).isEqualTo(n2);
-        assertThat(n1).isNotEqualTo(n3);
-        assertThat(n1.hashCode()).isEqualTo(n2.hashCode());
+        assertThat(n1).isEqualTo(n2)
+                .isNotEqualTo(n3)
+                .hasSameHashCodeAs(n2);
     }
 }

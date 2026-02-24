@@ -9,7 +9,7 @@ import com.pfplaybackend.api.user.domain.value.WalletAddress;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,7 +88,7 @@ class MemberDataTest {
     void updateDjScore() {
         // given
         MemberData member = MemberData.create(TEST_EMAIL, ProviderType.GOOGLE);
-        Map<ActivityType, ActivityData> activityMap = new HashMap<>();
+        Map<ActivityType, ActivityData> activityMap = new EnumMap<>(ActivityType.class);
         activityMap.put(ActivityType.DJ_PNT, ActivityData.create(member.getUserId(), ActivityType.DJ_PNT, 10));
         member.initializeActivityMap(activityMap);
 

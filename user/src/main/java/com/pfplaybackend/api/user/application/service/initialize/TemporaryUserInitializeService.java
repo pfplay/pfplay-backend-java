@@ -49,7 +49,6 @@ public class TemporaryUserInitializeService {
         GuestData guest = GuestData.createWithFixedUserId(userId, "Firefox/MacOS");
         ProfileData profile = userProfileCommandService.createProfileDataForGuest(guest.getUserId());
         guest.initiateProfile(profile);
-        // System.out.println("GT JWT: " + jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder().uid(guest.getUserId().getUid().toString()).email("N/A").accessLevel(AccessLevel.ROLE_GUEST).authorityTier(AuthorityTier.GT).build()));
         guestRepository.save(guest);
     }
 
@@ -62,7 +61,6 @@ public class TemporaryUserInitializeService {
 
         MemberData memberData = memberRepository.save(member);
         playlistSetupPort.createDefaultPlaylist(member.getUserId());
-        // System.out.println("AM JWT: " + jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder().uid(member.getUserId().getUid().toString()).email(member.getEmail()).accessLevel(AccessLevel.ROLE_MEMBER).authorityTier(member.getAuthorityTier()).build()));
         return memberData;
     }
 
@@ -73,7 +71,6 @@ public class TemporaryUserInitializeService {
         // 2. Wallet Update
         member.updateWalletAddress(new WalletAddress("wallet-address"));
         memberRepository.save(member);
-        // System.out.println("FM JWT: " + jwtService.generateNonExpiringAccessToken(TokenClaimsRequest.builder().uid(member.getUserId().getUid().toString()).email(member.getEmail()).accessLevel(AccessLevel.ROLE_MEMBER).authorityTier(member.getAuthorityTier()).build()));
         return member;
     }
 }

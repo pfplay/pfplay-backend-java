@@ -29,7 +29,7 @@ public abstract class BaseEntity {
     protected LocalDateTime updatedAt;
 
     @Transient
-    private final transient List<DomainEvent> domainEvents = new ArrayList<>();
+    private final List<DomainEvent> domainEvents = new ArrayList<>();
 
     protected void registerEvent(DomainEvent event) {
         this.domainEvents.add(event);

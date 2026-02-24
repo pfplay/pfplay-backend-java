@@ -26,6 +26,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class AvatarResourceQueryServiceTest {
 
+    private static final String FACE_URI_01 = "face_uri_01";
+    private static final String BODY_URI_01 = "body_uri_01";
+    private static final String AVA_ICON_FACE_HAPPY = "ava_icon_face_happy";
+    private static final String AVA_ICON_BODY_COOL = "ava_icon_body_cool";
+    private static final String BASIC_FACE_URI = "basic_face_uri";
+
     @Mock AvatarBodyResourceRepository avatarBodyResourceRepository;
     @Mock AvatarFaceResourceRepository avatarFaceResourceRepository;
     @Mock AvatarIconResourceRepository avatarIconResourceRepository;
@@ -35,15 +41,15 @@ class AvatarResourceQueryServiceTest {
     @DisplayName("findPairAvatarIconByFaceUri — 이름 기반으로 아이콘 URI를 생성한다")
     void findPairAvatarIconByFaceUriGeneratesIconName() {
         // given
-        AvatarFaceUri faceUri = new AvatarFaceUri("face_uri_01");
+        AvatarFaceUri faceUri = new AvatarFaceUri(FACE_URI_01);
         AvatarFaceResourceData faceData = AvatarFaceResourceData.builder()
-                .id(1L).name("ava_face_happy").resourceUri("face_uri_01").build();
-        when(avatarFaceResourceRepository.findOneAvatarResourceByResourceUri("face_uri_01"))
+                .id(1L).name("ava_face_happy").resourceUri(FACE_URI_01).build();
+        when(avatarFaceResourceRepository.findOneAvatarResourceByResourceUri(FACE_URI_01))
                 .thenReturn(faceData);
 
         AvatarIconResourceData iconData = AvatarIconResourceData.builder()
-                .id(1L).name("ava_icon_face_happy").resourceUri("icon_uri_01").pairType(PairType.FACE).build();
-        when(avatarIconResourceRepository.findByNameAndPairType("ava_icon_face_happy", PairType.FACE))
+                .id(1L).name(AVA_ICON_FACE_HAPPY).resourceUri("icon_uri_01").pairType(PairType.FACE).build();
+        when(avatarIconResourceRepository.findByNameAndPairType(AVA_ICON_FACE_HAPPY, PairType.FACE))
                 .thenReturn(iconData);
 
         // when
@@ -51,26 +57,26 @@ class AvatarResourceQueryServiceTest {
 
         // then
         assertThat(result.resourceUri()).isEqualTo("icon_uri_01");
-        assertThat(result.name()).isEqualTo("ava_icon_face_happy");
+        assertThat(result.name()).isEqualTo(AVA_ICON_FACE_HAPPY);
     }
 
     @Test
     @DisplayName("findPairAvatarIconByBodyUri — 바디 URI 기반으로 아이콘 URI를 생성한다")
     void findPairAvatarIconByBodyUriGeneratesIconName() {
         // given
-        AvatarBodyUri bodyUri = new AvatarBodyUri("body_uri_01");
+        AvatarBodyUri bodyUri = new AvatarBodyUri(BODY_URI_01);
         AvatarBodyResourceData bodyData = AvatarBodyResourceData.builder()
-                .id(1L).name("ava_body_cool").resourceUri("body_uri_01")
+                .id(1L).name("ava_body_cool").resourceUri(BODY_URI_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(true).isDefaultSetting(true)
                 .combinePositionX(0).combinePositionY(0)
                 .build();
-        when(avatarBodyResourceRepository.findOneAvatarResourceByResourceUri("body_uri_01"))
+        when(avatarBodyResourceRepository.findOneAvatarResourceByResourceUri(BODY_URI_01))
                 .thenReturn(bodyData);
 
         AvatarIconResourceData iconData = AvatarIconResourceData.builder()
-                .id(2L).name("ava_icon_body_cool").resourceUri("icon_uri_02").pairType(PairType.BODY).build();
-        when(avatarIconResourceRepository.findByNameAndPairType("ava_icon_body_cool", PairType.BODY))
+                .id(2L).name(AVA_ICON_BODY_COOL).resourceUri("icon_uri_02").pairType(PairType.BODY).build();
+        when(avatarIconResourceRepository.findByNameAndPairType(AVA_ICON_BODY_COOL, PairType.BODY))
                 .thenReturn(iconData);
 
         // when
@@ -78,19 +84,19 @@ class AvatarResourceQueryServiceTest {
 
         // then
         assertThat(result.resourceUri()).isEqualTo("icon_uri_02");
-        assertThat(result.name()).isEqualTo("ava_icon_body_cool");
+        assertThat(result.name()).isEqualTo(AVA_ICON_BODY_COOL);
     }
 
     @Test
     @DisplayName("isBasicFaceUri — 기본 얼굴 URI를 올바르게 판별한다")
     void isBasicFaceUriReturnsCorrectly() {
         // given
-        AvatarFaceUri basicFace = new AvatarFaceUri("basic_face_uri");
+        AvatarFaceUri basicFace = new AvatarFaceUri(BASIC_FACE_URI);
         AvatarFaceUri customFace = new AvatarFaceUri("custom_nft_uri");
 
-        when(avatarFaceResourceRepository.findByResourceUri("basic_face_uri"))
+        when(avatarFaceResourceRepository.findByResourceUri(BASIC_FACE_URI))
                 .thenReturn(Optional.of(AvatarFaceResourceData.builder()
-                        .id(1L).name("basic").resourceUri("basic_face_uri").build()));
+                        .id(1L).name("basic").resourceUri(BASIC_FACE_URI).build()));
         when(avatarFaceResourceRepository.findByResourceUri("custom_nft_uri"))
                 .thenReturn(Optional.empty());
 

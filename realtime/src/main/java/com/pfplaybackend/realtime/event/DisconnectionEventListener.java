@@ -21,7 +21,7 @@ public class DisconnectionEventListener implements ApplicationListener<SessionDi
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
         sessionCachePort.deleteSessionCache(sessionId);
-        logger.info("Web socket connection closed: " + sessionId);
+        logger.info("Web socket connection closed: {}", sessionId);
 
         CloseStatus closeStatus = event.getCloseStatus();
         Integer closeStatusCode = closeStatus.getCode();

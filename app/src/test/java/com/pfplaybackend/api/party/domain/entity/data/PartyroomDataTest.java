@@ -65,7 +65,7 @@ class PartyroomDataTest {
         partyroom.terminate();
 
         // when & then
-        assertThatThrownBy(() -> partyroom.validateNotTerminated())
+        assertThatThrownBy(partyroom::validateNotTerminated)
                 .isInstanceOf(ForbiddenException.class);
     }
 

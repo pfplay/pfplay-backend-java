@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserProfileQueryControllerTest {
 
     private static final String SUMMARY_ENDPOINT = "/api/v1/users/me/profile/summary";
+    private static final String BODY_PNG = "body.png";
 
     @Autowired
     MockMvc mockMvc;
@@ -39,7 +40,7 @@ class UserProfileQueryControllerTest {
     void getMyProfileSummaryMemberReturns200() throws Exception {
         // given
         ProfileSummaryDto dto = new ProfileSummaryDto(
-                "TestNick", "Hello", "body.png",
+                "TestNick", "Hello", BODY_PNG,
                 AvatarCompositionType.SINGLE_BODY,
                 0, 0, 0.0, 0.0, 1.0,
                 "face.png", "icon.png", "0xABC",
@@ -54,7 +55,7 @@ class UserProfileQueryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nickname").value("TestNick"))
                 .andExpect(jsonPath("$.data.introduction").value("Hello"))
-                .andExpect(jsonPath("$.data.avatarBodyUri").value("body.png"));
+                .andExpect(jsonPath("$.data.avatarBodyUri").value(BODY_PNG));
     }
 
     @Test
@@ -62,7 +63,7 @@ class UserProfileQueryControllerTest {
     void getMyProfileSummaryGuestReturns200() throws Exception {
         // given
         ProfileSummaryDto dto = new ProfileSummaryDto(
-                "GuestNick", "", "body.png",
+                "GuestNick", "", BODY_PNG,
                 AvatarCompositionType.SINGLE_BODY,
                 0, 0, 0.0, 0.0, 1.0,
                 null, "icon.png", null, List.of()

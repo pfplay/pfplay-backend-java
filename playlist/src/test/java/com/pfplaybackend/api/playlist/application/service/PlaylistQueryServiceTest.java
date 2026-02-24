@@ -56,8 +56,8 @@ class PlaylistQueryServiceTest {
         List<PlaylistSummaryDto> result = playlistQueryService.getPlaylists();
 
         // then
-        assertThat(result).hasSize(2);
-        assertThat(result).isEqualTo(expected);
+        assertThat(result).hasSize(2)
+                .isEqualTo(expected);
         verify(queryPort).findAllByUserId(userId);
     }
 

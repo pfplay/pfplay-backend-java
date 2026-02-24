@@ -6,6 +6,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.Builder;
 import lombok.Getter;
 
 @Embeddable
@@ -35,6 +36,7 @@ public class AvatarSetting {
 
     protected AvatarSetting() {}
 
+    @Builder
     public AvatarSetting(AvatarBodyUri avatarBodyUri, AvatarFaceUri avatarFaceUri, AvatarIconUri avatarIconUri,
                          AvatarCompositionType avatarCompositionType, FaceSourceType faceSourceType,
                          int combinePositionX, int combinePositionY,

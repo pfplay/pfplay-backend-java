@@ -18,15 +18,15 @@ class AvatarSettingTest {
 
     @BeforeEach
     void setUp() {
-        avatarSetting = new AvatarSetting(
-                new AvatarBodyUri(BODY_PNG),
-                new AvatarFaceUri(FACE_PNG),
-                new AvatarIconUri(ICON_PNG),
-                AvatarCompositionType.BODY_WITH_FACE,
-                FaceSourceType.INTERNAL_IMAGE,
-                100, 200,
-                0.5, 0.6, 1.0
-        );
+        avatarSetting = AvatarSetting.builder()
+                .avatarBodyUri(new AvatarBodyUri(BODY_PNG))
+                .avatarFaceUri(new AvatarFaceUri(FACE_PNG))
+                .avatarIconUri(new AvatarIconUri(ICON_PNG))
+                .avatarCompositionType(AvatarCompositionType.BODY_WITH_FACE)
+                .faceSourceType(FaceSourceType.INTERNAL_IMAGE)
+                .combinePositionX(100).combinePositionY(200)
+                .offsetX(0.5).offsetY(0.6).scale(1.0)
+                .build();
     }
 
     @Test
@@ -107,11 +107,9 @@ class AvatarSettingTest {
     @DisplayName("applyDefaults는 null인 URI만 빈 문자열로 초기화")
     void applyDefaultsOnlyFillsNullUris() {
         // given
-        AvatarSetting empty = new AvatarSetting(
-                null, null, null,
-                AvatarCompositionType.SINGLE_BODY, null,
-                0, 0, 0, 0, 0
-        );
+        AvatarSetting empty = AvatarSetting.builder()
+                .avatarCompositionType(AvatarCompositionType.SINGLE_BODY)
+                .build();
 
         // when
         empty.applyDefaults();

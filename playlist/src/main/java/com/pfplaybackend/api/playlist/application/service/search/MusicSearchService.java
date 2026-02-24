@@ -11,7 +11,6 @@ public class MusicSearchService {
     private final YoutubeSearchService youtubeSearchService;
 
     public SearchResultDto getSearchList(String q) {
-        SearchResultDto searchMusicResult = youtubeSearchService.searchByWord(q, 10);
-        return searchMusicResult;
+        return youtubeSearchService.searchByWord(q, 10);
     }
 }

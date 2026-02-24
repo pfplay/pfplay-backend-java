@@ -18,7 +18,7 @@ class ScoreTest {
     @DisplayName("음수 값은 0으로 클램핑")
     void negativeClampedToZero() {
         Score score = new Score(-5);
-        assertThat(score.getValue()).isEqualTo(0);
+        assertThat(score.getValue()).isZero();
     }
 
     @Test
@@ -36,7 +36,7 @@ class ScoreTest {
     void addNegativeClampedToZero() {
         Score score = new Score(3);
         Score result = score.add(-10);
-        assertThat(result.getValue()).isEqualTo(0);
+        assertThat(result.getValue()).isZero();
     }
 
     @Test
@@ -52,7 +52,7 @@ class ScoreTest {
     @DisplayName("zero 팩토리 메서드")
     void zero() {
         Score score = Score.zero();
-        assertThat(score.getValue()).isEqualTo(0);
+        assertThat(score.getValue()).isZero();
     }
 
     @Test
@@ -62,8 +62,8 @@ class ScoreTest {
         Score s2 = new Score(10);
         Score s3 = new Score(20);
 
-        assertThat(s1).isEqualTo(s2);
-        assertThat(s1).isNotEqualTo(s3);
-        assertThat(s1.hashCode()).isEqualTo(s2.hashCode());
+        assertThat(s1).isEqualTo(s2)
+                .isNotEqualTo(s3)
+                .hasSameHashCodeAs(s2);
     }
 }

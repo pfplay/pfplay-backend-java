@@ -15,6 +15,6 @@ public class ConnectionEventListener implements ApplicationListener<SessionConne
     public void onApplicationEvent(SessionConnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
         String sessionId = headerAccessor.getSessionId();
-        logger.info("Received a new web socket connection: " + sessionId);
+        logger.info("Received a new web socket connection: {}", sessionId);
     }
 }

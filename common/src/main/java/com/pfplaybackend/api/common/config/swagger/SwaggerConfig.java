@@ -3,7 +3,6 @@ package com.pfplaybackend.api.common.config.swagger;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
-import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;
@@ -13,21 +12,19 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Arrays;
 
-@SecuritySchemes({
-        @SecurityScheme(
-                name = "cookieAuth",
-                type = SecuritySchemeType.APIKEY,
-                in = SecuritySchemeIn.COOKIE,
-                paramName = "accessToken"
-        )
-})
+@SecurityScheme(
+        name = "cookieAuth",
+        type = SecuritySchemeType.APIKEY,
+        in = SecuritySchemeIn.COOKIE,
+        paramName = "accessToken"
+)
 @Configuration
 public class SwaggerConfig {
 
     @Value("${springdoc.version}")
     private String version;
-    private final String LOCAL_URL = "http://localhost:8080";
-    private final String PROD_URL = "https://pfplay-api.app";
+    private static final String LOCAL_URL = "http://localhost:8080";
+    private static final String PROD_URL = "https://pfplay-api.app";
 
     @Bean
     public OpenAPI openAPI() {

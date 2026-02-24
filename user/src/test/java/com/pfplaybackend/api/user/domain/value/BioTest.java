@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class BioTest {
 
     private static final String PLAYER1 = "Player1";
+    private static final String NEW_INTRO = "new intro";
 
     @Test
     @DisplayName("닉네임과 소개글로 Bio 생성")
@@ -52,11 +53,11 @@ class BioTest {
         Bio bio = new Bio(new Nickname("OldName"), "old intro");
 
         // when
-        bio.update("NewName", "new intro");
+        bio.update("NewName", NEW_INTRO);
 
         // then
         assertThat(bio.getNicknameValue()).isEqualTo("NewName");
-        assertThat(bio.getIntroduction()).isEqualTo("new intro");
+        assertThat(bio.getIntroduction()).isEqualTo(NEW_INTRO);
     }
 
     @Test
@@ -66,7 +67,7 @@ class BioTest {
         Bio bio = new Bio(new Nickname("ValidName"), "intro");
 
         // when / then
-        assertThatThrownBy(() -> bio.update("", "new intro"))
+        assertThatThrownBy(() -> bio.update("", NEW_INTRO))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }

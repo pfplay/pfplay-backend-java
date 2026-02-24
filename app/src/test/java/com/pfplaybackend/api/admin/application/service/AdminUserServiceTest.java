@@ -21,7 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -79,7 +79,7 @@ class AdminUserServiceTest {
     void createVirtualMemberSuccess() {
         // given
         ProfileData dummyProfile = createDummyProfile(new UserId(1L));
-        Map<ActivityType, ActivityData> activityMap = new HashMap<>();
+        Map<ActivityType, ActivityData> activityMap = new EnumMap<>(ActivityType.class);
 
         when(adminMemberPort.findMemberByEmail(anyString())).thenReturn(Optional.empty());
         when(adminProfileService.createProfileForVirtualMember(any(UserId.class), any(), any(), any()))
@@ -102,23 +102,20 @@ class AdminUserServiceTest {
     void createVirtualMemberEmailFormat() {
         // given
         ProfileData dummyProfile = createDummyProfile(new UserId(1L));
-        Map<ActivityType, ActivityData> activityMap = new HashMap<>();
+        Map<ActivityType, ActivityData> activityMap = new EnumMap<>(ActivityType.class);
 
         when(adminMemberPort.findMemberByEmail(anyString())).thenReturn(Optional.empty());
         when(adminProfileService.createProfileForVirtualMember(any(UserId.class), any(), any(), any()))
                 .thenReturn(dummyProfile);
         when(adminMemberPort.createUserActivities(any(UserId.class))).thenReturn(activityMap);
-        when(adminMemberPort.saveMember(any(MemberData.class))).thenAnswer(invocation -> {
-            MemberData member = invocation.getArgument(0);
-            return member;
-        });
+        when(adminMemberPort.saveMember(any(MemberData.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
         MemberData result = adminUserService.createVirtualMember();
 
         // then
-        assertThat(result.getEmail()).startsWith("virtual_");
-        assertThat(result.getEmail()).endsWith("@pfplay.system");
+        assertThat(result.getEmail()).startsWith("virtual_")
+                .endsWith("@pfplay.system");
     }
 
     @Test
@@ -136,7 +133,7 @@ class AdminUserServiceTest {
 
         when(adminMemberPort.findMemberById(userId.getUid())).thenReturn(Optional.of(virtualMember));
         when(adminProfileService.createProfileForVirtualMember(
-                eq(userId), eq("Virtual_AABBCC"), eq(newBodyUri), eq(newFaceUri)))
+                userId, "Virtual_AABBCC", newBodyUri, newFaceUri))
                 .thenReturn(updatedProfile);
         when(adminMemberPort.saveMember(any(MemberData.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -154,12 +151,13 @@ class AdminUserServiceTest {
         // given
         UserId userId = new UserId(201L);
         MemberData googleMember = createGoogleMemberData(userId);
+        AvatarBodyUri bodyUri = new AvatarBodyUri("body.png");
+        AvatarFaceUri faceUri = new AvatarFaceUri("face.png");
 
         when(adminMemberPort.findMemberById(userId.getUid())).thenReturn(Optional.of(googleMember));
 
         // when & then
-        assertThatThrownBy(() -> adminUserService.updateVirtualMemberAvatar(
-                userId, new AvatarBodyUri("body.png"), new AvatarFaceUri("face.png")))
+        assertThatThrownBy(() -> adminUserService.updateVirtualMemberAvatar(userId, bodyUri, faceUri))
                 .isInstanceOf(ForbiddenException.class);
     }
 

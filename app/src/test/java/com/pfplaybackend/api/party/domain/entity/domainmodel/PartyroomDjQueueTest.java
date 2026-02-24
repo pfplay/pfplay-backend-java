@@ -60,9 +60,10 @@ class PartyroomDjQueueTest {
         Map<Long, Integer> orderMap = remaining.stream()
                 .collect(Collectors.toMap(dj -> dj.getCrewId().getId(), DjData::getOrderNumber));
 
-        assertThat(orderMap).hasSize(2);
-        assertThat(orderMap.get(1L)).isEqualTo(1);
-        assertThat(orderMap.get(3L)).isEqualTo(2);
+        assertThat(orderMap)
+                .hasSize(2)
+                .containsEntry(1L, 1)
+                .containsEntry(3L, 2);
     }
 
     @Test
@@ -82,9 +83,10 @@ class PartyroomDjQueueTest {
         Map<Long, Integer> orderMap = remaining.stream()
                 .collect(Collectors.toMap(dj -> dj.getCrewId().getId(), DjData::getOrderNumber));
 
-        assertThat(orderMap).hasSize(2);
-        assertThat(orderMap.get(2L)).isEqualTo(1);
-        assertThat(orderMap.get(3L)).isEqualTo(2);
+        assertThat(orderMap)
+                .hasSize(2)
+                .containsEntry(2L, 1)
+                .containsEntry(3L, 2);
     }
 
     @Test

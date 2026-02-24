@@ -5,6 +5,8 @@ import com.pfplaybackend.api.common.aspect.context.AuthContext;
 public class ThreadLocalContext {
     private static final ThreadLocal<Object> contextHolder = new ThreadLocal<>();
 
+    private ThreadLocalContext() {}
+
     public static void setContext(Object object) {
         contextHolder.set(object);
     }

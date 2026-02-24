@@ -160,7 +160,8 @@ class ChatSimulationServiceTest {
         Set<Long> activeSimulations = chatSimulationService.getActiveSimulations();
 
         // then
-        assertThat(activeSimulations).hasSize(2);
-        assertThat(activeSimulations).containsExactlyInAnyOrder(partyroomId1, partyroomId2);
+        assertThat(activeSimulations)
+                .hasSize(2)
+                .containsExactlyInAnyOrder(partyroomId1, partyroomId2);
     }
 }

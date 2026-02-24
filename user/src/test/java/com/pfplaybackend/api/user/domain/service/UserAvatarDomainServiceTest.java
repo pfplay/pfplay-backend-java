@@ -7,7 +7,7 @@ import com.pfplaybackend.api.user.domain.enums.ObtainmentType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,7 +17,7 @@ class UserAvatarDomainServiceTest {
     UserAvatarDomainService userAvatarDomainService = new UserAvatarDomainService();
 
     private Map<ActivityType, ActivityData> createActivityMap(ActivityType type, int score) {
-        Map<ActivityType, ActivityData> map = new HashMap<>();
+        Map<ActivityType, ActivityData> map = new EnumMap<>(ActivityType.class);
         map.put(type, ActivityData.create(new UserId(1L), type, score));
         return map;
     }

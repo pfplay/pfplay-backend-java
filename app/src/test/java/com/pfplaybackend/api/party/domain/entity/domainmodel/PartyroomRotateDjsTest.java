@@ -60,9 +60,10 @@ class PartyroomRotateDjsTest {
         Map<Long, Integer> orderMap = djList.stream()
                 .collect(Collectors.toMap(dj -> dj.getCrewId().getId(), DjData::getOrderNumber));
 
-        assertThat(orderMap.get(1L)).isEqualTo(3); // 1번 DJ -> 맨 뒤로
-        assertThat(orderMap.get(2L)).isEqualTo(1); // 2번 DJ -> 1칸 앞으로
-        assertThat(orderMap.get(3L)).isEqualTo(2); // 3번 DJ -> 1칸 앞으로
+        assertThat(orderMap)
+                .containsEntry(1L, 3) // 1번 DJ -> 맨 뒤로
+                .containsEntry(2L, 1) // 2번 DJ -> 1칸 앞으로
+                .containsEntry(3L, 2); // 3번 DJ -> 1칸 앞으로
     }
 
     @Test

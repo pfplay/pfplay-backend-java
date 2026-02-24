@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
 import java.util.Collection;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -32,5 +33,21 @@ public class CustomJwtAuthenticationToken extends JwtAuthenticationToken {
     @Override
     public Object getPrincipal() {
         return userId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CustomJwtAuthenticationToken that)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(userId, that.userId)
+                && Objects.equals(email, that.email)
+                && authorityTier == that.authorityTier
+                && Objects.equals(provider, that.provider);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), userId, email, authorityTier, provider);
     }
 }

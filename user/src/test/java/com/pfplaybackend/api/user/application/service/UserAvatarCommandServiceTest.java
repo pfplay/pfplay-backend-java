@@ -43,6 +43,7 @@ class UserAvatarCommandServiceTest {
     private static final String ICON_URI_01 = "icon_uri_01";
     private static final String ICON_01 = "icon_01";
     private static final String PREMIUM_BODY = "premium_body";
+    private static final String BODY1 = "Body1";
 
     @Mock MemberRepository memberRepository;
     @Mock AvatarResourceQueryService avatarResourceQueryService;
@@ -78,7 +79,7 @@ class UserAvatarCommandServiceTest {
         when(memberRepository.findByUserId(userId)).thenReturn(Optional.of(member));
 
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(1L).name("Body1").resourceUri(BODY_01)
+                .id(1L).name(BODY1).resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(false).isDefaultSetting(true).isAvailable(true)
                 .combinePositionX(10).combinePositionY(20).build();
@@ -114,7 +115,7 @@ class UserAvatarCommandServiceTest {
         when(memberRepository.findByUserId(userId)).thenReturn(Optional.of(member));
 
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(1L).name("Body1").resourceUri(BODY_01)
+                .id(1L).name(BODY1).resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(true).isDefaultSetting(false).isAvailable(true)
                 .combinePositionX(10).combinePositionY(20).build();
@@ -204,7 +205,7 @@ class UserAvatarCommandServiceTest {
     void findAvatarIconPairWithSingleBodyReturnsPairIcon() {
         // given
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
-                .id(1L).name("Body1").resourceUri(BODY_01)
+                .id(1L).name(BODY1).resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
                 .isCombinable(false).isDefaultSetting(true).isAvailable(true)
                 .combinePositionX(0).combinePositionY(0).build();

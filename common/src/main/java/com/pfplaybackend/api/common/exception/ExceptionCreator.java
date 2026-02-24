@@ -4,6 +4,8 @@ import com.pfplaybackend.api.common.exception.http.*;
 
 public class ExceptionCreator {
 
+    private ExceptionCreator() {}
+
     public static AbstractHTTPException create(DomainException domainException) {
         String errorCode = domainException.getErrorCode();
         String message = domainException.getMessage();

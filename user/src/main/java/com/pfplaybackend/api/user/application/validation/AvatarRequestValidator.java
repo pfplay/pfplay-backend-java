@@ -23,17 +23,10 @@ public class AvatarRequestValidator {
     private void validateCompositionTypeAndFace(SetAvatarCommand command) {
         AvatarCompositionType type = command.avatarCompositionType();
 
-        switch (type) {
-            case SINGLE_BODY -> {
-                if (command.face() != null) {
-                    throw new ValidationException("SINGLE_BODY 타입에서는 face 정보가 없어야 합니다.");
-                }
-            }
-            case BODY_WITH_FACE -> {
-                if (command.face() == null) {
-                    throw new ValidationException("BODY_WITH_FACE 타입에서는 face 정보가 필수입니다.");
-                }
-            }
+        if (type == AvatarCompositionType.SINGLE_BODY && command.face() != null) {
+            throw new ValidationException("SINGLE_BODY 타입에서는 face 정보가 없어야 합니다.");
+        } else if (type == AvatarCompositionType.BODY_WITH_FACE && command.face() == null) {
+            throw new ValidationException("BODY_WITH_FACE 타입에서는 face 정보가 필수입니다.");
         }
     }
 

@@ -31,7 +31,7 @@ class DurationTest {
     @DisplayName("0:00 포맷도 유효")
     void fromStringZero() {
         Duration duration = Duration.fromString("0:00");
-        assertThat(duration.toSeconds()).isEqualTo(0L);
+        assertThat(duration.toSeconds()).isZero();
     }
 
     @Test
@@ -94,8 +94,8 @@ class DurationTest {
         Duration d2 = Duration.fromString(DURATION_3_45);
         Duration d3 = Duration.fromString("4:00");
 
-        assertThat(d1).isEqualTo(d2);
-        assertThat(d1).isNotEqualTo(d3);
-        assertThat(d1.hashCode()).isEqualTo(d2.hashCode());
+        assertThat(d1).isEqualTo(d2)
+                .isNotEqualTo(d3)
+                .hasSameHashCodeAs(d2);
     }
 }

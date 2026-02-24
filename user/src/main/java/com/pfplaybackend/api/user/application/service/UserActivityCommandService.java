@@ -8,7 +8,7 @@ import com.pfplaybackend.api.user.domain.enums.ActivityType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 
@@ -19,7 +19,7 @@ public class UserActivityCommandService {
     private final MemberRepository memberRepository;
 
     public Map<ActivityType, ActivityData> createUserActivities(UserId userId) {
-        Map<ActivityType, ActivityData> activityDataMap = new HashMap<>();
+        Map<ActivityType, ActivityData> activityDataMap = new EnumMap<>(ActivityType.class);
         for (ActivityType activityType : ActivityType.values()) {
             activityDataMap.put(activityType, ActivityData.create(userId, activityType, 0));
         }

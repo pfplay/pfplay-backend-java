@@ -56,7 +56,7 @@ public class CrewPenaltyCommandService {
 
         // 페널티 부과
         switch (penaltyType) {
-            case CHAT_MESSAGE_REMOVAL -> {} // 이벤트로만 처리
+            case CHAT_MESSAGE_REMOVAL -> { /* 이벤트로만 처리 */ }
             case CHAT_BAN_30_SECONDS -> recordInShortTime(punishedCrewId.getId());
             case ONE_TIME_EXPULSION -> partyroomAccessCommandService.expel(partyroom, punishedCrew, false);
             case PERMANENT_EXPULSION -> partyroomAccessCommandService.expel(partyroom, punishedCrew, true);

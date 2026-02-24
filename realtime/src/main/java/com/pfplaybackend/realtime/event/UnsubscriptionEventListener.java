@@ -24,11 +24,11 @@ public class UnsubscriptionEventListener implements ApplicationListener<SessionU
         String sessionId = headerAccessor.getSessionId();
         Principal principal = headerAccessor.getUser();
         if (principal == null) {
-            logger.warn("Unauthorized session requested, UserId is null, Session ID: " + sessionId);
+            logger.warn("Unauthorized session requested, UserId is null, Session ID: {}", sessionId);
             throw new AuthenticationServiceException("Unauthorized Session Requested");
         }
         sessionCachePort.deleteSessionCache(sessionId);
 
-        logger.info("Session has unsubscribed, sessionId : " + sessionId);
+        logger.info("Session has unsubscribed, sessionId : {}", sessionId);
     }
 }

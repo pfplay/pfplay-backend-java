@@ -78,8 +78,8 @@ class PartyroomQueryServiceGetDjsTest {
         List<DjWithProfileDto> result = partyroomQueryService.getDjs(partyroomId);
 
         // then
-        assertThat(result).hasSize(2);
-        assertThat(result).noneMatch(dto -> dto.crewId() == 2L);
+        assertThat(result).hasSize(2)
+                .noneMatch(dto -> dto.crewId() == 2L);
     }
 
     @Test

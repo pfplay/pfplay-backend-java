@@ -31,7 +31,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,11 +90,12 @@ class PlaybackReactionCommandServiceTest {
         Map<String, Boolean> result = playbackReactionCommandService.reactToCurrentPlayback(partyroomId, ReactionType.LIKE);
 
         // then
-        assertThat(result).containsEntry("isLiked", true);
-        assertThat(result).containsEntry("isDisliked", false);
-        assertThat(result).containsEntry("isGrabbed", false);
+        assertThat(result)
+                .containsEntry("isLiked", true)
+                .containsEntry("isDisliked", false)
+                .containsEntry("isGrabbed", false);
         verify(playbackReactionPostProcessCommandService).postProcess(
-                eq(postProcessResult), eq(ReactionType.LIKE), eq(partyroomId), eq(playbackId), eq(new CrewId(5L)));
+                postProcessResult, ReactionType.LIKE, partyroomId, playbackId, new CrewId(5L));
     }
 
     @Test

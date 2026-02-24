@@ -45,8 +45,8 @@ class SessionCacheIntegrationTest extends AbstractIntegrationTest {
         Long ttl = redisTemplate.getExpire(key, TimeUnit.SECONDS);
 
         // then
-        assertThat(ttl).isGreaterThan(0);
-        assertThat(ttl).isLessThanOrEqualTo(60);
+        assertThat(ttl).isGreaterThan(0)
+                .isLessThanOrEqualTo(60);
 
         // cleanup
         redisTemplate.delete(key);

@@ -55,11 +55,18 @@ public class ProfileData extends BaseEntity {
         this.userId = userId;
         this.bio = new Bio(nickname, introduction);
         this.walletAddress = walletAddress;
-        this.avatarSetting = new AvatarSetting(
-                avatarBodyUri, avatarFaceUri, avatarIconUri,
-                avatarCompositionType, faceSourceType,
-                combinePositionX, combinePositionY,
-                offsetX, offsetY, scale);
+        this.avatarSetting = AvatarSetting.builder()
+                .avatarBodyUri(avatarBodyUri)
+                .avatarFaceUri(avatarFaceUri)
+                .avatarIconUri(avatarIconUri)
+                .avatarCompositionType(avatarCompositionType)
+                .faceSourceType(faceSourceType)
+                .combinePositionX(combinePositionX)
+                .combinePositionY(combinePositionY)
+                .offsetX(offsetX)
+                .offsetY(offsetY)
+                .scale(scale)
+                .build();
     }
 
     @PrePersist

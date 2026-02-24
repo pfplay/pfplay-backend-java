@@ -16,11 +16,10 @@ class CookieUtilTest {
     private static final String SECURE = "Secure";
 
     private CookieUtil cookieUtil;
-    private JwtProperties jwtProperties;
 
     @BeforeEach
     void setUp() {
-        jwtProperties = new JwtProperties();
+        JwtProperties jwtProperties = new JwtProperties();
         jwtProperties.getCookie().setSecure(true);
         jwtProperties.getCookie().setSameSite("None");
         jwtProperties.getCookie().setPath("/");
@@ -41,11 +40,12 @@ class CookieUtilTest {
         assertThat(setCookieHeaders).isNotEmpty();
 
         String header = setCookieHeaders.iterator().next();
-        assertThat(header).contains("Max-Age=0");
-        assertThat(header).contains("SameSite=None");
-        assertThat(header).contains(SECURE);
-        assertThat(header).contains("HttpOnly");
-        assertThat(header).contains("Path=/");
+        assertThat(header)
+                .contains("Max-Age=0")
+                .contains("SameSite=None")
+                .contains(SECURE)
+                .contains("HttpOnly")
+                .contains("Path=/");
     }
 
     @Test
@@ -63,12 +63,8 @@ class CookieUtilTest {
         String addHeader = addResponse.getHeaders(SET_COOKIE_HEADER).iterator().next();
         String deleteHeader = deleteResponse.getHeaders(SET_COOKIE_HEADER).iterator().next();
 
-        // 두 헤더 모두 SameSite 속성을 포함해야 한다
-        assertThat(addHeader).contains("SameSite=");
-        assertThat(deleteHeader).contains("SameSite=");
-
-        // 두 헤더 모두 Secure 속성을 포함해야 한다
-        assertThat(addHeader).contains(SECURE);
-        assertThat(deleteHeader).contains(SECURE);
+        // 두 헤더 모두 SameSite와 Secure 속성을 포함해야 한다
+        assertThat(addHeader).contains("SameSite=").contains(SECURE);
+        assertThat(deleteHeader).contains("SameSite=").contains(SECURE);
     }
 }

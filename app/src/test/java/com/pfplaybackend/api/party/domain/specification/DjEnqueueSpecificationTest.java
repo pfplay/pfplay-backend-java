@@ -33,28 +33,32 @@ class DjEnqueueSpecificationTest {
     @Test
     @DisplayName("정상 DJ 등록 — 예외 없음")
     void validEnqueue() {
+        DjQueueData queue = openQueue();
         assertThatNoException().isThrownBy(() ->
-                spec.validate(openQueue(), false, false));
+                spec.validate(queue, false, false));
     }
 
     @Test
     @DisplayName("큐 닫힘 — QUEUE_CLOSED")
     void queueClosed() {
-        assertThatThrownBy(() -> spec.validate(closedQueue(), false, false))
+        DjQueueData queue = closedQueue();
+        assertThatThrownBy(() -> spec.validate(queue, false, false))
                 .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
     @DisplayName("빈 플레이리스트 — EMPTY_PLAYLIST")
     void emptyPlaylist() {
-        assertThatThrownBy(() -> spec.validate(openQueue(), false, true))
+        DjQueueData queue = openQueue();
+        assertThatThrownBy(() -> spec.validate(queue, false, true))
                 .isInstanceOf(ForbiddenException.class);
     }
 
     @Test
     @DisplayName("이미 등록된 DJ — ALREADY_REGISTERED")
     void alreadyRegistered() {
-        assertThatThrownBy(() -> spec.validate(openQueue(), true, false))
+        DjQueueData queue = openQueue();
+        assertThatThrownBy(() -> spec.validate(queue, true, false))
                 .isInstanceOf(ConflictException.class);
     }
 }

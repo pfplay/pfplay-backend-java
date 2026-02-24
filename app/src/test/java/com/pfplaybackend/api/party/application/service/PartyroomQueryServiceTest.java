@@ -90,8 +90,8 @@ class PartyroomQueryServiceTest {
         // then
         assertThat(result).hasSize(1);
         List<CrewDto> filteredCrews = result.get(0).crews();
-        assertThat(filteredCrews).hasSize(3);
-        assertThat(filteredCrews).allMatch(c -> c.gradeType().isEqualOrHigherThan(GradeType.MODERATOR));
+        assertThat(filteredCrews).hasSize(3)
+                .allMatch(c -> c.gradeType().isEqualOrHigherThan(GradeType.MODERATOR));
     }
 
     @Test

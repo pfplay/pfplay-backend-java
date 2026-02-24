@@ -16,7 +16,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @AggregateRoot
 @DynamicUpdate
@@ -129,7 +128,7 @@ public class MemberData extends UserAccountData {
     public ProfileSummary getProfileSummary() {
         List<ActivitySummary> activitySummaries = this.activityDataMap.values().stream()
                 .map(a -> new ActivitySummary(a.getActivityType(), a.getScore().getValue()))
-                .collect(Collectors.toList());
+                .toList();
 
         return buildProfileSummary(activitySummaries);
     }

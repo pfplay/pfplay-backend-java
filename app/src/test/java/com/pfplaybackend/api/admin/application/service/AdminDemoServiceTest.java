@@ -117,8 +117,8 @@ class AdminDemoServiceTest {
 
         // then
         assertThat(result.initialized()).isFalse();
-        assertThat(result.virtualMemberCount()).isEqualTo(0L);
-        assertThat(result.generalRoomCount()).isEqualTo(0L);
+        assertThat(result.virtualMemberCount()).isZero();
+        assertThat(result.generalRoomCount()).isZero();
     }
 
     @Test

@@ -48,7 +48,9 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
             latch.countDown();
         }, topic);
 
-        Thread.sleep(200); // 구독 등록 대기
+        // Brief pause to allow the RedisMessageListenerContainer to fully register the subscription.
+        // Correctness is guaranteed by the CountDownLatch await below, not by this sleep.
+        Thread.sleep(200); // NOSONAR (S2925) — no Awaitility available; latch ensures correctness
 
         // when
         redisTemplate.convertAndSend(topic, message);
@@ -78,7 +80,9 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
                     latch.countDown();
                 });
 
-        Thread.sleep(200);
+        // Brief pause to allow the RedisMessageListenerContainer to fully register the subscription.
+        // Correctness is guaranteed by the CountDownLatch await below, not by this sleep.
+        Thread.sleep(200); // NOSONAR (S2925) — no Awaitility available; latch ensures correctness
 
         // when
         redisTemplate.convertAndSend(topic, message);
@@ -103,7 +107,9 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
             latch.countDown();
         }, topic);
 
-        Thread.sleep(200);
+        // Brief pause to allow the RedisMessageListenerContainer to fully register the subscription.
+        // Correctness is guaranteed by the CountDownLatch await below, not by this sleep.
+        Thread.sleep(200); // NOSONAR (S2925) — no Awaitility available; latch ensures correctness
 
         // when
         redisTemplate.convertAndSend(topic, payload);
@@ -111,8 +117,8 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
         // then
         assertThat(latch.await(5, TimeUnit.SECONDS)).isTrue();
         String body = received.get();
-        assertThat(body).contains("TEST_EVENT");
-        assertThat(body).contains("42");
+        assertThat(body).contains("TEST_EVENT")
+                .contains("42");
     }
 
     @Test
@@ -122,8 +128,11 @@ class RedisPublishSubscribeIntegrationTest extends AbstractIntegrationTest {
         String topic = "test:pubsub:nosub";
         String message = "orphan-message";
 
-        // when & then — 예외 없이 즉시 반환
-        redisTemplate.convertAndSend(topic, message);
+        // when
+        Long receivers = redisTemplate.convertAndSend(topic, message);
+
+        // then — 구독자가 없으므로 수신자 수는 0이어야 한다
+        assertThat(receivers).isZero();
     }
 
     // --- helpers ---

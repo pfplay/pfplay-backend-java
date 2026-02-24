@@ -64,8 +64,8 @@ class ReactionStateTest {
         ReactionState state2 = new ReactionState(true, false, true);
 
         // then
-        assertThat(state1).isEqualTo(state2);
-        assertThat(state1.hashCode()).isEqualTo(state2.hashCode());
+        assertThat(state1).isEqualTo(state2)
+                .hasSameHashCodeAs(state2);
     }
 
     @Test

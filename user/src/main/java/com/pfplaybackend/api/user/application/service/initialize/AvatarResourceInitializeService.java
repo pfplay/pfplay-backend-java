@@ -24,22 +24,22 @@ public class AvatarResourceInitializeService {
     @Transactional
     public void addAvatarBodies() {
         // 기본 아바타 Body 리소스 추가
-        addAvatarBody("ava_body_basic_001", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_001.png?alt=media", ObtainmentType.BASIC, 0, true, true, 60, 41);
-        addAvatarBody("ava_body_basic_002", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_002.png?alt=media", ObtainmentType.BASIC, 0, false, false, 0, 0);
-        addAvatarBody("ava_body_basic_003", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_003.png?alt=media", ObtainmentType.BASIC, 0, false, false, 0, 0);
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_basic_001").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_001.png?alt=media").obtainableType(ObtainmentType.BASIC).obtainableScore(0).isCombinable(true).isDefaultSetting(true).combinePositionX(60).combinePositionY(41).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_basic_002").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_002.png?alt=media").obtainableType(ObtainmentType.BASIC).obtainableScore(0).isCombinable(false).isDefaultSetting(false).combinePositionX(0).combinePositionY(0).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_basic_003").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_basic%2Fava_basic_003.png?alt=media").obtainableType(ObtainmentType.BASIC).obtainableScore(0).isCombinable(false).isDefaultSetting(false).combinePositionX(0).combinePositionY(0).build());
         // 디제잉 해금 아바타 Body 리소스 추가
-        addAvatarBody("ava_body_djing_001", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_001.png?alt=media", ObtainmentType.DJ_PNT, 10, false, false, 0, 0);
-        addAvatarBody("ava_body_djing_002", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_002.png?alt=media", ObtainmentType.DJ_PNT, 25, false, false, 0, 0);
-        addAvatarBody("ava_body_djing_003", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_003.png?alt=media", ObtainmentType.DJ_PNT, 60, true, false, 60, 39);
-        addAvatarBody("ava_body_djing_004", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_004.png?alt=media", ObtainmentType.DJ_PNT, 100, true, false, 60, 45);
-        addAvatarBody("ava_body_djing_005", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_005.png?alt=media", ObtainmentType.DJ_PNT, 150, true, false, 60, 40);
-        addAvatarBody("ava_body_djing_006", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_006.png?alt=media", ObtainmentType.DJ_PNT, 200, true, false, 52, 39);
-        addAvatarBody("ava_body_djing_007", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_007.png?alt=media", ObtainmentType.DJ_PNT, 500, true, false, 60, 40);
-        addAvatarBody("ava_body_djing_008", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_008.png?alt=media", ObtainmentType.DJ_PNT, 1000, true, false, 60, 40);
-        addAvatarBody("ava_body_djing_009", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_009.png?alt=media", ObtainmentType.DJ_PNT, 2000, true, false, 60, 42);
-        addAvatarBody("ava_body_djing_010", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_010.png?alt=media", ObtainmentType.DJ_PNT, 4000, true, false, 58, 43);
-        addAvatarBody("ava_body_djing_011", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_011.png?alt=media", ObtainmentType.DJ_PNT, 7000, true, false, 60, 44);
-        addAvatarBody("ava_body_djing_012", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_012.png?alt=media", ObtainmentType.DJ_PNT, 10000, true, false, 56, 38);
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_001").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_001.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(10).isCombinable(false).isDefaultSetting(false).combinePositionX(0).combinePositionY(0).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_002").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_002.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(25).isCombinable(false).isDefaultSetting(false).combinePositionX(0).combinePositionY(0).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_003").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_003.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(60).isCombinable(true).isDefaultSetting(false).combinePositionX(60).combinePositionY(39).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_004").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_004.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(100).isCombinable(true).isDefaultSetting(false).combinePositionX(60).combinePositionY(45).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_005").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_005.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(150).isCombinable(true).isDefaultSetting(false).combinePositionX(60).combinePositionY(40).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_006").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_006.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(200).isCombinable(true).isDefaultSetting(false).combinePositionX(52).combinePositionY(39).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_007").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_007.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(500).isCombinable(true).isDefaultSetting(false).combinePositionX(60).combinePositionY(40).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_008").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_008.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(1000).isCombinable(true).isDefaultSetting(false).combinePositionX(60).combinePositionY(40).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_009").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_009.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(2000).isCombinable(true).isDefaultSetting(false).combinePositionX(60).combinePositionY(42).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_010").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_010.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(4000).isCombinable(true).isDefaultSetting(false).combinePositionX(58).combinePositionY(43).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_011").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_011.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(7000).isCombinable(true).isDefaultSetting(false).combinePositionX(60).combinePositionY(44).build());
+        addAvatarBody(AvatarBodyResourceData.builder().name("ava_body_djing_012").resourceUri("https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_djing%2Fava_djing_012.png?alt=media").obtainableType(ObtainmentType.DJ_PNT).obtainableScore(10000).isCombinable(true).isDefaultSetting(false).combinePositionX(56).combinePositionY(38).build());
     }
 
     @Transactional
@@ -56,25 +56,16 @@ public class AvatarResourceInitializeService {
         addAvatarIcon("ava_icon_body_djing_002", "https://firebasestorage.googleapis.com/v0/b/pfplay-firebase.appspot.com/o/ava_icon%2Fava_icon_body_djing_002.png?alt=media", PairType.BODY);
     }
 
-    private void addAvatarBody(String name, String resourceUri, ObtainmentType obtainableType,
-                               int obtainableScore, boolean isCombinable, boolean isDefaultSetting, int x, int y) {
-        Optional<AvatarBodyResourceData> existing = avatarBodyResourceRepository.findByName(name);
+    private void addAvatarBody(AvatarBodyResourceData template) {
+        Optional<AvatarBodyResourceData> existing = avatarBodyResourceRepository.findByName(template.getName());
         if (existing.isPresent()) {
             AvatarBodyResourceData data = existing.get();
-            data.updateResource(resourceUri, obtainableType, obtainableScore, isCombinable, isDefaultSetting, x, y);
+            data.updateResource(template.getResourceUri(), template.getObtainableType(),
+                    template.getObtainableScore(), template.isCombinable(),
+                    template.isDefaultSetting(), template.getCombinePositionX(), template.getCombinePositionY());
             avatarBodyResourceRepository.save(data);
         } else {
-            AvatarBodyResourceData avatarBodyResourceData = AvatarBodyResourceData.builder()
-                    .name(name)
-                    .resourceUri(resourceUri)
-                    .obtainableType(obtainableType)
-                    .obtainableScore(obtainableScore)
-                    .isCombinable(isCombinable)
-                    .isDefaultSetting(isDefaultSetting)
-                    .combinePositionX(x)
-                    .combinePositionY(y)
-                    .build();
-            avatarBodyResourceRepository.save(avatarBodyResourceData);
+            avatarBodyResourceRepository.save(template);
         }
     }
 

@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -95,6 +96,7 @@ class WebSocketHandshakeInterceptorTest {
         ServerHttpRequest request = mock(ServerHttpRequest.class);
 
         // when & then — 예외 없이 실행
-        interceptor.afterHandshake(request, response, wsHandler, null);
+        assertThatNoException().isThrownBy(() ->
+                interceptor.afterHandshake(request, response, wsHandler, null));
     }
 }

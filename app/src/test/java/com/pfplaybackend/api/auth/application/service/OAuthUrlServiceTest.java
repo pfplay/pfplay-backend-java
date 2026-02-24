@@ -26,6 +26,7 @@ class OAuthUrlServiceTest {
     private static final String TEST_STATE = "test-state";
     private static final String TEST_VERIFIER = "test-verifier";
     private static final String TWITTER = "twitter";
+    private static final String VERIFIER = "verifier";
 
     @Mock private OAuth2Properties oAuth2Properties;
     @Mock private StateStorePort stateStorePort;
@@ -67,7 +68,7 @@ class OAuthUrlServiceTest {
         when(stateStorePort.validateAndConsumeState(TEST_STATE, GOOGLE)).thenReturn(true);
 
         // when
-        boolean result = oAuthUrlService.validateAndConsumeState(TEST_STATE, OAuthProvider.GOOGLE, "verifier");
+        boolean result = oAuthUrlService.validateAndConsumeState(TEST_STATE, OAuthProvider.GOOGLE, VERIFIER);
 
         // then
         verify(stateStorePort, times(1)).validateAndConsumeState(TEST_STATE, GOOGLE);
@@ -81,7 +82,7 @@ class OAuthUrlServiceTest {
         when(stateStorePort.validateAndConsumeState("invalid-state", GOOGLE)).thenReturn(false);
 
         // when
-        boolean result = oAuthUrlService.validateAndConsumeState("invalid-state", OAuthProvider.GOOGLE, "verifier");
+        boolean result = oAuthUrlService.validateAndConsumeState("invalid-state", OAuthProvider.GOOGLE, VERIFIER);
 
         // then
         assertThat(result).isFalse();
@@ -104,11 +105,12 @@ class OAuthUrlServiceTest {
         OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.TWITTER, TEST_VERIFIER);
 
         // then
-        assertThat(result.authUrl()).contains("https://twitter.com/i/oauth2/authorize");
-        assertThat(result.authUrl()).contains("client_id=twitter-client-id");
-        assertThat(result.authUrl()).contains("state=twitter-state");
-        assertThat(result.authUrl()).contains("code_challenge=");
-        assertThat(result.authUrl()).contains("code_challenge_method=S256");
+        assertThat(result.authUrl())
+                .contains("https://twitter.com/i/oauth2/authorize")
+                .contains("client_id=twitter-client-id")
+                .contains("state=twitter-state")
+                .contains("code_challenge=")
+                .contains("code_challenge_method=S256");
         assertThat(result.provider()).isEqualTo(TWITTER);
     }
 
@@ -126,8 +128,9 @@ class OAuthUrlServiceTest {
         OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, TEST_VERIFIER);
 
         // then
-        assertThat(result.authUrl()).contains("access_type=offline");
-        assertThat(result.authUrl()).contains("prompt=consent");
+        assertThat(result.authUrl())
+                .contains("access_type=offline")
+                .contains("prompt=consent");
     }
 
     @Test
@@ -144,8 +147,9 @@ class OAuthUrlServiceTest {
         OAuthUrlResult result = oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, TEST_VERIFIER);
 
         // then
-        assertThat(result.authUrl()).doesNotContain("access_type=");
-        assertThat(result.authUrl()).doesNotContain("prompt=");
+        assertThat(result.authUrl())
+                .doesNotContain("access_type=")
+                .doesNotContain("prompt=");
     }
 
     @Test
@@ -155,7 +159,7 @@ class OAuthUrlServiceTest {
         when(oAuth2Properties.getProviders()).thenReturn(Map.of());
 
         // when & then
-        assertThatThrownBy(() -> oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, "verifier"))
+        assertThatThrownBy(() -> oAuthUrlService.generateAuthUrl(OAuthProvider.GOOGLE, VERIFIER))
                 .isInstanceOf(BadRequestException.class);
     }
 }
