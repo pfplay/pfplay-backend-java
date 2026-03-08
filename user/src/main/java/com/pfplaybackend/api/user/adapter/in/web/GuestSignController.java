@@ -8,6 +8,7 @@ import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.application.service.GuestSignService;
 import com.pfplaybackend.api.user.domain.entity.data.GuestData;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class GuestSignController {
     private final CookieUtil cookieUtil;
     private final JwtService jwtService;
 
+    @Operation(summary = "게스트 로그인", description = "게스트 사용자를 생성하거나 기존 게스트를 조회하여 액세스 토큰을 쿠키로 발급합니다. 인증 없이 호출 가능합니다.")
     @PostMapping("/guests/sign")
     public ResponseEntity<ApiCommonResponse<Void>> createGuest(
             HttpServletResponse response

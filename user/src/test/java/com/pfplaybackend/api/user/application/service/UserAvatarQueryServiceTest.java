@@ -72,7 +72,7 @@ class UserAvatarQueryServiceTest {
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
                 .id(1L).name(BODY1).resourceUri("body-uri")
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
-                .isCombinable(true).isDefaultSetting(true).isAvailable(true)
+                .combinable(true).defaultSetting(true).available(true)
                 .combinePositionX(0).combinePositionY(0)
                 .build();
         when(avatarResourceQueryService.findAllAvatarBodies()).thenReturn(List.of(bodyDto));
@@ -95,7 +95,7 @@ class UserAvatarQueryServiceTest {
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
                 .id(1L).name(BODY1).resourceUri("body-uri")
                 .obtainableType(ObtainmentType.DJ_PNT).obtainableScore(100)
-                .isCombinable(true).isDefaultSetting(false).isAvailable(false)
+                .combinable(true).defaultSetting(false).available(false)
                 .combinePositionX(0).combinePositionY(0)
                 .build();
         when(avatarResourceQueryService.findAllAvatarBodies()).thenReturn(List.of(bodyDto));

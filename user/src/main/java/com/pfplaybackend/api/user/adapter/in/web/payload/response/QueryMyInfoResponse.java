@@ -13,14 +13,14 @@ public class QueryMyInfoResponse {
     private String uid;
     private String email;
     private AuthorityTier authorityTier;
-    private boolean isProfileUpdated;
+    private boolean profileUpdated;
     private LocalDate registrationDate;
 
     public static QueryMyInfoResponse from(UserAccountData user) {
         return QueryMyInfoResponse.builder()
                 .uid(user.getUserId().getUid().toString())
                 .email(user.getEmail())
-                .isProfileUpdated(user.isProfileUpdated())
+                .profileUpdated(user.isProfileUpdated())
                 .registrationDate(user.getCreatedAt().toLocalDate())
                 .authorityTier(user.getAuthorityTier())
                 .build();

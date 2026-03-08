@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.playlist.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
+import com.pfplaybackend.api.common.config.swagger.ApiErrorCodes;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.CreatePlaylistRequest;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.DeletePlaylistsRequest;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdatePlaylistNameRequest;
@@ -9,6 +10,10 @@ import com.pfplaybackend.api.playlist.adapter.in.web.payload.response.DeletePlay
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.response.UpdatePlaylistNameResponse;
 import com.pfplaybackend.api.playlist.application.service.PlaylistCommandService;
 import com.pfplaybackend.api.playlist.domain.entity.data.PlaylistData;
+import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +30,8 @@ public class PlaylistCommandController {
 
     private final PlaylistCommandService playlistCommandService;
 
+    @Operation(summary = "플레이리스트 생성", description = "새로운 플레이리스트를 생성합니다. 회원만 사용할 수 있습니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @PostMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<ApiCommonResponse<CreatePlaylistResponse>> create(@RequestBody @Valid CreatePlaylistRequest request) {
@@ -34,6 +41,8 @@ public class PlaylistCommandController {
                 .body(ApiCommonResponse.success(CreatePlaylistResponse.from(playlist)));
     }
 
+    @Operation(summary = "플레이리스트 삭제", description = "하나 이상의 플레이리스트를 일괄 삭제합니다. 회원만 사용할 수 있습니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @DeleteMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<ApiCommonResponse<DeletePlaylistsResponse>> deletePlaylist(@RequestBody DeletePlaylistsRequest request) {
@@ -43,9 +52,14 @@ public class PlaylistCommandController {
                 .body(ApiCommonResponse.success(DeletePlaylistsResponse.from(request.getPlaylistIds())));
     }
 
+    @Operation(summary = "플레이리스트 이름 변경", description = "지정된 플레이리스트의 이름을 변경합니다. 회원만 사용할 수 있습니다.")
+    @SecurityRequirement(name = "cookieAuth")
+    @ApiErrorCodes({PlaylistException.class})
     @PatchMapping("{playlistId}")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<ApiCommonResponse<UpdatePlaylistNameResponse>> modifyPlaylistName(@PathVariable Long playlistId, @RequestBody UpdatePlaylistNameRequest request) {
+    public ResponseEntity<ApiCommonResponse<UpdatePlaylistNameResponse>> modifyPlaylistName(
+            @Parameter(description = "변경할 플레이리스트 ID") @PathVariable Long playlistId,
+            @RequestBody UpdatePlaylistNameRequest request) {
         PlaylistData playlist = playlistCommandService.renamePlaylist(playlistId, request.getName());
         return ResponseEntity
                 .status(HttpStatus.OK)

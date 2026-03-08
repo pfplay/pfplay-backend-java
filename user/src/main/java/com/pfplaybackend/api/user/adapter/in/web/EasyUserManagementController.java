@@ -8,6 +8,7 @@ import com.pfplaybackend.api.common.config.security.jwt.dto.TokenClaimsRequest;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class EasyUserManagementController {
 
     private final TemporaryUserInitializeService temporaryUserInitializeService;
 
+    @Operation(summary = "임시 준회원(AM) 생성", description = "개발/테스트 용도로 임시 준회원(Associate Member)을 생성합니다. 만료되지 않는 액세스 토큰이 쿠키에 설정됩니다.")
     @PostMapping("/members/sign/temporary/associate-member")
     public ResponseEntity<ApiCommonResponse<Void>> createAssociateMember(HttpServletResponse response) {
         UserId userId = new UserId();
@@ -42,6 +44,7 @@ public class EasyUserManagementController {
                 .body(ApiCommonResponse.ok());
     }
 
+    @Operation(summary = "임시 정회원(FM) 생성", description = "개발/테스트 용도로 임시 정회원(Full Member)을 생성합니다. 준회원 생성 후 정회원으로 승격되며, 만료되지 않는 액세스 토큰이 쿠키에 설정됩니다.")
     @PostMapping("/members/sign/temporary/full-member")
     public ResponseEntity<ApiCommonResponse<Void>> createFullMember(HttpServletResponse response) {
         UserId userId = new UserId();

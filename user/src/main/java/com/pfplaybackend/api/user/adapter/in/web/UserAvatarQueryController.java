@@ -5,6 +5,8 @@ import com.pfplaybackend.api.user.adapter.in.web.api.UserAvatarApi;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarBodyDto;
 import com.pfplaybackend.api.user.application.dto.shared.AvatarFaceDto;
 import com.pfplaybackend.api.user.application.service.UserAvatarQueryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ public class UserAvatarQueryController implements UserAvatarApi {
 
     private final UserAvatarQueryService userAvatarQueryService;
 
+    @Operation(summary = "아바타 바디 목록 조회", description = "사용 가능한 아바타 바디 리소스 목록을 조회합니다. 게스트와 회원 모두 조회 가능합니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     @GetMapping("/me/profile/avatar/bodies")
     public ResponseEntity<ApiCommonResponse<List<AvatarBodyDto>>> getMyAllAvatarBodies() {
@@ -30,6 +34,8 @@ public class UserAvatarQueryController implements UserAvatarApi {
         return ResponseEntity.ok().body(ApiCommonResponse.success(avatarBodies));
     }
 
+    @Operation(summary = "아바타 표정 목록 조회", description = "사용 가능한 아바타 표정(얼굴) 리소스 목록을 조회합니다. 게스트와 회원 모두 조회 가능합니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     @GetMapping("/me/profile/avatar/faces")
     public ResponseEntity<ApiCommonResponse<List<AvatarFaceDto>>> getMyDefaultAvatarFaces() {

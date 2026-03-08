@@ -17,9 +17,9 @@ public class AvatarBodyDto {
     private final String resourceUri;
     private final ObtainmentType obtainableType;
     private final int obtainableScore;
-    private final boolean isCombinable;
-    private final boolean isDefaultSetting;
-    private final boolean isAvailable;
+    private final boolean combinable;
+    private final boolean defaultSetting;
+    private final boolean available;
     private final int combinePositionX;
     private final int combinePositionY;
 
@@ -30,10 +30,10 @@ public class AvatarBodyDto {
                 .resourceUri(avatarBodyResource.getResourceUri())
                 .obtainableType(avatarBodyResource.getObtainableType())
                 .obtainableScore(avatarBodyResource.getObtainableScore())
-                .isCombinable(avatarBodyResource.isCombinable())
-                .isDefaultSetting(avatarBodyResource.isDefaultSetting())
-                // BASIC 타입인 경우 isAvailable 한 것으로 처리
-                .isAvailable(avatarBodyResource.getObtainableType().equals(ObtainmentType.BASIC))
+                .combinable(avatarBodyResource.isCombinable())
+                .defaultSetting(avatarBodyResource.isDefaultSetting())
+                // BASIC 타입인 경우 available 한 것으로 처리
+                .available(avatarBodyResource.getObtainableType().equals(ObtainmentType.BASIC))
                 .combinePositionX(avatarBodyResource.getCombinePositionX())
                 .combinePositionY(avatarBodyResource.getCombinePositionY())
                 .build();

@@ -16,6 +16,12 @@ import com.pfplaybackend.api.admin.application.service.AdminDemoService;
 import com.pfplaybackend.api.admin.application.service.AdminPartyroomService;
 import com.pfplaybackend.api.admin.application.service.ChatSimulationService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +36,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
+@io.swagger.v3.oas.annotations.Hidden
 @Tag(name = "Admin Demo API", description = "Demo environment initialization and simulation")
 @RestController
 @RequestMapping("/api/v1/admin/demo")
@@ -40,7 +47,11 @@ public class AdminDemoController {
     private final AdminPartyroomService adminPartyroomService;
     private final ChatSimulationService chatSimulationService;
 
-    @Operation(summary = "Check demo environment status")
+    @Operation(summary = "데모 환경 상태 확인", description = "현재 데모 환경의 초기화 여부, 가상 멤버 수, 파티룸 수를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "데모 환경 상태 조회 성공",
+                    content = @Content(schema = @Schema(implementation = QueryDemoEnvironmentStatusResponse.class)))
+    })
     @GetMapping("/status")
     public ResponseEntity<QueryDemoEnvironmentStatusResponse> getDemoEnvironmentStatus() {
         DemoStatusResult result = adminDemoService.getDemoEnvironmentStatus();
@@ -51,7 +62,14 @@ public class AdminDemoController {
                 .build());
     }
 
-    @Operation(summary = "Get all active partyrooms")
+    @Operation(summary = "활성 파티룸 전체 조회", description = "현재 활성 상태인 모든 파티룸 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "파티룸 목록 조회 성공",
+                    content = @Content(schema = @Schema(implementation = QueryAdminPartyroomListResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "403", description = "FM 권한이 필요합니다")
+    })
+    @SecurityRequirement(name = "cookieAuth")
     @GetMapping("/partyrooms")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<QueryAdminPartyroomListResponse> getPartyrooms() {
@@ -65,14 +83,22 @@ public class AdminDemoController {
                                 .linkDomain(item.linkDomain())
                                 .crewCount(item.crewCount())
                                 .djCount(item.djCount())
-                                .isPlaybackActivated(item.playbackActivated())
+                                .playbackActivated(item.playbackActivated())
                                 .build())
                         .collect(Collectors.toList()))
                 .build();
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Initialize complete demo environment")
+    @Operation(summary = "데모 환경 전체 초기화", description = "가상 멤버 생성, 파티룸 생성, DJ 등록 등 데모에 필요한 전체 환경을 한 번에 초기화합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "데모 환경 초기화 성공",
+                    content = @Content(schema = @Schema(implementation = InitializeDemoEnvironmentResponse.class))),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 파라미터"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "403", description = "FM 권한이 필요합니다")
+    })
+    @SecurityRequirement(name = "cookieAuth")
     @PostMapping("/init")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<InitializeDemoEnvironmentResponse> initializeDemoEnvironment(
@@ -105,11 +131,19 @@ public class AdminDemoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Simulate reactions in partyroom")
+    @Operation(summary = "파티룸 리액션 시뮬레이션", description = "지정된 파티룸에서 가상 멤버들의 좋아요/싫어요/그랩 리액션을 시뮬레이션합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "리액션 시뮬레이션 성공",
+                    content = @Content(schema = @Schema(implementation = SimulateReactionsResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "403", description = "FM 권한이 필요합니다"),
+            @ApiResponse(responseCode = "404", description = "해당 파티룸을 찾을 수 없습니다")
+    })
+    @SecurityRequirement(name = "cookieAuth")
     @PostMapping("/partyrooms/{partyroomId}/reactions")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<SimulateReactionsResponse> simulateReactions(
-            @PathVariable Long partyroomId,
+            @Parameter(description = "리액션을 시뮬레이션할 파티룸 ID") @PathVariable Long partyroomId,
             @Valid @RequestBody SimulateReactionsRequest request) {
 
         log.info("Admin simulating reactions: partyroomId={}", partyroomId);
@@ -135,11 +169,19 @@ public class AdminDemoController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Start chat simulation")
+    @Operation(summary = "채팅 시뮬레이션 시작", description = "지정된 파티룸에서 가상 멤버들의 채팅 시뮬레이션을 시작합니다. 스크립트 타입에 따라 다른 대화 패턴이 적용됩니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅 시뮬레이션 시작 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 스크립트 타입"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "403", description = "FM 권한이 필요합니다"),
+            @ApiResponse(responseCode = "404", description = "해당 파티룸을 찾을 수 없습니다")
+    })
+    @SecurityRequirement(name = "cookieAuth")
     @PostMapping("/partyrooms/{partyroomId}/chat")
     @PreAuthorize("hasAuthority('FM')")
     public ResponseEntity<Map<String, Object>> startChatSimulation(
-            @PathVariable Long partyroomId,
+            @Parameter(description = "채팅 시뮬레이션을 시작할 파티룸 ID") @PathVariable Long partyroomId,
             @Valid @RequestBody StartChatSimulationRequest request) {
 
         log.info("Admin starting chat simulation: partyroomId={}, scriptType={}",
@@ -155,10 +197,18 @@ public class AdminDemoController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Stop chat simulation")
+    @Operation(summary = "채팅 시뮬레이션 중지", description = "지정된 파티룸에서 실행 중인 채팅 시뮬레이션을 중지합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "채팅 시뮬레이션 중지 성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자"),
+            @ApiResponse(responseCode = "403", description = "FM 권한이 필요합니다"),
+            @ApiResponse(responseCode = "404", description = "해당 파티룸을 찾을 수 없습니다")
+    })
+    @SecurityRequirement(name = "cookieAuth")
     @DeleteMapping("/partyrooms/{partyroomId}/chat")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<Map<String, Object>> stopChatSimulation(@PathVariable Long partyroomId) {
+    public ResponseEntity<Map<String, Object>> stopChatSimulation(
+            @Parameter(description = "채팅 시뮬레이션을 중지할 파티룸 ID") @PathVariable Long partyroomId) {
 
         log.info("Admin stopping chat simulation: partyroomId={}", partyroomId);
         chatSimulationService.stopChatSimulation(partyroomId);

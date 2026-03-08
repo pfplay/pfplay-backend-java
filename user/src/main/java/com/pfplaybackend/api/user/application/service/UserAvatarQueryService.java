@@ -66,7 +66,7 @@ public class UserAvatarQueryService {
             Map<ActivityType, ActivityData> activityMap = member.getActivityDataMap();
             return avatarBodyDtoList.stream()
                     .map(avatarBodyDto -> avatarBodyDto.toBuilder()
-                            .isAvailable(userAvatarDomainService.isAvailableBody(
+                            .available(userAvatarDomainService.isAvailableBody(
                                     avatarBodyDto.getObtainableType(), avatarBodyDto.getObtainableScore(), activityMap))
                             .build()
                     ).toList();

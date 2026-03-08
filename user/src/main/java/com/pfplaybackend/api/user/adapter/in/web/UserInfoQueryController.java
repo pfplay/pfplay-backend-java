@@ -5,6 +5,8 @@ import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.exception.http.UnauthorizedException;
 import com.pfplaybackend.api.user.application.dto.result.MyInfoResult;
 import com.pfplaybackend.api.user.application.service.UserInfoQueryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,8 @@ public class UserInfoQueryController {
     private final UserInfoQueryService userInfoService;
     private final CookieUtil cookieUtil;
 
+    @Operation(summary = "내 정보 조회", description = "현재 인증된 사용자(게스트 또는 회원)의 기본 정보를 조회합니다. 인증이 유효하지 않은 경우 토큰 쿠키가 삭제됩니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @GetMapping("/me/info")
     @PreAuthorize("hasAnyRole('GUEST', 'MEMBER')")
     public ResponseEntity<ApiCommonResponse<MyInfoResult>> getMyInfo(HttpServletResponse response) {

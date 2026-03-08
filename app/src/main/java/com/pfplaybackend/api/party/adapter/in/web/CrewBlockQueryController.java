@@ -3,6 +3,8 @@ package com.pfplaybackend.api.party.adapter.in.web;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.party.application.dto.result.BlockedCrewResult;
 import com.pfplaybackend.api.party.application.service.CrewBlockQueryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ public class CrewBlockQueryController {
 
     private final CrewBlockQueryService crewBlockQueryService;
 
+    @Operation(summary = "차단 목록 조회", description = "내가 차단한 크루 목록을 조회합니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @GetMapping("/me/blocks")
     public ResponseEntity<ApiCommonResponse<List<BlockedCrewResult>>> getBlockCrews()  {
         return ResponseEntity.ok()

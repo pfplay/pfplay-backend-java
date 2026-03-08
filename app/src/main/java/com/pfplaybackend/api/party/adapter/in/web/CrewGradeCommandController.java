@@ -1,10 +1,16 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
+import com.pfplaybackend.api.common.config.swagger.ApiErrorCodes;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.AdjustGradeRequest;
 import com.pfplaybackend.api.party.application.dto.command.AdjustGradeCommand;
 import com.pfplaybackend.api.party.application.service.CrewGradeCommandService;
+import com.pfplaybackend.api.party.domain.exception.CrewException;
+import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,10 +34,14 @@ public class CrewGradeCommandController {
      * @param crewId
      * @param request
      */
+    @Operation(summary = "크루 등급 변경", description = "특정 크루의 파티룸 내 등급을 변경합니다. HOST 또는 COMMUNITY_MANAGER 등급이 필요합니다.")
+    @SecurityRequirement(name = "cookieAuth")
+    @ApiErrorCodes({GradeException.class, CrewException.class})
     @PatchMapping("/{partyroomId}/crews/{crewId}/grade")
-    public ResponseEntity<Void> updateCrewGrade(@PathVariable("partyroomId") long partyroomId,
-                            @PathVariable("crewId") long crewId,
-                            @RequestBody AdjustGradeRequest request) {
+    public ResponseEntity<Void> updateCrewGrade(
+            @Parameter(description = "파티룸 ID") @PathVariable("partyroomId") long partyroomId,
+            @Parameter(description = "크루 ID") @PathVariable("crewId") long crewId,
+            @RequestBody AdjustGradeRequest request) {
         crewGradeCommandService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId),
                 new AdjustGradeCommand(request.getGradeType()));
         return ResponseEntity.noContent().build();

@@ -1,16 +1,15 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
-import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
-import com.pfplaybackend.api.party.adapter.in.web.payload.response.access.LinkEnterResponse;
-import com.pfplaybackend.api.party.application.port.out.GuestAuthPort;
+import com.pfplaybackend.api.common.config.swagger.ApiErrorCodes;
+import com.pfplaybackend.api.party.application.dto.partyroom.LinkEnterDto;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessQueryService;
+import com.pfplaybackend.api.party.domain.exception.PartyroomException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,19 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PartyroomAccessQueryController {
 
     private final PartyroomAccessQueryService partyroomAccessQueryService;
-    private final GuestAuthPort guestAuthPort;
-    private final CookieUtil cookieUtil;
 
-    @GetMapping("/link/{linkDomain}/enter")
-    public ResponseEntity<ApiCommonResponse<LinkEnterResponse>> enterPartyroomByLinkAddress(
-            @PathVariable String linkDomain,
-            HttpServletResponse response) {
-        // 비인증 사용자인 경우 게스트 토큰 자동 발급
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            String guestToken = guestAuthPort.getOrCreateGuestToken();
-            cookieUtil.addAccessTokenCookie(response, guestToken);
-        }
+    @Operation(summary = "링크로 파티룸 정보 조회", description = "공유 링크 도메인으로 파티룸 정보를 조회합니다. (permitAll)")
+    @ApiErrorCodes({PartyroomException.class})
+    @GetMapping("/link/{linkDomain}")
+    public ResponseEntity<ApiCommonResponse<LinkEnterDto>> getPartyroomByLink(
+            @Parameter(description = "파티룸 공유 링크 도메인") @PathVariable String linkDomain) {
         return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomAccessQueryService.getPartyroomByLink(linkDomain)));
     }
 }

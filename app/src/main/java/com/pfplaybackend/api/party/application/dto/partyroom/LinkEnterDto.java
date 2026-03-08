@@ -1,6 +1,6 @@
-package com.pfplaybackend.api.party.adapter.in.web.payload.response.access;
+package com.pfplaybackend.api.party.application.dto.partyroom;
 
-public record LinkEnterResponse(
+public record LinkEnterDto(
         long partyroomId,
         String title,
         String introduction,

@@ -9,6 +9,8 @@ import com.pfplaybackend.api.user.adapter.in.web.payload.request.UpdateMyWalletR
 import com.pfplaybackend.api.user.application.dto.command.UpdateWalletCommand;
 import com.pfplaybackend.api.user.application.service.UserWalletCommandService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,11 +31,8 @@ public class UserWalletCommandController {
     private final CookieUtil cookieUtil;
     private final JwtService jwtService;
 
-    /**
-     * 호출한(인증된) 사용자의 프로필 리소스 내 Wallet 리소스를 갱신한다.
-     * @param request
-     * @return
-     */
+    @Operation(summary = "지갑 주소 수정", description = "현재 인증된 회원의 지갑 주소를 수정합니다. 수정 후 갱신된 정보로 액세스 토큰이 재발급됩니다. 회원만 사용 가능합니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @PutMapping("/me/profile/wallet")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<ApiCommonResponse<Void>> updateMyWallet(@RequestBody UpdateMyWalletRequest request, HttpServletResponse response) {

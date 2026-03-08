@@ -3,6 +3,8 @@ package com.pfplaybackend.api.playlist.adapter.in.web;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.playlist.adapter.in.web.payload.response.QueryPlaylistResponse;
 import com.pfplaybackend.api.playlist.application.service.PlaylistQueryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,8 @@ public class PlaylistQueryController {
 
     private final PlaylistQueryService playlistQueryService;
 
+    @Operation(summary = "플레이리스트 목록 조회", description = "현재 로그인한 회원의 전체 플레이리스트 목록을 조회합니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @GetMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<ApiCommonResponse<QueryPlaylistResponse>> getPlaylists() {

@@ -1,8 +1,6 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
-import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
-import com.pfplaybackend.api.party.adapter.in.web.payload.response.access.LinkEnterResponse;
-import com.pfplaybackend.api.party.application.port.out.GuestAuthPort;
+import com.pfplaybackend.api.party.application.dto.partyroom.LinkEnterDto;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +19,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PartyroomAccessQueryController.class)
@@ -43,34 +42,35 @@ class PartyroomAccessQueryControllerTest {
 
     @Autowired MockMvc mockMvc;
     @MockBean PartyroomAccessQueryService partyroomAccessQueryService;
-    @MockBean GuestAuthPort guestAuthPort;
-    @MockBean CookieUtil cookieUtil;
     @MockBean JwtDecoder jwtDecoder;
 
     @Test
-    @DisplayName("enterPartyroomByLinkAddress — 인증된 사용자이면 200 OK")
-    void enterPartyroomByLinkAddressAuthenticatedReturns200() throws Exception {
+    @DisplayName("getPartyroomByLink — 인증된 사용자이면 200 OK")
+    void getPartyroomByLinkAuthenticatedReturns200() throws Exception {
         // given
-        LinkEnterResponse linkEnterResponse = new LinkEnterResponse(1L, "Party Room", "Welcome!", null, 5);
-        when(partyroomAccessQueryService.getPartyroomByLink("test-link")).thenReturn(linkEnterResponse);
+        LinkEnterDto dto = new LinkEnterDto(1L, "Party Room", "Welcome!", null, 5);
+        when(partyroomAccessQueryService.getPartyroomByLink("test-link")).thenReturn(dto);
 
         // when & then
-        mockMvc.perform(get("/api/v1/partyrooms/link/test-link/enter")
+        mockMvc.perform(get("/api/v1/partyrooms/link/test-link")
                         .with(jwt().authorities(() -> "ROLE_MEMBER")))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.partyroomId").value(1))
+                .andExpect(jsonPath("$.data.title").value("Party Room"))
+                .andExpect(jsonPath("$.data.crewCount").value(5));
     }
 
     @Test
-    @DisplayName("enterPartyroomByLinkAddress — 미인증 사용자도 200 OK")
-    void enterPartyroomByLinkAddressAnonymousReturns200() throws Exception {
+    @DisplayName("getPartyroomByLink — 미인증 사용자도 200 OK (permitAll)")
+    void getPartyroomByLinkAnonymousReturns200() throws Exception {
         // given
-        when(guestAuthPort.getOrCreateGuestToken()).thenReturn("guest-token");
-        LinkEnterResponse linkEnterResponse = new LinkEnterResponse(1L, "Party Room", "Welcome!", null, 5);
-        when(partyroomAccessQueryService.getPartyroomByLink("test-link")).thenReturn(linkEnterResponse);
+        LinkEnterDto dto = new LinkEnterDto(1L, "Party Room", "Welcome!", null, 5);
+        when(partyroomAccessQueryService.getPartyroomByLink("test-link")).thenReturn(dto);
 
         // when & then
-        mockMvc.perform(get("/api/v1/partyrooms/link/test-link/enter")
+        mockMvc.perform(get("/api/v1/partyrooms/link/test-link")
                         .with(anonymous()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.playback").doesNotExist());
     }
 }

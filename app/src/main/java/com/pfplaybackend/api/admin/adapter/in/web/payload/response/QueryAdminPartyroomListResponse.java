@@ -23,6 +23,6 @@ public class QueryAdminPartyroomListResponse {
         private String linkDomain;
         private Integer crewCount;
         private Integer djCount;
-        private Boolean isPlaybackActivated;
+        private Boolean playbackActivated;
     }
 }

@@ -1,7 +1,7 @@
 package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.exception.ExceptionCreator;
-import com.pfplaybackend.api.party.adapter.in.web.payload.response.access.LinkEnterResponse;
+import com.pfplaybackend.api.party.application.dto.partyroom.LinkEnterDto;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
@@ -22,16 +22,16 @@ public class PartyroomAccessQueryService {
     private final PlaybackRepository playbackRepository;
 
     @Transactional(readOnly = true)
-    public LinkEnterResponse getPartyroomByLink(String linkDomain) {
+    public LinkEnterDto getPartyroomByLink(String linkDomain) {
         PartyroomData partyroom = aggregatePort.findByLinkDomain(LinkDomain.of(linkDomain))
                 .orElseThrow(() -> ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM));
 
         PartyroomId partyroomId = partyroom.getPartyroomId();
         long crewCount = aggregatePort.countActiveCrews(partyroomId);
 
-        LinkEnterResponse.PlaybackSummary playbackSummary = getPlaybackSummary(partyroomId);
+        LinkEnterDto.PlaybackSummary playbackSummary = getPlaybackSummary(partyroomId);
 
-        return new LinkEnterResponse(
+        return new LinkEnterDto(
                 partyroom.getId(),
                 partyroom.getTitle(),
                 partyroom.getIntroduction(),
@@ -40,13 +40,13 @@ public class PartyroomAccessQueryService {
         );
     }
 
-    private LinkEnterResponse.PlaybackSummary getPlaybackSummary(PartyroomId partyroomId) {
+    private LinkEnterDto.PlaybackSummary getPlaybackSummary(PartyroomId partyroomId) {
         PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
         if (!playbackState.isActivated() || playbackState.getCurrentPlaybackId() == null) {
             return null;
         }
         return playbackRepository.findById(playbackState.getCurrentPlaybackId().getId())
-                .map(pb -> new LinkEnterResponse.PlaybackSummary(pb.getName(), pb.getThumbnailImage()))
+                .map(pb -> new LinkEnterDto.PlaybackSummary(pb.getName(), pb.getThumbnailImage()))
                 .orElse(null);
     }
 }

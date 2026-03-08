@@ -81,7 +81,7 @@ class UserAvatarCommandServiceTest {
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
                 .id(1L).name(BODY1).resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
-                .isCombinable(false).isDefaultSetting(true).isAvailable(true)
+                .combinable(false).defaultSetting(true).available(true)
                 .combinePositionX(10).combinePositionY(20).build();
         when(avatarResourceQueryService.findAvatarBodyByUri(any(AvatarBodyUri.class)))
                 .thenReturn(bodyDto);
@@ -117,7 +117,7 @@ class UserAvatarCommandServiceTest {
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
                 .id(1L).name(BODY1).resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
-                .isCombinable(true).isDefaultSetting(false).isAvailable(true)
+                .combinable(true).defaultSetting(false).available(true)
                 .combinePositionX(10).combinePositionY(20).build();
         when(avatarResourceQueryService.findAvatarBodyByUri(any(AvatarBodyUri.class)))
                 .thenReturn(bodyDto);
@@ -154,7 +154,7 @@ class UserAvatarCommandServiceTest {
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
                 .id(2L).name("Premium").resourceUri(PREMIUM_BODY)
                 .obtainableType(ObtainmentType.DJ_PNT).obtainableScore(50)
-                .isCombinable(false).isDefaultSetting(false).isAvailable(false)
+                .combinable(false).defaultSetting(false).available(false)
                 .combinePositionX(0).combinePositionY(0).build();
         when(avatarResourceQueryService.findAvatarBodyByUri(any(AvatarBodyUri.class)))
                 .thenReturn(bodyDto);
@@ -187,7 +187,7 @@ class UserAvatarCommandServiceTest {
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
                 .id(2L).name("Premium").resourceUri(PREMIUM_BODY)
                 .obtainableType(ObtainmentType.DJ_PNT).obtainableScore(50)
-                .isCombinable(false).isDefaultSetting(false).isAvailable(false)
+                .combinable(false).defaultSetting(false).available(false)
                 .combinePositionX(0).combinePositionY(0).build();
         when(avatarResourceQueryService.findAvatarBodyByUri(any(AvatarBodyUri.class)))
                 .thenReturn(bodyDto);
@@ -207,7 +207,7 @@ class UserAvatarCommandServiceTest {
         AvatarBodyDto bodyDto = AvatarBodyDto.builder()
                 .id(1L).name(BODY1).resourceUri(BODY_01)
                 .obtainableType(ObtainmentType.BASIC).obtainableScore(0)
-                .isCombinable(false).isDefaultSetting(true).isAvailable(true)
+                .combinable(false).defaultSetting(true).available(true)
                 .combinePositionX(0).combinePositionY(0).build();
         AvatarIconDto iconDto = new AvatarIconDto(1L, ICON_01, ICON_URI_01, true);
         when(avatarResourceQueryService.findPairAvatarIconByBodyUri(any(AvatarBodyUri.class)))

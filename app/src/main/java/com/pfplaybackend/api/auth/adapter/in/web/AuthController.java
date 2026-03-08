@@ -12,6 +12,10 @@ import com.pfplaybackend.api.auth.application.service.LogoutService;
 import com.pfplaybackend.api.auth.application.service.OAuthUrlService;
 import com.pfplaybackend.api.auth.domain.enums.OAuthProvider;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
+import com.pfplaybackend.api.auth.domain.exception.AuthException;
+import com.pfplaybackend.api.common.config.swagger.ApiErrorCodes;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@Tag(name = "Auth API", description = "OAuth 인증 및 로그아웃 API")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -36,9 +41,8 @@ public class AuthController {
     private final LogoutService logoutService;
     private final CookieUtil cookieUtil;
 
-    /**
-     * OAuth 인증 URL 생성
-     */
+    @Operation(summary = "OAuth 인증 URL 생성", description = "지정된 OAuth 제공자(Google, Twitter)의 인증 URL을 생성합니다. 프론트엔드에서 이 URL로 사용자를 리다이렉트하여 OAuth 인증을 시작합니다.")
+    @ApiErrorCodes({AuthException.class})
     @PostMapping("/oauth/url")
     public ResponseEntity<GenerateOAuthUrlResponse> generateOAuthUrl(@Valid @RequestBody GenerateOAuthUrlRequest request) {
         log.info("Generating OAuth URL for provider: {}", request.getProvider());
@@ -71,9 +75,7 @@ public class AuthController {
         }
     }
 
-    /**
-     * OAuth 콜백 처리 (쿠키 방식만 지원)
-     */
+    @Operation(summary = "OAuth 콜백 로그인", description = "OAuth 제공자로부터 받은 인증 코드를 처리하여 로그인을 완료합니다. 성공 시 JWT 토큰이 HttpOnly 쿠키로 설정됩니다.")
     @PostMapping("/oauth/callback")
     public ResponseEntity<LoginOAuthResponse> oauthCallback(
             @Valid @RequestBody LoginOAuthRequest request,
@@ -130,6 +132,7 @@ public class AuthController {
         }
     }
 
+    @Operation(summary = "로그아웃", description = "현재 사용자를 로그아웃합니다. 활성 파티룸이 있으면 퇴장 처리 후, 인증 쿠키를 삭제합니다.")
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         try {

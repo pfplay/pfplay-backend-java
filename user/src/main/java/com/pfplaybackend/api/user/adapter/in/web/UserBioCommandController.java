@@ -4,6 +4,8 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.adapter.in.web.payload.request.UpdateMyBioRequest;
 import com.pfplaybackend.api.user.application.dto.command.UpdateBioCommand;
 import com.pfplaybackend.api.user.application.service.UserBioCommandService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +24,8 @@ public class UserBioCommandController {
 
     private final UserBioCommandService userBioService;
 
-    /**
-     * 호출한(인증된) 사용자의 프로필 리소스 내 Bio 리소스를 갱신한다.
-     * @param request
-     * @return
-     */
+    @Operation(summary = "자기소개 수정", description = "현재 인증된 회원의 닉네임과 자기소개를 수정합니다. 회원만 사용 가능합니다.")
+    @SecurityRequirement(name = "cookieAuth")
     @PutMapping("/me/profile/bio")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<ApiCommonResponse<Void>> setMyBio(@Valid @RequestBody UpdateMyBioRequest request) {

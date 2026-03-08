@@ -14,14 +14,14 @@ import java.util.Objects;
 @Data
 @AllArgsConstructor
 public class QueryDjQueueResponse {
-    private boolean isPlaybackActivated;
+    private boolean playbackActivated;
     private QueueStatus queueStatus;
-    private boolean isRegistered;
+    private boolean registered;
     private Map<String, Object> playback;
     private List<DjWithProfileDto> djs;
 
-    public static QueryDjQueueResponse from(boolean isPlaybackActivated, QueueStatus queueStatus,
-                                            boolean isRegistered, PlaybackData playback, List<DjWithProfileDto> djs) {
+    public static QueryDjQueueResponse from(boolean playbackActivated, QueueStatus queueStatus,
+                                            boolean registered, PlaybackData playback, List<DjWithProfileDto> djs) {
 
         Map<String, Object> map = null;
         if(Objects.nonNull(playback)) {
@@ -31,9 +31,9 @@ public class QueryDjQueueResponse {
             map.put("duration", playback.getDuration().toDisplayString());
         }
         return new QueryDjQueueResponse(
-                isPlaybackActivated,
+                playbackActivated,
                 queueStatus,
-                isRegistered,
+                registered,
                 map,
                 djs
         );

@@ -1,10 +1,13 @@
 package com.pfplaybackend.api.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
+@Schema(description = "공통 성공 응답")
 @Getter
 public class ApiCommonResponse<T> {
+    @Schema(description = "응답 데이터")
     private final T data;
 
     @Builder

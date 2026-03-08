@@ -2,7 +2,7 @@ package com.pfplaybackend.api.party.application.service;
 
 import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.party.adapter.in.web.payload.response.access.LinkEnterResponse;
+import com.pfplaybackend.api.party.application.dto.partyroom.LinkEnterDto;
 import com.pfplaybackend.api.party.adapter.out.persistence.PlaybackRepository;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomPlaybackData;
@@ -57,7 +57,7 @@ class PartyroomAccessQueryServiceTest {
         when(aggregatePort.findPlaybackState(new PartyroomId(42L))).thenReturn(playbackState);
 
         // when
-        LinkEnterResponse result = partyroomAccessQueryService.getPartyroomByLink(linkDomain);
+        LinkEnterDto result = partyroomAccessQueryService.getPartyroomByLink(linkDomain);
 
         // then
         assertThat(result.partyroomId()).isEqualTo(42L);
@@ -100,7 +100,7 @@ class PartyroomAccessQueryServiceTest {
         when(playbackRepository.findById(100L)).thenReturn(Optional.of(playbackData));
 
         // when
-        LinkEnterResponse result = partyroomAccessQueryService.getPartyroomByLink(linkDomain);
+        LinkEnterDto result = partyroomAccessQueryService.getPartyroomByLink(linkDomain);
 
         // then
         assertThat(result.partyroomId()).isEqualTo(42L);
