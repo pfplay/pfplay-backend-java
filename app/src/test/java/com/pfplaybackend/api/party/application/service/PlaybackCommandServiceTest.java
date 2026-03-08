@@ -182,7 +182,7 @@ class PlaybackCommandServiceTest {
                 .id(1L).partyroomId(partyroomId).userId(userId).gradeType(GradeType.CLUBBER).build();
         when(aggregatePort.findCrewById(1L)).thenReturn(Optional.of(djCrew));
 
-        PlaybackTrackDto trackDto = new PlaybackTrackDto("linkId", "Song", "thumb.jpg", "3:30", 1);
+        PlaybackTrackDto trackDto = new PlaybackTrackDto("linkId", "Song", "thumb.jpg", Duration.fromString("3:30"), 1);
         when(playlistCommandPort.getFirstTrack(playlistId)).thenReturn(trackDto);
 
         PlaybackData savedPlayback = mock(PlaybackData.class);

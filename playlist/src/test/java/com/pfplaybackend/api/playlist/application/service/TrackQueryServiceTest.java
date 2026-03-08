@@ -2,6 +2,7 @@ package com.pfplaybackend.api.playlist.application.service;
 
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
+import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
@@ -63,8 +64,8 @@ class TrackQueryServiceTest {
         when(aggregatePort.findPlaylistByIdAndOwner(playlistId, userId)).thenReturn(Optional.of(playlist));
 
         List<PlaylistTrackDto> tracks = List.of(
-                new PlaylistTrackDto(1L, "abc", "Song A", 0, "3:30", "https://img.example.com/a.jpg"),
-                new PlaylistTrackDto(2L, "def", "Song B", 1, "4:00", "https://img.example.com/b.jpg")
+                new PlaylistTrackDto(1L, "abc", "Song A", 0, Duration.fromString("3:30"), "https://img.example.com/a.jpg"),
+                new PlaylistTrackDto(2L, "def", "Song B", 1, Duration.fromString("4:00"), "https://img.example.com/b.jpg")
         );
         Page<PlaylistTrackDto> expectedPage = new PageImpl<>(tracks);
         when(queryPort.getTracksWithPagination(eq(new PlaylistId(playlistId)), any(Pageable.class))).thenReturn(expectedPage);

@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PartyContextAspect {
 
-    @Pointcut("execution(* com.pfplaybackend.api.party.application.service.*.*(..))")
+    @Pointcut("execution(* com.pfplaybackend.api.party.application.service.*.*(..)) || " +
+              "execution(* com.pfplaybackend.api.partyview.application.service.*.*(..))")
     public void contextRequiredMethods() {}
 
     @Around("contextRequiredMethods()")

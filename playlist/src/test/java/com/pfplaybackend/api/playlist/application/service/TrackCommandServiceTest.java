@@ -425,7 +425,7 @@ class TrackCommandServiceTest {
     void getFirstTrackReturnsFirstTrackAndRotates() {
         // given
         Long playlistId = 1L;
-        PlaylistTrackDto trackDto = new PlaylistTrackDto(10L, LINK_ID, "Song A", 1, "3:30", THUMBNAIL);
+        PlaylistTrackDto trackDto = new PlaylistTrackDto(10L, LINK_ID, "Song A", 1, Duration.fromString("3:30"), THUMBNAIL);
 
         @SuppressWarnings("unchecked")
         Page<PlaylistTrackDto> page = mock(Page.class);
@@ -442,7 +442,7 @@ class TrackCommandServiceTest {
         assertThat(result.linkId()).isEqualTo(LINK_ID);
         assertThat(result.name()).isEqualTo("Song A");
         assertThat(result.thumbnailImage()).isEqualTo(THUMBNAIL);
-        assertThat(result.duration()).isEqualTo("3:30");
+        assertThat(result.duration()).isEqualTo(Duration.fromString("3:30"));
         assertThat(result.orderNumber()).isEqualTo(1);
         verify(aggregatePort).rotateTrackOrder(playlistId, 3L);
     }

@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
+import com.pfplaybackend.api.party.adapter.in.web.payload.response.access.LinkEnterResponse;
 import com.pfplaybackend.api.party.application.port.out.GuestAuthPort;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessQueryService;
 import org.junit.jupiter.api.DisplayName;
@@ -15,8 +16,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Map;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
@@ -52,7 +51,8 @@ class PartyroomAccessQueryControllerTest {
     @DisplayName("enterPartyroomByLinkAddress — 인증된 사용자이면 200 OK")
     void enterPartyroomByLinkAddressAuthenticatedReturns200() throws Exception {
         // given
-        when(partyroomAccessQueryService.getRedirectUri("test-link")).thenReturn(Map.of("partyroomId", 1L));
+        LinkEnterResponse linkEnterResponse = new LinkEnterResponse(1L, "Party Room", "Welcome!", null, 5);
+        when(partyroomAccessQueryService.getPartyroomByLink("test-link")).thenReturn(linkEnterResponse);
 
         // when & then
         mockMvc.perform(get("/api/v1/partyrooms/link/test-link/enter")
@@ -65,7 +65,8 @@ class PartyroomAccessQueryControllerTest {
     void enterPartyroomByLinkAddressAnonymousReturns200() throws Exception {
         // given
         when(guestAuthPort.getOrCreateGuestToken()).thenReturn("guest-token");
-        when(partyroomAccessQueryService.getRedirectUri("test-link")).thenReturn(Map.of("partyroomId", 1L));
+        LinkEnterResponse linkEnterResponse = new LinkEnterResponse(1L, "Party Room", "Welcome!", null, 5);
+        when(partyroomAccessQueryService.getPartyroomByLink("test-link")).thenReturn(linkEnterResponse);
 
         // when & then
         mockMvc.perform(get("/api/v1/partyrooms/link/test-link/enter")

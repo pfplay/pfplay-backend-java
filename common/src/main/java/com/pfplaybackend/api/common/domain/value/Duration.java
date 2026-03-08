@@ -1,5 +1,8 @@
 package com.pfplaybackend.api.common.domain.value;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -14,6 +17,7 @@ public class Duration implements Serializable {
         this.totalSeconds = totalSeconds;
     }
 
+    @JsonCreator
     public static Duration fromString(String durationStr) {
         if (durationStr == null || durationStr.isBlank()) {
             throw new DateTimeParseException("Duration string is null or blank", "", 0);
@@ -55,6 +59,7 @@ public class Duration implements Serializable {
         return calculateEndTimeEpochMilli(Instant.now());
     }
 
+    @JsonValue
     public String toDisplayString() {
         long hours = totalSeconds / 3600;
         long minutes = (totalSeconds % 3600) / 60;

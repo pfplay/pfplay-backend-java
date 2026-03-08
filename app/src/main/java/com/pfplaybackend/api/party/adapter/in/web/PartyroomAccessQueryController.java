@@ -2,6 +2,7 @@ package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
+import com.pfplaybackend.api.party.adapter.in.web.payload.response.access.LinkEnterResponse;
 import com.pfplaybackend.api.party.application.port.out.GuestAuthPort;
 import com.pfplaybackend.api.party.application.service.PartyroomAccessQueryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @Tag(name = "Partyroom API")
 @RequestMapping("/api/v1/partyrooms")
 @RestController
@@ -28,7 +27,7 @@ public class PartyroomAccessQueryController {
     private final CookieUtil cookieUtil;
 
     @GetMapping("/link/{linkDomain}/enter")
-    public ResponseEntity<ApiCommonResponse<Map<String, Long>>> enterPartyroomByLinkAddress(
+    public ResponseEntity<ApiCommonResponse<LinkEnterResponse>> enterPartyroomByLinkAddress(
             @PathVariable String linkDomain,
             HttpServletResponse response) {
         // 비인증 사용자인 경우 게스트 토큰 자동 발급
@@ -37,6 +36,6 @@ public class PartyroomAccessQueryController {
             String guestToken = guestAuthPort.getOrCreateGuestToken();
             cookieUtil.addAccessTokenCookie(response, guestToken);
         }
-        return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomAccessQueryService.getRedirectUri(linkDomain)));
+        return ResponseEntity.ok().body(ApiCommonResponse.success(partyroomAccessQueryService.getPartyroomByLink(linkDomain)));
     }
 }

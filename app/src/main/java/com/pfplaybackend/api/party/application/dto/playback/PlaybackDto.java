@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.party.application.dto.playback;
 
+import com.pfplaybackend.api.common.domain.value.Duration;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,12 +11,12 @@ public class PlaybackDto {
     private long id;
     private String linkId;
     private String name;
-    private String duration;
+    private Duration duration;
     private String thumbnailImage;
     private long endTime;
 
     @QueryProjection
-    public PlaybackDto(long id, String linkId, String name, String duration, String thumbnailImage) {
+    public PlaybackDto(long id, String linkId, String name, Duration duration, String thumbnailImage) {
         this.id = id;
         this.linkId = linkId;
         this.name = name;
@@ -24,7 +25,7 @@ public class PlaybackDto {
     }
 
     public static PlaybackDto withEndTime(long id, String linkId, String name,
-                                           String duration, String thumbnailImage, long endTime) {
+                                           Duration duration, String thumbnailImage, long endTime) {
         PlaybackDto dto = new PlaybackDto(id, linkId, name, duration, thumbnailImage);
         dto.setEndTime(endTime);
         return dto;

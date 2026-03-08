@@ -20,7 +20,7 @@ class PlaybackDataTest {
         // when
         PlaybackData playback = PlaybackData.create(
                 partyroomId, userId,
-                "Test Song", "3:30", "linkId123", "thumb.jpg"
+                "Test Song", Duration.fromString("3:30"), "linkId123", "thumb.jpg"
         );
 
         // then
@@ -41,7 +41,7 @@ class PlaybackDataTest {
         // when
         PlaybackData playback = PlaybackData.create(
                 new PartyroomId(1L), new UserId(10L),
-                "Song", "5:00", "link1", "thumb.jpg"
+                "Song", Duration.fromString("5:00"), "link1", "thumb.jpg"
         );
 
         // then

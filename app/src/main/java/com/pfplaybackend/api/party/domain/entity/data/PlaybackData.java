@@ -68,21 +68,20 @@ public class PlaybackData extends BaseEntity {
     // ── Factory Method ──
 
     public static PlaybackData create(PartyroomId partyroomId, UserId userId,
-                                       String name, String duration, String linkId, String thumbnailImage, Instant now) {
-        Duration dur = Duration.fromString(duration);
+                                       String name, Duration duration, String linkId, String thumbnailImage, Instant now) {
         return PlaybackData.builder()
                 .partyroomId(partyroomId)
                 .userId(userId)
                 .name(name)
-                .duration(dur)
+                .duration(duration)
                 .linkId(linkId)
                 .thumbnailImage(thumbnailImage)
-                .endTime(dur.calculateEndTimeEpochMilli(now))
+                .endTime(duration.calculateEndTimeEpochMilli(now))
                 .build();
     }
 
     public static PlaybackData create(PartyroomId partyroomId, UserId userId,
-                                       String name, String duration, String linkId, String thumbnailImage) {
+                                       String name, Duration duration, String linkId, String thumbnailImage) {
         return create(partyroomId, userId, name, duration, linkId, thumbnailImage, Instant.now());
     }
 }

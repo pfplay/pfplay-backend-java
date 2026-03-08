@@ -1,5 +1,6 @@
 package com.pfplaybackend.api.playlist.adapter.in.web;
 
+import com.pfplaybackend.api.common.domain.value.Duration;
 import com.pfplaybackend.api.playlist.application.dto.PlaylistTrackDto;
 import com.pfplaybackend.api.playlist.application.service.TrackQueryService;
 import org.junit.jupiter.api.DisplayName;
@@ -38,7 +39,7 @@ class TrackQueryControllerTest {
     void getAllTracksMemberReturns200() throws Exception {
         // given
         Page<PlaylistTrackDto> page = new PageImpl<>(List.of(
-                new PlaylistTrackDto(1L, "abc123", "Test Track", 1, "03:30", "https://example.com/thumb.jpg")
+                new PlaylistTrackDto(1L, "abc123", "Test Track", 1, Duration.fromString("03:30"), "https://example.com/thumb.jpg")
         ));
         when(trackQueryService.getTracks(1L, 0, 10)).thenReturn(page);
 
