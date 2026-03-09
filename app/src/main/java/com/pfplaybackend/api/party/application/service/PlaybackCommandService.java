@@ -153,7 +153,9 @@ public class PlaybackCommandService implements PlaybackControlPort {
     }
 
     private void deactivateAndNotify(PartyroomData partyroom) {
-        partyroomAggregateService.deactivatePlayback(partyroom.getPartyroomId())
+        PartyroomId partyroomId = partyroom.getPartyroomId();
+        eventPublisher.publishEvent(new DjQueueChangedEvent(partyroomId, DjChangeType.DEACTIVATE, null));
+        partyroomAggregateService.deactivatePlayback(partyroomId)
                 .forEach(eventPublisher::publishEvent);
     }
 }

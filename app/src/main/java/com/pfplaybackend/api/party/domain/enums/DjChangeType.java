@@ -5,5 +5,6 @@ public enum DjChangeType {
     DEQUEUE,
     DEQUEUE_ADMIN,
     DEQUEUE_EXIT,
-    ROTATE
+    ROTATE,
+    DEACTIVATE
 }
