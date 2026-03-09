@@ -1,0 +1,17 @@
+{
+  "name": "asyncapi",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "generate": "node -e \"const G=require('@asyncapi/generator'),p=require('path');new G('@asyncapi/html-template',p.resolve('./output'),{forceWrite:true}).generateFromFile(p.resolve('./asyncapi.yml')).then(()=>console.log('Done!')).catch(e=>{console.error(e);process.exit(1)})\"",
+    "validate": "npx @asyncapi/cli validate asyncapi.yml"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@asyncapi/generator": "^2.11.0",
+    "@asyncapi/html-template": "^3.5.5"
+  }
+}
