@@ -60,9 +60,6 @@ springdoc:
     use-root-path: false
     path: /spec/api
   show-actuator: true
-  group-configs:
-    - group: api
-      paths-to-match: /api/**
 
 logging:
   level:
