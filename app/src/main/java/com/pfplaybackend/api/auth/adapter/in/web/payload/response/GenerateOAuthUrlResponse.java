@@ -32,15 +32,4 @@ public class GenerateOAuthUrlResponse {
      * URL 유효 시간 (초)
      */
     private Long expiresIn;
-
-    /**
-     * 추가 메타데이터 (선택적)
-     */
-    private String message;
-
-    /**
-     * 성공 여부
-     */
-    @Builder.Default
-    private Boolean success = true;
 }

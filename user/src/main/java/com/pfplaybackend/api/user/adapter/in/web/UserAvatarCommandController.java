@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
-import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.user.adapter.in.web.payload.request.UpdateAvatarRequest;
 import com.pfplaybackend.api.user.application.dto.command.SetAvatarCommand;
 import com.pfplaybackend.api.user.application.service.UserAvatarCommandService;
@@ -8,6 +7,7 @@ import com.pfplaybackend.api.user.application.validation.AvatarRequestValidator;
 import com.pfplaybackend.api.common.config.swagger.ApiErrorCodes;
 import com.pfplaybackend.api.user.domain.exception.UserAvatarException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -29,15 +29,16 @@ public class UserAvatarCommandController {
     private final AvatarRequestValidator avatarRequestValidator;
 
     @Operation(summary = "아바타 변경", description = "현재 인증된 회원의 아바타를 변경합니다. 바디와 표정 조합을 설정할 수 있습니다. 회원만 사용 가능합니다.")
+    @ApiResponse(responseCode = "204", description = "아바타 변경 성공")
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({UserAvatarException.class})
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     @PutMapping("/me/profile/avatar")
-    public ResponseEntity<ApiCommonResponse<Void>> setMyAvatar(@Valid @RequestBody UpdateAvatarRequest request) {
+    public ResponseEntity<Void> setMyAvatar(@Valid @RequestBody UpdateAvatarRequest request) {
         SetAvatarCommand command = toCommand(request);
         avatarRequestValidator.validate(command);
         userAvatarCommandService.setUserAvatar(command);
-        return ResponseEntity.ok().body(ApiCommonResponse.ok());
+        return ResponseEntity.noContent().build();
     }
 
     private SetAvatarCommand toCommand(UpdateAvatarRequest request) {

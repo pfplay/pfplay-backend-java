@@ -6,8 +6,8 @@ import lombok.Getter;
 
 @Getter
 public enum PenaltyException implements DomainException {
-    PERMANENT_EXPULSION("PNT-001", "Banned User", ErrorType.FORBIDDEN),
-    PENALTY_HISTORY_NOT_FOUND("PNT-002", "No penalty history found", ErrorType.NOT_FOUND);
+    PERMANENT_EXPULSION("PNT-001", "이용이 정지된 사용자입니다", ErrorType.FORBIDDEN),
+    PENALTY_HISTORY_NOT_FOUND("PNT-002", "페널티 이력을 찾을 수 없습니다", ErrorType.NOT_FOUND);
 
     private final String errorCode;
     private final String message;

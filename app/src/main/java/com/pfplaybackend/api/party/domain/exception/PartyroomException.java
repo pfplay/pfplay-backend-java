@@ -6,13 +6,12 @@ import lombok.Getter;
 
 @Getter
 public enum PartyroomException implements DomainException {
-    NOT_FOUND_ROOM("PTR-001", "Can not find Partyroom", ErrorType.NOT_FOUND),
-    ALREADY_TERMINATED("PTR-002", "Already Terminated Partyroom", ErrorType.FORBIDDEN),
-    EXCEEDED_LIMIT("PTR-003", "Exceeded Entrance Limit", ErrorType.FORBIDDEN),
-    ACTIVE_ANOTHER_ROOM("PTR-004", "Already Active in Another Partyroom", ErrorType.FORBIDDEN),
-    CACHE_MISSED_SESSION("PTR-005", "No cached data found for sessionId", ErrorType.NOT_FOUND),
-    RESTRICTED_AUTHORITY("PTR-006", "Authority Restriction", ErrorType.FORBIDDEN),
-    ALREADY_HOST("PTR-007", "Already Host in Another Partyroom", ErrorType.FORBIDDEN);
+    NOT_FOUND_ROOM("PTR-001", "파티룸을 찾을 수 없습니다", ErrorType.NOT_FOUND),
+    ALREADY_TERMINATED("PTR-002", "이미 종료된 파티룸입니다", ErrorType.FORBIDDEN),
+    EXCEEDED_LIMIT("PTR-003", "입장 인원 제한을 초과했습니다", ErrorType.FORBIDDEN),
+    ACTIVE_ANOTHER_ROOM("PTR-004", "이미 다른 파티룸에 입장 중입니다", ErrorType.FORBIDDEN),
+    RESTRICTED_AUTHORITY("PTR-005", "권한이 부족합니다", ErrorType.FORBIDDEN),
+    ALREADY_HOST("PTR-006", "이미 다른 파티룸의 호스트입니다", ErrorType.FORBIDDEN);
 
     private final String errorCode;
     private final String message;

@@ -3,6 +3,7 @@ package com.pfplaybackend.api.party.adapter.in.web;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.management.UpdateNoticeRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PartyroomNoticeCommandController {
 
     @Operation(summary = "공지사항 등록/수정", description = "파티룸의 공지사항을 등록하거나 수정합니다. 파티룸 운영진만 호출 가능합니다.")
+    @ApiResponse(responseCode = "204", description = "공지사항 등록/수정 성공")
     @SecurityRequirement(name = "cookieAuth")
     @PutMapping("/{partyroomId}/notice")
     public ResponseEntity<Void> registerNotice(
             @Parameter(description = "파티룸 ID") @PathVariable Long partyroomId,
             UpdateNoticeRequest updateNoticeRequest) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

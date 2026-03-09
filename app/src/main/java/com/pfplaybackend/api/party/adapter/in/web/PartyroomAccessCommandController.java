@@ -11,14 +11,13 @@ import com.pfplaybackend.api.party.domain.exception.PenaltyException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Partyroom API")
 @RequestMapping("/api/v1/partyrooms")
@@ -29,22 +28,24 @@ public class PartyroomAccessCommandController {
     private final PartyroomAccessCommandService partyroomAccessCommandService;
 
     @Operation(summary = "파티룸 입장", description = "파티룸에 입장합니다. 입장 시 크루(Crew)로 등록되며, 크루 정보가 반환됩니다.")
+    @ApiResponse(responseCode = "201", description = "파티룸 입장 성공")
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({PartyroomException.class, PenaltyException.class})
-    @PostMapping("/{partyroomId}/enter")
+    @PostMapping("/{partyroomId}/crews")
     public ResponseEntity<ApiCommonResponse<EnterPartyroomResponse>> enterPartyroom(
             @Parameter(description = "파티룸 ID") @PathVariable Long partyroomId) {
         CrewData crew = partyroomAccessCommandService.tryEnter(new PartyroomId(partyroomId));
-        return ResponseEntity.ok().body(ApiCommonResponse.success(EnterPartyroomResponse.from(crew)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiCommonResponse.success(EnterPartyroomResponse.from(crew)));
     }
 
     @Operation(summary = "파티룸 퇴장", description = "현재 입장한 파티룸에서 퇴장합니다. DJ 큐에 등록된 경우 자동으로 해제됩니다.")
+    @ApiResponse(responseCode = "204", description = "파티룸 퇴장 성공")
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({CrewException.class})
-    @PostMapping("/{partyroomId}/exit")
+    @DeleteMapping("/{partyroomId}/crews/me")
     public ResponseEntity<Void> exitPartyroom(
             @Parameter(description = "파티룸 ID") @PathVariable Long partyroomId) {
         partyroomAccessCommandService.exit(new PartyroomId(partyroomId));
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

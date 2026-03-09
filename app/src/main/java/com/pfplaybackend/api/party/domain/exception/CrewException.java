@@ -6,8 +6,8 @@ import lombok.Getter;
 
 @Getter
 public enum CrewException implements DomainException {
-    NOT_FOUND_ACTIVE_ROOM("CRW-001", "Can not find My Active Room", ErrorType.NOT_FOUND),
-    INVALID_ACTIVE_ROOM("CRW-002", "Invalid My Active Room", ErrorType.CONFLICT);
+    NOT_FOUND_ACTIVE_ROOM("CRW-001", "참여 중인 파티룸을 찾을 수 없습니다", ErrorType.NOT_FOUND),
+    INVALID_ACTIVE_ROOM("CRW-002", "유효하지 않은 파티룸 참여 상태입니다", ErrorType.CONFLICT);
 
     private final String errorCode;
     private final String message;

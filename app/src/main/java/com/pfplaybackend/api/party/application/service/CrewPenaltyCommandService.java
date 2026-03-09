@@ -38,7 +38,7 @@ public class CrewPenaltyCommandService {
     private final Clock clock;
 
     @Transactional
-    public void addPenalty(PartyroomId partyroomId, PunishPenaltyCommand command) {
+    public Long addPenalty(PartyroomId partyroomId, PunishPenaltyCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
 
@@ -75,8 +75,10 @@ public class CrewPenaltyCommandService {
                     .penaltyType(command.penaltyType())
                     .released(false)
                     .build();
-            crewPenaltyHistoryRepository.save(crewPenaltyHistoryData);
+            CrewPenaltyHistoryData saved = crewPenaltyHistoryRepository.save(crewPenaltyHistoryData);
+            return saved.getId();
         }
+        return null;
     }
 
     private void recordInShortTime(Long crewIdValue) {

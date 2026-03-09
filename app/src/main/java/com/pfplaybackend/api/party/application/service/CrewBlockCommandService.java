@@ -30,7 +30,7 @@ public class CrewBlockCommandService {
     private final Clock clock;
 
     @Transactional
-    public void addBlock(AddBlockCommand command) {
+    public Long addBlock(AddBlockCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         ActivePartyroomDto dto = partyroomQueryService.getMyActivePartyroomOrThrow(authContext.getUserId());
 
@@ -50,7 +50,8 @@ public class CrewBlockCommandService {
                 .unblocked(false)
                 .build();
 
-        blockHistoryRepository.save(historyData);
+        CrewBlockHistoryData saved = blockHistoryRepository.save(historyData);
+        return saved.getId();
     }
 
     @Transactional

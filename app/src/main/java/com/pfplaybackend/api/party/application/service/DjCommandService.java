@@ -37,7 +37,7 @@ public class DjCommandService {
     private final PartyroomQueryService partyroomQueryService;
 
     @Transactional
-    public void enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
+    public Long enqueueDj(PartyroomId partyroomId, PlaylistId playlistId)  {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
         PartyroomPlaybackData playbackState = aggregatePort.findPlaybackState(partyroomId);
@@ -59,7 +59,7 @@ public class DjCommandService {
 
         // Create and save DJ
         DjData dj = DjData.create(partyroom.getPartyroomId(), playlistId, crewId, nextOrder);
-        aggregatePort.saveDj(dj);
+        DjData saved = aggregatePort.saveDj(dj);
 
         playbackState.activate(null, null);
         aggregatePort.savePlaybackState(playbackState);
@@ -69,6 +69,7 @@ public class DjCommandService {
         if(isPostActivationProcessingRequired) {
             playbackControlPort.startPlayback(partyroom);
         }
+        return saved.getId();
     }
 
     @Transactional

@@ -13,8 +13,10 @@ import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,21 +32,23 @@ public class TrackCommandController {
     private final TrackCommandService trackCommandService;
 
     @Operation(summary = "트랙 추가", description = "지정된 플레이리스트에 새로운 트랙을 추가합니다. 회원만 사용할 수 있습니다.")
+    @ApiResponse(responseCode = "201", description = "트랙 추가 성공")
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({PlaylistException.class, TrackException.class})
     @PostMapping("{playlistId}/tracks")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<ApiCommonResponse<Void>> addTrack(
+    public ResponseEntity<ApiCommonResponse<Map<String, Long>>> addTrack(
             @Parameter(description = "트랙을 추가할 플레이리스트 ID") @PathVariable Long playlistId,
             @RequestBody AddTrackRequest request) {
         AddTrackCommand command = new AddTrackCommand(request.getName(), request.getLinkId(), request.getDuration(), request.getThumbnailImage());
-        trackCommandService.addTrackInPlaylist(playlistId, command);
+        Long trackId = trackCommandService.addTrackInPlaylist(playlistId, command);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiCommonResponse.ok());
+                .body(ApiCommonResponse.success(Map.of("trackId", trackId)));
     }
 
     @Operation(summary = "트랙 삭제", description = "지정된 플레이리스트에서 특정 트랙을 삭제합니다.")
+    @ApiResponse(responseCode = "204", description = "트랙 삭제 성공")
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({PlaylistException.class, TrackException.class})
     @DeleteMapping("{playlistId}/tracks/{trackId}")
@@ -52,10 +56,11 @@ public class TrackCommandController {
             @Parameter(description = "플레이리스트 ID") @PathVariable Long playlistId,
             @Parameter(description = "삭제할 트랙 ID") @PathVariable Long trackId) {
         trackCommandService.deleteTrackInPlaylist(playlistId, trackId);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "트랙 이동", description = "트랙을 현재 플레이리스트에서 다른 플레이리스트로 이동합니다. 회원만 사용할 수 있습니다.")
+    @ApiResponse(responseCode = "204", description = "트랙 이동 성공")
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({PlaylistException.class, TrackException.class})
     @PatchMapping("{playlistId}/tracks/{trackId}/move")
@@ -66,10 +71,11 @@ public class TrackCommandController {
             @RequestBody MoveTrackRequest request) {
         MoveTrackCommand command = new MoveTrackCommand(request.getTargetPlaylistId());
         trackCommandService.moveTrackToPlaylist(playlistId, trackId, command);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "트랙 순서 변경", description = "드래그 앤 드롭으로 플레이리스트 내 트랙의 순서를 변경합니다.")
+    @ApiResponse(responseCode = "204", description = "트랙 순서 변경 성공")
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({PlaylistException.class, TrackException.class})
     @PutMapping("{playlistId}/tracks/{trackId}")
@@ -79,7 +85,7 @@ public class TrackCommandController {
             @RequestBody UpdateTrackOrderRequest request) {
         UpdateTrackOrderCommand command = new UpdateTrackOrderCommand(request.getNextOrderNumber());
         trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command);
-        return ResponseEntity.accepted().build();
+        return ResponseEntity.noContent().build();
     }
 
 }

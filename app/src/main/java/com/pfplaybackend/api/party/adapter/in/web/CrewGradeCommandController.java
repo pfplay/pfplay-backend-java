@@ -10,6 +10,7 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,7 @@ public class CrewGradeCommandController {
      * @param request
      */
     @Operation(summary = "크루 등급 변경", description = "특정 크루의 파티룸 내 등급을 변경합니다. HOST 또는 COMMUNITY_MANAGER 등급이 필요합니다.")
+    @ApiResponse(responseCode = "204", description = "크루 등급 변경 성공")
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({GradeException.class, CrewException.class})
     @PatchMapping("/{partyroomId}/crews/{crewId}/grade")

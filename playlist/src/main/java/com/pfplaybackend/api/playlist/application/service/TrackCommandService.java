@@ -42,7 +42,7 @@ public class TrackCommandService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public void addTrackInPlaylist(Long playlistId, AddTrackCommand command) {
+    public Long addTrackInPlaylist(Long playlistId, AddTrackCommand command) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         // 플레이리스트 접근 권한 검사
         PlaylistData playlistData = aggregatePort.findPlaylistByIdAndOwner(playlistId, authContext.getUserId())
@@ -65,8 +65,9 @@ public class TrackCommandService {
                 .thumbnailImage(command.thumbnailImage())
                 .build();
 
-        aggregatePort.saveTrack(trackData);
+        TrackData saved = aggregatePort.saveTrack(trackData);
         eventPublisher.publishEvent(new TrackAddedEvent(new PlaylistId(playlistId), command.linkId(), command.name()));
+        return saved.getId();
     }
 
     @Transactional
