@@ -41,7 +41,7 @@ public class PartyroomAggregateService {
     /**
      * DJ큐 로테이션 (1번→마지막, 나머지 -1)
      */
-    public void rotateDjQueue(PartyroomId partyroomId) {
+    public List<DjData> rotateDjQueue(PartyroomId partyroomId) {
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
         int totalElements = queuedDjs.size();
         queuedDjs.forEach(dj -> {
@@ -52,6 +52,7 @@ public class PartyroomAggregateService {
             }
         });
         aggregatePort.saveDjs(queuedDjs);
+        return queuedDjs;
     }
 
     /**

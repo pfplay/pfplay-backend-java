@@ -83,7 +83,7 @@ class PlaybackCommandServiceTest {
         // given — tryProceed에서 DJ가 없으면 deactivate
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(false);
+        when(aggregatePort.findDjsOrdered(partyroomId)).thenReturn(List.of());
 
         // when
         playbackCommandService.complete(partyroomId, userId);
@@ -98,7 +98,7 @@ class PlaybackCommandServiceTest {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(false);
+        when(aggregatePort.findDjsOrdered(partyroomId)).thenReturn(List.of());
 
         // when
         playbackCommandService.complete(partyroomId, userId);
@@ -119,7 +119,7 @@ class PlaybackCommandServiceTest {
         when(partyroomQueryService.getMyActivePartyroom(userId)).thenReturn(Optional.of(activeDto));
         when(partyroomQueryService.getCrewOrThrow(new PartyroomId(activeDto.id()), userId)).thenReturn(adjuster);
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(false);
+        when(aggregatePort.findDjsOrdered(partyroomId)).thenReturn(List.of());
 
         // when
         playbackCommandService.skipByManager(partyroomId);
@@ -151,7 +151,7 @@ class PlaybackCommandServiceTest {
         // given
         PartyroomData partyroom = PartyroomData.builder().id(partyroomId.getId()).partyroomId(partyroomId).build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(false);
+        when(aggregatePort.findDjsOrdered(partyroomId)).thenReturn(List.of());
 
         // when
         playbackCommandService.skipPlayback(partyroomId);
@@ -170,13 +170,13 @@ class PlaybackCommandServiceTest {
                 .playbackTimeLimit(PlaybackTimeLimit.ofMinutes(10))
                 .build();
         when(partyroomQueryService.getPartyroomById(partyroomId)).thenReturn(partyroom);
-        when(partyroomAggregateService.hasQueuedDjs(partyroomId)).thenReturn(true);
 
         PlaylistId playlistId = new PlaylistId(100L);
         DjData djData = DjData.builder()
                 .id(1L).partyroomId(partyroomId).crewId(new CrewId(1L))
                 .playlistId(playlistId).orderNumber(1).build();
         when(aggregatePort.findDjsOrdered(partyroomId)).thenReturn(List.of(djData));
+        when(partyroomAggregateService.rotateDjQueue(partyroomId)).thenReturn(List.of(djData));
 
         CrewData djCrew = CrewData.builder()
                 .id(1L).partyroomId(partyroomId).userId(userId).gradeType(GradeType.CLUBBER).build();

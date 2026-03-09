@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -86,9 +87,10 @@ public class PlaybackCommandService implements PlaybackControlPort {
 
     private void tryProceed(PartyroomId partyroomId) {
         PartyroomData partyroom = partyroomQueryService.getPartyroomById(partyroomId);
+        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroomId);
 
-        if(partyroomAggregateService.hasQueuedDjs(partyroomId)) {
-            startPlayback(partyroom);
+        if(!queuedDjs.isEmpty()) {
+            doStart(partyroom, queuedDjs.size());
         }else{
             deactivateAndNotify(partyroom);
         }
@@ -97,15 +99,14 @@ public class PlaybackCommandService implements PlaybackControlPort {
     @Override
     public void startPlayback(PartyroomData partyroom) {
         List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getPartyroomId());
-        int maxAttempts = queuedDjs.size();
-        doStart(partyroom, maxAttempts);
+        doStart(partyroom, queuedDjs.size());
     }
 
     private void doStart(PartyroomData partyroom, int remainingAttempts) {
-        partyroomAggregateService.rotateDjQueue(partyroom.getPartyroomId());
+        List<DjData> rotatedDjs = partyroomAggregateService.rotateDjQueue(partyroom.getPartyroomId());
 
-        List<DjData> queuedDjs = aggregatePort.findDjsOrdered(partyroom.getPartyroomId());
-        DjData nextDj = queuedDjs.stream().findFirst().orElseThrow();
+        DjData nextDj = rotatedDjs.stream()
+                .min(Comparator.comparingInt(DjData::getOrderNumber)).orElseThrow();
         CrewData djCrew = aggregatePort.findCrewById(nextDj.getCrewId().getId()).orElseThrow();
         PlaybackData nextPlayback = getNextPlaybackInPlaylist(partyroom.getPartyroomId(), nextDj, djCrew.getUserId());
 
@@ -115,7 +116,8 @@ public class PlaybackCommandService implements PlaybackControlPort {
                 return;
             }
             PartyroomData reloaded = partyroomQueryService.getPartyroomById(partyroom.getPartyroomId());
-            if (partyroomAggregateService.hasQueuedDjs(reloaded.getPartyroomId())) {
+            List<DjData> remainingDjs = aggregatePort.findDjsOrdered(reloaded.getPartyroomId());
+            if (!remainingDjs.isEmpty()) {
                 doStart(reloaded, remainingAttempts - 1);
             } else {
                 deactivateAndNotify(reloaded);
