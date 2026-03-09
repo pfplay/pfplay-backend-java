@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,24 +23,20 @@ public class QueryPartyroomListResponse {
             String introduction,
             boolean playbackActivated,
             long crewCount,
-            Map<String, Object> playback,
-            List<Map<String, Object>> primaryIcons
+            PlaybackSummary playback,
+            List<CrewIcon> primaryIcons
     ) {}
 
     public static List<PartyroomElement> from(List<PartyroomWithCrewDto> partyrooms, Map<UserId, ProfileSettingDto> profileSettings) {
         return partyrooms.stream().map(partyroomWithCrewDto -> {
-            Map<String, Object> playback = null;
+            PlaybackSummary playback = null;
             if(partyroomWithCrewDto.playbackActivated()) {
-                playback = new HashMap<>();
-                playback.put("name", partyroomWithCrewDto.playbackDto().getName());
-                playback.put("thumbnailImage", partyroomWithCrewDto.playbackDto().getThumbnailImage());
+                playback = PlaybackSummary.withoutDuration(partyroomWithCrewDto.playbackDto());
             }
-            List<Map<String, Object>> primaryIcons = partyroomWithCrewDto.crews().stream().map(crewDto -> profileSettings.get(crewDto.userId()))
-                    .map(profileSettingDto -> {
-                        Map<String, Object> primaryAvatar = new HashMap<>();
-                        primaryAvatar.put("avatarIconUri", profileSettingDto.avatarIconUri());
-                        return primaryAvatar;
-                    }).toList();
+            List<CrewIcon> primaryIcons = partyroomWithCrewDto.crews().stream()
+                    .map(crewDto -> profileSettings.get(crewDto.userId()))
+                    .map(profileSettingDto -> new CrewIcon(profileSettingDto.avatarIconUri()))
+                    .toList();
             return new PartyroomElement(
                     partyroomWithCrewDto.partyroomId(),
                     partyroomWithCrewDto.stageType(),

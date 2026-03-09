@@ -4,12 +4,12 @@ import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.config.swagger.ApiErrorCodes;
 import com.pfplaybackend.api.common.domain.value.PlaylistId;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.dj.RegisterDjRequest;
+import com.pfplaybackend.api.party.adapter.in.web.payload.response.CreateDjResponse;
 import com.pfplaybackend.api.party.application.service.DjCommandService;
 import com.pfplaybackend.api.party.domain.exception.DjException;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.value.DjId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import java.util.Map;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,12 +38,12 @@ public class DjCommandController {
     @ApiErrorCodes({DjException.class})
     @PostMapping("/{partyroomId}/dj-queue")
     @PreAuthorize("hasAnyRole('ROLE_MEMBER')")
-    public ResponseEntity<ApiCommonResponse<Map<String, Long>>> enqueueDj(
+    public ResponseEntity<ApiCommonResponse<CreateDjResponse>> enqueueDj(
             @Parameter(description = "파티룸 ID") @PathVariable Long partyroomId,
             @RequestBody RegisterDjRequest request) {
         Long djId = djCommandService.enqueueDj(new PartyroomId(partyroomId), new PlaylistId(request.getPlaylistId()));
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiCommonResponse.success(Map.of("djId", djId)));
+                .body(ApiCommonResponse.success(new CreateDjResponse(djId)));
     }
 
     @Operation(summary = "본인 DJ 해제", description = "본인을 DJ 큐에서 해제합니다. 현재 재생 중인 DJ인 경우 재생이 중단됩니다.")

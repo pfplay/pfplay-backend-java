@@ -7,6 +7,7 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.playback.AggregationDto;
 import com.pfplaybackend.api.party.application.dto.playback.PlaybackDto;
+import com.pfplaybackend.api.party.application.dto.playback.ReactionHistoryDto;
 import com.pfplaybackend.api.party.application.port.out.UserProfileQueryPort;
 import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
 import com.pfplaybackend.api.party.application.service.PlaybackQueryService;
@@ -83,15 +84,8 @@ public class PartyroomSetupQueryService {
         }
     }
 
-    private static Map<String, Boolean> getHistory(Optional<PlaybackReactionHistoryData> optional) {
-        return optional.map(data -> Map.of(
-                "isLiked", data.isLiked(),
-                "isDislike", data.isDisliked(),
-                "isGrabbed", data.isGrabbed()
-        )).orElseGet(() -> Map.of(
-                "isLiked", false,
-                "isDislike", false,
-                "isGrabbed", false
-        ));
+    private static ReactionHistoryDto getHistory(Optional<PlaybackReactionHistoryData> optional) {
+        return optional.map(ReactionHistoryDto::from)
+                .orElseGet(ReactionHistoryDto::empty);
     }
 }

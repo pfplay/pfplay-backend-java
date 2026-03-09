@@ -1,10 +1,9 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
+import com.pfplaybackend.api.party.application.dto.playback.ReactionHistoryDto;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -25,7 +24,7 @@ class PlaybackReactionCommandControllerTest extends AbstractPartyCommandWebMvcTe
                 }
                 """;
         when(playbackReactionCommandService.reactToCurrentPlayback(any(), any()))
-                .thenReturn(Map.of("liked", true, "disliked", false, "grabbed", false));
+                .thenReturn(new ReactionHistoryDto(true, false, false));
 
         // when & then
         mockMvc.perform(post("/api/v1/partyrooms/1/playbacks/reaction")

@@ -8,6 +8,7 @@ import com.pfplaybackend.api.playlist.adapter.in.web.payload.request.UpdateTrack
 import com.pfplaybackend.api.playlist.application.dto.command.AddTrackCommand;
 import com.pfplaybackend.api.playlist.application.dto.command.MoveTrackCommand;
 import com.pfplaybackend.api.playlist.application.dto.command.UpdateTrackOrderCommand;
+import com.pfplaybackend.api.playlist.adapter.in.web.payload.response.CreateTrackResponse;
 import com.pfplaybackend.api.playlist.application.service.TrackCommandService;
 import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
@@ -16,7 +17,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,14 +37,14 @@ public class TrackCommandController {
     @ApiErrorCodes({PlaylistException.class, TrackException.class})
     @PostMapping("{playlistId}/tracks")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<ApiCommonResponse<Map<String, Long>>> addTrack(
+    public ResponseEntity<ApiCommonResponse<CreateTrackResponse>> addTrack(
             @Parameter(description = "트랙을 추가할 플레이리스트 ID") @PathVariable Long playlistId,
             @RequestBody AddTrackRequest request) {
         AddTrackCommand command = new AddTrackCommand(request.getName(), request.getLinkId(), request.getDuration(), request.getThumbnailImage());
         Long trackId = trackCommandService.addTrackInPlaylist(playlistId, command);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiCommonResponse.success(Map.of("trackId", trackId)));
+                .body(ApiCommonResponse.success(new CreateTrackResponse(trackId)));
     }
 
     @Operation(summary = "트랙 삭제", description = "지정된 플레이리스트에서 특정 트랙을 삭제합니다.")

@@ -13,6 +13,7 @@ import com.pfplaybackend.api.party.domain.exception.ReactionException;
 import com.pfplaybackend.api.party.domain.model.ReactionPostProcessResult;
 import com.pfplaybackend.api.party.domain.model.ReactionState;
 import com.pfplaybackend.api.party.domain.service.PlaybackReactionDomainService;
+import com.pfplaybackend.api.party.application.dto.playback.ReactionHistoryDto;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
@@ -20,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -34,7 +34,7 @@ public class PlaybackReactionCommandService {
     private final PlaybackReactionQueryService playbackReactionQueryService;
 
     @Transactional
-    public Map<String, Boolean> reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
+    public ReactionHistoryDto reactToCurrentPlayback(PartyroomId partyroomId, ReactionType reactionType) {
         AuthContext authContext = ThreadLocalContext.getAuthContext();
         if(AuthorityTier.GT.equals(authContext.getAuthorityTier()) && reactionType.equals(ReactionType.GRAB)) {
             throw ExceptionCreator.create(ReactionException.INVALID_REACTION);
@@ -50,11 +50,7 @@ public class PlaybackReactionCommandService {
         Optional<CrewData> optional = partyroomQueryService.getCrewByUserId(partyroomId, authContext.getUserId());
         CrewData crew = optional.orElseThrow();
         playbackReactionPostProcessCommandService.postProcess(reactionPostProcessDto, reactionType, partyroomId, playbackId, new CrewId(crew.getId()));
-        return Map.of(
-            "isLiked", targetState.liked(),
-            "isDisliked", targetState.disliked(),
-            "isGrabbed", targetState.grabbed()
-        );
+        return ReactionHistoryDto.from(targetState);
     }
 
     private PlaybackReactionHistoryData getValidReactionHistoryData(AuthContext authContext, PlaybackId playbackId) {

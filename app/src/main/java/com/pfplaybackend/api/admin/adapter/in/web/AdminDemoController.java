@@ -3,6 +3,8 @@ package com.pfplaybackend.api.admin.adapter.in.web;
 import com.pfplaybackend.api.admin.adapter.in.web.payload.request.InitializeDemoEnvironmentRequest;
 import com.pfplaybackend.api.admin.adapter.in.web.payload.request.SimulateReactionsRequest;
 import com.pfplaybackend.api.admin.adapter.in.web.payload.request.StartChatSimulationRequest;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.ChatSimulationStartResponse;
+import com.pfplaybackend.api.admin.adapter.in.web.payload.response.ChatSimulationStopResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.payload.response.InitializeDemoEnvironmentResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.payload.response.QueryAdminPartyroomListResponse;
 import com.pfplaybackend.api.admin.adapter.in.web.payload.response.QueryDemoEnvironmentStatusResponse;
@@ -31,8 +33,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -180,7 +180,7 @@ public class AdminDemoController {
     @SecurityRequirement(name = "cookieAuth")
     @PostMapping("/partyrooms/{partyroomId}/chat")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<Map<String, Object>> startChatSimulation(
+    public ResponseEntity<ChatSimulationStartResponse> startChatSimulation(
             @Parameter(description = "채팅 시뮬레이션을 시작할 파티룸 ID") @PathVariable Long partyroomId,
             @Valid @RequestBody StartChatSimulationRequest request) {
 
@@ -189,12 +189,7 @@ public class AdminDemoController {
 
         chatSimulationService.startChatSimulation(partyroomId, request.getScriptType());
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("partyroomId", partyroomId);
-        response.put("status", "STARTED");
-        response.put("scriptType", request.getScriptType());
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ChatSimulationStartResponse(partyroomId, "STARTED", request.getScriptType()));
     }
 
     @Operation(summary = "채팅 시뮬레이션 중지", description = "지정된 파티룸에서 실행 중인 채팅 시뮬레이션을 중지합니다.")
@@ -207,17 +202,13 @@ public class AdminDemoController {
     @SecurityRequirement(name = "cookieAuth")
     @DeleteMapping("/partyrooms/{partyroomId}/chat")
     @PreAuthorize("hasAuthority('FM')")
-    public ResponseEntity<Map<String, Object>> stopChatSimulation(
+    public ResponseEntity<ChatSimulationStopResponse> stopChatSimulation(
             @Parameter(description = "채팅 시뮬레이션을 중지할 파티룸 ID") @PathVariable Long partyroomId) {
 
         log.info("Admin stopping chat simulation: partyroomId={}", partyroomId);
         chatSimulationService.stopChatSimulation(partyroomId);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("partyroomId", partyroomId);
-        response.put("status", "STOPPED");
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ChatSimulationStopResponse(partyroomId, "STOPPED"));
     }
 
     private InitializeDemoEnvironmentResponse.PartyroomDetail toPartyroomDetail(DemoEnvironmentResult.PartyroomDetail detail) {

@@ -15,6 +15,7 @@ import com.pfplaybackend.api.party.domain.model.ReactionState;
 import com.pfplaybackend.api.party.domain.service.PlaybackReactionDomainService;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import com.pfplaybackend.api.party.application.dto.playback.ReactionHistoryDto;
 import com.pfplaybackend.api.party.domain.value.PlaybackId;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,13 +87,12 @@ class PlaybackReactionCommandServiceTest {
         when(partyroomQueryService.getCrewByUserId(partyroomId, userId)).thenReturn(Optional.of(crew));
 
         // when
-        Map<String, Boolean> result = playbackReactionCommandService.reactToCurrentPlayback(partyroomId, ReactionType.LIKE);
+        ReactionHistoryDto result = playbackReactionCommandService.reactToCurrentPlayback(partyroomId, ReactionType.LIKE);
 
         // then
-        assertThat(result)
-                .containsEntry("isLiked", true)
-                .containsEntry("isDisliked", false)
-                .containsEntry("isGrabbed", false);
+        assertThat(result.isLiked()).isTrue();
+        assertThat(result.isDisliked()).isFalse();
+        assertThat(result.isGrabbed()).isFalse();
         verify(playbackReactionPostProcessCommandService).postProcess(
                 postProcessResult, ReactionType.LIKE, partyroomId, playbackId, new CrewId(5L));
     }
@@ -143,10 +142,10 @@ class PlaybackReactionCommandServiceTest {
         when(partyroomQueryService.getCrewByUserId(partyroomId, userId)).thenReturn(Optional.of(crew));
 
         // when
-        Map<String, Boolean> result = playbackReactionCommandService.reactToCurrentPlayback(partyroomId, ReactionType.LIKE);
+        ReactionHistoryDto result = playbackReactionCommandService.reactToCurrentPlayback(partyroomId, ReactionType.LIKE);
 
         // then
-        assertThat(result).containsEntry("isLiked", false);
+        assertThat(result.isLiked()).isFalse();
         verify(playbackReactionDomainService).getReactionStateByHistory(historyData);
     }
 }

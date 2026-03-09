@@ -3,12 +3,12 @@ package com.pfplaybackend.api.party.adapter.in.web;
 import com.pfplaybackend.api.common.ApiCommonResponse;
 import com.pfplaybackend.api.common.config.swagger.ApiErrorCodes;
 import com.pfplaybackend.api.party.adapter.in.web.payload.request.regulation.ApplyPenaltyRequest;
+import com.pfplaybackend.api.party.adapter.in.web.payload.response.CreatePenaltyResponse;
 import com.pfplaybackend.api.party.application.dto.command.PunishPenaltyCommand;
 import com.pfplaybackend.api.party.application.service.CrewPenaltyCommandService;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.exception.PenaltyException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
-import java.util.Map;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,13 +42,13 @@ public class CrewPenaltyCommandController {
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({GradeException.class})
     @PostMapping("/{partyroomId}/penalties")
-    public ResponseEntity<ApiCommonResponse<Map<String, Long>>> imposeCrewPenalty(
+    public ResponseEntity<ApiCommonResponse<CreatePenaltyResponse>> imposeCrewPenalty(
             @Parameter(description = "파티룸 ID") @PathVariable("partyroomId") Long partyroomId,
             @Valid @RequestBody ApplyPenaltyRequest request) {
         Long penaltyId = crewPenaltyCommandService.addPenalty(new PartyroomId(partyroomId),
                 new PunishPenaltyCommand(request.getCrewId(), request.getPenaltyType(), request.getDetail()));
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiCommonResponse.success(Map.of("penaltyId", penaltyId)));
+                .body(ApiCommonResponse.success(new CreatePenaltyResponse(penaltyId)));
     }
 
     /**
