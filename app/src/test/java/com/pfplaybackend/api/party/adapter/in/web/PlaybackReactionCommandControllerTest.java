@@ -1,14 +1,8 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
-import com.pfplaybackend.api.party.application.service.PlaybackReactionCommandService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
@@ -19,12 +13,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PlaybackReactionCommandController.class)
-class PlaybackReactionCommandControllerTest {
-
-    @Autowired MockMvc mockMvc;
-    @MockBean PlaybackReactionCommandService playbackReactionCommandService;
-    @MockBean JwtDecoder jwtDecoder;
+class PlaybackReactionCommandControllerTest extends AbstractPartyCommandWebMvcTest {
 
     @Test
     @DisplayName("reactToPlayback — 200 OK")

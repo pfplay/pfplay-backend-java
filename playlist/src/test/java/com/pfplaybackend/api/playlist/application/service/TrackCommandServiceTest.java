@@ -29,6 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -96,6 +97,14 @@ class TrackCommandServiceTest {
         when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(playlistId), LINK_ID)).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(playlistId))
                 .thenReturn(new PlaylistSummaryDto(playlistId, TEST_PLAYLIST_NAME, 0, PlaylistType.PLAYLIST, 3L));
+        when(aggregatePort.saveTrack(any())).thenAnswer(invocation -> {
+            TrackData track = invocation.getArgument(0);
+            TrackData saved = TrackData.builder().playlistId(track.getPlaylistId()).name(track.getName())
+                    .linkId(track.getLinkId()).duration(track.getDuration()).orderNumber(track.getOrderNumber())
+                    .thumbnailImage(track.getThumbnailImage()).build();
+            ReflectionTestUtils.setField(saved, "id", 100L);
+            return saved;
+        });
 
         // when
         trackCommandService.addTrackInPlaylist(playlistId, command);
@@ -463,6 +472,14 @@ class TrackCommandServiceTest {
         when(aggregatePort.findTrackByPlaylistAndLink(new PlaylistId(playlistId), LINK_ID)).thenReturn(Optional.empty());
         when(playlistQueryService.getPlaylist(playlistId))
                 .thenReturn(new PlaylistSummaryDto(playlistId, TEST_PLAYLIST_NAME, 0, PlaylistType.PLAYLIST, 0L));
+        when(aggregatePort.saveTrack(any())).thenAnswer(invocation -> {
+            TrackData track = invocation.getArgument(0);
+            TrackData saved = TrackData.builder().playlistId(track.getPlaylistId()).name(track.getName())
+                    .linkId(track.getLinkId()).duration(track.getDuration()).orderNumber(track.getOrderNumber())
+                    .thumbnailImage(track.getThumbnailImage()).build();
+            ReflectionTestUtils.setField(saved, "id", 100L);
+            return saved;
+        });
 
         // when
         trackCommandService.addTrackInPlaylist(playlistId, command);

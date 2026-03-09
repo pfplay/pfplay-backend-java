@@ -3,7 +3,7 @@ package com.pfplaybackend.api.party.application.service;
 import com.pfplaybackend.api.common.ThreadLocalContext;
 import com.pfplaybackend.api.common.aspect.context.AuthContext;
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.common.exception.http.BadRequestException;
+import com.pfplaybackend.api.common.exception.http.ConflictException;
 import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.party.adapter.out.persistence.CrewBlockHistoryRepository;
 import com.pfplaybackend.api.party.application.dto.command.AddBlockCommand;
@@ -23,6 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -82,10 +83,17 @@ class CrewBlockCommandServiceTest {
 
         AddBlockCommand command = new AddBlockCommand(20L);
 
+        when(blockHistoryRepository.save(any(CrewBlockHistoryData.class))).thenAnswer(invocation -> {
+            CrewBlockHistoryData data = invocation.getArgument(0);
+            ReflectionTestUtils.setField(data, "id", 99L);
+            return data;
+        });
+
         // when
-        crewBlockCommandService.addBlock(command);
+        Long blockId = crewBlockCommandService.addBlock(command);
 
         // then
+        assertThat(blockId).isEqualTo(99L);
         ArgumentCaptor<CrewBlockHistoryData> captor = ArgumentCaptor.forClass(CrewBlockHistoryData.class);
         verify(blockHistoryRepository).save(captor.capture());
         CrewBlockHistoryData saved = captor.getValue();
@@ -96,7 +104,7 @@ class CrewBlockCommandServiceTest {
     }
 
     @Test
-    @DisplayName("addBlock — 이미 차단된 크루를 다시 차단하면 BadRequestException이 발생한다")
+    @DisplayName("addBlock — 이미 차단된 크루를 다시 차단하면 ConflictException이 발생한다")
     void addBlockAlreadyBlocked() {
         // given
         ActivePartyroomDto activeDto = new ActivePartyroomDto(1L, false, 10L, false, null, null);
@@ -113,7 +121,7 @@ class CrewBlockCommandServiceTest {
 
         // when & then
         assertThatThrownBy(() -> crewBlockCommandService.addBlock(command))
-                .isInstanceOf(BadRequestException.class);
+                .isInstanceOf(ConflictException.class);
     }
 
     // ========== removeBlock ==========

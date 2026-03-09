@@ -1,15 +1,10 @@
 package com.pfplaybackend.api.partyview.adapter.in.web;
 
+import com.pfplaybackend.api.party.adapter.in.web.AbstractPartyQueryWebMvcTest;
 import com.pfplaybackend.api.partyview.application.dto.DisplayDto;
 import com.pfplaybackend.api.partyview.application.dto.result.PartyroomSetupResult;
-import com.pfplaybackend.api.partyview.application.service.PartyroomSetupQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -20,12 +15,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PartyroomSetupController.class)
-class PartyroomSetupControllerTest {
-
-    @Autowired MockMvc mockMvc;
-    @MockBean PartyroomSetupQueryService partyroomSetupQueryService;
-    @MockBean JwtDecoder jwtDecoder;
+class PartyroomSetupControllerTest extends AbstractPartyQueryWebMvcTest {
 
     @Test
     @DisplayName("getSetupInfo — 200 OK")

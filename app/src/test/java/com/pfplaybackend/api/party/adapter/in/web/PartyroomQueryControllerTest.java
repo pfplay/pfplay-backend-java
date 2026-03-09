@@ -1,15 +1,9 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.party.application.dto.result.DjQueueInfoResult;
-import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
 import com.pfplaybackend.api.party.domain.enums.QueueStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 import java.util.Map;
@@ -20,12 +14,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PartyroomQueryController.class)
-class PartyroomQueryControllerTest {
-
-    @Autowired MockMvc mockMvc;
-    @MockBean PartyroomQueryService partyroomQueryService;
-    @MockBean JwtDecoder jwtDecoder;
+class PartyroomQueryControllerTest extends AbstractPartyQueryWebMvcTest {
 
     @Test
     @DisplayName("getPartyrooms — 200 OK + 파티룸 목록 반환")

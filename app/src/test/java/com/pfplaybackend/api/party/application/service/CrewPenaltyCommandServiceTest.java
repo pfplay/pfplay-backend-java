@@ -29,6 +29,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -125,10 +126,17 @@ class CrewPenaltyCommandServiceTest {
 
         PunishPenaltyCommand command = new PunishPenaltyCommand(20L, PenaltyType.PERMANENT_EXPULSION, "Harassment");
 
+        when(crewPenaltyHistoryRepository.save(any(CrewPenaltyHistoryData.class))).thenAnswer(invocation -> {
+            CrewPenaltyHistoryData data = invocation.getArgument(0);
+            ReflectionTestUtils.setField(data, "id", 77L);
+            return data;
+        });
+
         // when
-        crewPenaltyCommandService.addPenalty(partyroomId, command);
+        Long penaltyId = crewPenaltyCommandService.addPenalty(partyroomId, command);
 
         // then
+        assertThat(penaltyId).isEqualTo(77L);
         verify(partyroomAccessCommandService).expel(partyroom, punishedCrew, true);
         verify(eventPublisher).publishEvent(any(CrewPenalizedEvent.class));
         verify(crewPenaltyHistoryRepository).save(any(CrewPenaltyHistoryData.class));

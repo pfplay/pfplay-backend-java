@@ -1,18 +1,10 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
-import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
-import com.pfplaybackend.api.common.config.security.jwt.JwtService;
 import com.pfplaybackend.api.common.domain.value.UserId;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
-import com.pfplaybackend.api.user.application.service.initialize.TemporaryUserInitializeService;
 import com.pfplaybackend.api.user.domain.entity.data.MemberData;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -23,14 +15,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(EasyUserManagementController.class)
-class EasyUserManagementControllerTest {
-
-    @Autowired MockMvc mockMvc;
-    @MockBean CookieUtil cookieUtil;
-    @MockBean JwtService jwtService;
-    @MockBean TemporaryUserInitializeService temporaryUserInitializeService;
-    @MockBean JwtDecoder jwtDecoder;
+class EasyUserManagementControllerTest extends AbstractUserWebMvcTest {
 
     @Test
     @DisplayName("createAssociateMember — 200 OK")

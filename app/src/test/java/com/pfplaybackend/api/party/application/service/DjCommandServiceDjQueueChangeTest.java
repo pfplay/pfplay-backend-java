@@ -28,6 +28,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import java.util.Collections;
 import java.util.Optional;
 
+import org.springframework.test.util.ReflectionTestUtils;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -91,6 +93,11 @@ class DjCommandServiceDjQueueChangeTest {
         when(playlistQueryPort.isEmptyPlaylist(playlistId.getId())).thenReturn(false);
         when(aggregatePort.isDjRegistered(partyroomId, new CrewId(1L))).thenReturn(false);
         when(aggregatePort.findDjsOrdered(partyroomId)).thenReturn(Collections.emptyList());
+        when(aggregatePort.saveDj(any(DjData.class))).thenAnswer(invocation -> {
+            DjData dj = invocation.getArgument(0);
+            ReflectionTestUtils.setField(dj, "id", 42L);
+            return dj;
+        });
 
         // when
         djCommandService.enqueueDj(partyroomId, playlistId);

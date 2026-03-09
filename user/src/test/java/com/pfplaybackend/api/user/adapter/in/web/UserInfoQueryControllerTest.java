@@ -1,18 +1,9 @@
 package com.pfplaybackend.api.user.adapter.in.web;
 
-import com.pfplaybackend.api.common.config.security.jwt.CookieUtil;
 import com.pfplaybackend.api.common.enums.AuthorityTier;
 import com.pfplaybackend.api.user.application.dto.result.MyInfoResult;
-import com.pfplaybackend.api.user.application.service.UserInfoQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 
@@ -21,17 +12,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserInfoQueryController.class)
-@Import(UserInfoQueryControllerTest.TestMethodSecurityConfig.class)
-class UserInfoQueryControllerTest {
-
-    @EnableMethodSecurity
-    static class TestMethodSecurityConfig {}
-
-    @Autowired MockMvc mockMvc;
-    @MockBean UserInfoQueryService userInfoService;
-    @MockBean CookieUtil cookieUtil;
-    @MockBean JwtDecoder jwtDecoder;
+class UserInfoQueryControllerTest extends AbstractUserWebMvcTest {
 
     @Test
     @DisplayName("getMyInfo — ROLE_MEMBER이면 200 OK")

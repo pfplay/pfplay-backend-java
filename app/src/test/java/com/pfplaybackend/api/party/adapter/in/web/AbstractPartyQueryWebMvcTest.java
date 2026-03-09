@@ -1,0 +1,37 @@
+package com.pfplaybackend.api.party.adapter.in.web;
+
+import com.pfplaybackend.api.party.application.service.*;
+import com.pfplaybackend.api.partyview.adapter.in.web.PartyroomSetupController;
+import com.pfplaybackend.api.partyview.application.service.PartyroomSetupQueryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.web.servlet.MockMvc;
+
+@WebMvcTest({
+        PartyroomQueryController.class,
+        PartyroomNoticeQueryController.class,
+        CrewQueryController.class,
+        CrewBlockQueryController.class,
+        CrewPenaltyQueryController.class,
+        PlaybackQueryController.class,
+        PartyroomSetupController.class
+})
+@Import(AbstractPartyQueryWebMvcTest.SharedMethodSecurityConfig.class)
+public abstract class AbstractPartyQueryWebMvcTest {
+
+    @EnableMethodSecurity
+    static class SharedMethodSecurityConfig {}
+
+    @Autowired protected MockMvc mockMvc;
+    @MockBean protected PartyroomQueryService partyroomQueryService;
+    @MockBean protected PartyroomNoticeQueryService partyroomNoticeQueryService;
+    @MockBean protected CrewBlockQueryService crewBlockQueryService;
+    @MockBean protected CrewPenaltyQueryService crewPenaltyQueryService;
+    @MockBean protected PlaybackQueryService playbackQueryService;
+    @MockBean protected PartyroomSetupQueryService partyroomSetupQueryService;
+    @MockBean protected JwtDecoder jwtDecoder;
+}

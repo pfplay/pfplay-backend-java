@@ -1,58 +1,48 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
-import com.pfplaybackend.api.party.application.service.DjCommandService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(DjCommandController.class)
-@Import(DjCommandControllerTest.TestMethodSecurityConfig.class)
-class DjCommandControllerTest {
-
-    @EnableMethodSecurity
-    static class TestMethodSecurityConfig {}
-
-    @Autowired MockMvc mockMvc;
-    @MockBean DjCommandService djCommandService;
-    @MockBean JwtDecoder jwtDecoder;
+class DjCommandControllerTest extends AbstractPartyCommandWebMvcTest {
 
     @Test
-    @DisplayName("enqueueDj — 200 OK")
-    void enqueueDjReturns200() throws Exception {
+    @DisplayName("enqueueDj — 201 Created + djId 반환")
+    void enqueueDjReturns201WithDjId() throws Exception {
+        // given
         String body = """
                 {
                     "playlistId": 1
                 }
                 """;
+        when(djCommandService.enqueueDj(any(), any())).thenReturn(42L);
 
-        mockMvc.perform(post("/api/v1/partyrooms/1/djs")
+        // when & then
+        mockMvc.perform(post("/api/v1/partyrooms/1/dj-queue")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.djId").value(42));
     }
 
     @Test
-    @DisplayName("dequeueDj — 200 OK")
-    void dequeueDjReturns200() throws Exception {
-        mockMvc.perform(delete("/api/v1/partyrooms/1/djs/me")
+    @DisplayName("dequeueDj — 204 No Content")
+    void dequeueDjReturns204() throws Exception {
+        mockMvc.perform(delete("/api/v1/partyrooms/1/dj-queue/me")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -64,7 +54,7 @@ class DjCommandControllerTest {
                 }
                 """;
 
-        mockMvc.perform(post("/api/v1/partyrooms/1/djs")
+        mockMvc.perform(post("/api/v1/partyrooms/1/dj-queue")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))

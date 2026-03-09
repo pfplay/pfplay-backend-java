@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.party.application.service.PartyroomCommandService;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.enums.StageType;
 import com.pfplaybackend.api.party.domain.value.LinkDomain;
@@ -9,12 +8,7 @@ import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.api.party.domain.value.PlaybackTimeLimit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -24,16 +18,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PartyroomCommandController.class)
-class PartyroomCommandControllerTest {
-
-    @Autowired MockMvc mockMvc;
-    @MockBean PartyroomCommandService partyroomCommandService;
-    @MockBean JwtDecoder jwtDecoder;
+class PartyroomCommandControllerTest extends AbstractPartyCommandWebMvcTest {
 
     @Test
-    @DisplayName("createPartyroom — 200 OK + 서비스 호출")
-    void createPartyroomReturns200() throws Exception {
+    @DisplayName("createPartyroom — 201 Created + 서비스 호출")
+    void createPartyroomReturns201() throws Exception {
         // given
         String body = """
                 {
@@ -57,7 +46,7 @@ class PartyroomCommandControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
     }
 
     @Test

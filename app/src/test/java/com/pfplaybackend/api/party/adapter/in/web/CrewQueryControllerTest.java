@@ -1,16 +1,8 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
 import com.pfplaybackend.api.party.application.dto.result.CrewProfileSummaryResult;
-import com.pfplaybackend.api.party.application.service.PartyroomQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -19,16 +11,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CrewQueryController.class)
-@Import(CrewQueryControllerTest.TestMethodSecurityConfig.class)
-class CrewQueryControllerTest {
-
-    @EnableMethodSecurity
-    static class TestMethodSecurityConfig {}
-
-    @Autowired MockMvc mockMvc;
-    @MockBean PartyroomQueryService partyroomQueryService;
-    @MockBean JwtDecoder jwtDecoder;
+class CrewQueryControllerTest extends AbstractPartyQueryWebMvcTest {
 
     @Test
     @DisplayName("getOtherProfileSummary — ROLE_MEMBER이면 200 OK")

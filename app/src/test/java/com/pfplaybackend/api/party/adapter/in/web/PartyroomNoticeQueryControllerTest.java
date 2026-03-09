@@ -1,13 +1,7 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
-import com.pfplaybackend.api.party.application.service.PartyroomNoticeQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -15,12 +9,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PartyroomNoticeQueryController.class)
-class PartyroomNoticeQueryControllerTest {
-
-    @Autowired MockMvc mockMvc;
-    @MockBean PartyroomNoticeQueryService partyroomNoticeQueryService;
-    @MockBean JwtDecoder jwtDecoder;
+class PartyroomNoticeQueryControllerTest extends AbstractPartyQueryWebMvcTest {
 
     @Test
     @DisplayName("getNotice — 200 OK")

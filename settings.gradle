@@ -1,2 +1,8 @@
 rootProject.name = 'pfplay'
 include 'common', 'realtime', 'playlist', 'user', 'app'
+
+buildCache {
+	local {
+		enabled = true
+	}
+}

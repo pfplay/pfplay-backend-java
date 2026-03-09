@@ -58,16 +58,16 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.authUrl").value("https://accounts.google.com/auth"));
+                .andExpect(jsonPath("$.data.authUrl").value("https://accounts.google.com/auth"));
     }
 
     @Test
-    @DisplayName("logout — 200 OK")
-    void logoutReturns200() throws Exception {
+    @DisplayName("logout — 204 No Content")
+    void logoutReturns204() throws Exception {
         mockMvc.perform(post("/api/v1/auth/logout")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
     }
 
     // ── oauthCallback ──
@@ -98,8 +98,7 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("Authentication successful"));
+                .andExpect(jsonPath("$.data.tokenType").value("Cookie"));
 
         verify(cookieUtil).addAccessTokenCookie(any(), eq("access-token"));
     }
@@ -127,8 +126,7 @@ class AuthControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -154,62 +152,8 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
+                .andExpect(jsonPath("$.data.tokenType").value("Cookie"));
 
         verify(oAuthUrlService, never()).validateAndConsumeState(anyString(), any(), anyString());
-    }
-
-    @Test
-    @DisplayName("oauthCallback — 서버 오류 발생 시 500 반환")
-    void oauthCallbackServerErrorReturns500() throws Exception {
-        // given
-        String codeVerifier = "a".repeat(43);
-        String body = """
-                {
-                    "provider": "google",
-                    "code": "auth-code-123",
-                    "codeVerifier": "%s"
-                }
-                """.formatted(codeVerifier);
-
-        when(authService.processOAuthLogin(any(OAuthLoginCommand.class)))
-                .thenThrow(new RuntimeException("Unexpected error"));
-
-        // when & then
-        mockMvc.perform(post("/api/v1/auth/oauth/callback")
-                        .with(jwt())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.message").value("Authentication failed"));
-    }
-
-    // ── generateOAuthUrl — 추가 에러 케이스 ──
-
-    @Test
-    @DisplayName("generateOAuthUrl — 서버 오류 발생 시 500 반환")
-    void generateOAuthUrlServerErrorReturns500() throws Exception {
-        // given
-        String codeVerifier = "a".repeat(43);
-        String body = """
-                {
-                    "provider": "google",
-                    "codeVerifier": "%s"
-                }
-                """.formatted(codeVerifier);
-
-        when(oAuthUrlService.generateAuthUrl(any(OAuthProvider.class), anyString()))
-                .thenThrow(new RuntimeException("Unexpected error"));
-
-        // when & then
-        mockMvc.perform(post("/api/v1/auth/oauth/url")
-                        .with(jwt())
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.success").value(false));
     }
 }

@@ -1,6 +1,5 @@
 package com.pfplaybackend.api.admin.adapter.in.web;
 
-import com.pfplaybackend.api.admin.application.service.AdminUserService;
 import com.pfplaybackend.api.common.config.security.enums.ProviderType;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.common.domain.value.UserId;
@@ -13,14 +12,7 @@ import com.pfplaybackend.api.user.domain.value.AvatarIconUri;
 import com.pfplaybackend.api.user.domain.value.AvatarSetting;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -30,16 +22,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AdminUserController.class)
-@Import(AdminUserControllerTest.TestMethodSecurityConfig.class)
-class AdminUserControllerTest {
-
-    @EnableMethodSecurity
-    static class TestMethodSecurityConfig {}
-
-    @Autowired MockMvc mockMvc;
-    @MockBean AdminUserService adminUserService;
-    @MockBean JwtDecoder jwtDecoder;
+class AdminUserControllerTest extends AbstractAdminWebMvcTest {
 
     @Test
     @DisplayName("createVirtualMember — FM 권한이면 201 Created")

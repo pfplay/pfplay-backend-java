@@ -1,14 +1,8 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
-import com.pfplaybackend.api.party.application.service.CrewGradeCommandService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -17,12 +11,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CrewGradeCommandController.class)
-class CrewGradeCommandControllerTest {
-
-    @Autowired MockMvc mockMvc;
-    @MockBean CrewGradeCommandService crewGradeCommandService;
-    @MockBean JwtDecoder jwtDecoder;
+class CrewGradeCommandControllerTest extends AbstractPartyCommandWebMvcTest {
 
     @Test
     @DisplayName("updateCrewGrade — 204 No Content")

@@ -1,15 +1,9 @@
 package com.pfplaybackend.api.playlist.adapter.in.web;
 
 import com.pfplaybackend.api.playlist.application.dto.PlaylistSummaryDto;
-import com.pfplaybackend.api.playlist.application.service.PlaylistQueryService;
 import com.pfplaybackend.api.playlist.domain.enums.PlaylistType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -19,17 +13,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(PlaylistQueryController.class)
-class PlaylistQueryControllerTest {
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @MockBean
-    PlaylistQueryService playlistQueryService;
-
-    @MockBean
-    JwtDecoder jwtDecoder;
+class PlaylistQueryControllerTest extends AbstractPlaylistWebMvcTest {
 
     @Test
     @DisplayName("GET /playlists — MEMBER 권한이면 200과 플레이리스트 배열을 반환한다")

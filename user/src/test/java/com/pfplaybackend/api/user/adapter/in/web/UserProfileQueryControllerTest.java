@@ -3,14 +3,8 @@ package com.pfplaybackend.api.user.adapter.in.web;
 import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.user.application.dto.shared.ActivitySummaryDto;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSummaryDto;
-import com.pfplaybackend.api.user.application.service.UserProfileQueryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
@@ -20,20 +14,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(UserProfileQueryController.class)
-class UserProfileQueryControllerTest {
+class UserProfileQueryControllerTest extends AbstractUserWebMvcTest {
 
     private static final String SUMMARY_ENDPOINT = "/api/v1/users/me/profile/summary";
     private static final String BODY_PNG = "body.png";
-
-    @Autowired
-    MockMvc mockMvc;
-
-    @MockBean
-    UserProfileQueryService userProfileQueryService;
-
-    @MockBean
-    JwtDecoder jwtDecoder;
 
     @Test
     @DisplayName("GET /me/profile/summary — MEMBER 권한이면 200과 프로필 JSON을 반환한다")

@@ -1,35 +1,28 @@
 package com.pfplaybackend.api.party.adapter.in.web;
 
-import com.pfplaybackend.api.party.application.service.CrewPenaltyCommandService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.test.web.servlet.MockMvc;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(CrewPenaltyCommandController.class)
-class CrewPenaltyCommandControllerTest {
-
-    @Autowired MockMvc mockMvc;
-    @MockBean CrewPenaltyCommandService crewPenaltyCommandService;
-    @MockBean JwtDecoder jwtDecoder;
+class CrewPenaltyCommandControllerTest extends AbstractPartyCommandWebMvcTest {
 
     @Test
-    @DisplayName("imposeCrewPenalty — 202 Accepted")
-    void imposeCrewPenaltyReturns202() throws Exception {
+    @DisplayName("imposeCrewPenalty — 201 Created + penaltyId 반환")
+    void imposeCrewPenaltyReturns201WithPenaltyId() throws Exception {
         // given
         String body = """
                 {"crewId": 1, "penaltyType": "ONE_TIME_EXPULSION", "detail": "Disruptive behavior"}
                 """;
+        when(crewPenaltyCommandService.addPenalty(any(), any())).thenReturn(77L);
 
         // when & then
         mockMvc.perform(post("/api/v1/partyrooms/1/penalties")
@@ -37,16 +30,17 @@ class CrewPenaltyCommandControllerTest {
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.data.penaltyId").value(77));
     }
 
     @Test
-    @DisplayName("releaseCrewPenalty — 202 Accepted")
-    void releaseCrewPenaltyReturns202() throws Exception {
+    @DisplayName("releaseCrewPenalty — 204 No Content")
+    void releaseCrewPenaltyReturns204() throws Exception {
         mockMvc.perform(delete("/api/v1/partyrooms/1/penalties/100")
                         .with(jwt().authorities(() -> "ROLE_MEMBER"))
                         .with(csrf()))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isNoContent());
     }
 
     @Test
