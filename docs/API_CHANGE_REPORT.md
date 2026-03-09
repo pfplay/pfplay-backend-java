@@ -8,7 +8,7 @@
 
 ## 변경 요약
 
-이번 변경은 크게 **8가지 영역**을 다룹니다:
+이번 변경은 크게 **12가지 영역**을 다룹니다:
 
 1. **REST API 경로(URL) 변경** — 동사를 제거하고 리소스 명사 중심으로 전환
 2. **HTTP 상태 코드 정리** — RESTful 규약에 맞게 201/204/200 통일
@@ -19,6 +19,9 @@
 7. **Map → Typed Record DTO 마이그레이션** — 응답 타입 명시화 (JSON 구조 변경 없음)
 8. **응답 DTO 필드 변경** — PlaybackDto 반응 카운트 제거, WebSocket 이벤트 페이로드 축소
 9. **Request DTO 유효성 검사 강화** — 필수 필드 서버 측 검증 추가
+10. **WebSocket 이벤트 이름 변경** — 과거형 snake_case 컨벤션 적용
+11. **WebSocket 메시지 메타데이터 추가** — id, timestamp 필드 추가 + partyroomId 플랫 직렬화
+12. **WebSocket 입퇴장 이벤트 분리 + 아바타 스키마 변경** — 구조적 변경
 
 ---
 
@@ -334,7 +337,16 @@ Auth API도 `ApiCommonResponse` 래퍼로 통일했습니다. 기존의 `success
 
 ### 응답 DTO & WebSocket 이벤트 변경
 - [ ] Setup API (`GET /api/v1/partyrooms/setup`): `display.playback`에서 `likeCount`, `dislikeCount`, `grabCount` 제거됨 → `display.reaction.aggregation`에서 조회
-- [ ] WebSocket `playback_start` 이벤트: `playback` 페이로드에서 반응 카운트 제거 → 클라이언트에서 초기값(0, 0, 0) 설정 후 `reaction_aggregation` 이벤트로 업데이트
+- [ ] WebSocket `playback_started` 이벤트: `playback` 페이로드에서 반응 카운트 제거 → 클라이언트에서 초기값(0, 0, 0) 설정 후 `reaction_aggregation_updated` 이벤트로 업데이트
+
+### WebSocket 이벤트 변경 (섹션 12~14)
+- [ ] `eventType` 문자열 상수 전체 업데이트 (11개 이벤트 이름 변경, 위 테이블 참조)
+- [ ] `eventType` 값이 대문자 ENUM 형태로 변경: `"chat"` → `"CHAT_MESSAGE_SENT"` 등
+- [ ] `partyroomId` 접근 경로 변경: `event.partyroomId.id` → `event.partyroomId` (플랫 정수)
+- [ ] `partyroom_access` 핸들러 → `crew_entered` / `crew_exited` 2개 핸들러로 분리
+- [ ] `accessType` 필드 기반 분기 로직 제거
+- [ ] 아바타 필드 접근 경로 변경: `crew.avatarBodyUri` → `crew.avatar.avatarBodyUri` (crew_entered, crew_profile_changed)
+- [ ] (선택) 신규 `id`, `timestamp` 메타데이터 활용 — 멱등성 처리, 메시지 순서 보장에 활용 가능
 
 ### Swagger & 응답 타입
 - [ ] 에러 응답(4xx)이 Swagger UI에 정상 표시되는지 확인
@@ -508,4 +520,165 @@ WebSocket `playback_start` 이벤트의 `playback` 필드에서 반응 카운트
 }
 ```
 
-> **프론트엔드 조치**: 재생 시작 시 카운트는 항상 0이므로, 클라이언트에서 초기값(0, 0, 0)을 설정하면 됩니다. 이후 `reaction_aggregation` 이벤트로 실시간 업데이트 수신.
+> **프론트엔드 조치**: 재생 시작 시 카운트는 항상 0이므로, 클라이언트에서 초기값(0, 0, 0)을 설정하면 됩니다. 이후 `reaction_aggregation_updated` 이벤트로 실시간 업데이트 수신.
+
+---
+
+## 12. WebSocket 이벤트 이름 변경 (과거형 컨벤션)
+
+모든 WebSocket 이벤트 이름이 **과거형 snake_case**로 통일되었습니다. `eventType` 필드 값도 동일하게 변경됩니다.
+
+| 변경 전 | 변경 후 | 설명 |
+|---------|---------|------|
+| `chat` | `chat_message_sent` | 채팅 메시지 |
+| `partyroom_access` | `crew_entered` / `crew_exited` | 입퇴장 (**분리**, 아래 14번 참조) |
+| `partyroom_deactivation` | `playback_deactivated` | 재생 비활성화 |
+| `playback_start` | `playback_started` | 재생 시작 |
+| `reaction_motion` | `reaction_performed` | 리액션 모션 |
+| `reaction_aggregation` | `reaction_aggregation_updated` | 리액션 집계 |
+| `dj_queue_change` | `dj_queue_changed` | DJ 큐 변경 |
+| `crew_grade` | `crew_grade_changed` | 등급 변경 |
+| `crew_penalty` | `crew_penalized` | 페널티 |
+| `crew_profile` | `crew_profile_changed` | 프로필 변경 |
+| `partyroom_closed` | `partyroom_closed` | 변경 없음 |
+
+> **프론트엔드 조치**: STOMP 구독 후 `eventType` 기반 메시지 라우팅 로직의 문자열 상수를 모두 업데이트하세요. `eventType` 값은 이제 **대문자 ENUM** 형태입니다 (예: `CHAT_MESSAGE_SENT`, `CREW_ENTERED`).
+
+---
+
+## 13. WebSocket 메시지 메타데이터 추가 + partyroomId 직렬화 변경
+
+### 13-1. 공통 메타데이터 필드 추가
+
+모든 서버→클라이언트 브로드캐스트 메시지에 다음 2개 필드가 **신규 추가**되었습니다:
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | `string` (UUID v4) | 메시지 고유 식별자 (멱등성 처리, 중복 수신 방지에 활용) |
+| `timestamp` | `integer` (int64) | 메시지 발행 시각 (Unix epoch milliseconds) |
+
+```json
+// 모든 브로드캐스트 메시지의 공통 구조
+{
+  "partyroomId": 10,
+  "eventType": "PLAYBACK_STARTED",
+  "id": "550e8400-e29b-41d4-a716-446655440003",
+  "timestamp": 1709964213000,
+  // ... 이벤트별 데이터
+}
+```
+
+### 13-2. partyroomId 직렬화 변경 (객체 → 플랫 정수)
+
+`partyroomId` 필드가 **중첩 객체에서 플랫 정수**로 변경되었습니다.
+
+```json
+// Before
+{ "partyroomId": { "id": 10 } }
+
+// After
+{ "partyroomId": 10 }
+```
+
+> **프론트엔드 조치**:
+> - `event.partyroomId.id` → `event.partyroomId`로 접근 경로를 변경하세요.
+> - `id`, `timestamp` 필드가 추가되었으므로, 메시지 파싱 시 이를 활용할 수 있습니다 (필수 처리는 아님).
+
+---
+
+## 14. WebSocket 입퇴장 이벤트 분리 + 아바타 스키마 변경
+
+### 14-1. `partyroom_access` → `crew_entered` + `crew_exited` 분리
+
+기존의 단일 `partyroom_access` 이벤트가 **입장과 퇴장으로 완전 분리**되었습니다.
+
+**기존 (단일 이벤트):**
+```json
+{
+  "partyroomId": { "id": 10 },
+  "eventType": "partyroom_access",
+  "accessType": "ENTER",
+  "crew": { "crewId": 42, "gradeType": "CLUBBER", "nickname": "DJ_파티왕", ... }
+}
+```
+
+**변경 후 — 입장 (`crew_entered`):**
+```json
+{
+  "partyroomId": 10,
+  "eventType": "CREW_ENTERED",
+  "id": "...",
+  "timestamp": 1709964213000,
+  "crew": {
+    "crewId": 42,
+    "gradeType": "CLUBBER",
+    "nickname": "DJ_파티왕",
+    "avatar": {
+      "avatarCompositionType": "SINGLE_BODY",
+      "avatarBodyUri": "/avatars/body/1.png",
+      "avatarFaceUri": null,
+      "avatarIconUri": "/avatars/icon/1.png",
+      "combinePositionX": 0,
+      "combinePositionY": 0,
+      "offsetX": 0.0,
+      "offsetY": 0.0,
+      "scale": 1.0
+    }
+  }
+}
+```
+
+**변경 후 — 퇴장 (`crew_exited`):**
+```json
+{
+  "partyroomId": 10,
+  "eventType": "CREW_EXITED",
+  "id": "...",
+  "timestamp": 1709964213000,
+  "crewId": 42
+}
+```
+
+### 14-2. 아바타 필드 → `avatar` 중첩 객체로 변경
+
+`crew_entered`와 `crew_profile_changed` 이벤트에서 아바타 관련 9개 필드가 **`avatar` 객체로 그룹화**되었습니다.
+
+```json
+// Before (플랫)
+{
+  "crewId": 42,
+  "nickname": "DJ_파티왕",
+  "avatarCompositionType": "SINGLE_BODY",
+  "avatarBodyUri": "...",
+  "avatarFaceUri": null,
+  "avatarIconUri": "...",
+  "combinePositionX": 0,
+  "combinePositionY": 0,
+  "offsetX": 0.0,
+  "offsetY": 0.0,
+  "scale": 1.0
+}
+
+// After (중첩)
+{
+  "crewId": 42,
+  "nickname": "DJ_파티왕",
+  "avatar": {
+    "avatarCompositionType": "SINGLE_BODY",
+    "avatarBodyUri": "...",
+    "avatarFaceUri": null,
+    "avatarIconUri": "...",
+    "combinePositionX": 0,
+    "combinePositionY": 0,
+    "offsetX": 0.0,
+    "offsetY": 0.0,
+    "scale": 1.0
+  }
+}
+```
+
+> **프론트엔드 조치**:
+> - `partyroom_access` 이벤트 핸들러를 `crew_entered` / `crew_exited` 2개로 분리하세요.
+> - `accessType` 필드 기반 분기 로직은 제거하세요.
+> - 아바타 필드 접근: `crew.avatarBodyUri` → `crew.avatar.avatarBodyUri`로 변경하세요.
+> - `crew_profile_changed`도 동일: `event.avatarBodyUri` → `event.avatar.avatarBodyUri`

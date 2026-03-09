@@ -2,7 +2,7 @@ asyncapi: 3.0.0
 
 info:
   title: PFPlay WebSocket API
-  version: 1.0.0
+  version: 2.0.0
   description: |
     PFPlay 실시간 음악 파티 플랫폼의 WebSocket 이벤트 규격서입니다.
 
@@ -19,9 +19,12 @@ info:
     ```
 
     ## 공통 규칙
-    - 모든 서버→클라이언트 브로드캐스트 메시지에는 `partyroomId`와 `eventType` 필드가 포함됩니다.
-    - `eventType`은 해당 메시지의 토픽 이름과 동일합니다 (예: `chat`, `playback_start`).
-    - `partyroomId`는 `{ "id": <number> }` 형태의 객체입니다.
+    - 모든 서버→클라이언트 브로드캐스트 메시지에는 공통 메타데이터가 포함됩니다:
+      - `partyroomId` (integer) — 파티룸 식별자 (플랫 정수)
+      - `eventType` (string) — 이벤트 종류 (과거형 snake_case)
+      - `id` (string) — 메시지 고유 ID (UUID v4)
+      - `timestamp` (integer) — 메시지 발행 시각 (Unix epoch ms)
+    - 이벤트 이름은 **과거형**을 사용합니다 (예: `playback_started`, `crew_entered`).
   contact:
     name: PFPlay Backend Team
   license:
@@ -82,28 +85,30 @@ channels:
       partyroomId:
         description: 파티룸 ID
     messages:
-      ChatMessage:
-        $ref: '#/components/messages/ChatMessage'
-      PartyroomAccessMessage:
-        $ref: '#/components/messages/PartyroomAccessMessage'
-      PartyroomDeactivationMessage:
-        $ref: '#/components/messages/PartyroomDeactivationMessage'
-      PartyroomClosedMessage:
-        $ref: '#/components/messages/PartyroomClosedMessage'
-      PlaybackStartMessage:
-        $ref: '#/components/messages/PlaybackStartMessage'
-      ReactionMotionMessage:
-        $ref: '#/components/messages/ReactionMotionMessage'
-      ReactionAggregationMessage:
-        $ref: '#/components/messages/ReactionAggregationMessage'
-      DjQueueChangeMessage:
-        $ref: '#/components/messages/DjQueueChangeMessage'
-      CrewGradeMessage:
-        $ref: '#/components/messages/CrewGradeMessage'
-      CrewPenaltyMessage:
-        $ref: '#/components/messages/CrewPenaltyMessage'
-      CrewProfileMessage:
-        $ref: '#/components/messages/CrewProfileMessage'
+      ChatMessageSent:
+        $ref: '#/components/messages/ChatMessageSent'
+      CrewEntered:
+        $ref: '#/components/messages/CrewEntered'
+      CrewExited:
+        $ref: '#/components/messages/CrewExited'
+      PlaybackDeactivated:
+        $ref: '#/components/messages/PlaybackDeactivated'
+      PartyroomClosed:
+        $ref: '#/components/messages/PartyroomClosed'
+      PlaybackStarted:
+        $ref: '#/components/messages/PlaybackStarted'
+      ReactionPerformed:
+        $ref: '#/components/messages/ReactionPerformed'
+      ReactionAggregationUpdated:
+        $ref: '#/components/messages/ReactionAggregationUpdated'
+      DjQueueChanged:
+        $ref: '#/components/messages/DjQueueChanged'
+      CrewGradeChanged:
+        $ref: '#/components/messages/CrewGradeChanged'
+      CrewPenalized:
+        $ref: '#/components/messages/CrewPenalized'
+      CrewProfileChanged:
+        $ref: '#/components/messages/CrewProfileChanged'
 
   # ─────────────────────────────────────────
   # Server → Client (Subscribe, Private)
@@ -140,32 +145,41 @@ operations:
       - $ref: '#/channels/heartbeat/messages/HeartbeatRequest'
 
   # Server → Client (Group Broadcast)
-  receiveChat:
+  receiveChatMessageSent:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: 채팅 메시지 수신
     summary: 파티룸 그룹 채팅 메시지를 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/ChatMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/ChatMessageSent'
 
-  receivePartyroomAccess:
+  receiveCrewEntered:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
-    title: 입퇴장 이벤트 수신
-    summary: 크루 입장/퇴장 알림을 수신합니다.
+    title: 크루 입장 수신
+    summary: 새 크루가 파티룸에 입장했을 때 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/PartyroomAccessMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/CrewEntered'
 
-  receivePartyroomDeactivation:
+  receiveCrewExited:
+    action: receive
+    channel:
+      $ref: '#/channels/partyroomBroadcast'
+    title: 크루 퇴장 수신
+    summary: 크루가 파티룸에서 퇴장했을 때 수신합니다.
+    messages:
+      - $ref: '#/channels/partyroomBroadcast/messages/CrewExited'
+
+  receivePlaybackDeactivated:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: 재생 비활성화 수신
     summary: 파티룸 재생이 비활성화되었을 때 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/PartyroomDeactivationMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/PlaybackDeactivated'
 
   receivePartyroomClosed:
     action: receive
@@ -174,70 +188,70 @@ operations:
     title: 파티룸 종료 수신
     summary: 파티룸이 종료(삭제)되었을 때 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/PartyroomClosedMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/PartyroomClosed'
 
-  receivePlaybackStart:
+  receivePlaybackStarted:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: 재생 시작 수신
     summary: 새 트랙 재생이 시작되었을 때 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/PlaybackStartMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/PlaybackStarted'
 
-  receiveReactionMotion:
+  receiveReactionPerformed:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: 리액션 모션 수신
     summary: 크루의 리액션 모션 애니메이션 이벤트를 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/ReactionMotionMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/ReactionPerformed'
 
-  receiveReactionAggregation:
+  receiveReactionAggregationUpdated:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: 리액션 집계 수신
     summary: 현재 재생 곡의 리액션 집계(좋아요/싫어요/그랩 카운트) 업데이트를 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/ReactionAggregationMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/ReactionAggregationUpdated'
 
-  receiveDjQueueChange:
+  receiveDjQueueChanged:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: DJ 큐 변경 수신
     summary: DJ 큐 목록이 변경(등록/해제/순서 변경)되었을 때 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/DjQueueChangeMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/DjQueueChanged'
 
-  receiveCrewGrade:
+  receiveCrewGradeChanged:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: 등급 변경 수신
     summary: 크루의 파티룸 내 등급이 변경되었을 때 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/CrewGradeMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/CrewGradeChanged'
 
-  receiveCrewPenalty:
+  receiveCrewPenalized:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: 페널티 수신
     summary: 크루에게 페널티가 부과되었을 때 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/CrewPenaltyMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/CrewPenalized'
 
-  receiveCrewProfile:
+  receiveCrewProfileChanged:
     action: receive
     channel:
       $ref: '#/channels/partyroomBroadcast'
     title: 프로필 변경 수신
     summary: 크루의 프로필(닉네임, 아바타)이 변경되었을 때 수신합니다.
     messages:
-      - $ref: '#/channels/partyroomBroadcast/messages/CrewProfileMessage'
+      - $ref: '#/channels/partyroomBroadcast/messages/CrewProfileChanged'
 
   receiveHeartbeat:
     action: receive
@@ -268,76 +282,98 @@ components:
         type: object
 
     # ─── Server → Client (Group Broadcast) ───
-    ChatMessage:
-      name: ChatMessage
+    ChatMessageSent:
+      name: ChatMessageSent
       title: 채팅 메시지 (수신)
       summary: 그룹 채팅 메시지 브로드캐스트
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/OutgoingGroupChatPayload'
+        $ref: '#/components/schemas/ChatMessageSentPayload'
       examples:
         - name: 일반 채팅
           payload:
-            partyroomId: { id: 10 }
-            eventType: chat
+            partyroomId: 10
+            eventType: CHAT_MESSAGE_SENT
+            id: "550e8400-e29b-41d4-a716-446655440000"
+            timestamp: 1709964213000
             crew: { crewId: 42 }
             message: { messageId: "msg-abc-123", content: "좋은 노래네요!" }
 
-    PartyroomAccessMessage:
-      name: PartyroomAccessMessage
-      title: 입퇴장 알림
-      summary: 크루 입장(ENTER) 또는 퇴장(EXIT) 브로드캐스트
+    CrewEntered:
+      name: CrewEntered
+      title: 크루 입장
+      summary: 새 크루가 파티룸에 입장함
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/PartyroomAccessPayload'
+        $ref: '#/components/schemas/CrewEnteredPayload'
       examples:
         - name: 크루 입장
           payload:
-            partyroomId: { id: 10 }
-            eventType: partyroom_access
-            accessType: ENTER
+            partyroomId: 10
+            eventType: CREW_ENTERED
+            id: "550e8400-e29b-41d4-a716-446655440001"
+            timestamp: 1709964213000
             crew:
               crewId: 42
               gradeType: CLUBBER
               nickname: "DJ_파티왕"
-              avatarCompositionType: SINGLE_BODY
-              avatarBodyUri: "/avatars/body/1.png"
-              avatarFaceUri: null
-              avatarIconUri: "/avatars/icon/1.png"
-              combinePositionX: 0
-              combinePositionY: 0
-              offsetX: 0.0
-              offsetY: 0.0
-              scale: 1.0
+              avatar:
+                avatarCompositionType: SINGLE_BODY
+                avatarBodyUri: "/avatars/body/1.png"
+                avatarFaceUri: null
+                avatarIconUri: "/avatars/icon/1.png"
+                combinePositionX: 0
+                combinePositionY: 0
+                offsetX: 0.0
+                offsetY: 0.0
+                scale: 1.0
 
-    PartyroomDeactivationMessage:
-      name: PartyroomDeactivationMessage
+    CrewExited:
+      name: CrewExited
+      title: 크루 퇴장
+      summary: 크루가 파티룸에서 퇴장함
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/CrewExitedPayload'
+      examples:
+        - name: 크루 퇴장
+          payload:
+            partyroomId: 10
+            eventType: CREW_EXITED
+            id: "550e8400-e29b-41d4-a716-446655440002"
+            timestamp: 1709964213000
+            crewId: 42
+
+    PlaybackDeactivated:
+      name: PlaybackDeactivated
       title: 재생 비활성화
       summary: 파티룸 재생이 비활성화됨 (DJ 큐가 비어 더 이상 재생할 곡이 없음)
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/PartyroomDeactivationPayload'
+        $ref: '#/components/schemas/PlaybackDeactivatedPayload'
 
-    PartyroomClosedMessage:
-      name: PartyroomClosedMessage
+    PartyroomClosed:
+      name: PartyroomClosed
       title: 파티룸 종료
       summary: 호스트가 파티룸을 삭제하여 종료됨
       contentType: application/json
       payload:
         $ref: '#/components/schemas/PartyroomClosedPayload'
 
-    PlaybackStartMessage:
-      name: PlaybackStartMessage
+    PlaybackStarted:
+      name: PlaybackStarted
       title: 재생 시작
       summary: 새 트랙 재생이 시작됨
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/PlaybackStartPayload'
+        $ref: '#/components/schemas/PlaybackStartedPayload'
       examples:
         - name: 재생 시작
           payload:
-            partyroomId: { id: 10 }
-            eventType: playback_start
+            partyroomId: 10
+            eventType: PLAYBACK_STARTED
+            id: "550e8400-e29b-41d4-a716-446655440003"
+            timestamp: 1709964213000
             crewId: 42
             playback:
               id: 1
@@ -347,91 +383,120 @@ components:
               thumbnailImage: "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg"
               endTime: 1709964213000
 
-    ReactionMotionMessage:
-      name: ReactionMotionMessage
-      title: 리액션 모션
+    ReactionPerformed:
+      name: ReactionPerformed
+      title: 리액션 수행
       summary: 크루의 리액션 모션 애니메이션 (좋아요/싫어요/그랩 + 댄스 모션)
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/ReactionMotionPayload'
+        $ref: '#/components/schemas/ReactionPerformedPayload'
       examples:
         - name: 좋아요 + 댄스
           payload:
-            partyroomId: { id: 10 }
-            eventType: reaction_motion
+            partyroomId: 10
+            eventType: REACTION_PERFORMED
+            id: "550e8400-e29b-41d4-a716-446655440004"
+            timestamp: 1709964213000
             reactionType: LIKE
             motionType: DANCE_TYPE_1
             crew: { crewId: 42 }
 
-    ReactionAggregationMessage:
-      name: ReactionAggregationMessage
+    ReactionAggregationUpdated:
+      name: ReactionAggregationUpdated
       title: 리액션 집계
       summary: 현재 재생 곡의 리액션 집계 업데이트
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/ReactionAggregationPayload'
+        $ref: '#/components/schemas/ReactionAggregationUpdatedPayload'
       examples:
         - name: 집계 업데이트
           payload:
-            partyroomId: { id: 10 }
-            eventType: reaction_aggregation
+            partyroomId: 10
+            eventType: REACTION_AGGREGATION_UPDATED
+            id: "550e8400-e29b-41d4-a716-446655440005"
+            timestamp: 1709964213000
             aggregation: { likeCount: 5, dislikeCount: 1, grabCount: 2 }
 
-    DjQueueChangeMessage:
-      name: DjQueueChangeMessage
+    DjQueueChanged:
+      name: DjQueueChanged
       title: DJ 큐 변경
       summary: DJ 큐 목록 전체가 갱신됨 (등록/해제/순서 변경 시)
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/DjQueueChangePayload'
+        $ref: '#/components/schemas/DjQueueChangedPayload'
       examples:
         - name: DJ 큐 갱신
           payload:
-            partyroomId: { id: 10 }
-            eventType: dj_queue_change
+            partyroomId: 10
+            eventType: DJ_QUEUE_CHANGED
+            id: "550e8400-e29b-41d4-a716-446655440006"
+            timestamp: 1709964213000
             djs:
               - { crewId: 42, orderNumber: 1, nickname: "DJ_파티왕", avatarIconUri: "/avatars/icon/1.png" }
               - { crewId: 55, orderNumber: 2, nickname: "음악매니아", avatarIconUri: "/avatars/icon/2.png" }
 
-    CrewGradeMessage:
-      name: CrewGradeMessage
+    CrewGradeChanged:
+      name: CrewGradeChanged
       title: 등급 변경
       summary: 크루의 파티룸 내 등급이 변경됨
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/CrewGradePayload'
+        $ref: '#/components/schemas/CrewGradeChangedPayload'
       examples:
         - name: 등급 승격
           payload:
-            partyroomId: { id: 10 }
-            eventType: crew_grade
+            partyroomId: 10
+            eventType: CREW_GRADE_CHANGED
+            id: "550e8400-e29b-41d4-a716-446655440007"
+            timestamp: 1709964213000
             adjuster: { crewId: 1 }
             adjusted: { crewId: 42, prevGradeType: CLUBBER, currGradeType: MODERATOR }
 
-    CrewPenaltyMessage:
-      name: CrewPenaltyMessage
+    CrewPenalized:
+      name: CrewPenalized
       title: 페널티
       summary: 크루에게 페널티가 부과됨
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/CrewPenaltyPayload'
+        $ref: '#/components/schemas/CrewPenalizedPayload'
       examples:
         - name: 채팅 금지
           payload:
-            partyroomId: { id: 10 }
-            eventType: crew_penalty
+            partyroomId: 10
+            eventType: CREW_PENALIZED
+            id: "550e8400-e29b-41d4-a716-446655440008"
+            timestamp: 1709964213000
             penaltyType: CHAT_BAN_30_SECONDS
             detail: "부적절한 채팅"
             punisher: { crewId: 1 }
             punished: { crewId: 42 }
 
-    CrewProfileMessage:
-      name: CrewProfileMessage
+    CrewProfileChanged:
+      name: CrewProfileChanged
       title: 프로필 변경
       summary: 크루의 프로필(닉네임, 아바타)이 변경됨
       contentType: application/json
       payload:
-        $ref: '#/components/schemas/CrewProfilePayload'
+        $ref: '#/components/schemas/CrewProfileChangedPayload'
+      examples:
+        - name: 프로필 변경
+          payload:
+            partyroomId: 10
+            eventType: CREW_PROFILE_CHANGED
+            id: "550e8400-e29b-41d4-a716-446655440009"
+            timestamp: 1709964213000
+            crewId: 42
+            nickname: "새닉네임"
+            avatar:
+              avatarCompositionType: BODY_WITH_FACE
+              avatarBodyUri: "/avatars/body/2.png"
+              avatarFaceUri: "/avatars/face/1.png"
+              avatarIconUri: "/avatars/icon/2.png"
+              combinePositionX: 10
+              combinePositionY: 20
+              offsetX: 0.5
+              offsetY: 0.3
+              scale: 1.2
 
     # ─── Server → Client (Private) ───
     HeartbeatResponse:
@@ -444,32 +509,43 @@ components:
         const: PONG
 
   schemas:
-    # ─── Common ───
-    PartyroomId:
+    # ─── Common Metadata ───
+    BroadcastMetadata:
       type: object
-      description: 파티룸 식별자
+      description: 모든 브로드캐스트 메시지의 공통 메타데이터
       properties:
-        id:
+        partyroomId:
           type: integer
           format: int64
-          description: 파티룸 ID
-      required: [id]
+          description: 파티룸 ID (플랫 정수)
+        eventType:
+          $ref: '#/components/schemas/EventType'
+        id:
+          type: string
+          format: uuid
+          description: 메시지 고유 ID (UUID v4)
+        timestamp:
+          type: integer
+          format: int64
+          description: 메시지 발행 시각 (Unix epoch milliseconds)
+      required: [partyroomId, eventType, id, timestamp]
 
     EventType:
       type: string
-      description: 이벤트 타입 식별자
+      description: 이벤트 타입 식별자 (과거형)
       enum:
-        - chat
-        - partyroom_access
-        - partyroom_deactivation
-        - partyroom_closed
-        - playback_start
-        - reaction_motion
-        - reaction_aggregation
-        - dj_queue_change
-        - crew_grade
-        - crew_penalty
-        - crew_profile
+        - CHAT_MESSAGE_SENT
+        - CREW_ENTERED
+        - CREW_EXITED
+        - PLAYBACK_DEACTIVATED
+        - PARTYROOM_CLOSED
+        - PLAYBACK_STARTED
+        - REACTION_PERFORMED
+        - REACTION_AGGREGATION_UPDATED
+        - DJ_QUEUE_CHANGED
+        - CREW_GRADE_CHANGED
+        - CREW_PENALIZED
+        - CREW_PROFILE_CHANGED
 
     # ─── Client → Server Payloads ───
     IncomingGroupChatPayload:
@@ -482,172 +558,243 @@ components:
       required: [content]
 
     # ─── Server → Client Payloads ───
-    OutgoingGroupChatPayload:
+    ChatMessageSentPayload:
       type: object
       description: 그룹 채팅 브로드캐스트 메시지
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: chat
-        crew:
-          $ref: '#/components/schemas/CrewInfo'
-        message:
-          $ref: '#/components/schemas/ChatContent'
-      required: [partyroomId, eventType, crew, message]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: CHAT_MESSAGE_SENT
+            crew:
+              $ref: '#/components/schemas/CrewInfo'
+            message:
+              $ref: '#/components/schemas/ChatContent'
+          required: [crew, message]
 
-    PartyroomAccessPayload:
+    CrewEnteredPayload:
       type: object
-      description: 크루 입퇴장 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: partyroom_access
-        accessType:
-          $ref: '#/components/schemas/AccessType'
-        crew:
-          $ref: '#/components/schemas/CrewSummary'
-      required: [partyroomId, eventType, accessType, crew]
+      description: 크루 입장 이벤트
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: CREW_ENTERED
+            crew:
+              $ref: '#/components/schemas/CrewSummary'
+          required: [crew]
 
-    PartyroomDeactivationPayload:
+    CrewExitedPayload:
+      type: object
+      description: 크루 퇴장 이벤트
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: CREW_EXITED
+            crewId:
+              type: integer
+              format: int64
+              description: 퇴장한 크루 ID
+          required: [crewId]
+
+    PlaybackDeactivatedPayload:
       type: object
       description: 재생 비활성화 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: partyroom_deactivation
-      required: [partyroomId, eventType]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: PLAYBACK_DEACTIVATED
 
     PartyroomClosedPayload:
       type: object
       description: 파티룸 종료 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: partyroom_closed
-      required: [partyroomId, eventType]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: PARTYROOM_CLOSED
 
-    PlaybackStartPayload:
+    PlaybackStartedPayload:
       type: object
       description: 재생 시작 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: playback_start
-        crewId:
-          type: integer
-          format: int64
-          description: 현재 DJ의 크루 ID
-        playback:
-          $ref: '#/components/schemas/PlaybackSnapshot'
-      required: [partyroomId, eventType, crewId, playback]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: PLAYBACK_STARTED
+            crewId:
+              type: integer
+              format: int64
+              description: 현재 DJ의 크루 ID
+            playback:
+              $ref: '#/components/schemas/PlaybackSnapshot'
+          required: [crewId, playback]
 
-    ReactionMotionPayload:
+    ReactionPerformedPayload:
       type: object
       description: 리액션 모션 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: reaction_motion
-        reactionType:
-          $ref: '#/components/schemas/ReactionType'
-        motionType:
-          $ref: '#/components/schemas/MotionType'
-        crew:
-          $ref: '#/components/schemas/CrewMotionInfo'
-      required: [partyroomId, eventType, reactionType, motionType, crew]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: REACTION_PERFORMED
+            reactionType:
+              $ref: '#/components/schemas/ReactionType'
+            motionType:
+              $ref: '#/components/schemas/MotionType'
+            crew:
+              $ref: '#/components/schemas/CrewMotionInfo'
+          required: [reactionType, motionType, crew]
 
-    ReactionAggregationPayload:
+    ReactionAggregationUpdatedPayload:
       type: object
       description: 리액션 집계 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: reaction_aggregation
-        aggregation:
-          $ref: '#/components/schemas/Aggregation'
-      required: [partyroomId, eventType, aggregation]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: REACTION_AGGREGATION_UPDATED
+            aggregation:
+              $ref: '#/components/schemas/Aggregation'
+          required: [aggregation]
 
-    DjQueueChangePayload:
+    DjQueueChangedPayload:
       type: object
       description: DJ 큐 변경 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: dj_queue_change
-        djs:
-          type: array
-          description: 현재 DJ 큐 전체 목록
-          items:
-            $ref: '#/components/schemas/DjWithProfile'
-      required: [partyroomId, eventType, djs]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: DJ_QUEUE_CHANGED
+            djs:
+              type: array
+              description: 현재 DJ 큐 전체 목록
+              items:
+                $ref: '#/components/schemas/DjWithProfile'
+          required: [djs]
 
-    CrewGradePayload:
+    CrewGradeChangedPayload:
       type: object
       description: 크루 등급 변경 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: crew_grade
-        adjuster:
-          $ref: '#/components/schemas/AdjusterInfo'
-        adjusted:
-          $ref: '#/components/schemas/AdjustedInfo'
-      required: [partyroomId, eventType, adjuster, adjusted]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: CREW_GRADE_CHANGED
+            adjuster:
+              $ref: '#/components/schemas/AdjusterInfo'
+            adjusted:
+              $ref: '#/components/schemas/AdjustedInfo'
+          required: [adjuster, adjusted]
 
-    CrewPenaltyPayload:
+    CrewPenalizedPayload:
       type: object
       description: 크루 페널티 이벤트
-      properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: crew_penalty
-        penaltyType:
-          $ref: '#/components/schemas/PenaltyType'
-        detail:
-          type: string
-          description: 페널티 사유
-        punisher:
-          $ref: '#/components/schemas/PunisherInfo'
-        punished:
-          $ref: '#/components/schemas/PunishedInfo'
-      required: [partyroomId, eventType, penaltyType, detail, punisher, punished]
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: CREW_PENALIZED
+            penaltyType:
+              $ref: '#/components/schemas/PenaltyType'
+            detail:
+              type: string
+              description: 페널티 사유
+            punisher:
+              $ref: '#/components/schemas/PunisherInfo'
+            punished:
+              $ref: '#/components/schemas/PunishedInfo'
+          required: [penaltyType, detail, punisher, punished]
 
-    CrewProfilePayload:
+    CrewProfileChangedPayload:
       type: object
       description: 크루 프로필 변경 이벤트
+      allOf:
+        - $ref: '#/components/schemas/BroadcastMetadata'
+        - type: object
+          properties:
+            eventType:
+              type: string
+              const: CREW_PROFILE_CHANGED
+            crewId:
+              type: integer
+              format: int64
+              description: 프로필이 변경된 크루 ID
+            nickname:
+              type: string
+              description: 변경된 닉네임
+            avatar:
+              $ref: '#/components/schemas/AvatarProfile'
+          required: [crewId, nickname, avatar]
+
+    # ─── Shared Schemas ───
+    CrewInfo:
+      type: object
+      description: 채팅 발신자 정보
       properties:
-        partyroomId:
-          $ref: '#/components/schemas/PartyroomId'
-        eventType:
-          type: string
-          const: crew_profile
         crewId:
           type: integer
           format: int64
-          description: 프로필이 변경된 크루 ID
+          description: 크루 ID
+      required: [crewId]
+
+    ChatContent:
+      type: object
+      description: 채팅 메시지 내용
+      properties:
+        messageId:
+          type: string
+          description: 메시지 고유 ID
+        content:
+          type: string
+          description: 메시지 텍스트
+      required: [messageId, content]
+
+    CrewSummary:
+      type: object
+      description: 크루 요약 정보 (입장 시 전달)
+      properties:
+        crewId:
+          type: integer
+          format: int64
+          description: 크루 ID
+        gradeType:
+          $ref: '#/components/schemas/GradeType'
         nickname:
           type: string
-          description: 변경된 닉네임
+          description: 닉네임
+        avatar:
+          $ref: '#/components/schemas/AvatarProfile'
+      required: [crewId, gradeType, nickname, avatar]
+
+    AvatarProfile:
+      type: object
+      description: 아바타 프로필 정보
+      properties:
         avatarCompositionType:
           $ref: '#/components/schemas/AvatarCompositionType'
         avatarBodyUri:
@@ -678,75 +825,7 @@ components:
           type: number
           format: double
           description: 렌더링 스케일
-      required: [partyroomId, eventType, crewId, nickname, avatarCompositionType, avatarBodyUri, avatarIconUri, combinePositionX, combinePositionY, offsetX, offsetY, scale]
-
-    # ─── Shared Schemas ───
-    CrewInfo:
-      type: object
-      description: 채팅 발신자 정보
-      properties:
-        crewId:
-          type: integer
-          format: int64
-          description: 크루 ID
-      required: [crewId]
-
-    ChatContent:
-      type: object
-      description: 채팅 메시지 내용
-      properties:
-        messageId:
-          type: string
-          description: 메시지 고유 ID
-        content:
-          type: string
-          description: 메시지 텍스트
-      required: [messageId, content]
-
-    CrewSummary:
-      type: object
-      description: 크루 요약 정보 (입퇴장 시 전달)
-      properties:
-        crewId:
-          type: integer
-          format: int64
-          description: 크루 ID
-        gradeType:
-          $ref: '#/components/schemas/GradeType'
-        nickname:
-          type: string
-          description: 닉네임
-        avatarCompositionType:
-          $ref: '#/components/schemas/AvatarCompositionType'
-        avatarBodyUri:
-          type: string
-          description: 아바타 바디 이미지 URI
-        avatarFaceUri:
-          type: string
-          nullable: true
-          description: 아바타 얼굴 이미지 URI
-        avatarIconUri:
-          type: string
-          description: 아바타 아이콘 이미지 URI
-        combinePositionX:
-          type: integer
-          description: 얼굴 합성 X 좌표
-        combinePositionY:
-          type: integer
-          description: 얼굴 합성 Y 좌표
-        offsetX:
-          type: number
-          format: double
-          description: 렌더링 X 오프셋
-        offsetY:
-          type: number
-          format: double
-          description: 렌더링 Y 오프셋
-        scale:
-          type: number
-          format: double
-          description: 렌더링 스케일
-      required: [crewId, gradeType, nickname, avatarCompositionType, avatarBodyUri, avatarIconUri, combinePositionX, combinePositionY, offsetX, offsetY, scale]
+      required: [avatarCompositionType, avatarBodyUri, avatarIconUri, combinePositionX, combinePositionY, offsetX, offsetY, scale]
 
     CrewMotionInfo:
       type: object
@@ -864,11 +943,6 @@ components:
       required: [crewId]
 
     # ─── Enums ───
-    AccessType:
-      type: string
-      description: 입퇴장 타입
-      enum: [ENTER, EXIT]
-
     GradeType:
       type: string
       description: |
