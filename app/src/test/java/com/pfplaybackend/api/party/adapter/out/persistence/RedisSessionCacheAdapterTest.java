@@ -1,7 +1,6 @@
 package com.pfplaybackend.api.party.adapter.out.persistence;
 
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.common.exception.http.NotFoundException;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.port.out.PartyroomQueryPort;
 import com.pfplaybackend.api.party.domain.value.CrewId;
@@ -59,8 +58,8 @@ class RedisSessionCacheAdapterTest {
     }
 
     @Test
-    @DisplayName("saveSessionCache — 활성 파티룸이 없으면 예외가 발생한다")
-    void saveSessionCacheNoActivePartyroomThrows() {
+    @DisplayName("saveSessionCache — 활성 파티룸이 없으면 세션 캐시를 저장하지 않는다")
+    void saveSessionCacheNoActivePartyroomSkips() {
         // given
         String sessionId = "session-123";
         String userIdStr = "1";
@@ -68,10 +67,11 @@ class RedisSessionCacheAdapterTest {
         UserId userId = UserId.fromString(userIdStr);
         when(partyroomQueryPort.getActivePartyroomByUserId(userId)).thenReturn(Optional.empty());
 
-        // when & then
-        assertThatThrownBy(() ->
-                redisSessionCacheAdapter.saveSessionCache(sessionId, userIdStr, destination))
-                .isInstanceOf(NotFoundException.class);
+        // when
+        redisSessionCacheAdapter.saveSessionCache(sessionId, userIdStr, destination);
+
+        // then
+        verify(valueOperations, never()).set(any(), any());
     }
 
     @Test

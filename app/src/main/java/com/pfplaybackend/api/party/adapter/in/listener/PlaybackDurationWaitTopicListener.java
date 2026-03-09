@@ -5,11 +5,15 @@ import com.pfplaybackend.api.party.application.port.out.ExpirationTaskPort;
 import com.pfplaybackend.api.party.application.service.PlaybackCommandService;
 import com.pfplaybackend.api.party.application.service.lock.DistributedLockExecutor;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 
 @AllArgsConstructor
 public class PlaybackDurationWaitTopicListener implements MessageListener {
+
+    private static final Logger logger = LoggerFactory.getLogger(PlaybackDurationWaitTopicListener.class);
 
     private ExpirationTaskPort expirationTaskPort;
     private DistributedLockExecutor distributedLockExecutor;
@@ -20,13 +24,18 @@ public class PlaybackDurationWaitTopicListener implements MessageListener {
         String expiredKey = message.toString();
         if(expiredKey.startsWith("TASK:WAIT")) {
             String taskId = expiredKey.split(":")[2];
-            PlaybackDurationWaitDto deserialized = expirationTaskPort.getTaskArgs(taskId, PlaybackDurationWaitDto.class);
-            String suffixId = deserialized.userId().getUid().toString();
-            distributedLockExecutor.performTaskWithLock(suffixId, () -> {
-                expirationTaskPort.clearTaskArgs(taskId);
-                playbackCommandService.complete(deserialized.partyroomId(), deserialized.userId());
-                return null;
-            });
+            try {
+                PlaybackDurationWaitDto deserialized = expirationTaskPort.getTaskArgs(taskId, PlaybackDurationWaitDto.class);
+                String suffixId = deserialized.userId().getUid().toString();
+                distributedLockExecutor.performTaskWithLock(suffixId, () -> {
+                    expirationTaskPort.clearTaskArgs(taskId);
+                    playbackCommandService.complete(deserialized.partyroomId(), deserialized.userId());
+                    return null;
+                });
+            } catch (Exception e) {
+                logger.warn("Failed to process playback expiration for taskId={} — possibly stale key after server restart: {}",
+                        taskId, e.getMessage());
+            }
         }
     }
 }

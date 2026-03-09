@@ -1,14 +1,14 @@
 package com.pfplaybackend.api.party.adapter.out.persistence;
 
 import com.pfplaybackend.api.common.domain.value.UserId;
-import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.application.dto.partyroom.ActivePartyroomDto;
 import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto;
 import com.pfplaybackend.api.party.application.port.out.PartyroomQueryPort;
-import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 import com.pfplaybackend.realtime.port.SessionCachePort;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +18,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RedisSessionCacheAdapter implements SessionCachePort {
+    private static final Logger logger = LoggerFactory.getLogger(RedisSessionCacheAdapter.class);
     private final RedisTemplate<String, Object> redisTemplate;
     private final PartyroomQueryPort partyroomQueryPort;
 
@@ -29,11 +30,12 @@ public class RedisSessionCacheAdapter implements SessionCachePort {
             String topic = parts[2];
             String separator = parts[3];
             if (topic.equals("partyrooms")) {
-                Optional<PartyroomSessionDto> PartyroomSessionDto = createSessionData(sessionId, userIdObj);
-                if (PartyroomSessionDto.isEmpty()) {
-                    throw ExceptionCreator.create(PartyroomException.NOT_FOUND_ROOM);
+                Optional<PartyroomSessionDto> partyroomSessionDto = createSessionData(sessionId, userIdObj);
+                if (partyroomSessionDto.isEmpty()) {
+                    logger.warn("No active partyroom found for userId={}, sessionId={} — skipping session cache", userId, sessionId);
+                    return;
                 }
-                PartyroomSessionDto sessionData = PartyroomSessionDto.get();
+                PartyroomSessionDto sessionData = partyroomSessionDto.get();
                 redisTemplate.opsForValue().set(sessionId, sessionData);
             }
         }

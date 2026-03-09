@@ -36,9 +36,24 @@ subprojects {
 	}
 
 	tasks.named('test') {
-		useJUnitPlatform()
+		useJUnitPlatform {
+			if (project.hasProperty('include-integration')) {
+				includeTags 'integration'
+			} else {
+				excludeTags 'integration'
+			}
+		}
 		maxParallelForks = Math.max(1, Runtime.runtime.availableProcessors().intdiv(4))
 		forkEvery = 0  // reuse JVM across tests
+		jvmArgs '-XX:+UseParallelGC'
+	}
+
+	tasks.register('integrationTest', Test) {
+		useJUnitPlatform {
+			includeTags 'integration'
+		}
+		maxParallelForks = 1
+		forkEvery = 0
 		jvmArgs '-XX:+UseParallelGC'
 	}
 
