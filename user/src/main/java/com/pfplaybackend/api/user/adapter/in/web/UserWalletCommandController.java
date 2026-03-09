@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +36,7 @@ public class UserWalletCommandController {
     @SecurityRequirement(name = "cookieAuth")
     @PutMapping("/me/profile/wallet")
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<ApiCommonResponse<Void>> updateMyWallet(@RequestBody UpdateMyWalletRequest request, HttpServletResponse response) {
+    public ResponseEntity<ApiCommonResponse<Void>> updateMyWallet(@Valid @RequestBody UpdateMyWalletRequest request, HttpServletResponse response) {
         MemberData member = userWalletService.updateMyWalletAddress(new UpdateWalletCommand(request.getWalletAddress()));
         cookieUtil.addAccessTokenCookie(response, jwtService.generateNonExpiringAccessToken(new TokenClaimsRequest(
                 member.getUserId().getUid().toString(),

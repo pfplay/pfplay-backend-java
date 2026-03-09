@@ -8,6 +8,7 @@ import com.pfplaybackend.api.party.domain.exception.CrewException;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,7 +44,7 @@ public class CrewGradeCommandController {
     public ResponseEntity<Void> updateCrewGrade(
             @Parameter(description = "파티룸 ID") @PathVariable("partyroomId") long partyroomId,
             @Parameter(description = "크루 ID") @PathVariable("crewId") long crewId,
-            @RequestBody AdjustGradeRequest request) {
+            @Valid @RequestBody AdjustGradeRequest request) {
         crewGradeCommandService.updateGrade(new PartyroomId(partyroomId), new CrewId(crewId),
                 new AdjustGradeCommand(request.getGradeType()));
         return ResponseEntity.noContent().build();

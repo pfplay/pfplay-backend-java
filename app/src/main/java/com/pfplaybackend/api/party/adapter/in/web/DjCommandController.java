@@ -10,6 +10,7 @@ import com.pfplaybackend.api.party.domain.exception.DjException;
 import com.pfplaybackend.api.party.domain.exception.GradeException;
 import com.pfplaybackend.api.party.domain.value.DjId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -40,7 +41,7 @@ public class DjCommandController {
     @PreAuthorize("hasAnyRole('ROLE_MEMBER')")
     public ResponseEntity<ApiCommonResponse<CreateDjResponse>> enqueueDj(
             @Parameter(description = "파티룸 ID") @PathVariable Long partyroomId,
-            @RequestBody RegisterDjRequest request) {
+            @Valid @RequestBody RegisterDjRequest request) {
         Long djId = djCommandService.enqueueDj(new PartyroomId(partyroomId), new PlaylistId(request.getPlaylistId()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(new CreateDjResponse(djId)));

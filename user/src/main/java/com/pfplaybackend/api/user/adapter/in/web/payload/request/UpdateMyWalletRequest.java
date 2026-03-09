@@ -1,8 +1,10 @@
 package com.pfplaybackend.api.user.adapter.in.web.payload.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
 public class UpdateMyWalletRequest {
-    String walletAddress;
+    @NotBlank(message = "walletAddress is required.")
+    private String walletAddress;
 }

@@ -7,6 +7,7 @@ import com.pfplaybackend.api.party.application.dto.playback.ReactionHistoryDto;
 import com.pfplaybackend.api.party.application.service.PlaybackReactionCommandService;
 import com.pfplaybackend.api.party.domain.exception.ReactionException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,7 +30,7 @@ public class PlaybackReactionCommandController {
     @PostMapping("/{partyroomId}/playbacks/reaction")
     public ResponseEntity<ApiCommonResponse<ReactionHistoryDto>> reactToPlayback(
             @Parameter(description = "파티룸 ID") @PathVariable Long partyroomId,
-            @RequestBody ReactPlaybackRequest request) {
+            @Valid @RequestBody ReactPlaybackRequest request) {
         return ResponseEntity.ok().body(
                 ApiCommonResponse.success(playbackReactionCommandService.reactToCurrentPlayback(
                         new PartyroomId(partyroomId), request.getReactionType())));

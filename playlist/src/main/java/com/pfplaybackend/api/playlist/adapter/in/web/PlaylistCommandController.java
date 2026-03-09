@@ -46,7 +46,7 @@ public class PlaylistCommandController {
     @SecurityRequirement(name = "cookieAuth")
     @DeleteMapping()
     @PreAuthorize("hasRole('ROLE_MEMBER')")
-    public ResponseEntity<Void> deletePlaylist(@RequestBody DeletePlaylistsRequest request) {
+    public ResponseEntity<Void> deletePlaylist(@Valid @RequestBody DeletePlaylistsRequest request) {
         playlistCommandService.deletePlaylist(request.getPlaylistIds());
         return ResponseEntity.noContent().build();
     }
@@ -59,7 +59,7 @@ public class PlaylistCommandController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<Void> modifyPlaylistName(
             @Parameter(description = "변경할 플레이리스트 ID") @PathVariable Long playlistId,
-            @RequestBody UpdatePlaylistNameRequest request) {
+            @Valid @RequestBody UpdatePlaylistNameRequest request) {
         playlistCommandService.renamePlaylist(playlistId, request.getName());
         return ResponseEntity.noContent().build();
     }

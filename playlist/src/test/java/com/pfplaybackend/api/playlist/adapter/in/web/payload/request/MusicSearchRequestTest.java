@@ -46,6 +46,6 @@ class MusicSearchRequestTest {
 
         // then
         assertThat(violations).hasSize(1);
-        assertThat(violations.iterator().next().getMessage()).isEqualTo("q cannot be null");
+        assertThat(violations.iterator().next().getMessage()).isEqualTo("q is required.");
     }
 }

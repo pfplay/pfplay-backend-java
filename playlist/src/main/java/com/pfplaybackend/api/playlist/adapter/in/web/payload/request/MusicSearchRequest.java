@@ -1,6 +1,6 @@
 package com.pfplaybackend.api.playlist.adapter.in.web.payload.request;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.BindParam;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.BindParam;
 @Getter
 @Setter
 public class MusicSearchRequest {
-    @NotNull(message = "q cannot be null")
+    @NotBlank(message = "q is required.")
     private final String q;
 
     private final String platform;

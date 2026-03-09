@@ -12,6 +12,7 @@ import com.pfplaybackend.api.playlist.adapter.in.web.payload.response.CreateTrac
 import com.pfplaybackend.api.playlist.application.service.TrackCommandService;
 import com.pfplaybackend.api.playlist.domain.exception.PlaylistException;
 import com.pfplaybackend.api.playlist.domain.exception.TrackException;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,7 +40,7 @@ public class TrackCommandController {
     @PreAuthorize("hasRole('ROLE_MEMBER')")
     public ResponseEntity<ApiCommonResponse<CreateTrackResponse>> addTrack(
             @Parameter(description = "트랙을 추가할 플레이리스트 ID") @PathVariable Long playlistId,
-            @RequestBody AddTrackRequest request) {
+            @Valid @RequestBody AddTrackRequest request) {
         AddTrackCommand command = new AddTrackCommand(request.getName(), request.getLinkId(), request.getDuration(), request.getThumbnailImage());
         Long trackId = trackCommandService.addTrackInPlaylist(playlistId, command);
         return ResponseEntity
@@ -68,7 +69,7 @@ public class TrackCommandController {
     public ResponseEntity<Void> moveTrack(
             @Parameter(description = "현재 플레이리스트 ID") @PathVariable Long playlistId,
             @Parameter(description = "이동할 트랙 ID") @PathVariable Long trackId,
-            @RequestBody MoveTrackRequest request) {
+            @Valid @RequestBody MoveTrackRequest request) {
         MoveTrackCommand command = new MoveTrackCommand(request.getTargetPlaylistId());
         trackCommandService.moveTrackToPlaylist(playlistId, trackId, command);
         return ResponseEntity.noContent().build();
@@ -82,7 +83,7 @@ public class TrackCommandController {
     public ResponseEntity<Void> updateMusicOrder(
             @Parameter(description = "플레이리스트 ID") @PathVariable Long playlistId,
             @Parameter(description = "순서를 변경할 트랙 ID") @PathVariable Long trackId,
-            @RequestBody UpdateTrackOrderRequest request) {
+            @Valid @RequestBody UpdateTrackOrderRequest request) {
         UpdateTrackOrderCommand command = new UpdateTrackOrderCommand(request.getNextOrderNumber());
         trackCommandService.updateTrackOrderInPlaylist(playlistId, trackId, command);
         return ResponseEntity.noContent().build();

@@ -8,13 +8,17 @@
 
 ## 변경 요약
 
-이번 변경은 크게 **5가지 영역**을 다룹니다:
+이번 변경은 크게 **8가지 영역**을 다룹니다:
 
 1. **REST API 경로(URL) 변경** — 동사를 제거하고 리소스 명사 중심으로 전환
 2. **HTTP 상태 코드 정리** — RESTful 규약에 맞게 201/204/200 통일
 3. **응답 패턴 일관성 확보** — 모든 API의 요청/응답 구조를 통일된 규칙으로 정리
 4. **에러 메시지 한국어화** — 모든 도메인 에러 메시지를 한국어로 변환
 5. **일부 에러 코드의 HTTP 상태 코드 변경** — 의미에 맞는 상태 코드로 교정
+6. **Swagger 에러 응답 가시성 수정** — 4xx 에러 응답이 Swagger UI에 정상 표시
+7. **Map → Typed Record DTO 마이그레이션** — 응답 타입 명시화 (JSON 구조 변경 없음)
+8. **응답 DTO 필드 변경** — PlaybackDto 반응 카운트 제거, WebSocket 이벤트 페이로드 축소
+9. **Request DTO 유효성 검사 강화** — 필수 필드 서버 측 검증 추가
 
 ---
 
@@ -328,9 +332,180 @@ Auth API도 `ApiCommonResponse` 래퍼로 통일했습니다. 기존의 `success
 - [ ] 아바타 변경: 200 → **204 No Content**, 본문 파싱 제거
 - [ ] 자기소개 수정: 200 → **204 No Content**, 본문 파싱 제거
 
+### 응답 DTO & WebSocket 이벤트 변경
+- [ ] Setup API (`GET /api/v1/partyrooms/setup`): `display.playback`에서 `likeCount`, `dislikeCount`, `grabCount` 제거됨 → `display.reaction.aggregation`에서 조회
+- [ ] WebSocket `playback_start` 이벤트: `playback` 페이로드에서 반응 카운트 제거 → 클라이언트에서 초기값(0, 0, 0) 설정 후 `reaction_aggregation` 이벤트로 업데이트
+
+### Swagger & 응답 타입
+- [ ] 에러 응답(4xx)이 Swagger UI에 정상 표시되는지 확인
+- [ ] 기존 `Map<String, Object>` 응답이 typed record DTO로 변경된 필드 확인 (아래 섹션 9 참조)
+
 ### 에러 처리
 - [ ] BLK-002: 400 → 409 변경 반영
 - [ ] DJ-004: 400 → 404 변경 반영
 - [ ] PTR-005~006 에러 코드 재매핑 확인
 - [ ] 에러 메시지 표시 로직 확인 (한국어로 변경됨)
 - [ ] `GET /api/v1/users/members/sign` 호출 코드 제거 (API 삭제됨)
+
+---
+
+## 8. Swagger 에러 응답 가시성 수정
+
+### 문제
+Swagger UI에서 200 이외의 에러 응답 코드(400, 403, 404, 409)가 표시되지 않았습니다.
+
+### 원인
+- `application.yml`의 `group-configs`로 정의된 API 그룹은 `@Component` 기반 `OperationCustomizer`를 자동 적용하지 않음
+- `ApiErrorResponse` 스키마가 OpenAPI components에 등록되지 않아 `$ref` 참조 실패 → Swagger UI가 해당 응답 섹션을 숨김
+
+### 해결
+- `application.yml`의 `group-configs` 제거
+- `SwaggerConfig`에서 `GroupedOpenApi` 빈으로 대체하고 `ApiErrorCodeCustomizer`(OperationCustomizer)와 `apiErrorResponseSchemaCustomizer`(OpenApiCustomizer)를 명시적으로 등록
+
+---
+
+## 9. Map → Typed Record DTO 마이그레이션
+
+Swagger에서 필드가 드러나지 않는 `Map<String, Object>` / `Map<String, Boolean>` 응답을 모두 typed record DTO로 교체했습니다.
+
+### 변경 내역
+
+| 기존 타입 | 신규 DTO | 사용처 |
+|----------|---------|-------|
+| `Map<String, Boolean>` | `ReactionHistoryDto(isLiked, isDisliked, isGrabbed)` | `POST /partyrooms/{id}/playbacks/reaction`, Setup API `history` 필드 |
+| `Map<String, Object>` (playback info) | `PlaybackSummary(name, thumbnailImage, duration)` | DJ 큐 조회, 파티룸 목록 |
+| `Map<String, Object>` (avatar icon) | `CrewIcon(bodyUri, faceUri)` | 크루 아이콘 응답 |
+| `Map<String, Object>` (생성 ID) | `CreateDjResponse(djId)` | DJ 등록 |
+| `Map<String, Object>` (생성 ID) | `CreateBlockResponse(blockId)` | 크루 차단 |
+| `Map<String, Object>` (생성 ID) | `CreatePenaltyResponse(penaltyId)` | 페널티 부과 |
+| `Map<String, Object>` (생성 ID) | `CreateTrackResponse(trackId)` | 트랙 추가 |
+| `Map<String, Object>` (시뮬레이션) | `ChatSimulationStartResponse(partyroomId, status, scriptType)` | Admin 시뮬레이션 시작 |
+| `Map<String, Object>` (시뮬레이션) | `ChatSimulationStopResponse(partyroomId, status)` | Admin 시뮬레이션 중지 |
+
+> **프론트엔드 조치**: 응답 JSON 구조 자체는 변경되지 않았습니다. 기존 `Map`으로 직렬화되던 키-값이 동일한 필드명의 record로 대체되었으므로, 클라이언트 측 파싱 로직 변경은 불필요합니다.
+
+---
+
+## 10. Request DTO 유효성 검사 강화
+
+모든 Request DTO에 Jakarta Bean Validation 어노테이션을 추가하고, 컨트롤러의 `@RequestBody`에 `@Valid`를 적용했습니다.
+
+### 영향
+- 기존에 서버 측에서 검증되지 않던 필수 필드가 이제 검증됩니다
+- 누락 필드 시 **400 Bad Request** + 필드별 에러 메시지가 반환됩니다
+
+### 적용된 검증 규칙
+
+| Request DTO | 필드 | 어노테이션 |
+|-------------|------|-----------|
+| `CreatePartyroomRequest` | title | `@NotBlank` `@Size(max=100)` |
+| | playbackTimeLimit | `@NotNull` `@Min(1)` |
+| `UpdatePartyroomRequest` | title | `@NotBlank` `@Size(max=100)` |
+| | playbackTimeLimit | `@NotNull` `@Min(1)` |
+| `UpdateDjQueueStatusRequest` | queueStatus | `@NotNull` |
+| `RegisterDjRequest` | playlistId | `@NotNull` |
+| `AddBlockRequest` | crewId | `@NotNull` |
+| `AdjustGradeRequest` | gradeType | `@NotNull` |
+| `ApplyPenaltyRequest` | crewId | `@NotNull` |
+| `ReactPlaybackRequest` | reactionType | `@NotNull` |
+| `AddTrackRequest` | name, linkId, duration, thumbnailImage | `@NotBlank` |
+| `CreatePlaylistRequest` | name | `@NotBlank` `@Size(max=100)` |
+| `DeletePlaylistsRequest` | playlistIds | `@NotEmpty` |
+| `MoveTrackRequest` | targetPlaylistId | `@NotNull` |
+| `UpdatePlaylistNameRequest` | name | `@NotBlank` `@Size(max=100)` |
+| `UpdateTrackOrderRequest` | nextOrderNumber | `@NotNull` `@Min(0)` |
+| `MusicSearchRequest` | q | `@NotBlank` |
+| `UpdateMyWalletRequest` | walletAddress | `@NotBlank` |
+
+### `@Valid` 적용된 컨트롤러 (신규 추가분)
+
+| 컨트롤러 | 메서드 |
+|---------|--------|
+| `PartyroomCommandController` | `updatePartyroom`, `updateDjQueue` |
+| `PlaybackReactionCommandController` | `reactToPlayback` |
+| `TrackCommandController` | `addTrack`, `moveTrack`, `updateMusicOrder` |
+| `CrewBlockCommandController` | `blockOtherCrew` |
+| `DjCommandController` | `enqueueDj` |
+| `PlaylistCommandController` | `deletePlaylist`, `modifyPlaylistName` |
+| `CrewGradeCommandController` | `updateCrewGrade` |
+| `UserWalletCommandController` | `updateMyWallet` |
+
+> **프론트엔드 조치**: 필수 필드 누락 시 기존에는 서버 내부에서 `NullPointerException` 등이 발생했으나, 이제 명확한 400 응답이 반환됩니다. 기존 정상 호출에는 영향이 없습니다.
+
+---
+
+## 11. 응답 DTO 필드 변경 & WebSocket 이벤트 축소
+
+### 11-1. PlaybackDto — 반응 카운트 필드 제거
+
+ERD 정규화로 `PlaybackAggregationData` 엔티티가 분리되면서, `PlaybackDto`에서 `likeCount`, `dislikeCount`, `grabCount` 3개 필드가 제거되었습니다.
+
+**영향 받는 API**: `GET /api/v1/partyrooms/setup` (`DisplayDto.playback`)
+
+```json
+// Before
+{
+  "display": {
+    "playback": {
+      "id": 1, "linkId": "...", "name": "...",
+      "duration": "3:00", "thumbnailImage": "...", "endTime": 999,
+      "likeCount": 5,       // REMOVED
+      "dislikeCount": 1,    // REMOVED
+      "grabCount": 2        // REMOVED
+    },
+    "reaction": {
+      "history": { "isLiked": false, "isDisliked": false, "isGrabbed": false },
+      "aggregation": { "likeCount": 5, "dislikeCount": 1, "grabCount": 2 }
+    }
+  }
+}
+
+// After
+{
+  "display": {
+    "playback": {
+      "id": 1, "linkId": "...", "name": "...",
+      "duration": "3:00", "thumbnailImage": "...", "endTime": 999
+    },
+    "reaction": {
+      "history": { "isLiked": false, "isDisliked": false, "isGrabbed": false },
+      "aggregation": { "likeCount": 5, "dislikeCount": 1, "grabCount": 2 }
+    }
+  }
+}
+```
+
+> **프론트엔드 조치**: `display.playback.likeCount` 대신 `display.reaction.aggregation.likeCount` 사용
+
+### 11-2. PLAYBACK_START 이벤트 — playback 페이로드 축소
+
+WebSocket `playback_start` 이벤트의 `playback` 필드에서 반응 카운트가 제거되었습니다.
+
+```json
+// Before
+{
+  "partyroomId": { "id": 10 },
+  "eventType": "PLAYBACK_START",
+  "crewId": 1,
+  "playback": {
+    "id": 1, "linkId": "...", "name": "...",
+    "duration": "3:00", "thumbnailImage": "...", "endTime": 999,
+    "likeCount": 0,       // REMOVED
+    "dislikeCount": 0,    // REMOVED
+    "grabCount": 0        // REMOVED
+  }
+}
+
+// After
+{
+  "partyroomId": { "id": 10 },
+  "eventType": "PLAYBACK_START",
+  "crewId": 1,
+  "playback": {
+    "id": 1, "linkId": "...", "name": "...",
+    "duration": "3:00", "thumbnailImage": "...", "endTime": 999
+  }
+}
+```
+
+> **프론트엔드 조치**: 재생 시작 시 카운트는 항상 0이므로, 클라이언트에서 초기값(0, 0, 0)을 설정하면 됩니다. 이후 `reaction_aggregation` 이벤트로 실시간 업데이트 수신.

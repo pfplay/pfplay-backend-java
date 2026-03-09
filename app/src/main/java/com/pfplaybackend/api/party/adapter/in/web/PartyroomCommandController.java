@@ -13,6 +13,7 @@ import com.pfplaybackend.api.party.application.service.PartyroomCommandService;
 import com.pfplaybackend.api.party.domain.entity.data.PartyroomData;
 import com.pfplaybackend.api.party.domain.exception.PartyroomException;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,7 +40,7 @@ public class PartyroomCommandController {
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({PartyroomException.class})
     @PostMapping
-    public ResponseEntity<ApiCommonResponse<CreatePartyroomResponse>> createPartyroom(@RequestBody CreatePartyroomRequest request) {
+    public ResponseEntity<ApiCommonResponse<CreatePartyroomResponse>> createPartyroom(@Valid @RequestBody CreatePartyroomRequest request) {
         PartyroomData partyRoom = partyroomCommandService.createGeneralPartyRoom(
                 new CreatePartyroomCommand(request.getTitle(), request.getIntroduction(), request.getLinkDomain(), request.getPlaybackTimeLimit()));
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiCommonResponse.success(CreatePartyroomResponse.from(partyRoom)));
@@ -52,7 +53,7 @@ public class PartyroomCommandController {
     @PutMapping("/{partyroomId}")
     public ResponseEntity<Void> updatePartyroom(
             @Parameter(description = "파티룸 ID") @PathVariable Long partyroomId,
-            @RequestBody UpdatePartyroomRequest request) {
+            @Valid @RequestBody UpdatePartyroomRequest request) {
         partyroomCommandService.updatePartyroom(new PartyroomId(partyroomId),
                 new UpdatePartyroomCommand(request.getTitle(), request.getIntroduction(), request.getLinkDomain(), request.getPlaybackTimeLimit()));
         return ResponseEntity.noContent().build();
@@ -76,7 +77,7 @@ public class PartyroomCommandController {
     @PutMapping("/{partyroomId}/dj-queue")
     public ResponseEntity<Void> updateDjQueue(
             @Parameter(description = "파티룸 ID") @PathVariable Long partyroomId,
-            @RequestBody UpdateDjQueueStatusRequest request) {
+            @Valid @RequestBody UpdateDjQueueStatusRequest request) {
         partyroomCommandService.updateDjQueueStatus(new PartyroomId(partyroomId),
                 new UpdateDjQueueStatusCommand(request.getQueueStatus()));
         return ResponseEntity.noContent().build();

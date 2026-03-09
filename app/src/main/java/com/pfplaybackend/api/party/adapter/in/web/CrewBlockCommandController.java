@@ -8,6 +8,7 @@ import com.pfplaybackend.api.party.application.dto.command.AddBlockCommand;
 import com.pfplaybackend.api.party.application.service.CrewBlockCommandService;
 import com.pfplaybackend.api.party.domain.exception.BlockException;
 import com.pfplaybackend.api.party.domain.exception.CrewException;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,7 +32,7 @@ public class CrewBlockCommandController {
     @SecurityRequirement(name = "cookieAuth")
     @ApiErrorCodes({BlockException.class, CrewException.class})
     @PostMapping("/me/blocks")
-    public ResponseEntity<ApiCommonResponse<CreateBlockResponse>> blockOtherCrew(@RequestBody AddBlockRequest request)  {
+    public ResponseEntity<ApiCommonResponse<CreateBlockResponse>> blockOtherCrew(@Valid @RequestBody AddBlockRequest request)  {
         Long blockId = crewBlockCommandService.addBlock(new AddBlockCommand(request.getCrewId()));
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiCommonResponse.success(new CreateBlockResponse(blockId)));

@@ -8,8 +8,9 @@ import lombok.Getter;
 @Getter
 public class ApplyPenaltyRequest {
 
+    @NotNull(message = "crewId is required.")
     private Long crewId;
-    @NotNull(message = "PenaltyType is required.")
+    @NotNull(message = "penaltyType is required.")
     private PenaltyType penaltyType;
     private String detail;
 

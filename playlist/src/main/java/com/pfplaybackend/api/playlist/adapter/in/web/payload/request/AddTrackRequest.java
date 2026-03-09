@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.playlist.adapter.in.web.payload.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,15 +11,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddTrackRequest {
-    @Schema(description = "곡 이름", example = "BLACKPINK - ‘Shut Down’ M/V", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
+    @NotBlank(message = "name is required.")
+    @Schema(description = "곡 이름", example = "BLACKPINK - 'Shut Down' M/V", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String name;
 
+    @NotBlank(message = "linkId is required.")
     @Schema(description = "곡 링크 id", example = "POe9SOEKotk", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String linkId;
 
+    @NotBlank(message = "duration is required.")
     @Schema(description = "곡 재생 시간", example = "03:01", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String duration;
 
+    @NotBlank(message = "thumbnailImage is required.")
     @Schema(description = "곡 썸네일 이미지", example = "https://i.ytimg.com/vi/POe9SOEKotk/mqdefault.jpg", requiredMode = Schema.RequiredMode.REQUIRED, type = "string")
     private String thumbnailImage;
 }
