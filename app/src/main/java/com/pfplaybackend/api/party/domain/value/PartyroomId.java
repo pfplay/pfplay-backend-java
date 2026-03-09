@@ -1,6 +1,8 @@
 package com.pfplaybackend.api.party.domain.value;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.Embeddable;
 import lombok.Getter;
 
@@ -12,8 +14,14 @@ import java.util.Objects;
 public class PartyroomId implements Serializable {
     private long id;
     public PartyroomId() {}
+    @JsonCreator
     public PartyroomId(long id) {
         this.id = id;
+    }
+
+    @JsonValue
+    public long value() {
+        return id;
     }
 
     public static PartyroomId of(Long id) {

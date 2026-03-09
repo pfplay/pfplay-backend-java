@@ -9,6 +9,8 @@ import java.io.Serializable;
 public record PlaybackStartMessage(
         PartyroomId partyroomId,
         MessageTopic eventType,
+        String id,
+        long timestamp,
         long crewId,
         PlaybackSnapshot playback
 ) implements Serializable, GroupBroadcastMessage {}

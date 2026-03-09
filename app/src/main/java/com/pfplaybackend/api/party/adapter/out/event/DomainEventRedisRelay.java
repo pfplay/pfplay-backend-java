@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class DomainEventRedisRelay {
@@ -28,21 +30,21 @@ public class DomainEventRedisRelay {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(CrewAccessedEvent event) {
-        CrewSummaryDto crewSummary;
         if (event.getAccessType() == AccessType.ENTER) {
             CrewData crew = crewRepository.findById(event.getCrewId().getId()).orElseThrow();
             ProfileSettingDto profile = userProfileService.getUserProfileSetting(event.getUserId());
-            crewSummary = CrewSummaryDto.from(crew, profile);
+            CrewSummaryDto crewSummary = CrewSummaryDto.from(crew, profile);
+            messagePublisher.publish(MessageTopic.CREW_ENTERED.topic(),
+                    CrewEnteredMessage.create(event.getPartyroomId(), crewSummary));
         } else {
-            crewSummary = CrewSummaryDto.exitOnly(event.getCrewId().getId());
+            messagePublisher.publish(MessageTopic.CREW_EXITED.topic(),
+                    CrewExitedMessage.create(event.getPartyroomId(), event.getCrewId().getId()));
         }
-        messagePublisher.publish(MessageTopic.PARTYROOM_ACCESS.topic(),
-                PartyroomAccessMessage.create(event.getPartyroomId(), event.getAccessType(), crewSummary));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(DjQueueChangedEvent event) {
-        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGE.topic(),
+        messagePublisher.publish(MessageTopic.DJ_QUEUE_CHANGED.topic(),
                 DjQueueChangeMessage.create(
                         event.getPartyroomId(),
                         partyroomQueryService.getDjs(event.getPartyroomId())
@@ -51,48 +53,52 @@ public class DomainEventRedisRelay {
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(PlaybackStartedEvent event) {
-        messagePublisher.publish(MessageTopic.PLAYBACK_START.topic(),
-                new PlaybackStartMessage(event.getPartyroomId(), MessageTopic.PLAYBACK_START,
+        messagePublisher.publish(MessageTopic.PLAYBACK_STARTED.topic(),
+                new PlaybackStartMessage(event.getPartyroomId(), MessageTopic.PLAYBACK_STARTED,
+                        UUID.randomUUID().toString(), System.currentTimeMillis(),
                         event.getCrewId().getId(), event.getPlayback()));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(PlaybackDeactivatedEvent event) {
-        messagePublisher.publish(MessageTopic.PARTYROOM_DEACTIVATION.topic(),
-                new PartyroomDeactivationMessage(event.getPartyroomId(), MessageTopic.PARTYROOM_DEACTIVATION));
+        messagePublisher.publish(MessageTopic.PLAYBACK_DEACTIVATED.topic(),
+                new PartyroomDeactivationMessage(event.getPartyroomId(), MessageTopic.PLAYBACK_DEACTIVATED,
+                        UUID.randomUUID().toString(), System.currentTimeMillis()));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(CrewGradeChangedEvent event) {
-        messagePublisher.publish(MessageTopic.CREW_GRADE.topic(),
+        messagePublisher.publish(MessageTopic.CREW_GRADE_CHANGED.topic(),
                 CrewGradeMessage.from(event.getPartyroomId(), event.getAdjusterCrewId(),
                         event.getAdjustedCrewId(), event.getPrevGrade(), event.getCurrGrade()));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(CrewPenalizedEvent event) {
-        messagePublisher.publish(MessageTopic.CREW_PENALTY.topic(),
+        messagePublisher.publish(MessageTopic.CREW_PENALIZED.topic(),
                 CrewPenaltyMessage.from(event.getPartyroomId(), event.getPunisherCrewId(),
                         event.getPunishedCrewId(), event.getDetail(), event.getPenaltyType()));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(ReactionMotionChangedEvent event) {
-        messagePublisher.publish(MessageTopic.REACTION_MOTION.topic(),
+        messagePublisher.publish(MessageTopic.REACTION_PERFORMED.topic(),
                 ReactionMotionMessage.from(event.getPartyroomId(), event.getReactionType(),
                         event.getMotionType(), event.getCrewId()));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(ReactionAggregationChangedEvent event) {
-        messagePublisher.publish(MessageTopic.REACTION_AGGREGATION.topic(),
-                new ReactionAggregationMessage(event.getPartyroomId(), MessageTopic.REACTION_AGGREGATION,
+        messagePublisher.publish(MessageTopic.REACTION_AGGREGATION_UPDATED.topic(),
+                new ReactionAggregationMessage(event.getPartyroomId(), MessageTopic.REACTION_AGGREGATION_UPDATED,
+                        UUID.randomUUID().toString(), System.currentTimeMillis(),
                         new AggregationDto(event.getLikeCount(), event.getDislikeCount(), event.getGrabCount())));
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     public void on(PartyroomClosedEvent event) {
         messagePublisher.publish(MessageTopic.PARTYROOM_CLOSED.topic(),
-                new PartyroomClosedMessage(event.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED));
+                new PartyroomClosedMessage(event.getPartyroomId(), MessageTopic.PARTYROOM_CLOSED,
+                        UUID.randomUUID().toString(), System.currentTimeMillis()));
     }
 }

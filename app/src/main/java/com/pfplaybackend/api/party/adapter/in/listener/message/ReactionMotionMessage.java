@@ -7,10 +7,13 @@ import com.pfplaybackend.api.party.domain.value.CrewId;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public record ReactionMotionMessage(
         PartyroomId partyroomId,
         MessageTopic eventType,
+        String id,
+        long timestamp,
         ReactionType reactionType,
         MotionType motionType,
         CrewMotionInfo crew
@@ -21,7 +24,9 @@ public record ReactionMotionMessage(
     public static ReactionMotionMessage from(PartyroomId partyroomId, ReactionType reactionType, MotionType motionType, CrewId crewId) {
         return new ReactionMotionMessage(
                 partyroomId,
-                MessageTopic.REACTION_MOTION,
+                MessageTopic.REACTION_PERFORMED,
+                UUID.randomUUID().toString(),
+                System.currentTimeMillis(),
                 reactionType,
                 motionType,
                 new CrewMotionInfo(crewId.getId())

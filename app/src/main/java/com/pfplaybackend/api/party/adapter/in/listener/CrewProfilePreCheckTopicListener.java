@@ -36,7 +36,7 @@ public class CrewProfilePreCheckTopicListener implements MessageListener {
             String suffixId = deserialized.userId().getUid().toString();
             distributedLockExecutor.performTaskWithLock(suffixId, () -> {
                 crewProfileService.preCheck(command).ifPresent(changed ->
-                        messagePublisher.publish(MessageTopic.CREW_PROFILE.topic(),
+                        messagePublisher.publish(MessageTopic.CREW_PROFILE_CHANGED.topic(),
                                 CrewProfileMessage.from(changed)));
                 return null;
             });

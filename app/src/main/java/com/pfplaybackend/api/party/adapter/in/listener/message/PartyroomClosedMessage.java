@@ -7,5 +7,7 @@ import java.io.Serializable;
 
 public record PartyroomClosedMessage(
         PartyroomId partyroomId,
-        MessageTopic eventType
+        MessageTopic eventType,
+        String id,
+        long timestamp
 ) implements Serializable, GroupBroadcastMessage {}

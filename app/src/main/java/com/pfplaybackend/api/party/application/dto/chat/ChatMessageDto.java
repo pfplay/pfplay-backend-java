@@ -5,10 +5,13 @@ import com.pfplaybackend.api.party.application.dto.partyroom.PartyroomSessionDto
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public record ChatMessageDto(
         PartyroomId partyroomId,
         MessageTopic eventType,
+        String id,
+        long timestamp,
         CrewInfo crew,
         ChatContent message
 ) implements Serializable {
@@ -19,7 +22,9 @@ public record ChatMessageDto(
     public static ChatMessageDto from(PartyroomSessionDto sessionDto, String content, long timestamp) {
         return new ChatMessageDto(
                 sessionDto.partyroomId(),
-                MessageTopic.CHAT,
+                MessageTopic.CHAT_MESSAGE_SENT,
+                UUID.randomUUID().toString(),
+                System.currentTimeMillis(),
                 new CrewInfo(sessionDto.crewId()),
                 new ChatContent(timestamp + ":" + sessionDto.crewId(), content)
         );

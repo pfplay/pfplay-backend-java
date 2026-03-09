@@ -6,14 +6,18 @@ import com.pfplaybackend.api.party.domain.value.PartyroomId;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 public record DjQueueChangeMessage(
         PartyroomId partyroomId,
         MessageTopic eventType,
+        String id,
+        long timestamp,
         List<DjWithProfileDto> djs
 ) implements Serializable, GroupBroadcastMessage {
 
     public static DjQueueChangeMessage create(PartyroomId partyroomId, List<DjWithProfileDto> djs) {
-        return new DjQueueChangeMessage(partyroomId, MessageTopic.DJ_QUEUE_CHANGE, djs);
+        return new DjQueueChangeMessage(partyroomId, MessageTopic.DJ_QUEUE_CHANGED,
+                UUID.randomUUID().toString(), System.currentTimeMillis(), djs);
     }
 }

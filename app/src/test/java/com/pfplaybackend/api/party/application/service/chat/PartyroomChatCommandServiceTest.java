@@ -67,7 +67,7 @@ class PartyroomChatCommandServiceTest {
         partyroomChatCommandService.sendMessage(sessionId, HELLO_MESSAGE);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.CHAT.topic()), any(ChatMessageDto.class));
+        verify(messagePublisher).publish(eq(MessageTopic.CHAT_MESSAGE_SENT.topic()), any(ChatMessageDto.class));
     }
 
     @Test

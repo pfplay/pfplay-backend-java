@@ -43,17 +43,18 @@ public class RedisListenerConfig {
 
         // Standard broadcast listeners: deserialize → sendToGroup
         Map.<String, Class<? extends GroupBroadcastMessage>>ofEntries(
-                entry("chat", OutgoingGroupChatMessage.class),
-                entry("partyroom_deactivation", PartyroomDeactivationMessage.class),
-                entry("partyroom_access", PartyroomAccessMessage.class),
+                entry("chat_message_sent", OutgoingGroupChatMessage.class),
+                entry("playback_deactivated", PartyroomDeactivationMessage.class),
+                entry("crew_entered", CrewEnteredMessage.class),
+                entry("crew_exited", CrewExitedMessage.class),
                 entry("partyroom_closed", PartyroomClosedMessage.class),
-                entry("reaction_motion", ReactionMotionMessage.class),
-                entry("reaction_aggregation", ReactionAggregationMessage.class),
-                entry("crew_grade", CrewGradeMessage.class),
-                entry("crew_penalty", CrewPenaltyMessage.class),
-                entry("crew_profile", CrewProfileMessage.class),
-                entry("dj_queue_change", DjQueueChangeMessage.class),
-                entry("playback_start", PlaybackStartMessage.class)
+                entry("reaction_performed", ReactionMotionMessage.class),
+                entry("reaction_aggregation_updated", ReactionAggregationMessage.class),
+                entry("crew_grade_changed", CrewGradeMessage.class),
+                entry("crew_penalized", CrewPenaltyMessage.class),
+                entry("crew_profile_changed", CrewProfileMessage.class),
+                entry("dj_queue_changed", DjQueueChangeMessage.class),
+                entry("playback_started", PlaybackStartMessage.class)
         ).forEach((topic, type) ->
                 container.addMessageListener(
                         new GroupBroadcastTopicListener<>(simpMessageSender, objectMapper, type),

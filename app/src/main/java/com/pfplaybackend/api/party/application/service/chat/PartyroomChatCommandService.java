@@ -43,7 +43,7 @@ public class PartyroomChatCommandService {
                 PartyroomSessionDto sessionDto = objectMapper.convertValue(object, PartyroomSessionDto.class);
                 if(isPossibleChat(sessionDto.crewId())) {
                     ChatMessageDto chatPayload = ChatMessageDto.from(sessionDto, content, clock.millis());
-                    messagePublisher.publish(MessageTopic.CHAT.topic(), chatPayload);
+                    messagePublisher.publish(MessageTopic.CHAT_MESSAGE_SENT.topic(), chatPayload);
                 }
             } catch (IllegalArgumentException e) {
                 logger.error(

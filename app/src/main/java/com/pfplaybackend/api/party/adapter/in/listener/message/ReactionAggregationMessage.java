@@ -9,5 +9,7 @@ import java.io.Serializable;
 public record ReactionAggregationMessage(
         PartyroomId partyroomId,
         MessageTopic eventType,
+        String id,
+        long timestamp,
         AggregationDto aggregation
 ) implements Serializable, GroupBroadcastMessage {}

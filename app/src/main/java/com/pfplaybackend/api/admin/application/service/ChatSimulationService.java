@@ -9,6 +9,7 @@ import com.pfplaybackend.api.common.exception.ExceptionCreator;
 import com.pfplaybackend.api.party.application.dto.chat.ChatMessageDto;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
+import java.util.UUID;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -248,11 +249,13 @@ public class ChatSimulationService {
     private void sendChatMessage(Long partyroomId, Long crewId, String content) {
         ChatMessageDto chatMessage = new ChatMessageDto(
                 new PartyroomId(partyroomId),
-                MessageTopic.CHAT,
+                MessageTopic.CHAT_MESSAGE_SENT,
+                UUID.randomUUID().toString(),
+                clock.millis(),
                 new ChatMessageDto.CrewInfo(crewId),
                 new ChatMessageDto.ChatContent(clock.millis() + ":" + crewId, content)
         );
 
-        messagePublisher.publish(MessageTopic.CHAT.topic(), chatMessage);
+        messagePublisher.publish(MessageTopic.CHAT_MESSAGE_SENT.topic(), chatMessage);
     }
 }

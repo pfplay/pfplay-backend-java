@@ -1,34 +1,35 @@
 package com.pfplaybackend.api.party.adapter.in.listener.message;
 
-import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.common.domain.enums.MessageTopic;
 import com.pfplaybackend.api.party.application.dto.command.CrewProfileChangedCommand;
+import com.pfplaybackend.api.party.application.dto.shared.AvatarProfile;
 import com.pfplaybackend.api.party.domain.value.PartyroomId;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public record CrewProfileMessage(
-        MessageTopic eventType,
         PartyroomId partyroomId,
+        MessageTopic eventType,
+        String id,
+        long timestamp,
         long crewId,
         String nickname,
-        AvatarCompositionType avatarCompositionType,
-        String avatarBodyUri,
-        String avatarFaceUri,
-        String avatarIconUri,
-        int combinePositionX,
-        int combinePositionY,
-        double offsetX,
-        double offsetY,
-        double scale
+        AvatarProfile avatar
 ) implements Serializable, GroupBroadcastMessage {
 
     public static CrewProfileMessage from(CrewProfileChangedCommand command) {
-        return new CrewProfileMessage(MessageTopic.CREW_PROFILE, command.partyroomId(), command.crewId(),
+        return new CrewProfileMessage(
+                command.partyroomId(),
+                MessageTopic.CREW_PROFILE_CHANGED,
+                UUID.randomUUID().toString(),
+                System.currentTimeMillis(),
+                command.crewId(),
                 command.nickname(),
-                command.avatarCompositionType(),
-                command.avatarBodyUri(), command.avatarFaceUri(), command.avatarIconUri(),
-                command.combinePositionX(), command.combinePositionY(),
-                command.offsetX(), command.offsetY(), command.scale());
+                AvatarProfile.from(command.avatarCompositionType(),
+                        command.avatarBodyUri(), command.avatarFaceUri(), command.avatarIconUri(),
+                        command.combinePositionX(), command.combinePositionY(),
+                        command.offsetX(), command.offsetY(), command.scale())
+        );
     }
 }

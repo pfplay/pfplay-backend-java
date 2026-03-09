@@ -68,7 +68,7 @@ class DomainEventRedisRelayTest {
         // then
         verify(crewRepository).findById(crewId.getId());
         verify(userProfileService).getUserProfileSetting(userId);
-        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.CREW_ENTERED.topic()), any());
     }
 
     @Test
@@ -82,7 +82,7 @@ class DomainEventRedisRelayTest {
 
         // then
         verify(crewRepository, never()).findById(any());
-        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_ACCESS.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.CREW_EXITED.topic()), any());
     }
 
     @Test
@@ -97,7 +97,7 @@ class DomainEventRedisRelayTest {
         domainEventRedisRelay.on(event);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGE.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.DJ_QUEUE_CHANGED.topic()), any());
     }
 
     @Test
@@ -111,7 +111,7 @@ class DomainEventRedisRelayTest {
         domainEventRedisRelay.on(event);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.PLAYBACK_START.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.PLAYBACK_STARTED.topic()), any());
     }
 
     @Test
@@ -124,7 +124,7 @@ class DomainEventRedisRelayTest {
         domainEventRedisRelay.on(event);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.PARTYROOM_DEACTIVATION.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.PLAYBACK_DEACTIVATED.topic()), any());
     }
 
     @Test
@@ -141,7 +141,7 @@ class DomainEventRedisRelayTest {
         domainEventRedisRelay.on(event);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.CREW_GRADE.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.CREW_GRADE_CHANGED.topic()), any());
     }
 
     @Test
@@ -158,7 +158,7 @@ class DomainEventRedisRelayTest {
         domainEventRedisRelay.on(event);
 
         // then
-        verify(messagePublisher).publish(eq(MessageTopic.CREW_PENALTY.topic()), any());
+        verify(messagePublisher).publish(eq(MessageTopic.CREW_PENALIZED.topic()), any());
     }
 
     @Test
