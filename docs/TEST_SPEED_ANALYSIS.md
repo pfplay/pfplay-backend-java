@@ -226,3 +226,47 @@ org.gradle.caching=true
 | 2 | **C. JVM 기동 최적화** | 1줄 변경 | ~5~10초 | 낮음 |
 | 3 | **B. 독립 Context 통합** | 테스트 리팩토링 | ~3~5초 | 중간 |
 | 4 | **E. 선택적 실행** | 스크립트 작성 | 상황에 따라 | 낮음 |
+
+---
+
+## 적용 결과
+
+### 적용한 방안: A + C
+
+```groovy
+// build.gradle — 변경 전
+maxParallelForks = Math.max(1, Runtime.runtime.availableProcessors().intdiv(4))
+jvmArgs '-XX:+UseParallelGC'
+
+// build.gradle — 변경 후
+maxParallelForks = 1  // single JVM to maximize Spring Context cache reuse
+jvmArgs '-XX:+UseParallelGC', '-XX:TieredStopAtLevel=1'
+```
+
+> `-Xverify:none`은 Java 13+에서 deprecated이므로 적용하지 않았다.
+
+### 적용하지 않은 방안: B (독립 Context 통합)
+
+`AuthControllerTest`는 MockBean 구성이 기존 abstract base와 다르고,
+`PartyroomAccessQueryControllerTest`는 커스텀 `SecurityFilterChain`(permitAll)이 필요하여
+기존 base에 통합하면 다른 테스트의 보안 설정에 영향을 준다.
+
+A 적용으로 fork가 모듈당 1개가 되면 context 캐시가 JVM 내에서 완전히 재사용되므로,
+독립 context가 있더라도 **모듈당 1회만 로딩**된다. 무리한 통합 없이도 충분한 효과를 얻었다.
+
+### Before / After 비교
+
+| 지표 | Before | After | 변화 |
+|------|--------|-------|------|
+| **전체 빌드 시간** | **~2분** | **~32초** | **-73%** |
+| JVM fork 수 | 17개 | 4개 (모듈당 1개) | -76% |
+| Task Execution (합산) | 5m 50s | 1m 8s | -81% |
+
+### 모듈별 `:test` 태스크 Before / After
+
+| 모듈 | Before | After | 변화 |
+|------|--------|-------|------|
+| **:app** | 1m 23s | **25s** | -70% |
+| **:user** | 1m 26s | **13s** | -85% |
+| **:playlist** | 1m 12s | **12s** | -83% |
+| **:common** | 38s | **5s** | -87% |
