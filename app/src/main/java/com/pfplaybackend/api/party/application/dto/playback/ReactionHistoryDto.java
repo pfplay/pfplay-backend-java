@@ -6,9 +6,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "재생 리액션 히스토리")
 public record ReactionHistoryDto(
-        @Schema(description = "좋아요 여부") boolean isLiked,
-        @Schema(description = "싫어요 여부") boolean isDisliked,
-        @Schema(description = "그랩 여부") boolean isGrabbed
+        @Schema(description = "좋아요 여부", example = "false") boolean isLiked,
+        @Schema(description = "싫어요 여부", example = "false") boolean isDisliked,
+        @Schema(description = "그랩 여부", example = "false") boolean isGrabbed
 ) {
     public static ReactionHistoryDto empty() {
         return new ReactionHistoryDto(false, false, false);
