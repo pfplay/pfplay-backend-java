@@ -10,15 +10,15 @@ subprojects {
 
 	group = 'com.pfplaybackend'
 	version = '0.0.1-SNAPSHOT'
-	sourceCompatibility = '17'
+	sourceCompatibility = '21'
 
 	repositories {
 		mavenCentral()
 	}
 
 	dependencies {
-		compileOnly 'org.projectlombok:lombok:1.18.22'
-		annotationProcessor 'org.projectlombok:lombok:1.18.22'
+		compileOnly 'org.projectlombok:lombok:1.18.34'
+		annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testImplementation 'com.tngtech.archunit:archunit-junit5:1.2.1'

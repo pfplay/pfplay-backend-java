@@ -4,7 +4,7 @@
 
 A sophisticated Spring Boot backend service powering PFPlay, a real-time collaborative music party platform where users can create virtual party rooms, share music, DJ together, and interact in real-time.
 
-[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.java.net/)
+[![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.java.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.3-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0.30-blue.svg)](https://www.mysql.com/)
 [![Redis](https://img.shields.io/badge/Redis-Latest-red.svg)](https://redis.io/)
@@ -74,7 +74,7 @@ A sophisticated Spring Boot backend service powering PFPlay, a real-time collabo
 ## Technology Stack
 
 ### Core Framework
-- **Java 17** - Modern Java LTS version
+- **Java 21** - Latest Java LTS version
 - **Spring Boot 3.2.3** - Application framework
 - **Gradle** - Build automation
 
@@ -181,7 +181,7 @@ The project follows **Hexagonal Architecture (Ports & Adapters)** with DDD princ
 
 ### Prerequisites
 
-- **Java 17** or higher
+- **Java 21** or higher
 - **Docker & Docker Compose** ([Install link](https://docs.docker.com/engine/install/))
 - **Git**
 
@@ -515,4 +515,4 @@ Copyright (c) PFPlay. All rights reserved.
 
 ---
 
-**Built with Spring Boot 3.2.3 | Java 17 | MySQL 8.0.30 | Redis**
+**Built with Spring Boot 3.2.3 | Java 21 | MySQL 8.0.30 | Redis**
