@@ -63,7 +63,8 @@ public class SecurityConfig {
                 "http://localhost:3000",
                 "http://localhost:8080",
                 "http://admin.pfplay.xyz",
-                "https://pfplay.xyz"));
+                "https://pfplay.xyz",
+                "https://api.pfplay.xyz"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

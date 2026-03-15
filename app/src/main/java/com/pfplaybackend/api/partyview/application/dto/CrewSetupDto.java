@@ -4,20 +4,21 @@ import com.pfplaybackend.api.common.domain.enums.AvatarCompositionType;
 import com.pfplaybackend.api.party.domain.entity.data.CrewData;
 import com.pfplaybackend.api.party.domain.enums.GradeType;
 import com.pfplaybackend.api.user.application.dto.shared.ProfileSettingDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public record CrewSetupDto(
-        long crewId,
-        GradeType gradeType,
-        String nickname,
-        AvatarCompositionType avatarCompositionType,
-        String avatarBodyUri,
-        String avatarFaceUri,
-        String avatarIconUri,
-        int combinePositionX,
-        int combinePositionY,
-        double offsetX,
-        double offsetY,
-        double scale
+        @Schema(example = "1") long crewId,
+        @Schema(example = "CLUBBER") GradeType gradeType,
+        @Schema(example = "DJ_Master") String nickname,
+        @Schema(example = "COMBINE") AvatarCompositionType avatarCompositionType,
+        @Schema(example = "https://cdn.pfplay.xyz/avatar/body/default.png") String avatarBodyUri,
+        @Schema(example = "https://cdn.pfplay.xyz/avatar/face/smile.png") String avatarFaceUri,
+        @Schema(example = "https://cdn.pfplay.xyz/avatar/icon/1.png") String avatarIconUri,
+        @Schema(example = "0") int combinePositionX,
+        @Schema(example = "0") int combinePositionY,
+        @Schema(example = "0.0") double offsetX,
+        @Schema(example = "0.0") double offsetY,
+        @Schema(example = "1.0") double scale
 ) {
     public static CrewSetupDto from(CrewData crew, ProfileSettingDto p) {
         return new CrewSetupDto(crew.getId(), crew.getGradeType(),

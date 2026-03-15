@@ -34,7 +34,7 @@ public class UserAvatarQueryController implements UserAvatarApi {
         return ResponseEntity.ok().body(ApiCommonResponse.success(avatarBodies));
     }
 
-    @Operation(summary = "아바타 표정 목록 조회", description = "사용 가능한 아바타 표정(얼굴) 리소스 목록을 조회합니다. 게스트와 회원 모두 조회 가능합니다.")
+    @Operation(summary = "아바타 얼굴 목록 조회", description = "사용 가능한 아바타 얼굴 리소스 목록을 조회합니다. 게스트와 회원 모두 조회 가능합니다.")
     @SecurityRequirement(name = "cookieAuth")
     @PreAuthorize("hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER')")
     @GetMapping("/me/profile/avatar/faces")
