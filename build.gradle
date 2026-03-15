@@ -43,9 +43,9 @@ subprojects {
 				excludeTags 'integration'
 			}
 		}
-		maxParallelForks = Math.max(1, Runtime.runtime.availableProcessors().intdiv(4))
+		maxParallelForks = 1  // single JVM to maximize Spring Context cache reuse
 		forkEvery = 0  // reuse JVM across tests
-		jvmArgs '-XX:+UseParallelGC'
+		jvmArgs '-XX:+UseParallelGC', '-XX:TieredStopAtLevel=1'
 	}
 
 	tasks.register('integrationTest', Test) {
