@@ -110,17 +110,17 @@ jobs:
             --tunnel-through-iap \
             --project=${{ env.PROJECT_ID }} \
             --command="
-              echo '${{ secrets.PACKAGE_ACCESS_TOKEN }}' | sudo docker login ghcr.io -u JeekLee --password-stdin &&
-              sudo docker pull ghcr.io/pfplay/${{ env.IMAGE_NAME }}:latest &&
-              sudo docker stop pfplay-api 2>/dev/null || true &&
-              sudo docker rm pfplay-api 2>/dev/null || true &&
+              echo '${{ secrets.PACKAGE_ACCESS_TOKEN }}' | docker login ghcr.io -u JeekLee --password-stdin &&
+              docker pull ghcr.io/pfplay/${{ env.IMAGE_NAME }}:latest &&
+              docker stop pfplay-api 2>/dev/null || true &&
+              docker rm pfplay-api 2>/dev/null || true &&
               sudo mkdir -p /app && sudo mv /tmp/pfplay.env /app/pfplay.env && sudo chmod 600 /app/pfplay.env &&
-              sudo docker run -d \
+              docker run -d \
                 --name pfplay-api \
                 --network api_backend \
                 --env-file /app/pfplay.env \
                 -p 8080:8080 \
                 --restart unless-stopped \
                 ghcr.io/pfplay/${{ env.IMAGE_NAME }}:latest &&
-              sudo docker image prune -f
+              docker image prune -f
             "
