@@ -85,7 +85,7 @@ jobs:
 
       # --- [환경변수 파일 생성 및 전송] ---
       - name: Generate .env file
-        run: echo "${{ secrets.ENV_FILE }}" > pfplay.env
+        run: echo "${{ secrets.DOT_ENV }}" > pfplay.env
 
       - name: Copy .env to VM
         run: |
