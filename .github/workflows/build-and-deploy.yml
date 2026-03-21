@@ -95,6 +95,14 @@ jobs:
             --project=${{ env.PROJECT_ID }}
 
       # --- [IAP 배포] ---
+      - name: Check SSH username
+        run: |
+          gcloud compute ssh ${{ env.GCE_INSTANCE }} \
+            --zone=${{ env.GCE_ZONE }} \
+            --tunnel-through-iap \
+            --project=${{ env.PROJECT_ID }} \
+            --command="whoami"
+
       - name: Deploy to VM via IAP Tunnel
         run: |
           gcloud compute ssh ${{ env.GCE_INSTANCE }} \
