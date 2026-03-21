@@ -108,8 +108,9 @@ jobs:
               sudo mkdir -p /app && sudo mv /tmp/pfplay.env /app/pfplay.env && sudo chmod 600 /app/pfplay.env &&
               sudo docker run -d \
                 --name pfplay-api \
+                --network api_backend \
                 --env-file /app/pfplay.env \
-                -p 8088:8080 \
+                -p 8080:8080 \
                 --restart unless-stopped \
                 ghcr.io/pfplay/${{ env.IMAGE_NAME }}:latest &&
               sudo docker image prune -f
