@@ -1,52 +1,35 @@
 name: Release - Code Deploy with Github Actions (WIF & IAP Version)
 
-#on:
+on:
 #  push:
 #    tags:
 #      - 'v*'
-on:
   push:
-    branches: [ feature/code-deploy-gcpp ]
+    branches: [ feature/code-deploy-gcp ]  # 테스트용
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  RESOURCE_DIR: src/main/resources
-  GCR_PACKAGE_NAME: pfplay-backend-java
+  IMAGE_NAME: pfplay-api
   GCE_INSTANCE: pfplay-api
   GCE_ZONE: asia-northeast3-a
 
 jobs:
   deploy:
-    name: Build and dockerize & deploy
+    name: Build, Dockerize & Deploy
     runs-on: ubuntu-latest
-    permissions: # WIF 사용을 위해 반드시 필요
-      contents: read
-      packages: write
-      id-token: write
+    permissions:
+      contents: write   # GitHub Release 생성
+      packages: write   # GHCR 이미지 push
+      id-token: write   # WIF 인증
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set release version
-#        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $RELEASE_VERSION
-        run: echo "RELEASE_VERSION=v0.0.0" >> $RELEASE_VERSION
+      - name: Extract release version from tag
+        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-      # --- [기존 리소스 파일 생성 로직 유지] ---
-      - name: Create directory for resources
-        run: mkdir -p $RESOURCE_DIR/key
-
-      - name: Set application.yml
-        env:
-          PROPERTY_FILE: ${{ secrets.PROD_PROFILE }}
-        run: echo $PROPERTY_FILE | base64 --decode > $RESOURCE_DIR/application.yml
-
-      - name: Set JWT keys
-        run: |
-          echo "${{ secrets.JWT_PRIVATE_KEY }}" | base64 --decode > $RESOURCE_DIR/key/private_key.pem
-          echo "${{ secrets.JWT_PUBLIC_KEY }}" | base64 --decode > $RESOURCE_DIR/key/public_key.pem
-
-      # --- [빌드 및 도커화] ---
+      # --- [빌드] ---
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -55,39 +38,63 @@ jobs:
           cache: 'gradle'
 
       - name: Build with Gradle
-        run: chmod +x ./gradlew && ./gradlew build -x test
+        run: chmod +x ./gradlew && ./gradlew :app:build -x test
+
+      # --- [릴리스 생성] ---
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_VERSION }}
+          name: Release ${{ env.RELEASE_VERSION }}
+          generate_release_notes: true
+
+      # --- [도커화 및 GHCR 업로드] ---
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: JeekLee
-          password: ${{ secrets.PACKAGE_ACCESS_TOKEN }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./api/Dockerfile-deploy
+          file: ./app/Dockerfile
           push: true
           tags: |
-            ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:latest
-            ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:${{ env.RELEASE_VERSION }}
+            ghcr.io/pfplay/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/pfplay/${{ env.IMAGE_NAME }}:${{ env.RELEASE_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # --- [GCP 인증 및 IAP 배포] ---
-      - id: 'auth'
-        name: 'Authenticate to Google Cloud'
-        uses: 'google-github-actions/auth@v2'
+      # --- [GCP 인증] ---
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v2'
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
 
-      - name: 'Deploy to VM via IAP Tunnel'
+      # --- [환경변수 파일 생성 및 전송] ---
+      - name: Generate .env file
+        run: echo "${{ secrets.ENV_FILE }}" > pfplay.env
+
+      - name: Copy .env to VM
+        run: |
+          gcloud compute scp pfplay.env ${{ env.GCE_INSTANCE }}:/tmp/pfplay.env \
+            --zone=${{ env.GCE_ZONE }} \
+            --tunnel-through-iap \
+            --project=${{ env.PROJECT_ID }}
+
+      # --- [IAP 배포] ---
+      - name: Deploy to VM via IAP Tunnel
         run: |
           gcloud compute ssh ${{ env.GCE_INSTANCE }} \
             --zone=${{ env.GCE_ZONE }} \
@@ -95,13 +102,15 @@ jobs:
             --project=${{ env.PROJECT_ID }} \
             --command="
               echo '${{ secrets.PACKAGE_ACCESS_TOKEN }}' | sudo docker login ghcr.io -u JeekLee --password-stdin &&
-              sudo docker pull ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:latest &&
-              sudo docker stop pfplay-api-server || true &&
-              sudo docker rm pfplay-api-server || true &&
-              sudo docker run -d --name pfplay-api-server \
+              sudo docker pull ghcr.io/pfplay/${{ env.IMAGE_NAME }}:latest &&
+              sudo docker stop pfplay-api 2>/dev/null || true &&
+              sudo docker rm pfplay-api 2>/dev/null || true &&
+              sudo mkdir -p /app && sudo mv /tmp/pfplay.env /app/pfplay.env && sudo chmod 600 /app/pfplay.env &&
+              sudo docker run -d \
+                --name pfplay-api \
+                --env-file /app/pfplay.env \
                 -p 8088:8080 \
                 --restart unless-stopped \
-                ghcr.io/pfplay/${{ env.GCR_PACKAGE_NAME }}:latest &&
-              sudo docker network connect api_backend pfplay-api-server || true &&
+                ghcr.io/pfplay/${{ env.IMAGE_NAME }}:latest &&
               sudo docker image prune -f
             "
