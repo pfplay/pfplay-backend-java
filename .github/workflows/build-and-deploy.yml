@@ -1,14 +1,17 @@
 name: Release - Code Deploy with Github Actions (WIF & IAP Version)
 
+#on:
+#  push:
+#    tags:
+#      - 'v*'
 on:
   push:
-    tags:
-      - 'v*'
+    branches: [ feature/code-deploy-gcpp ]
 
 env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   RESOURCE_DIR: src/main/resources
   GCR_PACKAGE_NAME: pfplay-backend-java
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GCE_INSTANCE: pfplay-api
   GCE_ZONE: asia-northeast3-a
 
@@ -21,17 +24,13 @@ jobs:
       packages: write
       id-token: write
 
-    defaults:
-      run:
-        working-directory: api
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set env
-#        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV
-        run: echo "RELEASE_VERSION=v0.0.0" >> $GITHUB_ENV
+      - name: Set release version
+#        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/v}" >> $RELEASE_VERSION
+        run: echo "RELEASE_VERSION=v0.0.0" >> $RELEASE_VERSION
 
       # --- [기존 리소스 파일 생성 로직 유지] ---
       - name: Create directory for resources
