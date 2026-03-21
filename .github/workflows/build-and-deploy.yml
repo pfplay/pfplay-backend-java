@@ -5,7 +5,7 @@ on:
 #    tags:
 #      - 'v*'
   push:
-    branches: [ feature/code-deploy-gcp ]  # 테스트용
+    branches: [ main ]  # 버전 관리 적용 전 임의로 0.0.0 버전으로 생성 및 적용
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
