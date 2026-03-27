@@ -1,3 +1,5 @@
 package com.pfplaybackend.api.partyview.application.dto;
 
-public record CurrentDjDto(long crewId) {}
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record CurrentDjDto(@Schema(example = "1") long crewId) {}

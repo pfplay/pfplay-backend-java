@@ -1,3 +1,10 @@
 package com.pfplaybackend.api.user.application.dto.shared;
 
-public record AvatarFaceDto(long id, String name, String resourceUri, boolean available) {}
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record AvatarFaceDto(
+        @Schema(example = "1") long id,
+        @Schema(example = "smile") String name,
+        @Schema(example = "https://cdn.pfplay.xyz/avatar/face/smile.png") String resourceUri,
+        @Schema(example = "true") boolean available
+) {}

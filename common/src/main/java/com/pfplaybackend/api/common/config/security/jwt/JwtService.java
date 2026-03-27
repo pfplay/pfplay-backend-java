@@ -68,7 +68,7 @@ public class JwtService {
                 .subject(subject)
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(getSigningKey())
+                .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
 
@@ -84,7 +84,7 @@ public class JwtService {
                 .subject(subject)
                 .issuedAt(now)
                 .expiration(expiryDate)
-                .signWith(getSigningKey())
+                .signWith(getSigningKey(), Jwts.SIG.HS256)
                 .compact();
     }
 

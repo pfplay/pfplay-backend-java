@@ -1,6 +1,7 @@
 package com.pfplaybackend.api.playlist.adapter.in.web.payload.response;
 
 import com.pfplaybackend.api.playlist.application.dto.search.SearchResultDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -26,10 +27,10 @@ public class QueryMusicSearchResponse {
 
     @Getter
     @Builder
-    static class MusicData {
-        private String videoId;
-        private String videoTitle;
-        private String runningTime;
-        private String thumbnailUrl;
+    public static class MusicData {
+        @Schema(example = "dQw4w9WgXcQ") private String videoId;
+        @Schema(example = "Rick Astley - Never Gonna Give You Up") private String videoTitle;
+        @Schema(example = "3:33") private String runningTime;
+        @Schema(example = "https://i.ytimg.com/vi/dQw4w9WgXcQ/default.jpg") private String thumbnailUrl;
     }
 }

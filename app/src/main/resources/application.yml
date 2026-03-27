@@ -59,7 +59,7 @@ springdoc:
     disable-swagger-default-url: true
     use-root-path: false
     path: /spec/api
-  show-actuator: true
+  show-actuator: false
 
 logging:
   level:
@@ -122,11 +122,39 @@ app:
 
 ---
 
-# 🟡 개발 환경 (추후 필요 시 확장)
+# 🟡 개발 환경
 spring:
   config:
     activate:
       on-profile: dev
+
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: false
+
+  sql:
+    init:
+      mode: never
+
+logging:
+  level:
+    org.springframework.security: INFO
+    org.springframework.web.reactive.function.client: INFO
+
+server:
+  error:
+    include-stacktrace: never
+
+app:
+  jwt:
+    cookie:
+      domain: ${COOKIE_DOMAIN}
+      secure: ${COOKIE_SECURE:true}
+      same-site: ${COOKIE_SAME_SITE:Lax}
 
 ---
 
@@ -136,14 +164,37 @@ spring:
     activate:
       on-profile: prod
 
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: false
+
+  sql:
+    init:
+      mode: never
+
+server:
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+logging:
+  level:
+    org.springframework.security: WARN
+    org.springframework.web.reactive.function.client: WARN
+
 app:
   jwt:
     cookie:
+      domain: ${COOKIE_DOMAIN}
       secure: true
       same-site: Strict
-      domain: ${PRODUCTION_DOMAIN}
 
 springdoc:
-  # 운영에서는 Swagger 비활성화 권장
   swagger-ui:
     enabled: false

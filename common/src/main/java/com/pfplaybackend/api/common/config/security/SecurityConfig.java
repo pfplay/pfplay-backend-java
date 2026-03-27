@@ -42,7 +42,9 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/v1/admin/**").permitAll()  // Admin API - no auth required (temporary)
                         .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/spec/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .anyRequest().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .bearerTokenResolver(customBearerTokenResolver)
@@ -59,11 +61,10 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(List.of(
                 "https://localhost:3000",
                 "http://localhost:3000",
-                "http://localhost:4000",
                 "http://localhost:8080",
                 "http://admin.pfplay.xyz",
                 "https://pfplay.xyz",
-                "https://pfplay-api.app"));
+                "https://api.pfplay.xyz"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
